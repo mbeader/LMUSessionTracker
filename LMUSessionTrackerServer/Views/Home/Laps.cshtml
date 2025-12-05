@@ -1,0 +1,56 @@
+@using LMUSessionTracker.Core.Session
+@model CarHistory
+@{
+    ViewData["Title"] = "Laps";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col">
+        <dl>
+            <dt>Slot ID</dt>
+            <dd>@Model.Car.SlotId</dd>
+            <dt>Class</dt>
+            <dd>@Model.Car.Class</dd>
+            <dt>Number</dt>
+            <dd>@Model.Car.Number</dd>
+            <dt>Team</dt>
+            <dd>@Model.Car.TeamName</dd>
+        </dl>
+    </div>
+    <div class="col">
+        <dl>
+            <dt>Vehicle</dt>
+            <dd>@Model.Car.VehicleName</dd>
+            <dt>Veh</dt>
+            <dd>@Model.Car.Veh</dd>
+            <dt>ID</dt>
+            <dd>@Model.Car.Id</dd>
+        </dl>
+    </div>
+</div>
+
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Lap</th>
+            <th>Driver</th>
+            <th class="text-end">Time</th>
+            <th class="text-end">S1</th>
+            <th class="text-end">S2</th>
+            <th class="text-end">S3</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(Lap lap in Model.Laps) {
+            <tr>
+                <td>@lap.LapNumber</td>
+                <td>@lap.Driver</td>
+                <td class="text-end">@Format.LapTime(lap.TotalTime)</td>
+                <td class="text-end">@Format.LapTime(lap.Sector1)</td>
+                <td class="text-end">@Format.LapTime(lap.Sector2)</td>
+                <td class="text-end">@Format.LapTime(lap.Sector3)</td>
+            </tr>
+        }
+    </tbody>
+</table>

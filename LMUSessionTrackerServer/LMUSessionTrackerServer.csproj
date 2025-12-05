@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>LMUSessionTracker.Server</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--<PackageReference Include="log4net" Version="3.2.0" />-->
+    <!--<PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="8.0.0" />-->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="logs\**" />
+        <Content Remove="logs\**" />
+        <EmbeddedResource Remove="logs\**" />
+        <None Remove="logs\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="data\**" />
+        <Content Remove="data\**" />
+        <EmbeddedResource Remove="data\**" />
+        <None Remove="data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="out\**" />
+        <Content Remove="out\**" />
+        <EmbeddedResource Remove="out\**" />
+        <None Remove="out\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="debug\**" />
+        <Content Remove="debug\**" />
+        <EmbeddedResource Remove="debug\**" />
+        <None Remove="debug\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\LMUSessionTrackerCore\LMUSessionTrackerCore.csproj" />
+    </ItemGroup>
+
+</Project>

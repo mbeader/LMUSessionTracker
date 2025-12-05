@@ -1,0 +1,39 @@
+@using LMUSessionTracker.Core.LMU
+@using LMUSessionTracker.Core.Session
+@model IndexViewModel
+<h3 id="standings"><a href="#standings">Standings</a></h3>
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Pos</td>
+            <th>PIC</td>
+            <th>Class</td>
+            <th>Number</td>
+            <th>Team</td>
+            <th>Driver</td>
+            <th>Behind</td>
+            <th>Int</td>
+            <th>Laps</td>
+            <th>Fuel</td>
+            <th>Status</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(Standing car in Model.Standings) {
+            CarKey id = new CarKey() { SlotId = car.slotID, Veh = car.vehicleFilename };
+            <tr>
+                <td><a asp-action="laps" asp-route-id="@id.Id()">@car.position</a></td>
+                <td>@(Model.PositionInClass.TryGetValue(id, out int pic) ? pic : "")</td>
+                <td>@car.carClass</td>
+                <td>@car.carNumber</td>
+                <td>@(string.IsNullOrEmpty(car.fullTeamName) ? car.vehicleName : car.fullTeamName)</td>
+                <td>@car.driverName</td>
+                <td class="text-end">@Format.Diff(car.lapsBehindLeader, car.timeBehindLeader)</td>
+                <td class="text-end">@Format.Diff(car.lapsBehindNext, car.timeBehindNext)</td>
+                <td class="text-end">@car.lapsCompleted</td>
+                <td class="text-end">@Format.Percent(car.fuelFraction)</td>
+                <td>@car.Status()</td>
+            </tr>
+        }
+    </tbody>
+</table>

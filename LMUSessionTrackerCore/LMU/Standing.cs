@@ -1,0 +1,80 @@
+﻿namespace LMUSessionTracker.Core.LMU {
+	public class Standing {
+		public AttackMode attackMode { get; set; }
+		public double bestLapSectorTime1 { get; set; }
+		public double bestLapSectorTime2 { get; set; }
+		public double bestLapTime { get; set; }
+		public double bestSectorTime1 { get; set; }
+		public double bestSectorTime2 { get; set; }
+		public Velocity carAcceleration { get; set; }
+		public string carClass { get; set; }
+		public string carId { get; set; }
+		public string carNumber { get; set; }
+		public Position carPosition { get; set; }
+		public Velocity carVelocity { get; set; }
+		public string countLapFlag { get; set; }
+		public double currentSectorTime1 { get; set; }
+		public double currentSectorTime2 { get; set; }
+		public string driverName { get; set; }
+		public bool drsActive { get; set; }
+		public double estimatedLapTime { get; set; }
+		public string finishStatus { get; set; }
+		public string flag { get; set; }
+		public bool focus { get; set; }
+		public double fuelFraction { get; set; }
+		public string fullTeamName { get; set; }
+		public string gamePhase { get; set; }
+		public bool hasFocus { get; set; }
+		public bool headlights { get; set; }
+		public int inControl { get; set; }
+		public bool inGarageStall { get; set; }
+		public double lapDistance { get; set; }
+		public double lapStartET { get; set; }
+		public int lapsBehindLeader { get; set; }
+		public int lapsBehindNext { get; set; }
+		public int lapsCompleted { get; set; }
+		public double lastLapTime { get; set; }
+		public double lastSectorTime1 { get; set; }
+		public double lastSectorTime2 { get; set; }
+		public double pathLateral { get; set; }
+		public int penalties { get; set; }
+		public string pitGroup { get; set; }
+		public double pitLapDistance { get; set; }
+		public string pitState { get; set; }
+		public int pitstops { get; set; }
+		public bool pitting { get; set; }
+		public bool player { get; set; }
+		public int position { get; set; }
+		public int qualification { get; set; }
+		public string sector { get; set; }
+		public bool serverScored { get; set; }
+		public int slotID { get; set; }
+		public long steamID { get; set; }
+		public double timeBehindLeader { get; set; }
+		public double timeBehindNext { get; set; }
+		public double timeIntoLap { get; set; }
+		public double trackEdge { get; set; }
+		public bool underYellow { get; set; }
+		public string upgradePack { get; set; }
+		public string vehicleFilename { get; set; }
+		public string vehicleName { get; set; }
+		
+		// indicating pit should be done on lap with entering status
+		public string Status() {
+			if(inGarageStall)
+				return "Gar";
+			else if(pitState == "NONE")
+				return "Run";
+			else if(pitState == "ENTERING")
+				return "In";
+			else if(pitState == "EXITING")
+				return "Out";
+			else if(pitState == "STOPPED")
+				return "Pit";
+			else if(pitState == "REQUEST")
+				return "Req";
+			else
+				return "???";
+		}
+	}
+}

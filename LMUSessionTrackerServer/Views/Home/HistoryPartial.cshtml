@@ -1,0 +1,33 @@
+@using LMUSessionTracker.Core.Session
+@model List<CarHistory>
+@{
+    SortedSet<string> drivers = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+}
+<h3>History</h3>
+
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Class</td>
+            <th>Number</td>
+            <th>Team</td>
+            <th>Drivers</td>
+            <th>Vehicle</td>
+            <th>Laps</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(CarHistory car in Model) {
+            drivers.Clear();
+            car.Laps.ForEach(lap => { if(!string.IsNullOrEmpty(lap.Driver)) drivers.Add(lap.Driver); });
+            <tr>
+                <td>@car.Car.Class</td>
+                <td>@car.Car.Number</td>
+                <td>@car.Car.TeamName</td>
+                <td>@string.Join(", ", drivers)</td>
+                <td>@car.Car.VehicleName</td>
+                <td><a asp-action="laps" asp-route-id="@car.Key.Id()">@(car.Laps?.Count > 0 ? car.Laps[^1].LapNumber : 0)</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
