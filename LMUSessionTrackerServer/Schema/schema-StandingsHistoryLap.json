@@ -1,0 +1,59 @@
+{
+	"$id": "StandingsHistoryLap",
+	"type": "object",
+	"properties": {
+		"carClass": {
+			"enum": [ "Hyper", "LMP2", "LMP3", "GTE", "GT3" ]
+		},
+		"driverName": {
+			"type": "string"
+		},
+		"finishStatus": {
+			"enum": [ "FSTAT_NONE", "FSTAT_CHECKERED", "FSTAT_DNF", "FSTAT_DQ" ]
+		},
+		"lapTime": {
+			"type": "number",
+			"minimum": -1
+		},
+		"pitting": {
+			"type": "boolean"
+		},
+		"position": {
+			"type": "integer",
+			"minimum": -1
+		},
+		"sectorTime1": {
+			"type": "number",
+			"minimum": -1
+		},
+		"sectorTime2": {
+			"type": "number",
+			"minimum": -1
+		},
+		"slotID": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"totalLaps": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"vehicleName": {
+			"type": "string"
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"carClass",
+		"driverName",
+		"finishStatus",
+		"lapTime",
+		"pitting",
+		"position",
+		"sectorTime1",
+		"sectorTime2",
+		"slotID",
+		"totalLaps",
+		"vehicleName"
+	]
+}

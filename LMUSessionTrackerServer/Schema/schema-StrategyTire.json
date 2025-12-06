@@ -1,0 +1,21 @@
+{
+	"$id": "StrategyTire",
+	"type": "object",
+	"properties": {
+		"changed": {
+			"type": "boolean"
+		},
+		"compound": {
+			"enum": [ "N/A", "Soft", "Medium", "Hard", "Wet" ]
+		},
+		"new": {
+			"type": "boolean"
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"changed",
+		"compound",
+		"new"
+	]
+}

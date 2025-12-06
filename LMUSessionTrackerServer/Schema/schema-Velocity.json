@@ -1,0 +1,25 @@
+{
+	"$id": "Velocity",
+	"type": "object",
+	"properties": {
+		"velocity": {
+			"type": "number"
+		},
+		"x": {
+			"type": "number"
+		},
+		"y": {
+			"type": "number"
+		},
+		"z": {
+			"type": "number"
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"velocity",
+		"x",
+		"y",
+		"z"
+	]
+}

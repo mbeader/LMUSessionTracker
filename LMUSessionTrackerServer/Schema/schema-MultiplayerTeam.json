@@ -1,0 +1,35 @@
+{
+	"$id": "MultiplayerTeam",
+	"type": "object",
+	"properties": {
+		"Id": {
+			"type": "string"
+		},
+		"carNumber": {
+			"type": "string"
+		},
+		"drivers": {
+			"type": "object",
+			"patternProperties": {
+				"^.+$": {
+					"$ref": "schema-MultiplayerTeamMember.json"
+				}
+			},
+			"additionalProperties": false
+		},
+		"name": {
+			"type": "string"
+		},
+		"vehicle": {
+			"type": "string"
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"Id",
+		"carNumber",
+		"drivers",
+		"name",
+		"vehicle"
+	]
+}

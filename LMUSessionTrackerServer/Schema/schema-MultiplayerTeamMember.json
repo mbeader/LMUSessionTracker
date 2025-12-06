@@ -1,0 +1,20 @@
+{
+	"$id": "MultiplayerTeamMember",
+	"type": "object",
+	"properties": {
+		"nationality": {
+			"type": "string"
+		},
+		"roles": {
+			"type": "array",
+			"items": {
+				"enum": [ "Admin", "Race Engineer", "Driver" ]
+			}
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"nationality",
+		"roles"
+	]
+}

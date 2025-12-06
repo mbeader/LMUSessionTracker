@@ -1,0 +1,14 @@
+{
+	"$id": "Completion",
+	"type": "object",
+	"properties": {
+		"timeCompletion": {
+			"type": "number",
+			"minimum": 0
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"timeCompletion"
+	]
+}

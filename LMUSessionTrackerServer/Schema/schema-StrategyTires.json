@@ -1,0 +1,25 @@
+{
+	"$id": "StrategyTires",
+	"type": "object",
+	"properties": {
+		"fl": {
+			"$ref": "schema-StrategyTire.json"
+		},
+		"fr": {
+			"$ref": "schema-StrategyTire.json"
+		},
+		"rl": {
+			"$ref": "schema-StrategyTire.json"
+		},
+		"rr": {
+			"$ref": "schema-StrategyTire.json"
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"fl",
+		"fr",
+		"rl",
+		"rr"
+	]
+}

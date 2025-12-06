@@ -1,0 +1,266 @@
+{
+	"$id": "Standing",
+	"$defs": {
+		"AttackMode": {
+			"$ref": "schema-AttackMode.json"
+		},
+		"Position": {
+			"$ref": "schema-Position.json"
+		},
+		"Velocity": {
+			"$ref": "schema-Velocity.json"
+		}
+	},
+	"type": "object",
+	"properties": {
+		"attackMode": {
+			"$ref": "#/$defs/AttackMode"
+		},
+		"bestLapSectorTime1": {
+			"type": "number"
+		},
+		"bestLapSectorTime2": {
+			"type": "number"
+		},
+		"bestLapTime": {
+			"type": "number"
+		},
+		"bestSectorTime1": {
+			"type": "number"
+		},
+		"bestSectorTime2": {
+			"type": "number"
+		},
+		"carAcceleration": {
+			"$ref": "#/$defs/Velocity"
+		},
+		"carClass": {
+			"enum": [ "Hyper", "LMP2", "LMP3", "GTE", "GT3" ]
+		},
+		"carId": {
+			"type": "string"
+		},
+		"carNumber": {
+			"type": "string"
+		},
+		"carPosition": {
+			"$ref": "#/$defs/Position"
+		},
+		"carVelocity": {
+			"$ref": "#/$defs/Velocity"
+		},
+		"countLapFlag": {
+			"enum": [ "COUNT_LAP_AND_TIME", "COUNT_LAP_ONLY", "COUNT_NEITHER" ]
+		},
+		"currentSectorTime1": {
+			"type": "number"
+		},
+		"currentSectorTime2": {
+			"type": "number"
+		},
+		"driverName": {
+			"type": "string"
+		},
+		"drsActive": {
+			"type": "boolean"
+		},
+		"estimatedLapTime": {
+			"type": "number"
+		},
+		"finishStatus": {
+			"enum": [ "FSTAT_NONE", "FSTAT_CHECKERED", "FSTAT_DNF", "FSTAT_DQ" ]
+		},
+		"flag": {
+			"enum": [ "GREEN", "BLUE" ]
+		},
+		"focus": {
+			"type": "boolean"
+		},
+		"fuelFraction": {
+			"type": "number"
+		},
+		"fullTeamName": {
+			"type": "string"
+		},
+		"gamePhase": {
+			"enum": [ "FORMATION", "GREEN" ]
+		},
+		"hasFocus": {
+			"type": "boolean"
+		},
+		"headlights": {
+			"type": "boolean"
+		},
+		"inControl": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 2
+		},
+		"inGarageStall": {
+			"type": "boolean"
+		},
+		"lapDistance": {
+			"type": "number"
+		},
+		"lapStartET": {
+			"type": "number"
+		},
+		"lapsBehindLeader": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"lapsBehindNext": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"lapsCompleted": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"lastLapTime": {
+			"type": "number"
+		},
+		"lastSectorTime1": {
+			"type": "number"
+		},
+		"lastSectorTime2": {
+			"type": "number"
+		},
+		"pathLateral": {
+			"type": "number"
+		},
+		"penalties": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"pitGroup": {
+			"type": "string"
+		},
+		"pitLapDistance": {
+			"type": "number"
+		},
+		"pitState": {
+			"enum": [ "NONE", "REQUEST", "ENTERING", "STOPPED", "EXITING" ]
+		},
+		"pitstops": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"pitting": {
+			"type": "boolean"
+		},
+		"player": {
+			"type": "boolean"
+		},
+		"position": {
+			"type": "integer",
+			"minimum": 1
+		},
+		"qualification": {
+			"type": "integer",
+			"minimum": 1
+		},
+		"sector": {
+			"enum": [ "SECTOR1", "SECTOR2", "SECTOR3" ]
+		},
+		"serverScored": {
+			"type": "boolean"
+		},
+		"slotID": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"steamID": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"timeBehindLeader": {
+			"type": "number"
+		},
+		"timeBehindNext": {
+			"type": "number"
+		},
+		"timeIntoLap": {
+			"type": "number"
+		},
+		"trackEdge": {
+			"type": "number"
+		},
+		"underYellow": {
+			"type": "boolean"
+		},
+		"upgradePack": {
+			"type": "string",
+			"minLength": 32,
+			"maxLength": 32,
+			"pattern": "^[0-9a-fA-F]+$"
+		},
+		"vehicleFilename": {
+			"type": "string"
+		},
+		"vehicleName": {
+			"type": "string"
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"attackMode",
+		"bestLapSectorTime1",
+		"bestLapSectorTime2",
+		"bestLapTime",
+		"bestSectorTime1",
+		"bestSectorTime2",
+		"carAcceleration",
+		"carClass",
+		"carId",
+		"carNumber",
+		"carPosition",
+		"carVelocity",
+		"countLapFlag",
+		"currentSectorTime1",
+		"currentSectorTime2",
+		"driverName",
+		"drsActive",
+		"estimatedLapTime",
+		"finishStatus",
+		"flag",
+		"focus",
+		"fuelFraction",
+		"fullTeamName",
+		"gamePhase",
+		"hasFocus",
+		"headlights",
+		"inControl",
+		"inGarageStall",
+		"lapDistance",
+		"lapStartET",
+		"lapsBehindLeader",
+		"lapsBehindNext",
+		"lapsCompleted",
+		"lastLapTime",
+		"lastSectorTime1",
+		"lastSectorTime2",
+		"pathLateral",
+		"penalties",
+		"pitGroup",
+		"pitLapDistance",
+		"pitState",
+		"pitstops",
+		"pitting",
+		"player",
+		"position",
+		"qualification",
+		"sector",
+		"serverScored",
+		"slotID",
+		"steamID",
+		"timeBehindLeader",
+		"timeBehindNext",
+		"timeIntoLap",
+		"trackEdge",
+		"underYellow",
+		"upgradePack",
+		"vehicleFilename",
+		"vehicleName"
+	]
+}

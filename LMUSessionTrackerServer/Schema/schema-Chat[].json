@@ -1,0 +1,7 @@
+{
+	"$id": "Chat[]",
+	"type": "array",
+	"items": {
+		"$ref": "schema-Chat.json"
+	}
+}

@@ -1,0 +1,175 @@
+{
+	"$id": "SessionInfo",
+	"$defs": {
+		"Completion": {
+			"$ref": "schema-Completion.json"
+		},
+		"Velocity": {
+			"$ref": "schema-Velocity.json"
+		}
+	},
+	"type": "object",
+	"properties": {
+		"ambientTemp": {
+			"type": "number"
+		},
+		"averagePathWetness": {
+			"type": "number",
+			"minimum": 0
+		},
+		"currentEventTime": {
+			"type": "number"
+		},
+		"darkCloud": {
+			"type": "number",
+			"minimum": 0
+		},
+		"endEventTime": {
+			"type": "number",
+			"minimum": 0
+		},
+		"gameMode": {
+			"enum": [ "UNKNOWN" ]
+		},
+		"gamePhase": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 9
+		},
+		"inRealtime": {
+			"type": "boolean"
+		},
+		"lapDistance": {
+			"type": "number",
+			"minimum": 0
+		},
+		"maxPathWetness": {
+			"type": "number",
+			"minimum": 0,
+			"maximum": 0
+		},
+		"maxPlayers": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"maxTime": {
+			"type": "number",
+			"minimum": 0
+		},
+		"maximumLaps": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 4294967295
+		},
+		"minPathWetness": {
+			"type": "number",
+			"minimum": 0,
+			"maximum": 0
+		},
+		"numRedLights": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"numberOfPlayers": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"numberOfVehicles": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"passwordProtected": {
+			"type": "boolean"
+		},
+		"playerFileName": {
+			"type": "string"
+		},
+		"playerName": {
+			"type": "string"
+		},
+		"raceCompletion": {
+			"$ref": "#/$defs/Completion"
+		},
+		"raining": {
+			"type": "number",
+			"minimum": 0
+		},
+		"sectorFlag": {
+			"type": "array",
+			"items": {
+				"enum": [ "UNKNOWN", "YELLOW" ]
+			},
+			"minItems": 3,
+			"maxItems": 3
+		},
+		"serverName": {
+			"type": "string"
+		},
+		"serverPort": {
+			"type": "integer"
+		},
+		"session": {
+			"enum": [ "TESTDAY", "PRACTICE1", "PRACTICE2", "PRACTICE3", "PRACTICE4", "QUALIFYING1", "QUALIFYING2", "QUALIFYING3", "QUALIFYING4", "WARMUP", "RACE1", "RACE2", "RACE3", "RACE4" ]
+		},
+		"startEventTime": {
+			"type": "number",
+			"minimum": 0
+		},
+		"startLightFrame": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"timeRemainingInGamePhase": {
+			"type": "number",
+			"minimum": 0
+		},
+		"trackName": {
+			"type": "string"
+		},
+		"trackTemp": {
+			"type": "number"
+		},
+		"windSpeed": {
+			"$ref": "#/$defs/Velocity"
+		},
+		"yellowFlagState": {
+			"enum": [ "NONE" ]
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"ambientTemp",
+		"averagePathWetness",
+		"currentEventTime",
+		"darkCloud",
+		"endEventTime",
+		"gameMode",
+		"gamePhase",
+		"inRealtime",
+		"lapDistance",
+		"maxPathWetness",
+		"maxPlayers",
+		"maxTime",
+		"maximumLaps",
+		"minPathWetness",
+		"numRedLights",
+		"numberOfPlayers",
+		"numberOfVehicles",
+		"passwordProtected",
+		"playerFileName",
+		"playerName",
+		"raceCompletion",
+		"raining",
+		"sectorFlag",
+		"serverName",
+		"serverPort",
+		"session",
+		"startEventTime",
+		"startLightFrame",
+		"timeRemainingInGamePhase",
+		"trackName",
+		"trackTemp",
+		"windSpeed",
+		"yellowFlagState"
+	]
+}

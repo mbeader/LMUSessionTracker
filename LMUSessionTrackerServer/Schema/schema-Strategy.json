@@ -1,0 +1,46 @@
+{
+	"$id": "Strategy",
+	"type": "object",
+	"properties": {
+		"driver": {
+			"type": "string"
+		},
+		"driverSwap": {
+			"type": "boolean"
+		},
+		"lap": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"penalty": {
+			"type": "boolean"
+		},
+		"previousStintDuration": {
+			"type": "number",
+			"minimum": 0
+		},
+		"time": {
+			"type": "number",
+			"minimum": 0
+		},
+		"tyres": {
+			"$ref": "schema-StrategyTires.json"
+		},
+		"ve": {
+			"type": "number",
+			"maximum": 1,
+			"minimum": 0
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"driver",
+		"driverSwap",
+		"lap",
+		"penalty",
+		"previousStintDuration",
+		"time",
+		"tyres",
+		"ve"
+	]
+}

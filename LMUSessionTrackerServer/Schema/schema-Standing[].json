@@ -1,0 +1,12 @@
+{
+	"$id": "Standing[]",
+	"$defs": {
+		"Standing": {
+			"$ref": "schema-Standing.json"
+		}
+	},
+	"type": "array",
+	"items": {
+		"$ref": "#/$defs/Standing"
+	}
+}

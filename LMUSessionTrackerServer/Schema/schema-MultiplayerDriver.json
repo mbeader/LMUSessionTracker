@@ -1,0 +1,33 @@
+{
+	"$id": "MultiplayerDriver",
+	"type": "object",
+	"properties": {
+		"isConnected": {
+			"type": "boolean"
+		},
+		"nationality": {
+			"type": "string"
+		},
+		"roles": {
+			"type": "array",
+			"items": {
+				"enum": [ "Admin", "Race Engineer", "Driver" ]
+			}
+		},
+		"teamId": {
+			"type": "string"
+		},
+		"teamName": {
+			"type": "string"
+		},
+		"uniqueTeamId": {
+			"type": "string"
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"isConnected",
+		"nationality",
+		"roles"
+	]
+}

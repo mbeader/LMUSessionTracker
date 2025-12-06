@@ -1,0 +1,27 @@
+{
+	"$id": "AttackMode",
+	"type": "object",
+	"properties": {
+		"remainingCount": {
+			"type": "integer",
+			"maximum": 0,
+			"minimum": 0
+		},
+		"timeRemaining": {
+			"type": "integer",
+			"maximum": 0,
+			"minimum": 0
+		},
+		"totalCount": {
+			"type": "integer",
+			"maximum": 0,
+			"minimum": 0
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"remainingCount",
+		"timeRemaining",
+		"totalCount"
+	]
+}

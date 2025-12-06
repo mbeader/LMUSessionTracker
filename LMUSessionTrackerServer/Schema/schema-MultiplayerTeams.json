@@ -1,0 +1,41 @@
+{
+	"$id": "MultiplayerTeams",
+	"$defs": {
+		"MultiplayerDriver": {
+			"$ref": "schema-MultiplayerDriver.json"
+		},
+		"MultiplayerTeam": {
+			"$ref": "schema-MultiplayerTeam.json"
+		}
+	},
+	"type": "object",
+	"properties": {
+		"coherenceId": {
+			"type": "integer"
+		},
+		"drivers": {
+			"type": "object",
+			"patternProperties": {
+				"^.+$": {
+					"$ref": "#/$defs/MultiplayerDriver"
+				}
+			},
+			"additionalProperties": false
+		},
+		"teams": {
+			"type": "object",
+			"patternProperties": {
+				"^.+$": {
+					"$ref": "#/$defs/MultiplayerTeam"
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"coherenceId",
+		"drivers",
+		"teams"
+	]
+}

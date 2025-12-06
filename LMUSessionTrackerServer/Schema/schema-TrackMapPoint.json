@@ -1,0 +1,27 @@
+{
+	"$id": "TrackMapPoint",
+	"type": "object",
+	"properties": {
+		"x": {
+			"type": "number"
+		},
+		"y": {
+			"type": "number"
+		},
+		"z": {
+			"type": "number"
+		},
+		"type": {
+			"type": "integer",
+			"maximum": 210,
+			"minimum": 0
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"x",
+		"y",
+		"z",
+		"type"
+	]
+}

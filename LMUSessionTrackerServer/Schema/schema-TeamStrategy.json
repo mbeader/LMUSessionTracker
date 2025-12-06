@@ -1,0 +1,17 @@
+{
+	"$id": "TeamStrategy",
+	"type": "array",
+	"prefixItems": [
+		{
+			"type": "string"
+		},
+		{
+			"type": "array",
+			"items": {
+				"$ref": "schema-Strategy.json"
+			}
+		}
+	],
+	"minItems": 2,
+	"maxItems": 2
+}

@@ -1,0 +1,7 @@
+{
+	"$id": "TeamStrategy[]",
+	"type": "array",
+	"items": {
+		"$ref": "schema-TeamStrategy.json"
+	}
+}

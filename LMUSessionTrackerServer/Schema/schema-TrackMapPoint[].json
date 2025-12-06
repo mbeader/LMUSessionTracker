@@ -1,0 +1,7 @@
+{
+	"$id": "TrackMapPoint[]",
+	"type": "array",
+	"items": {
+		"$ref": "schema-TrackMapPoint.json"
+	}
+}
