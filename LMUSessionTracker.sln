@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMUSessionTrackerCore", "LMUSessionTrackerCore\LMUSessionTrackerCore.csproj", "{F1818DCA-90EE-46DB-B0B1-6AC5D3DA477B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMUSessionTrackerCore.Tests", "LMUSessionTrackerCore.Tests\LMUSessionTrackerCore.Tests.csproj", "{931EF3A3-758F-4F01-AD7C-81C476B0765C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F1818DCA-90EE-46DB-B0B1-6AC5D3DA477B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1818DCA-90EE-46DB-B0B1-6AC5D3DA477B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1818DCA-90EE-46DB-B0B1-6AC5D3DA477B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{931EF3A3-758F-4F01-AD7C-81C476B0765C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{931EF3A3-758F-4F01-AD7C-81C476B0765C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{931EF3A3-758F-4F01-AD7C-81C476B0765C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{931EF3A3-758F-4F01-AD7C-81C476B0765C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
