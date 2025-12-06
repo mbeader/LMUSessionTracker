@@ -1,6 +1,7 @@
 ﻿using LMUSessionTracker.Core.Json;
 using LMUSessionTracker.Core.LMU;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,18 +12,19 @@ using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Http {
 	public class LMUClient {
-		private static readonly bool debug = false;
-		private static readonly string debugdir = "debug";
-		private static readonly string baseuri = "http://localhost:6397/";
-		private static readonly TimeSpan timeout = new TimeSpan(2 * TimeSpan.TicksPerSecond);
 		private readonly HttpClient httpClient;
 		private readonly ILogger<LMUClient> logger;
 		private readonly SchemaValidator schemaValidator;
+		private readonly LMUClientOptions options;
 
-		public LMUClient(ILogger<LMUClient> logger, SchemaValidator schemaValidator = null) {
-			httpClient = new HttpClient() { BaseAddress = new Uri(baseuri), Timeout = timeout };
+		public LMUClient(ILogger<LMUClient> logger, SchemaValidator schemaValidator = null, IOptions<LMUClientOptions> options = null) {
 			this.logger = logger;
 			this.schemaValidator = schemaValidator;
+			this.options = options?.Value ?? new LMUClientOptions();
+			httpClient = new HttpClient() {
+				BaseAddress = new Uri(this.options.BaseUri),
+				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond)
+			};
 		}
 
 		private async Task<T> Get<T>(string path) {
@@ -32,9 +34,9 @@ namespace LMUSessionTracker.Core.Http {
 					string body = await res.Content.ReadAsStringAsync();
 					if(!string.IsNullOrEmpty(body)) {
 						T result = JsonConvert.DeserializeObject<T>(body);
-						if(schemaValidator != null)
+						if(options.ValidateResponses && schemaValidator != null)
 							schemaValidator.Validate(body, typeof(T));
-						if(debug && result != null)
+						if(options.LogResponses && result != null)
 							LogResponse(path, result);
 						return result;
 					}
@@ -53,10 +55,10 @@ namespace LMUSessionTracker.Core.Http {
 
 		private void LogResponse<T>(string path, T response) {
 			try {
-				if(!Directory.Exists(debugdir))
-					Directory.CreateDirectory(debugdir);
+				if(!Directory.Exists(options.LogDirectory))
+					Directory.CreateDirectory(options.LogDirectory);
 				string json = JsonConvert.SerializeObject(response);
-				File.WriteAllText(Path.Join(debugdir, $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}{path.Replace("/", "_")}.json"), json);
+				File.WriteAllText(Path.Join(options.LogDirectory, $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}{path.Replace("/", "_")}.json"), json);
 			} catch(Exception e) {
 				logger.LogWarning(e, "Failed to write request debug file");
 			}

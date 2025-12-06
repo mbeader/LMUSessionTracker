@@ -1,4 +1,5 @@
-using LMUSessionTracker.Core.LMU;
+using LMUSessionTracker.Core.Http;
+using LMUSessionTracker.Core.Json;
 using LMUSessionTracker.Core.Services;
 using LMUSessionTracker.Core.Session;
 using Microsoft.AspNetCore.Builder;
@@ -21,8 +22,12 @@ namespace LMUSessionTracker.Server {
 			// Add services to the container.
 			builder.Services.AddControllersWithViews();
 
+			builder.Services.Configure<LMUClientOptions>(builder.Configuration.GetSection("LMUClient"));
+			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
 			builder.Services.AddSingleton<SessionManager>();
 			builder.Services.AddScoped<SessionViewer>();
+			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled)))
+				builder.Services.AddScoped<SchemaValidation.Validator>();
 			builder.Services.AddScoped<LMUClient>();
 			builder.Services.AddHostedService<SessionService>();
 			//builder.Services.AddHostedService<ReplayService>();

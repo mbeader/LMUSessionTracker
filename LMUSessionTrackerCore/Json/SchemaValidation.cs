@@ -1,5 +1,6 @@
 ﻿using LMUSessionTracker.Core.LMU;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
@@ -105,9 +106,9 @@ namespace LMUSessionTracker.Core.Json {
 			private readonly ILogger<Validator> logger;
 			private readonly SchemaValidatorOptions options;
 
-			public Validator(ILogger<Validator> logger, SchemaValidatorOptions options = null) {
+			public Validator(ILogger<Validator> logger, IOptions<SchemaValidatorOptions> options = null) {
 				this.logger = logger;
-				this.options = options ?? new SchemaValidatorOptions();
+				this.options = options?.Value ?? new SchemaValidatorOptions();
 			}
 
 			public bool Validate(string json, Type type) {
