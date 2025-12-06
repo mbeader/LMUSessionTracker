@@ -28,7 +28,7 @@ namespace LMUSessionTracker.Server {
 			builder.Services.AddScoped<SessionViewer>();
 			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled)))
 				builder.Services.AddScoped<SchemaValidation.Validator>();
-			builder.Services.AddScoped<LMUClient>();
+			builder.Services.AddScoped<ILMUClient, LMUClient>();
 			builder.Services.AddHostedService<SessionService>();
 			//builder.Services.AddHostedService<ReplayService>();
 

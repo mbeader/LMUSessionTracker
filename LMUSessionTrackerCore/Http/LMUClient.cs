@@ -11,7 +11,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Http {
-	public class LMUClient {
+	public class LMUClient : ILMUClient {
 		private readonly HttpClient httpClient;
 		private readonly ILogger<LMUClient> logger;
 		private readonly SchemaValidator schemaValidator;
@@ -64,12 +64,32 @@ namespace LMUSessionTracker.Core.Http {
 			}
 		}
 
+		public Task<List<Chat>> GetChat() {
+			return Get<List<Chat>>("/rest/chat");
+		}
+
+		public Task<MultiplayerTeams> GetMultiplayerTeams() {
+			return Get<MultiplayerTeams>("/rest/multiplayer/teams");
+		}
+
+		public Task<TeamStrategy> GetStrategy() {
+			return Get<TeamStrategy>("/rest/strategy/overall");
+		}
+
 		public Task<SessionInfo> GetSessionInfo() {
 			return Get<SessionInfo>("/rest/watch/sessionInfo");
 		}
 
 		public Task<List<Standing>> GetStandings() {
 			return Get<List<Standing>>("/rest/watch/standings");
+		}
+
+		public Task<StandingsHistory> GetStandingsHistory() {
+			return Get<StandingsHistory>("/rest/watch/standings/history");
+		}
+
+		public Task<List<TrackMapPoint>> GetTrackMap() {
+			return Get<List<TrackMapPoint>>("/rest/watch/trackmap");
 		}
 	}
 }
