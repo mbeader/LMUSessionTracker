@@ -26,36 +26,43 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
-    <ItemGroup>
-        <Compile Remove="logs\**" />
-        <Content Remove="logs\**" />
-        <EmbeddedResource Remove="logs\**" />
-        <None Remove="logs\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="logs\**" />
+    <Content Remove="logs\**" />
+    <EmbeddedResource Remove="logs\**" />
+    <None Remove="logs\**" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Remove="data\**" />
-        <Content Remove="data\**" />
-        <EmbeddedResource Remove="data\**" />
-        <None Remove="data\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="data\**" />
+    <Content Remove="data\**" />
+    <EmbeddedResource Remove="data\**" />
+    <None Remove="data\**" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Remove="out\**" />
-        <Content Remove="out\**" />
-        <EmbeddedResource Remove="out\**" />
-        <None Remove="out\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="out\**" />
+    <Content Remove="out\**" />
+    <EmbeddedResource Remove="out\**" />
+    <None Remove="out\**" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Remove="debug\**" />
-        <Content Remove="debug\**" />
-        <EmbeddedResource Remove="debug\**" />
-        <None Remove="debug\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="debug\**" />
+    <Content Remove="debug\**" />
+    <EmbeddedResource Remove="debug\**" />
+    <None Remove="debug\**" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\LMUSessionTrackerCore\LMUSessionTrackerCore.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\LMUSessionTrackerCore\Json\Schema\*.json">
+      <Link>Json\Schema\%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LMUSessionTrackerCore\LMUSessionTrackerCore.csproj" />
+  </ItemGroup>
 
 </Project>

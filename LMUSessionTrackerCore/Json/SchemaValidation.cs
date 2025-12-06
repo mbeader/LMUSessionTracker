@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace LMUSessionTracker.Server {
+namespace LMUSessionTracker.Core.Json {
 	public static class SchemaValidation {
 		private static readonly string filenameformat = "schema-{0}.json";
 		private static readonly List<Type> types = new List<Type>() {
@@ -45,8 +45,10 @@ namespace LMUSessionTracker.Server {
 		}
 
 		public static void LoadJsonSchemas() {
+			if(loaded)
+				throw new Exception("Schemas already loaded");
 			foreach(Type type in types) {
-				string filename = Path.Join("Schema", string.Format(filenameformat, type.Name));
+				string filename = Path.Join(AppContext.BaseDirectory, "Json", "Schema", string.Format(filenameformat, type.Name));
 				using(StreamReader file = File.OpenText(filename))
 				using(JsonTextReader reader = new JsonTextReader(file)) {
 					JSchemaUrlResolver resolver = new JSchemaUrlResolver();
