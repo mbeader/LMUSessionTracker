@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using LMUSessionTracker.Core.Json;
+using LMUSessionTracker.Core.LMU;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,7 +9,7 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace LMUSessionTracker.Core.LMU {
+namespace LMUSessionTracker.Core.Http {
 	public class LMUClient {
 		private static readonly bool debug = false;
 		private static readonly string debugdir = "debug";
@@ -15,10 +17,12 @@ namespace LMUSessionTracker.Core.LMU {
 		private static readonly TimeSpan timeout = new TimeSpan(2 * TimeSpan.TicksPerSecond);
 		private readonly HttpClient httpClient;
 		private readonly ILogger<LMUClient> logger;
+		private readonly SchemaValidator schemaValidator;
 
-		public LMUClient(ILogger<LMUClient> logger) {
+		public LMUClient(ILogger<LMUClient> logger, SchemaValidator schemaValidator = null) {
 			httpClient = new HttpClient() { BaseAddress = new Uri(baseuri), Timeout = timeout };
 			this.logger = logger;
+			this.schemaValidator = schemaValidator;
 		}
 
 		private async Task<T> Get<T>(string path) {
@@ -28,6 +32,8 @@ namespace LMUSessionTracker.Core.LMU {
 					string body = await res.Content.ReadAsStringAsync();
 					if(!string.IsNullOrEmpty(body)) {
 						T result = JsonConvert.DeserializeObject<T>(body);
+						if(schemaValidator != null)
+							schemaValidator.Validate(body, typeof(T));
 						if(debug && result != null)
 							LogResponse(path, result);
 						return result;

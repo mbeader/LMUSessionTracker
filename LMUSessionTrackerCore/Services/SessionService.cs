@@ -1,4 +1,5 @@
-﻿using LMUSessionTracker.Core.LMU;
+﻿using LMUSessionTracker.Core.Http;
+using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Session;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

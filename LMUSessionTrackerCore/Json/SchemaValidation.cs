@@ -100,5 +100,19 @@ namespace LMUSessionTracker.Core.Json {
 				ConcatError(sb, child, prefix);
 			}
 		}
+
+		public class Validator : SchemaValidator {
+			private readonly ILogger<Validator> logger;
+			private readonly SchemaValidatorOptions options;
+
+			public Validator(ILogger<Validator> logger, SchemaValidatorOptions options = null) {
+				this.logger = logger;
+				this.options = options ?? new SchemaValidatorOptions();
+			}
+
+			public bool Validate(string json, Type type) {
+				return SchemaValidation.Validate(json, type, logger);
+			}
+		}
 	}
 }
