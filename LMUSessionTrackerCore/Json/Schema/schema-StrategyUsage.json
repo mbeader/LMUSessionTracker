@@ -1,0 +1,13 @@
+{
+	"$id": "StrategyUsage",
+	"type": "object",
+	"patternProperties": {
+		"^.+$": {
+			"type": "array",
+			"items": {
+				"$ref": "schema-StrategyDriverUsage.json"
+			}
+		}
+	},
+	"additionalProperties": false
+}

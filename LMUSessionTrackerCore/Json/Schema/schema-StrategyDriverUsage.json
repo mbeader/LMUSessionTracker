@@ -1,0 +1,29 @@
+{
+	"$id": "StrategyDriverUsage",
+	"type": "object",
+	"properties": {
+		"lap": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"pit": {
+			"type": "boolean"
+		},
+		"stint": {
+			"type": "integer",
+			"minimum": 1
+		},
+		"ve": {
+			"type": "number",
+			"maximum": 1,
+			"minimum": 0
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"lap",
+		"pit",
+		"stint",
+		"ve"
+	]
+}
