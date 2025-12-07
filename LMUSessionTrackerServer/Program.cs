@@ -1,5 +1,6 @@
 using LMUSessionTracker.Core.Http;
 using LMUSessionTracker.Core.Json;
+using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Protocol;
 using LMUSessionTracker.Core.Services;
 using LMUSessionTracker.Core.Session;
@@ -23,16 +24,23 @@ namespace LMUSessionTracker.Server {
 			// Add services to the container.
 			builder.Services.AddControllersWithViews();
 
-			builder.Services.Configure<LMUClientOptions>(builder.Configuration.GetSection("LMUClient"));
+			var clientConfig = builder.Configuration.GetSection("Client");
+			var serverConfig = builder.Configuration.GetSection("Server");
+			builder.Services.Configure<LMUClientOptions>(clientConfig.GetSection("LMU"));
+			builder.Services.Configure<ProtocolClientOptions>(clientConfig.GetSection("Protocol"));
+			builder.Services.Configure<ServerOptions>(serverConfig);
 			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
+
 			builder.Services.AddSingleton<SessionManager>();
 			builder.Services.AddScoped<SessionViewer>();
 			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled)))
 				builder.Services.AddScoped<SchemaValidation.Validator>();
-			builder.Services.AddScoped<ILMUClient, LMUClient>();
-			builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
-			builder.Services.AddScoped<ProtocolServer, SessionArbiter>();
-			builder.Services.AddHostedService<ClientService>();
+			if(serverConfig.Get<ServerOptions>().UseLocalClient) {
+				builder.Services.AddScoped<LMUClient, HttpLMUClient>();
+				builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
+				builder.Services.AddHostedService<ClientService>();
+			}
+			builder.Services.AddSingleton<ProtocolServer, SessionArbiter>();
 			//builder.Services.AddHostedService<SessionService>();
 			//builder.Services.AddHostedService<ReplayService>();
 

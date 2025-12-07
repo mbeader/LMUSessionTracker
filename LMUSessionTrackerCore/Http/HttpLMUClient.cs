@@ -11,13 +11,13 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Http {
-	public class LMUClient : ILMUClient {
+	public class HttpLMUClient : LMUClient {
 		private readonly HttpClient httpClient;
-		private readonly ILogger<LMUClient> logger;
+		private readonly ILogger<HttpLMUClient> logger;
 		private readonly SchemaValidator schemaValidator;
 		private readonly LMUClientOptions options;
 
-		public LMUClient(ILogger<LMUClient> logger, SchemaValidator schemaValidator = null, IOptions<LMUClientOptions> options = null) {
+		public HttpLMUClient(ILogger<HttpLMUClient> logger, SchemaValidator schemaValidator = null, IOptions<LMUClientOptions> options = null) {
 			this.logger = logger;
 			this.schemaValidator = schemaValidator;
 			this.options = options?.Value ?? new LMUClientOptions();

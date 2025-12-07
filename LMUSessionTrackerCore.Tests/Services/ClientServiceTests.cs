@@ -1,4 +1,3 @@
-using LMUSessionTracker.Core.Http;
 using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tests.Services {
 	public class ClientServiceTests {
-		private readonly Mock<ILMUClient> client;
+		private readonly Mock<LMUClient> client;
 		private readonly Mock<IServiceScope> scope;
 		private readonly ClientService service;
 
 		public ClientServiceTests() {
-			client = new Mock<ILMUClient>();
+			client = new Mock<LMUClient>();
 			scope = new Mock<IServiceScope>();
-			scope.Setup(x => x.ServiceProvider.GetService(typeof(ILMUClient))).Returns(client.Object);
+			scope.Setup(x => x.ServiceProvider.GetService(typeof(LMUClient))).Returns(client.Object);
 			Mock<IServiceScopeFactory> scopeFactory = new Mock<IServiceScopeFactory>();
 			scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
 			Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();

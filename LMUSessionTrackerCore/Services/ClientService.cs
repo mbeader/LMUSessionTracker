@@ -1,4 +1,4 @@
-﻿using LMUSessionTracker.Core.Http;
+﻿using LMUSessionTracker.Core.LMU;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Core.Services {
 	public class ClientService : PeriodicService<ClientService> {
 		private ClientState state = ClientState.Idle;
-		private ILMUClient client;
+		private LMUClient client;
 
 		public ClientState State => state;
 
@@ -27,7 +27,7 @@ namespace LMUSessionTracker.Core.Services {
 		}
 
 		public override Task Start(IServiceScope scope) {
-			client = scope.ServiceProvider.GetRequiredService<ILMUClient>();
+			client = scope.ServiceProvider.GetRequiredService<LMUClient>();
 			return Task.CompletedTask;
 		}
 

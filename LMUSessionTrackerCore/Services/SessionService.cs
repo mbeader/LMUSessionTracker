@@ -1,5 +1,4 @@
-﻿using LMUSessionTracker.Core.Http;
-using LMUSessionTracker.Core.LMU;
+﻿using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Session;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,7 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Core.Services {
 	public class SessionService : PeriodicService<SessionService> {
 		private SessionManager manager;
-		private ILMUClient client;
+		private LMUClient client;
 
 		public SessionService(ILogger<SessionService> logger, IServiceProvider serviceProvider) : base(logger, serviceProvider) {
 		}
@@ -21,7 +20,7 @@ namespace LMUSessionTracker.Core.Services {
 
 		public override Task Start(IServiceScope scope) {
 			manager = scope.ServiceProvider.GetRequiredService<SessionManager>();
-			client = scope.ServiceProvider.GetRequiredService<ILMUClient>();
+			client = scope.ServiceProvider.GetRequiredService<LMUClient>();
 			return Task.CompletedTask;
 		}
 

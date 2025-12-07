@@ -1,9 +1,8 @@
-﻿using LMUSessionTracker.Core.LMU;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace LMUSessionTracker.Core.Http {
-	public interface ILMUClient {
+namespace LMUSessionTracker.Core.LMU {
+	public interface LMUClient {
 		public Task<List<Chat>> GetChat();
 
 		public Task<MultiplayerTeams> GetMultiplayerTeams();
