@@ -6,12 +6,8 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>LMUSessionTracker.Core.Tests</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
-    <!--
-    This template uses native xUnit.net command line options when using 'dotnet run' and
-    VSTest by default when using 'dotnet test'. For more information on how to enable support
-    for Microsoft Testing Platform, please visit:
-      https://xunit.net/docs/getting-started/v3/microsoft-testing-platform
-    -->
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.0.6" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit.v3" Version="3.2.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
