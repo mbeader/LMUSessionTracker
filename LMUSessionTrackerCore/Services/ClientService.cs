@@ -1,4 +1,5 @@
 ﻿using LMUSessionTracker.Core.LMU;
+using LMUSessionTracker.Core.Protocol;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -6,10 +7,17 @@ using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Services {
 	public class ClientService : PeriodicService<ClientService> {
+		private LMUClient lmuClient;
+		private ProtocolClient protocolClient;
 		private ClientState state = ClientState.Idle;
-		private LMUClient client;
+		private ProtocolRole role = ProtocolRole.None;
+		private string sessionId;
+		private string clientId = "t";
 
 		public ClientState State => state;
+		public ProtocolRole Role => role;
+		public string SessionId => sessionId;
+		public string ClientId => clientId;
 
 		public ClientService(ILogger<ClientService> logger, IServiceProvider serviceProvider) : base(logger, serviceProvider) {
 		}
@@ -27,21 +35,92 @@ namespace LMUSessionTracker.Core.Services {
 		}
 
 		public override Task Start(IServiceScope scope) {
-			client = scope.ServiceProvider.GetRequiredService<LMUClient>();
+			lmuClient = scope.ServiceProvider.GetRequiredService<LMUClient>();
+			protocolClient = scope.ServiceProvider.GetRequiredService<ProtocolClient>();
 			return Task.CompletedTask;
 		}
 
 		public override async Task Do() {
-			var sessionInfo = await client.GetSessionInfo();
-			var multiplayerTeams = await client.GetMultiplayerTeams();
-			if(sessionInfo == null) {
+			ProtocolMessage message = new ProtocolMessage() { ClientId = clientId, SessionId = sessionId };
+			message.SessionInfo = await lmuClient.GetSessionInfo();
+			if(message.SessionInfo == null && state == ClientState.Idle) {
+				return;
+			} else if(message.SessionInfo == null && state != ClientState.Idle) {
 				state = ClientState.Idle;
+				role = ProtocolRole.None;
+				sessionId = null;
+				await protocolClient.Send(message);
 				return;
 			}
-			if(multiplayerTeams != null) {
-				state = ClientState.Connected;
+			message.MultiplayerTeams = await lmuClient.GetMultiplayerTeams();
+			if(message.MultiplayerTeams != null) {
+				// online
+				if(state == ClientState.Idle) {
+					ProtocolStatus result = await protocolClient.Send(message);
+					if(result == null) {
+						state = ClientState.Disconnected;
+					} else if(result.Result == ProtocolResult.Changed) {
+						role = result.Role;
+						if(role == ProtocolRole.Primary)
+							state = ClientState.Working;
+						else
+							state = ClientState.Connected;
+					}
+					sessionId = result.SessionId;
+				} else if(state == ClientState.Working) {
+					// add other data
+					ProtocolStatus result = await protocolClient.Send(message);
+					if(result == null) {
+						state = ClientState.Disconnected;
+					} else if(result.Result == ProtocolResult.Changed) {
+						sessionId = result.SessionId;
+					} else if(result.Result == ProtocolResult.Demoted) {
+						role = result.Role;
+						state = ClientState.Connected;
+					} else if(result.Result == ProtocolResult.Rejected) {
+						role = result.Role;
+						state = ClientState.Idle;
+						sessionId = null;
+					}
+				} else if(state == ClientState.Connected) {
+					ProtocolStatus result = await protocolClient.Send(message);
+					if(result == null) {
+						state = ClientState.Disconnected;
+					} else if(result.Result == ProtocolResult.Changed) {
+						sessionId = result.SessionId;
+					} else if(result.Result == ProtocolResult.Promoted) {
+						role = result.Role;
+						state = ClientState.Working;
+					} else if(result.Result == ProtocolResult.Rejected) {
+						role = result.Role;
+						state = ClientState.Idle;
+						sessionId = null;
+					}
+				}
 			} else {
-				state = ClientState.Working;
+				// offline
+				if(state == ClientState.Idle) {
+					ProtocolStatus result = await protocolClient.Send(message);
+					if(result == null) {
+						state = ClientState.Disconnected;
+					} else if(result.Result == ProtocolResult.Changed) {
+						role = result.Role;
+						state = ClientState.Working;
+					}
+					sessionId = result.SessionId;
+				} else if(state == ClientState.Working) {
+					// add other data
+					ProtocolStatus result = await protocolClient.Send(message);
+					if(result == null) {
+						state = ClientState.Disconnected;
+					} else if(result.Result == ProtocolResult.Changed) {
+						sessionId = result.SessionId;
+					} else if(result.Result == ProtocolResult.Rejected) {
+						role = result.Role;
+						state = ClientState.Idle;
+						sessionId = null;
+					}
+				}
 			}
 		}
 

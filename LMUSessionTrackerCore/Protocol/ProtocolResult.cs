@@ -11,11 +11,11 @@
 		/// <summary>
 		/// Client role changed from secondary to primary
 		/// </summary>
-		Promotion,
+		Promoted,
 		/// <summary>
 		/// Client role changed from primary to secondary
 		/// </summary>
-		Demotion,
+		Demoted,
 		/// <summary>
 		/// Session changed, roles unchanged
 		/// </summary>

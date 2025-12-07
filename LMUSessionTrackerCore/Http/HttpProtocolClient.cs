@@ -1,8 +1,10 @@
 ﻿using LMUSessionTracker.Core.Protocol;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Http {
@@ -20,8 +22,31 @@ namespace LMUSessionTracker.Core.Http {
 			};
 		}
 
-		public Task<ProtocolStatus> Send(ProtocolMessage data) {
-			return Task.FromResult(new ProtocolStatus() { Role = ProtocolRole.None, Result = ProtocolResult.Rejected });
+		private async Task<T> Post<T, TBody>(string path, TBody body) {
+			try {
+				string json = JsonConvert.SerializeObject(body);
+				HttpResponseMessage res = await httpClient.PostAsync(path, new StringContent(json));
+				if(res.StatusCode == System.Net.HttpStatusCode.OK && res.Content != null) {
+					string content = await res.Content.ReadAsStringAsync();
+					if(!string.IsNullOrEmpty(content)) {
+						T result = JsonConvert.DeserializeObject<T>(content);
+						return result;
+					}
+				}
+				return default;
+			} catch(Exception e) {
+				if(e is HttpRequestException hre && hre.InnerException is SocketException se && se.SocketErrorCode == SocketError.ConnectionRefused)
+					logger.LogDebug("Connection refused");
+				else if(e is TaskCanceledException tce && tce.InnerException is TimeoutException ite || e is TimeoutException te)
+					logger.LogDebug("Connection timeout");
+				else
+					logger.LogError(e, $"Request failed for endpoint: {path}");
+				return default;
+			}
+		}
+
+		public async Task<ProtocolStatus> Send(ProtocolMessage data) {
+			return await Post<ProtocolStatus, ProtocolMessage>("api/Data", data);
 		}
 	}
 }
