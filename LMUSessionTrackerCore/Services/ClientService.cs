@@ -52,75 +52,70 @@ namespace LMUSessionTracker.Core.Services {
 				await protocolClient.Send(message);
 				return;
 			}
+			await HandleActiveSession(message);
+		}
+
+		private async Task HandleActiveSession(ProtocolMessage message) {
 			message.MultiplayerTeams = await lmuClient.GetMultiplayerTeams();
-			if(message.MultiplayerTeams != null) {
-				// online
-				if(state == ClientState.Idle) {
-					ProtocolStatus result = await protocolClient.Send(message);
-					if(result == null) {
-						state = ClientState.Disconnected;
-					} else if(result.Result == ProtocolResult.Changed) {
-						role = result.Role;
-						if(role == ProtocolRole.Primary)
-							state = ClientState.Working;
-						else
-							state = ClientState.Connected;
-					}
-					sessionId = result.SessionId;
-				} else if(state == ClientState.Working) {
-					// add other data
-					ProtocolStatus result = await protocolClient.Send(message);
-					if(result == null) {
-						state = ClientState.Disconnected;
-					} else if(result.Result == ProtocolResult.Changed) {
-						sessionId = result.SessionId;
-					} else if(result.Result == ProtocolResult.Demoted) {
-						role = result.Role;
+			switch(state) {
+				case ClientState.Idle:
+				case ClientState.Connected:
+					break;
+				case ClientState.Working:
+					message.Standings = await lmuClient.GetStandings();
+					message.TeamStrategy = await lmuClient.GetStrategy();
+					message.Chat = await lmuClient.GetChat();
+					break;
+				case ClientState.Disconnected:
+				default:
+					throw new Exception("Invalid pre-state");
+			}
+			ProtocolStatus result = await protocolClient.Send(message);
+			if(result == null) {
+				state = ClientState.Disconnected;
+				return;
+			}
+			bool online = message.MultiplayerTeams != null;
+			switch((state, result.Result, online)) {
+				case (ClientState.Working, ProtocolResult.Accepted, true):
+				case (ClientState.Connected, ProtocolResult.Accepted, true):
+				case (ClientState.Working, ProtocolResult.Accepted, false):
+					break;
+				case (ClientState.Idle, ProtocolResult.Changed, true):
+					role = result.Role;
+					if(role == ProtocolRole.Primary)
+						state = ClientState.Working;
+					else
 						state = ClientState.Connected;
-					} else if(result.Result == ProtocolResult.Rejected) {
-						role = result.Role;
-						state = ClientState.Idle;
-						sessionId = null;
-					}
-				} else if(state == ClientState.Connected) {
-					ProtocolStatus result = await protocolClient.Send(message);
-					if(result == null) {
-						state = ClientState.Disconnected;
-					} else if(result.Result == ProtocolResult.Changed) {
-						sessionId = result.SessionId;
-					} else if(result.Result == ProtocolResult.Promoted) {
-						role = result.Role;
-						state = ClientState.Working;
-					} else if(result.Result == ProtocolResult.Rejected) {
-						role = result.Role;
-						state = ClientState.Idle;
-						sessionId = null;
-					}
-				}
-			} else {
-				// offline
-				if(state == ClientState.Idle) {
-					ProtocolStatus result = await protocolClient.Send(message);
-					if(result == null) {
-						state = ClientState.Disconnected;
-					} else if(result.Result == ProtocolResult.Changed) {
-						role = result.Role;
-						state = ClientState.Working;
-					}
 					sessionId = result.SessionId;
-				} else if(state == ClientState.Working) {
-					// add other data
-					ProtocolStatus result = await protocolClient.Send(message);
-					if(result == null) {
-						state = ClientState.Disconnected;
-					} else if(result.Result == ProtocolResult.Changed) {
-						sessionId = result.SessionId;
-					} else if(result.Result == ProtocolResult.Rejected) {
-						role = result.Role;
-						state = ClientState.Idle;
-						sessionId = null;
-					}
-				}
+					break;
+				case (ClientState.Idle, ProtocolResult.Changed, false):
+					role = result.Role;
+					state = ClientState.Working;
+					sessionId = result.SessionId;
+					break;
+				case (ClientState.Working, ProtocolResult.Changed, true):
+				case (ClientState.Connected, ProtocolResult.Changed, true):
+				case (ClientState.Working, ProtocolResult.Changed, false):
+					sessionId = result.SessionId;
+					break;
+				case (ClientState.Working, ProtocolResult.Demoted, true):
+					role = result.Role;
+					state = ClientState.Connected;
+					break;
+				case (ClientState.Connected, ProtocolResult.Promoted, true):
+					role = result.Role;
+					state = ClientState.Working;
+					break;
+				case (ClientState.Working, ProtocolResult.Rejected, true):
+				case (ClientState.Connected, ProtocolResult.Rejected, true):
+				case (ClientState.Working, ProtocolResult.Rejected, false):
+					role = result.Role;
+					state = ClientState.Idle;
+					sessionId = null;
+					break;
+				default:
+					throw new Exception($"Invalid state. Online: {online}, Client: {state}, Result: {result.Result}");
 			}
 		}
 

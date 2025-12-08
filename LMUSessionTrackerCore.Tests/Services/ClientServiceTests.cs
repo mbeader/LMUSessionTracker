@@ -288,5 +288,18 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			await service.Do();
 			AssertState(TestState.Idle());
 		}
+
+		[Fact]
+		public async Task Do_OnlineSessionInvalidState_Throws() {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
+			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
+			await service.Start(scope.Object);
+			AssertState(TestState.Idle());
+			await service.Do();
+			AssertState(TestState.OnlineWorking("s1"));
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Promoted, Role = ProtocolRole.Primary, SessionId = "s1" });
+			await Assert.ThrowsAsync<Exception>(service.Do);
+		}
 	}
 }

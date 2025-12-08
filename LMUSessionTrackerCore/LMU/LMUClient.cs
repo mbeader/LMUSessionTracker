@@ -9,6 +9,8 @@ namespace LMUSessionTracker.Core.LMU {
 
 		public Task<TeamStrategy> GetStrategy();
 
+		public Task<StrategyUsage> GetStrategyUsage();
+
 		public Task<SessionInfo> GetSessionInfo();
 
 		public Task<List<Standing>> GetStandings();

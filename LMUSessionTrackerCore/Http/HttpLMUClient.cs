@@ -76,6 +76,10 @@ namespace LMUSessionTracker.Core.Http {
 			return Get<TeamStrategy>("/rest/strategy/overall");
 		}
 
+		public Task<StrategyUsage> GetStrategyUsage() {
+			return Get<StrategyUsage>("/rest/strategy/usage");
+		}
+
 		public Task<SessionInfo> GetSessionInfo() {
 			return Get<SessionInfo>("/rest/watch/sessionInfo");
 		}
