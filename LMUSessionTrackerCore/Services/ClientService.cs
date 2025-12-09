@@ -41,6 +41,15 @@ namespace LMUSessionTracker.Core.Services {
 		}
 
 		public override async Task Do() {
+			lmuClient.OpenContext();
+			try {
+				await HandleSession();
+			} finally {
+				lmuClient.CloseContext();
+			}
+		}
+
+		private async Task HandleSession() {
 			ProtocolMessage message = new ProtocolMessage() { ClientId = clientId, SessionId = sessionId };
 			message.SessionInfo = await lmuClient.GetSessionInfo();
 			if(message.SessionInfo == null && state == ClientState.Idle) {

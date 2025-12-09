@@ -39,7 +39,10 @@ namespace LMUSessionTracker.Server {
 			if(serverOptions.UseLocalClient) {
 				builder.Services.AddScoped<LMUClient, HttpLMUClient>();
 				builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
-				builder.Services.AddHostedService<ClientService>();
+				if(serverOptions.LMULoggingOnly)
+					builder.Services.AddHostedService<ResponseLoggerService>();
+				else
+					builder.Services.AddHostedService<ClientService>();
 			}
 			if(serverOptions.RejectAllClients)
 				builder.Services.AddSingleton<ProtocolServer, AutoRejectServer>();

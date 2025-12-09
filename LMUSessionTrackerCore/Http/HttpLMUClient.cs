@@ -16,6 +16,10 @@ namespace LMUSessionTracker.Core.Http {
 		private readonly ILogger<HttpLMUClient> logger;
 		private readonly SchemaValidator schemaValidator;
 		private readonly LMUClientOptions options;
+		private readonly string logPath;
+		private string contextId = null;
+		private Dictionary<string, object> objContext = new Dictionary<string, object>();
+		private Dictionary<string, string> rawContext = new Dictionary<string, string>();
 
 		public HttpLMUClient(ILogger<HttpLMUClient> logger, SchemaValidator schemaValidator = null, IOptions<LMUClientOptions> options = null) {
 			this.logger = logger;
@@ -25,6 +29,9 @@ namespace LMUSessionTracker.Core.Http {
 				BaseAddress = new Uri(this.options.BaseUri),
 				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond)
 			};
+			if(this.options.LogResponses && string.IsNullOrEmpty(this.options.LogDirectory))
+				throw new Exception("Directory for response logging must be specified");
+			logPath = Path.GetFullPath(this.options.LogDirectory);
 		}
 
 		private async Task<T> Get<T>(string path) {
@@ -32,12 +39,14 @@ namespace LMUSessionTracker.Core.Http {
 				HttpResponseMessage res = await httpClient.GetAsync(path);
 				if(res.StatusCode == System.Net.HttpStatusCode.OK && res.Content != null) {
 					string body = await res.Content.ReadAsStringAsync();
+					if(options.LogResponses)
+						rawContext.Add(path, body);
 					if(!string.IsNullOrEmpty(body)) {
 						T result = JsonConvert.DeserializeObject<T>(body);
 						if(options.ValidateResponses && schemaValidator != null)
 							schemaValidator.Validate(body, typeof(T));
-						if(options.LogResponses && result != null)
-							LogResponse(path, result);
+						if(options.LogResponses)
+							objContext.Add(path, result);
 						return result;
 					}
 				}
@@ -55,13 +64,47 @@ namespace LMUSessionTracker.Core.Http {
 
 		private void LogResponse<T>(string path, T response) {
 			try {
-				if(!Directory.Exists(options.LogDirectory))
-					Directory.CreateDirectory(options.LogDirectory);
+				if(!Directory.Exists(logPath))
+					Directory.CreateDirectory(logPath);
 				string json = JsonConvert.SerializeObject(response);
-				File.WriteAllText(Path.Join(options.LogDirectory, $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}{path.Replace("/", "_")}.json"), json);
+				File.WriteAllText(Path.Join(logPath, $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}{path.Replace("/", "_")}.json"), json);
 			} catch(Exception e) {
 				logger.LogWarning(e, "Failed to write request debug file");
 			}
+		}
+
+		private void LogContext() {
+			if(contextId == null || !options.LogResponses)
+				return;
+			try {
+				if(!Directory.Exists(logPath))
+					Directory.CreateDirectory(logPath);
+				File.WriteAllText(Path.Join(logPath, $"{contextId}-obj.json"), JsonConvert.SerializeObject(objContext, Formatting.Indented));
+				File.WriteAllText(Path.Join(logPath, $"{contextId}-raw.json"), JsonConvert.SerializeObject(rawContext));
+			} catch(Exception e) {
+				logger.LogWarning(e, "Failed to write request debug file");
+			}
+		}
+
+		public void OpenContext() {
+			if(contextId != null) {
+				logger.LogWarning("A leftover context was not logged");
+				ResetContext();
+			}
+			contextId = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
+		}
+
+		public void CloseContext() {
+			if(contextId == null)
+				return;
+			LogContext();
+			ResetContext();
+		}
+
+		private void ResetContext() {
+			contextId = null;
+			objContext.Clear();
+			rawContext.Clear();
 		}
 
 		public Task<List<Chat>> GetChat() {

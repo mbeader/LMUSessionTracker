@@ -3,6 +3,10 @@ using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.LMU {
 	public interface LMUClient {
+		public void OpenContext();
+
+		public void CloseContext();
+
 		public Task<List<Chat>> GetChat();
 
 		public Task<MultiplayerTeams> GetMultiplayerTeams();
