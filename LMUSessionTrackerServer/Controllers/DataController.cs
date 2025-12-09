@@ -16,9 +16,18 @@ namespace LMUSessionTracker.Server.Controllers {
 			this.arbiter = arbiter;
 		}
 
+		[HttpPost("a")]
+		public IActionResult Index() {
+			if(!IPAddress.IsLoopback(HttpContext.Connection.RemoteIpAddress))
+				return StatusCode(403);
+			if(!ModelState.IsValid)
+				return BadRequest();
+			return Ok();
+		}
+
 		[HttpPost]
 		public async Task<IActionResult> Index([FromBody] ProtocolMessage data) {
-			if(IPAddress.IsLoopback(HttpContext.Connection.RemoteIpAddress))
+			if(!IPAddress.IsLoopback(HttpContext.Connection.RemoteIpAddress))
 				return StatusCode(403);
 			if(!ModelState.IsValid)
 				return BadRequest();

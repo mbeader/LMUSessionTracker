@@ -26,6 +26,7 @@ namespace LMUSessionTracker.Server {
 
 			var clientConfig = builder.Configuration.GetSection("Client");
 			var serverConfig = builder.Configuration.GetSection("Server");
+			var serverOptions = serverConfig.Get<ServerOptions>();
 			builder.Services.Configure<LMUClientOptions>(clientConfig.GetSection("LMU"));
 			builder.Services.Configure<ProtocolClientOptions>(clientConfig.GetSection("Protocol"));
 			builder.Services.Configure<ServerOptions>(serverConfig);
@@ -35,12 +36,15 @@ namespace LMUSessionTracker.Server {
 			builder.Services.AddScoped<SessionViewer>();
 			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled)))
 				builder.Services.AddScoped<SchemaValidation.Validator>();
-			if(serverConfig.Get<ServerOptions>().UseLocalClient) {
+			if(serverOptions.UseLocalClient) {
 				builder.Services.AddScoped<LMUClient, HttpLMUClient>();
 				builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
 				builder.Services.AddHostedService<ClientService>();
 			}
-			builder.Services.AddSingleton<ProtocolServer, SessionArbiter>();
+			if(serverOptions.RejectAllClients)
+				builder.Services.AddSingleton<ProtocolServer, AutoRejectServer>();
+			else
+				builder.Services.AddSingleton<ProtocolServer, SessionArbiter>();
 			//builder.Services.AddHostedService<SessionService>();
 			//builder.Services.AddHostedService<ReplayService>();
 
