@@ -39,16 +39,18 @@ namespace LMUSessionTracker.Core.Session {
 		private int ClassId(string s) {
 			if(s.Contains("Hyper", StringComparison.OrdinalIgnoreCase))
 				return 1;
-			else if(s.Contains("LMP2", StringComparison.OrdinalIgnoreCase))
+			else if(s.Contains("LMP2_ELMS", StringComparison.OrdinalIgnoreCase))
 				return 2;
-			else if(s.Contains("LMP3", StringComparison.OrdinalIgnoreCase))
+			else if(s.Contains("LMP2", StringComparison.OrdinalIgnoreCase))
 				return 3;
-			else if(s.Contains("GTE", StringComparison.OrdinalIgnoreCase))
+			else if(s.Contains("LMP3", StringComparison.OrdinalIgnoreCase))
 				return 4;
-			else if(s.Contains("GT3", StringComparison.OrdinalIgnoreCase))
+			else if(s.Contains("GTE", StringComparison.OrdinalIgnoreCase))
 				return 5;
-			else
+			else if(s.Contains("GT3", StringComparison.OrdinalIgnoreCase))
 				return 6;
+			else
+				return 7;
 		}
 
 		public void Clear() {

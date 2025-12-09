@@ -3,7 +3,7 @@
 	"type": "object",
 	"properties": {
 		"carClass": {
-			"enum": [ "Hyper", "LMP2", "LMP3", "GTE", "GT3" ]
+			"enum": [ "Hyper", "LMP2_ELMS", "LMP2", "LMP3", "GTE", "GT3" ]
 		},
 		"driverName": {
 			"type": "string"
