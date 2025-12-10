@@ -64,7 +64,7 @@ namespace LMUSessionTracker.Core.Json {
 			loaded = true;
 		}
 
-		public static bool Validate(string json, Type type, ILogger logger = null) {
+		public static bool Validate(string json, Type type, string id = null, ILogger logger = null) {
 			if(!loaded)
 				throw new Exception("Schemas not loaded");
 			try {
@@ -84,7 +84,8 @@ namespace LMUSessionTracker.Core.Json {
 					}
 					sb.AppendLine();
 					sb.AppendLine(obj.ToString());
-					File.WriteAllText(Path.Join("logs", "schema", $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}-invalid-{type.Name}.txt"), sb.ToString());
+					string runId = id ?? DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
+					File.WriteAllText(Path.Join("logs", "schema", $"{runId}-invalid-{type.Name}.txt"), sb.ToString());
 				}
 				return res;
 			} catch(Exception e) {
@@ -112,8 +113,8 @@ namespace LMUSessionTracker.Core.Json {
 				this.options = options?.Value ?? new SchemaValidatorOptions();
 			}
 
-			public bool Validate(string json, Type type) {
-				return SchemaValidation.Validate(json, type, logger);
+			public bool Validate(string json, Type type, string id = null) {
+				return SchemaValidation.Validate(json, type, id, logger);
 			}
 		}
 	}

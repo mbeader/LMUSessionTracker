@@ -2,7 +2,7 @@
 using LMUSessionTracker.Core.Session;
 using System.Collections.Generic;
 
-namespace LMUSessionTracker.Core.Session.Replay {
+namespace LMUSessionTracker.Core.Replay {
 	public class CarReplay {
 		public CarKey Key { get; set; }
 		public List<LapReplay> Laps = new List<LapReplay>();

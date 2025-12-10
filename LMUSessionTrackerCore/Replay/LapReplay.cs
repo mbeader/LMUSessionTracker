@@ -1,7 +1,7 @@
 ﻿using LMUSessionTracker.Core.LMU;
 using System.Collections.Generic;
 
-namespace LMUSessionTracker.Core.Session.Replay {
+namespace LMUSessionTracker.Core.Replay {
 	public class LapReplay {
 		public int Num { get; init; }
 		//public List<AttackMode> attackMode { get; set; }

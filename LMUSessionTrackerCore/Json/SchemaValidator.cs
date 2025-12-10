@@ -2,6 +2,6 @@
 
 namespace LMUSessionTracker.Core.Json {
 	public interface SchemaValidator {
-		public bool Validate(string json, Type type) ;
+		public bool Validate(string json, Type type, string id = null);
 	}
 }

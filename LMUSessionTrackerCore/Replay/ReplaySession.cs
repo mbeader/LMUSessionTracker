@@ -1,8 +1,9 @@
 ﻿using LMUSessionTracker.Core.LMU;
+using LMUSessionTracker.Core.Session;
 using System.Collections.Generic;
 
-namespace LMUSessionTracker.Core.Session.Replay {
-	public class Replay {
+namespace LMUSessionTracker.Core.Replay {
+	public class ReplaySession {
 		public Dictionary<CarKey, CarReplay> Cars { get; } = new Dictionary<CarKey, CarReplay>();
 
 		public void Update(List<Standing> standings) {

@@ -2,6 +2,7 @@ using LMUSessionTracker.Core.Http;
 using LMUSessionTracker.Core.Json;
 using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Protocol;
+using LMUSessionTracker.Core.Replay;
 using LMUSessionTracker.Core.Services;
 using LMUSessionTracker.Core.Session;
 using Microsoft.AspNetCore.Builder;
@@ -29,20 +30,28 @@ namespace LMUSessionTracker.Server {
 			var serverOptions = serverConfig.Get<ServerOptions>();
 			builder.Services.Configure<LMUClientOptions>(clientConfig.GetSection("LMU"));
 			builder.Services.Configure<ProtocolClientOptions>(clientConfig.GetSection("Protocol"));
+			builder.Services.Configure<ReplayOptions>(clientConfig.GetSection("Replay"));
 			builder.Services.Configure<ServerOptions>(serverConfig);
 			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
 
 			builder.Services.AddSingleton<SessionManager>();
 			builder.Services.AddScoped<SessionViewer>();
-			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled)))
-				builder.Services.AddScoped<SchemaValidation.Validator>();
+			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled))) {
+				SchemaValidation.LoadJsonSchemas();
+				builder.Services.AddScoped<SchemaValidator, SchemaValidation.Validator>();
+			}
 			if(serverOptions.UseLocalClient) {
-				builder.Services.AddScoped<LMUClient, HttpLMUClient>();
-				builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
-				if(serverOptions.LMULoggingOnly)
-					builder.Services.AddHostedService<ResponseLoggerService>();
-				else
-					builder.Services.AddHostedService<ClientService>();
+				if(serverOptions.UseReplay) {
+					builder.Services.AddScoped<ReplayLMUClient>();
+					builder.Services.AddHostedService<ReplayClientService>();
+				} else {
+					builder.Services.AddScoped<LMUClient, HttpLMUClient>();
+					builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
+					if(serverOptions.LMULoggingOnly)
+						builder.Services.AddHostedService<ResponseLoggerService>();
+					else
+						builder.Services.AddHostedService<ClientService>();
+				}
 			}
 			if(serverOptions.RejectAllClients)
 				builder.Services.AddSingleton<ProtocolServer, AutoRejectServer>();
@@ -58,8 +67,7 @@ namespace LMUSessionTracker.Server {
 				.ReadFrom.Configuration(builder.Configuration)
 				.ReadFrom.Services(services)
 				.Enrich.FromLogContext()
-				.Enrich.WithThreadId()
-				.WriteTo.Console());
+				.Enrich.WithThreadId());
 
 			var app = builder.Build();
 

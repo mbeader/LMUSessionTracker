@@ -1,6 +1,6 @@
 ﻿using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Session;
-using LMUSessionTracker.Core.Session.Replay;
+using LMUSessionTracker.Core.Replay;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -13,7 +13,7 @@ namespace LMUSessionTracker.Core.Services {
 	public class ReplayService : PeriodicService<ReplayService> {
 		private SessionManager manager;
 		private List<(SessionInfo info, List<Standing> standings)> data;
-		private Replay replay;
+		private ReplaySession replay;
 		private int i;
 
 		public ReplayService(ILogger<ReplayService> logger, IServiceProvider serviceProvider) : base(logger, serviceProvider) {
@@ -26,7 +26,7 @@ namespace LMUSessionTracker.Core.Services {
 		public override Task Start(IServiceScope scope) {
 			manager = scope.ServiceProvider.GetRequiredService<SessionManager>();
 			data = Load("debug");
-			replay = new Replay();
+			replay = new ReplaySession();
 			i = 0;
 			return Task.CompletedTask;
 		}

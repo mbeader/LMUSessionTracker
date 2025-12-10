@@ -46,7 +46,7 @@ namespace LMUSessionTracker.Core.Http {
 						rawContext.Add(path, body);
 					if(!string.IsNullOrEmpty(body)) {
 						T result = JsonConvert.DeserializeObject<T>(body, serializerSettings);
-						if(options.ValidateResponses && schemaValidator != null)
+						if(result != null && options.ValidateResponses && schemaValidator != null)
 							schemaValidator.Validate(body, typeof(T));
 						if(options.LogResponses)
 							objContext.Add(path, result);
