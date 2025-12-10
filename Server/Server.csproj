@@ -5,6 +5,7 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <RootNamespace>LMUSessionTracker.Server</RootNamespace>
+    <AssemblyName>LMUSessionTracker.Server</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -55,14 +56,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\LMUSessionTrackerCore\Json\Schema\*.json">
+    <Content Include="..\Core\Json\Schema\*.json">
       <Link>Json\Schema\%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LMUSessionTrackerCore\LMUSessionTrackerCore.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <OutputType>Exe</OutputType>
     <RootNamespace>LMUSessionTracker.Core.Tests</RootNamespace>
-    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>LMUSessionTracker.Core.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LMUSessionTrackerCore\LMUSessionTrackerCore.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

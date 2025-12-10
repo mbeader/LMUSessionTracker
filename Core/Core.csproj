@@ -5,6 +5,7 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <RootNamespace>LMUSessionTracker.Core</RootNamespace>
+    <AssemblyName>LMUSessionTracker.Core</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

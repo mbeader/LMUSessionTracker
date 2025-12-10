@@ -2,6 +2,7 @@
 data/
 out/
 reports/
+misc/
 # default dotnet ignore below
 
 ## Ignore Visual Studio temporary files, build results, and
