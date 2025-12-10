@@ -2,6 +2,9 @@
 	"$id": "MultiplayerDriver",
 	"type": "object",
 	"properties": {
+		"badge": {
+			"enum": [ "none", "sr-noob", "sr-rookie", "sr-clean", "sr-saint", "sr-warning" ]
+		},
 		"isConnected": {
 			"type": "boolean"
 		},
@@ -26,7 +29,6 @@
 	},
 	"additionalProperties": false,
 	"required": [
-		"isConnected",
 		"nationality",
 		"roles"
 	]

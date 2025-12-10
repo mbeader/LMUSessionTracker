@@ -2,6 +2,9 @@
 	"$id": "MultiplayerTeamMember",
 	"type": "object",
 	"properties": {
+		"badge": {
+			"enum": [ "none", "sr-noob", "sr-rookie", "sr-clean", "sr-saint", "sr-warning" ]
+		},
 		"nationality": {
 			"type": "string"
 		},
@@ -14,6 +17,7 @@
 	},
 	"additionalProperties": false,
 	"required": [
+		"badge",
 		"nationality",
 		"roles"
 	]

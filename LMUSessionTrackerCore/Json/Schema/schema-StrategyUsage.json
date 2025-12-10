@@ -3,7 +3,7 @@
 	"type": "object",
 	"patternProperties": {
 		"^.+$": {
-			"type": "array",
+			"type": [ "array", "null" ],
 			"items": {
 				"$ref": "schema-StrategyDriverUsage.json"
 			}

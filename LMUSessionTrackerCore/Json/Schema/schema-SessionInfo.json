@@ -15,7 +15,8 @@
 		},
 		"averagePathWetness": {
 			"type": "number",
-			"minimum": 0
+			"minimum": 0,
+			"maximum": 1
 		},
 		"currentEventTime": {
 			"type": "number"
@@ -46,7 +47,7 @@
 		"maxPathWetness": {
 			"type": "number",
 			"minimum": 0,
-			"maximum": 0
+			"maximum": 1
 		},
 		"maxPlayers": {
 			"type": "integer",
@@ -64,7 +65,7 @@
 		"minPathWetness": {
 			"type": "number",
 			"minimum": 0,
-			"maximum": 0
+			"maximum": 1
 		},
 		"numRedLights": {
 			"type": "integer",
@@ -97,7 +98,7 @@
 		"sectorFlag": {
 			"type": "array",
 			"items": {
-				"enum": [ "UNKNOWN", "YELLOW" ]
+				"enum": [ "UNKNOWN", "YELLOW", "RED", "CHECKERED" ]
 			},
 			"minItems": 3,
 			"maxItems": 3
@@ -109,7 +110,7 @@
 			"type": "integer"
 		},
 		"session": {
-			"enum": [ "TESTDAY", "PRACTICE1", "PRACTICE2", "PRACTICE3", "PRACTICE4", "QUALIFYING1", "QUALIFYING2", "QUALIFYING3", "QUALIFYING4", "WARMUP", "RACE1", "RACE2", "RACE3", "RACE4" ]
+			"enum": [ "TESTDAY", "PRACTICE1", "PRACTICE2", "PRACTICE3", "PRACTICE4", "QUALIFY1", "QUALIFY2", "QUALIFY3", "QUALIFY4", "WARMUP", "RACE1", "RACE2", "RACE3", "RACE4" ]
 		},
 		"startEventTime": {
 			"type": "number",
@@ -120,8 +121,7 @@
 			"minimum": 0
 		},
 		"timeRemainingInGamePhase": {
-			"type": "number",
-			"minimum": 0
+			"type": "number"
 		},
 		"trackName": {
 			"type": "string"
