@@ -40,13 +40,14 @@ namespace LMUSessionTracker.Core.Services {
 			return Task.CompletedTask;
 		}
 
-		public override async Task Do() {
+		public override async Task<bool> Do() {
 			lmuClient.OpenContext();
 			try {
 				await HandleSession();
 			} finally {
 				lmuClient.CloseContext();
 			}
+			return true;
 		}
 
 		private async Task HandleSession() {

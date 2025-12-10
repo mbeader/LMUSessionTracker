@@ -2,49 +2,53 @@
 using LMUSessionTracker.Core.Session;
 using LMUSessionTracker.Core.Session.Replay;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Services {
-	public class ReplayService : BackgroundService {
-		private readonly ILogger<SessionService> logger;
-		private readonly IServiceProvider serviceProvider;
+	public class ReplayService : PeriodicService<ReplayService> {
+		private SessionManager manager;
+		private List<(SessionInfo info, List<Standing> standings)> data;
+		private Replay replay;
+		private int i;
 
-		public ReplayService(ILogger<SessionService> logger, IServiceProvider serviceProvider) {
-			this.logger = logger;
-			this.serviceProvider = serviceProvider;
+		public ReplayService(ILogger<ReplayService> logger, IServiceProvider serviceProvider) : base(logger, serviceProvider) {
 		}
 
-		protected override Task ExecuteAsync(CancellationToken stoppingToken) {
-			logger.LogInformation("Starting service");
-			using(IServiceScope scope = serviceProvider.CreateScope()) {
-				SessionManager manager = scope.ServiceProvider.GetRequiredService<SessionManager>();
-				List<(SessionInfo info, List<Standing> standings)> data = Load("debug");
-				Replay replay = new Replay();
-				int i = 0;
-				while(!stoppingToken.IsCancellationRequested) {
-					if(i >= data.Count)
-						break;
-					(SessionInfo info, List<Standing> standings) = data[i++];
-					manager.UpdateSession(info);
-					if(info != null) {
-						replay.Update(standings);
-						manager.UpdateStandings(standings);
-					}
-					manager.PeriodicPersist();
-				}
-				manager.Persist();
-				logger.LogInformation("Stopping service");
-				foreach(CarReplay car in replay.Cars.Values)
-					File.WriteAllText(Path.Combine("debug", "replay", $"replay-{car.Key.SlotId}.json"), JsonConvert.SerializeObject(car, Formatting.Indented));
-				File.WriteAllText(Path.Combine("debug", "replay.json"), JsonConvert.SerializeObject(replay.Cars, Formatting.Indented));
+		public override int CalculateDelay() {
+			return 0;
+		}
+
+		public override Task Start(IServiceScope scope) {
+			manager = scope.ServiceProvider.GetRequiredService<SessionManager>();
+			data = Load("debug");
+			replay = new Replay();
+			i = 0;
+			return Task.CompletedTask;
+		}
+
+		public override Task<bool> Do() {
+			if(i >= data.Count)
+				return Task.FromResult(false);
+			(SessionInfo info, List<Standing> standings) = data[i++];
+			manager.UpdateSession(info);
+			if(info != null) {
+				replay.Update(standings);
+				manager.UpdateStandings(standings);
 			}
+			manager.PeriodicPersist();
+			return Task.FromResult(true);
+		}
+
+		public override Task End() {
+			manager.Persist();
+			foreach(CarReplay car in replay.Cars.Values)
+				File.WriteAllText(Path.Combine("debug", "replay", $"replay-{car.Key.SlotId}.json"), JsonConvert.SerializeObject(car, Formatting.Indented));
+			File.WriteAllText(Path.Combine("debug", "replay.json"), JsonConvert.SerializeObject(replay.Cars, Formatting.Indented));
 			return Task.CompletedTask;
 		}
 
@@ -53,7 +57,7 @@ namespace LMUSessionTracker.Core.Services {
 			List<string> files = new List<string>(Directory.EnumerateFiles(dir));
 			files.RemoveAll(x => x.Contains("replay"));
 			files.Sort();
-			for(int i = 0; i < files.Count;) 				try {
+			for(int i = 0; i < files.Count;) try {
 					SessionInfo info = JsonConvert.DeserializeObject<SessionInfo>(File.ReadAllText(files[i++]));
 					List<Standing> standings = JsonConvert.DeserializeObject<List<Standing>>(File.ReadAllText(files[i++]));
 					data.Add((info, standings));

@@ -1,10 +1,7 @@
-﻿using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Session;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,8 +20,9 @@ namespace LMUSessionTracker.Core.Services {
 			using(IServiceScope scope = serviceProvider.CreateScope()) {
 				await Start(scope);
 				while(!stoppingToken.IsCancellationRequested) {
-					await Do();
-					await Task.Delay(CalculateDelay(), stoppingToken);
+					if(!await Do())
+						break;
+					await Task.Delay(CalculateDelay(), stoppingToken).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
 				}
 				await End();
 				logger.LogInformation("Stopping service");
@@ -35,7 +33,7 @@ namespace LMUSessionTracker.Core.Services {
 
 		public abstract Task Start(IServiceScope scope);
 
-		public abstract Task Do();
+		public abstract Task<bool> Do();
 
 		public abstract Task End();
 	}

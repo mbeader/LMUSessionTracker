@@ -24,7 +24,7 @@ namespace LMUSessionTracker.Core.Services {
 			return Task.CompletedTask;
 		}
 
-		public override async Task Do() {
+		public override async Task<bool> Do() {
 			SessionInfo info = await client.GetSessionInfo();
 			manager.UpdateSession(info);
 			if(info != null) {
@@ -32,6 +32,7 @@ namespace LMUSessionTracker.Core.Services {
 				manager.UpdateStandings(standings);
 			}
 			manager.PeriodicPersist();
+			return true;
 		}
 
 		public override Task End() {

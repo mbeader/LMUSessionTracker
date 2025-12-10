@@ -20,13 +20,14 @@ namespace LMUSessionTracker.Core.Services {
 			return Task.CompletedTask;
 		}
 
-		public override async Task Do() {
+		public override async Task<bool> Do() {
 			lmuClient.OpenContext();
 			try {
 				await MakeRequests();
 			} finally {
 				lmuClient.CloseContext();
 			}
+			return true;
 		}
 
 		private async Task MakeRequests() {
@@ -37,7 +38,7 @@ namespace LMUSessionTracker.Core.Services {
 			await lmuClient.GetStrategy();
 			await lmuClient.GetStrategyUsage();
 			await lmuClient.GetStandingsHistory();
-			await lmuClient.GetTrackMap();
+			//await lmuClient.GetTrackMap();
 		}
 
 		public override Task End() {
