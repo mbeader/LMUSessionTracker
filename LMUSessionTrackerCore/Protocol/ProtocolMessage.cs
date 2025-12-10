@@ -9,7 +9,7 @@ namespace LMUSessionTracker.Core.Protocol {
 		public SessionInfo SessionInfo { get; set; }
 		public MultiplayerTeams MultiplayerTeams { get; set; }
 		public List<Standing> Standings { get; set; }
-		public TeamStrategy TeamStrategy { get; set; }
+		public List<TeamStrategy> TeamStrategy { get; set; }
 		public List<Chat> Chat { get; set; }
 	}
 }

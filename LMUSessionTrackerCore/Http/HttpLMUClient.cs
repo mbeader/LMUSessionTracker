@@ -16,6 +16,7 @@ namespace LMUSessionTracker.Core.Http {
 		private readonly ILogger<HttpLMUClient> logger;
 		private readonly SchemaValidator schemaValidator;
 		private readonly LMUClientOptions options;
+		private readonly JsonSerializerSettings serializerSettings;
 		private readonly string logPath;
 		private string contextId = null;
 		private Dictionary<string, object> objContext = new Dictionary<string, object>();
@@ -29,6 +30,8 @@ namespace LMUSessionTracker.Core.Http {
 				BaseAddress = new Uri(this.options.BaseUri),
 				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond)
 			};
+			serializerSettings = new JsonSerializerSettings();
+			serializerSettings.Converters.Add(new TeamStrategyConverter());
 			if(this.options.LogResponses && string.IsNullOrEmpty(this.options.LogDirectory))
 				throw new Exception("Directory for response logging must be specified");
 			logPath = Path.GetFullPath(this.options.LogDirectory);
@@ -42,7 +45,7 @@ namespace LMUSessionTracker.Core.Http {
 					if(options.LogResponses)
 						rawContext.Add(path, body);
 					if(!string.IsNullOrEmpty(body)) {
-						T result = JsonConvert.DeserializeObject<T>(body);
+						T result = JsonConvert.DeserializeObject<T>(body, serializerSettings);
 						if(options.ValidateResponses && schemaValidator != null)
 							schemaValidator.Validate(body, typeof(T));
 						if(options.LogResponses)
@@ -66,7 +69,7 @@ namespace LMUSessionTracker.Core.Http {
 			try {
 				if(!Directory.Exists(logPath))
 					Directory.CreateDirectory(logPath);
-				string json = JsonConvert.SerializeObject(response);
+				string json = JsonConvert.SerializeObject(response, serializerSettings);
 				File.WriteAllText(Path.Join(logPath, $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}{path.Replace("/", "_")}.json"), json);
 			} catch(Exception e) {
 				logger.LogWarning(e, "Failed to write request debug file");
@@ -79,8 +82,8 @@ namespace LMUSessionTracker.Core.Http {
 			try {
 				if(!Directory.Exists(logPath))
 					Directory.CreateDirectory(logPath);
-				File.WriteAllText(Path.Join(logPath, $"{contextId}-obj.json"), JsonConvert.SerializeObject(objContext, Formatting.Indented));
-				File.WriteAllText(Path.Join(logPath, $"{contextId}-raw.json"), JsonConvert.SerializeObject(rawContext));
+				File.WriteAllText(Path.Join(logPath, $"{contextId}-obj.json"), JsonConvert.SerializeObject(objContext, Formatting.Indented, serializerSettings));
+				File.WriteAllText(Path.Join(logPath, $"{contextId}-raw.json"), JsonConvert.SerializeObject(rawContext, serializerSettings));
 			} catch(Exception e) {
 				logger.LogWarning(e, "Failed to write request debug file");
 			}
@@ -115,8 +118,8 @@ namespace LMUSessionTracker.Core.Http {
 			return Get<MultiplayerTeams>("/rest/multiplayer/teams");
 		}
 
-		public Task<TeamStrategy> GetStrategy() {
-			return Get<TeamStrategy>("/rest/strategy/overall");
+		public Task<List<TeamStrategy>> GetStrategy() {
+			return Get<List<TeamStrategy>>("/rest/strategy/overall");
 		}
 
 		public Task<StrategyUsage> GetStrategyUsage() {

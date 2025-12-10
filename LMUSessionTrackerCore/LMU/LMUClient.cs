@@ -11,7 +11,7 @@ namespace LMUSessionTracker.Core.LMU {
 
 		public Task<MultiplayerTeams> GetMultiplayerTeams();
 
-		public Task<TeamStrategy> GetStrategy();
+		public Task<List<TeamStrategy>> GetStrategy();
 
 		public Task<StrategyUsage> GetStrategyUsage();
 
