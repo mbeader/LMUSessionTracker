@@ -1,6 +1,6 @@
 using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Session;
-using LMUSessionTracker.Server.Models;
+using LMUSessionTracker.Server.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;

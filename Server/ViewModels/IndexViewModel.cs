@@ -2,7 +2,7 @@
 using LMUSessionTracker.Core.Session;
 using System.Collections.Generic;
 
-namespace LMUSessionTracker.Server.Models {
+namespace LMUSessionTracker.Server.ViewModels {
 	public class IndexViewModel {
 		public SessionInfo Info { get; set; }
 		public List<Standing> Standings { get; set; }
