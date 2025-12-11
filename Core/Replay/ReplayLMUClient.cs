@@ -50,7 +50,7 @@ namespace LMUSessionTracker.Core.Replay {
 		}
 
 		private string GetContent(string path) {
-			if(context.TryGetValue(path, out string content))
+			if(context != null && context.TryGetValue(path, out string content))
 				return content;
 			return null;
 		}

@@ -5,6 +5,7 @@ using LMUSessionTracker.Core.Protocol;
 using LMUSessionTracker.Core.Replay;
 using LMUSessionTracker.Core.Services;
 using LMUSessionTracker.Core.Session;
+using LMUSessionTracker.Server.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,12 +36,13 @@ namespace LMUSessionTracker.Server {
 			builder.Services.Configure<ServerOptions>(serverConfig);
 			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
 
-			builder.Services.AddDbContext<SqliteContext>(options =>
-				options.UseSqlite(builder.Configuration["ConnectionStrings:Sqlite"]),
-				ServiceLifetime.Scoped);
+			//builder.Services.AddDbContext<SqliteContext>(options =>
+			//	options.UseSqlite(builder.Configuration["ConnectionStrings:Sqlite"]),
+			//	ServiceLifetime.Scoped);
+			builder.Services.AddDbContextFactory<SqliteContext>(options => options.UseSqlite(builder.Configuration["ConnectionStrings:Sqlite"]));
 
-			builder.Services.AddSingleton<SessionManager>();
-			builder.Services.AddScoped<SessionViewer>();
+			//builder.Services.AddSingleton<SessionManager>();
+			//builder.Services.AddScoped<SessionViewer>();
 			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled))) {
 				SchemaValidation.LoadJsonSchemas();
 				builder.Services.AddScoped<SchemaValidator, SchemaValidation.Validator>();
@@ -48,7 +50,12 @@ namespace LMUSessionTracker.Server {
 			if(serverOptions.UseLocalClient) {
 				if(serverOptions.UseReplay) {
 					builder.Services.AddScoped<ReplayLMUClient>();
-					builder.Services.AddHostedService<ReplayClientService>();
+					if(serverOptions.SendReplay) {
+					builder.Services.AddScoped<LMUClient>(provider => provider.GetRequiredService<ReplayLMUClient>());
+						builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
+						builder.Services.AddHostedService<ClientService>();
+					} else
+						builder.Services.AddHostedService<ReplayClientService>();
 				} else {
 					builder.Services.AddScoped<LMUClient, HttpLMUClient>();
 					builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
@@ -62,6 +69,8 @@ namespace LMUSessionTracker.Server {
 				builder.Services.AddSingleton<ProtocolServer, AutoRejectServer>();
 			else
 				builder.Services.AddSingleton<ProtocolServer, SessionArbiter>();
+			builder.Services.AddScoped<SessionRepository, SqliteSessionRepository>();
+			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
 			//builder.Services.AddHostedService<SessionService>();
 			//builder.Services.AddHostedService<ReplayService>();
 

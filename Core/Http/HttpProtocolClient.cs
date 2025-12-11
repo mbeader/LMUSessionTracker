@@ -4,7 +4,10 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Http {
@@ -18,14 +21,14 @@ namespace LMUSessionTracker.Core.Http {
 			this.options = options?.Value ?? new ProtocolClientOptions();
 			httpClient = new HttpClient() {
 				BaseAddress = new Uri(this.options.BaseUri),
-				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond)
+				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond),
 			};
 		}
 
 		private async Task<T> Post<T, TBody>(string path, TBody body) {
 			try {
 				string json = JsonConvert.SerializeObject(body);
-				HttpResponseMessage res = await httpClient.PostAsync(path, new StringContent(json));
+				HttpResponseMessage res = await httpClient.PostAsync(path, new StringContent(json, Encoding.UTF8, "application/json"));
 				if(res.StatusCode == System.Net.HttpStatusCode.OK && res.Content != null) {
 					string content = await res.Content.ReadAsStringAsync();
 					if(!string.IsNullOrEmpty(content)) {

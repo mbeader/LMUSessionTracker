@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LMUSessionTracker.Core.LMU;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -28,5 +29,20 @@ namespace LMUSessionTracker.Server.Models {
 		public ICollection<Entry> Entries { get; } = new List<Entry>();
 		public ICollection<Member> Members { get; } = new List<Member>();
 		public ICollection<Chat> Chats { get; } = new List<Chat>();
+
+		public void From(SessionInfo info) {
+			EndEventTime = info.endEventTime;
+			GameMode = info.gameMode;
+			LapDistance = info.lapDistance;
+			MaxPlayers = info.maxPlayers;
+			MaxTime = info.maxTime;
+			MaximumLaps = info.maximumLaps;
+			PasswordProtected = info.passwordProtected;
+			ServerName = info.serverName;
+			ServerPort = info.serverPort;
+			SessionType = info.session;
+			StartEventTime = info.startEventTime;
+			TrackName = info.trackName;
+		}
 	}
 }

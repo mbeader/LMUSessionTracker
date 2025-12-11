@@ -1,88 +1,26 @@
-﻿@model IndexViewModel
+@using Session = LMUSessionTracker.Server.Models.Session
+@model IndexViewModel
 @{
-    ViewData["Title"] = "Home Page";
-    var hasStandings = Model.Standings != null && Model.Standings.Count > 0;
+    ViewData["Title"] = "Sessions";
 }
 
-@if(Model.Info != null) {
-<div class="row">
-<div class="col">
-<h3>Session</h3>
-<div>
-    <dl>
-        <dt>Server</dt>
-        <dd>@Model.Info.serverName</dd>
-        <dt>Track</dt>
-        <dd>@Model.Info.trackName</dd>
-        <dt>Session</dt>
-        <dd>@Model.Info.session</dd>
-        <dt>Phase</dt>
-        <dd>@Model.Info.PhaseName()</dd>
-        <dt>Yellow state</dt>
-        <dd>@Model.Info.yellowFlagState</dd>
-        <dt>Sectors</dt>
-        <dd>@string.Join(" ", Model.Info.sectorFlag ?? new List<string>())</dd>
-    </dl>
-</div>
-</div>
+<h3>Sessions</h3>
+    <table class="table table-sm table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Start time</th>
+                <th>Track</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(Session session in Model.Sessions) {
+                <tr>
+                    <td><a asp-action="Session">@session.Timestamp.ToString("yyyy-MM-dd HH:mm")</a></td>
+                    <td>@session.TrackName</td>
+                    <td>@session.SessionType</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-<div class="col">
-<h3>Timing</h3>
-<div>
-    <dl>
-        <dt>Time remaining</dt>
-        <dd>@Format.Time(Model.Info.timeRemainingInGamePhase)</dd>
-        <dt>Start time</dt>
-        <dd>@Format.Time(Model.Info.startEventTime)</dd>
-        <dt>Current time</dt>
-        <dd>@Format.Time(Model.Info.currentEventTime)</dd>
-        <dt>End time</dt>
-        <dd>@Format.Time(Model.Info.endEventTime)</dd>
-        <dt>Completion</dt>
-        <dd>@Format.Percent(Model.Info.raceCompletion.timeCompletion)</dd>
-        <dt>Max time</dt>
-        <dd>@Format.Time(Model.Info.maxTime)</dd>
-    </dl>
-</div>
-</div>
-
-<div class="col">
-<h3>Conditions</h3>
-<div>
-    <dl>
-        <dt>Ambient temp</dt>
-        <dd>@Format.Temp(Model.Info.ambientTemp)</dd>
-        <dt>Track temp</dt>
-        <dd>@Format.Temp(Model.Info.trackTemp)</dd>
-        <dt>Dark cloud</dt>
-        <dd>@Format.Percent(Model.Info.darkCloud)</dd>
-        <dt>Wetness (min)</dt>
-        <dd>@Format.Percent(Model.Info.minPathWetness)</dd>
-        <dt>Wetness (avg)</dt>
-        <dd>@Format.Percent(Model.Info.averagePathWetness)</dd>
-        <dt>Wetness (max)</dt>
-        <dd>@Format.Percent(Model.Info.minPathWetness)</dd>
-        <dt>Raining</dt>
-        <dd>@Format.Percent(Model.Info.raining)</dd>
-        <dt>Wind</dt>
-        <dd>@Model.Info.windSpeed.velocity.ToString("N1")</dd>
-    </dl>
-</div>
-</div>
-</div>
-}
-
-@if(hasStandings) {
-    <partial name="StandingsPartial" model="Model" />
-}
-
-@if(Model.History != null) {
-    if(hasStandings) {
-        <div><a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#history">Show history</a></div>
-        <div class="collapse" id="history">
-            <partial name="HistoryPartial" model="Model.History" />
-        </div>
-    } else {
-        <partial name="HistoryPartial" model="Model.History" />
-    }
-}

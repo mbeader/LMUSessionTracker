@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LMUSessionTracker.Core.LMU;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -37,5 +38,32 @@ namespace LMUSessionTracker.Server.Models {
 		public string YellowFlagState { get; set; }
 
 		public Session Session { get; set; }
+
+		public void From(SessionInfo info) {
+			AmbientTemp = info.ambientTemp;
+			AveragePathWetness = info.averagePathWetness;
+			CurrentEventTime = info.currentEventTime;
+			DarkCloud = info.darkCloud;
+			GamePhase = info.gamePhase;
+			InRealtime = info.inRealtime;
+			MaxPathWetness = info.maxPathWetness;
+			MinPathWetness = info.minPathWetness;
+			NumRedLights = info.numRedLights;
+			NumberOfPlayers = info.numberOfPlayers;
+			NumberOfVehicles = info.numberOfVehicles;
+			RaceCompletion = info.raceCompletion?.timeCompletion;
+			Raining = info.raining;
+			Sector1Flag = info.sectorFlag?[0];
+			Sector2Flag = info.sectorFlag?[1];
+			Sector3Flag = info.sectorFlag?[2];
+			StartLightFrame = info.startLightFrame;
+			TimeRemainingInGamePhase = info.timeRemainingInGamePhase;
+			TrackTemp = info.trackTemp;
+			WindVelocity = info.windSpeed?.velocity;
+			WindX = info.windSpeed?.x;
+			WindY = info.windSpeed?.y;
+			WindZ = info.windSpeed?.z;
+			YellowFlagState = info.yellowFlagState;
+		}
 	}
 }
