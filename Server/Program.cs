@@ -6,6 +6,7 @@ using LMUSessionTracker.Core.Replay;
 using LMUSessionTracker.Core.Services;
 using LMUSessionTracker.Core.Session;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +34,10 @@ namespace LMUSessionTracker.Server {
 			builder.Services.Configure<ReplayOptions>(clientConfig.GetSection("Replay"));
 			builder.Services.Configure<ServerOptions>(serverConfig);
 			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
+
+			builder.Services.AddDbContext<SqliteContext>(options =>
+				options.UseSqlite(builder.Configuration["ConnectionStrings:Sqlite"]),
+				ServiceLifetime.Scoped);
 
 			builder.Services.AddSingleton<SessionManager>();
 			builder.Services.AddScoped<SessionViewer>();
@@ -70,6 +75,11 @@ namespace LMUSessionTracker.Server {
 				.Enrich.WithThreadId());
 
 			var app = builder.Build();
+
+			using(var serviceScope = app.Services.CreateScope()) {
+				var context = serviceScope.ServiceProvider.GetRequiredService<SqliteContext>();
+				context.Database.Migrate();
+			}
 
 			// Configure the HTTP request pipeline.
 			if(!app.Environment.IsDevelopment()) {
