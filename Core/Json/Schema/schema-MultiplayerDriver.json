@@ -3,7 +3,7 @@
 	"type": "object",
 	"properties": {
 		"badge": {
-			"enum": [ "none", "sr-noob", "sr-rookie", "sr-clean", "sr-saint", "sr-warning" ]
+			"enum": [ "none", "sr-noob", "sr-rookie", "sr-clean", "sr-saint", "sr-warning", "sr-danger", "sr-probation", "irl-driver", "content-creator" ]
 		},
 		"isConnected": {
 			"type": "boolean"
