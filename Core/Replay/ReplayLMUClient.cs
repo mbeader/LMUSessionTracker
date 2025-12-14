@@ -1,5 +1,6 @@
 ﻿using LMUSessionTracker.Core.Json;
 using LMUSessionTracker.Core.LMU;
+using LMUSessionTracker.Core.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -15,6 +16,7 @@ namespace LMUSessionTracker.Core.Replay {
 		private readonly ILogger<ReplayLMUClient> logger;
 		private readonly ReplayOptions options;
 		private readonly SchemaValidator schemaValidator;
+		private readonly ContinueProviderSource continueProviderSource;
 		private readonly JsonSerializerSettings serializerSettings;
 		private readonly string path;
 		private readonly Queue<string> runQueue;
@@ -23,10 +25,11 @@ namespace LMUSessionTracker.Core.Replay {
 		public string ContextId { get; private set; }
 		public int Remaining => runQueue.Count;
 
-		public ReplayLMUClient(ILogger<ReplayLMUClient> logger, IOptions<ReplayOptions> options, SchemaValidator schemaValidator = null) {
+		public ReplayLMUClient(ILogger<ReplayLMUClient> logger, IOptions<ReplayOptions> options, SchemaValidator schemaValidator = null, ContinueProviderSource continueProviderSource = null) {
 			this.logger = logger;
 			this.options = options.Value ?? new ReplayOptions();
 			this.schemaValidator = schemaValidator;
+			this.continueProviderSource = continueProviderSource;
 			if(string.IsNullOrEmpty(this.options.Directory))
 				throw new Exception("Replay directory not specified");
 			path = Path.GetFullPath(this.options.Directory);
@@ -90,6 +93,10 @@ namespace LMUSessionTracker.Core.Replay {
 
 		public void CloseContext() {
 			ResetContext();
+			if(runQueue.Count == 0 && continueProviderSource != null) {
+				continueProviderSource.Continue = false;
+				logger.LogInformation("Replay finished");
+			}
 		}
 
 		private void ResetContext() {

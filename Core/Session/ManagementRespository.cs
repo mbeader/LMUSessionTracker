@@ -5,5 +5,6 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Core.Session {
 	public interface ManagementRespository {
 		public Task<Guid> CreateSession(SessionInfo info);
+		public Task UpdateSession(Guid sessionId, SessionInfo info);
 	}
 }

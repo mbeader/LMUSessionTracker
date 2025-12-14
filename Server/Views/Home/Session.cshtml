@@ -4,24 +4,24 @@
     var hasStandings = Model.Standings != null && Model.Standings.Count > 0;
 }
 
-@if(Model.Info != null) {
+@if(Model.SessionState != null) {
 <div class="row">
 <div class="col">
 <h3>Session</h3>
 <div>
     <dl>
         <dt>Server</dt>
-        <dd>@Model.Info.serverName</dd>
+        <dd>@Model.Session.ServerName</dd>
         <dt>Track</dt>
-        <dd>@Model.Info.trackName</dd>
+        <dd>@Model.Session.TrackName</dd>
         <dt>Session</dt>
-        <dd>@Model.Info.session</dd>
+        <dd>@Model.Session.SessionType</dd>
         <dt>Phase</dt>
-        <dd>@Model.Info.PhaseName()</dd>
+        <dd>@Model.SessionState.GamePhase</dd>
         <dt>Yellow state</dt>
-        <dd>@Model.Info.yellowFlagState</dd>
+        <dd>@Model.SessionState.YellowFlagState</dd>
         <dt>Sectors</dt>
-        <dd>@string.Join(" ", Model.Info.sectorFlag ?? new List<string>())</dd>
+        <dd>@Model.SessionState.Sector1Flag @Model.SessionState.Sector2Flag @Model.SessionState.Sector3Flag</dd>
     </dl>
 </div>
 </div>
@@ -31,17 +31,17 @@
 <div>
     <dl>
         <dt>Time remaining</dt>
-        <dd>@Format.Time(Model.Info.timeRemainingInGamePhase)</dd>
+        <dd>@Format.Time(Model.SessionState.TimeRemainingInGamePhase)</dd>
         <dt>Start time</dt>
-        <dd>@Format.Time(Model.Info.startEventTime)</dd>
+        <dd>@Format.Time(Model.Session.StartEventTime)</dd>
         <dt>Current time</dt>
-        <dd>@Format.Time(Model.Info.currentEventTime)</dd>
+        <dd>@Format.Time(Model.SessionState.CurrentEventTime)</dd>
         <dt>End time</dt>
-        <dd>@Format.Time(Model.Info.endEventTime)</dd>
+        <dd>@Format.Time(Model.Session.EndEventTime)</dd>
         <dt>Completion</dt>
-        <dd>@Format.Percent(Model.Info.raceCompletion.timeCompletion)</dd>
+        <dd>@Format.Percent(Model.SessionState.RaceCompletion)</dd>
         <dt>Max time</dt>
-        <dd>@Format.Time(Model.Info.maxTime)</dd>
+        <dd>@Format.Time(Model.Session.MaxTime)</dd>
     </dl>
 </div>
 </div>
@@ -51,21 +51,21 @@
 <div>
     <dl>
         <dt>Ambient temp</dt>
-        <dd>@Format.Temp(Model.Info.ambientTemp)</dd>
+        <dd>@Format.Temp(Model.SessionState.AmbientTemp)</dd>
         <dt>Track temp</dt>
-        <dd>@Format.Temp(Model.Info.trackTemp)</dd>
+        <dd>@Format.Temp(Model.SessionState.TrackTemp)</dd>
         <dt>Dark cloud</dt>
-        <dd>@Format.Percent(Model.Info.darkCloud)</dd>
+        <dd>@Format.Percent(Model.SessionState.DarkCloud)</dd>
         <dt>Wetness (min)</dt>
-        <dd>@Format.Percent(Model.Info.minPathWetness)</dd>
+        <dd>@Format.Percent(Model.SessionState.MinPathWetness)</dd>
         <dt>Wetness (avg)</dt>
-        <dd>@Format.Percent(Model.Info.averagePathWetness)</dd>
+        <dd>@Format.Percent(Model.SessionState.AveragePathWetness)</dd>
         <dt>Wetness (max)</dt>
-        <dd>@Format.Percent(Model.Info.minPathWetness)</dd>
+        <dd>@Format.Percent(Model.SessionState.MaxPathWetness)</dd>
         <dt>Raining</dt>
-        <dd>@Format.Percent(Model.Info.raining)</dd>
+        <dd>@Format.Percent(Model.SessionState.Raining)</dd>
         <dt>Wind</dt>
-        <dd>@Model.Info.windSpeed.velocity.ToString("N1")</dd>
+        <dd>@Model.SessionState.WindVelocity?.ToString("N1")</dd>
     </dl>
 </div>
 </div>

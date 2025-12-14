@@ -16,7 +16,7 @@
         <tbody>
             @foreach(Session session in Model.Sessions) {
                 <tr>
-                    <td><a asp-action="Session">@session.Timestamp.ToString("yyyy-MM-dd HH:mm")</a></td>
+                    <td><a asp-action="Session" asp-route-sessionId="@session.SessionId">@session.Timestamp.ToString("yyyy-MM-dd HH:mm")</a></td>
                     <td>@session.TrackName</td>
                     <td>@session.SessionType</td>
                 </tr>

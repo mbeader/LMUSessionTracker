@@ -51,8 +51,11 @@ namespace LMUSessionTracker.Server {
 				if(serverOptions.UseReplay) {
 					builder.Services.AddScoped<ReplayLMUClient>();
 					if(serverOptions.SendReplay) {
-					builder.Services.AddScoped<LMUClient>(provider => provider.GetRequiredService<ReplayLMUClient>());
+						builder.Services.AddScoped<LMUClient>(provider => provider.GetRequiredService<ReplayLMUClient>());
 						builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
+						builder.Services.AddSingleton<SimpleContinueProvider<ClientService>>();
+						builder.Services.AddSingleton<ContinueProvider<ClientService>>(provider => provider.GetRequiredService<SimpleContinueProvider<ClientService>>());
+						builder.Services.AddSingleton<ContinueProviderSource>(provider => provider.GetRequiredService<SimpleContinueProvider<ClientService>>());
 						builder.Services.AddHostedService<ClientService>();
 					} else
 						builder.Services.AddHostedService<ReplayClientService>();
@@ -84,9 +87,12 @@ namespace LMUSessionTracker.Server {
 				.Enrich.WithThreadId());
 
 			var app = builder.Build();
-
 			using(var serviceScope = app.Services.CreateScope()) {
 				var context = serviceScope.ServiceProvider.GetRequiredService<SqliteContext>();
+				if(serverOptions.RecreateDatabaseOnStartup) {
+					logger.Information("Recreating database");
+					context.Database.EnsureDeleted();
+				}
 				context.Database.Migrate();
 			}
 

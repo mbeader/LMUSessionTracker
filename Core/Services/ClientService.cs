@@ -9,6 +9,7 @@ namespace LMUSessionTracker.Core.Services {
 	public class ClientService : PeriodicService<ClientService> {
 		private LMUClient lmuClient;
 		private ProtocolClient protocolClient;
+		private ContinueProvider<ClientService> continueProvider;
 		private ClientState state = ClientState.Idle;
 		private ProtocolRole role = ProtocolRole.None;
 		private string sessionId;
@@ -26,28 +27,32 @@ namespace LMUSessionTracker.Core.Services {
 			switch(state) {
 				case ClientState.Idle:
 				case ClientState.Working:
-					return 1000;
+					return 0;
 				case ClientState.Connected:
 				case ClientState.Disconnected:
 				default:
-					return 10000;
+					return 0;
 			}
 		}
 
 		public override Task Start(IServiceScope scope) {
 			lmuClient = scope.ServiceProvider.GetRequiredService<LMUClient>();
 			protocolClient = scope.ServiceProvider.GetRequiredService<ProtocolClient>();
+			continueProvider = scope.ServiceProvider.GetService<ContinueProvider<ClientService>>();
 			return Task.CompletedTask;
 		}
 
 		public override async Task<bool> Do() {
+			(ClientState state, ProtocolRole role, string sessionId) last = (state, role, sessionId);
 			lmuClient.OpenContext();
 			try {
 				await HandleSession();
 			} finally {
 				lmuClient.CloseContext();
 			}
-			return true;
+			if(last.state != state || last.role != role || last.sessionId != sessionId)
+				logger.LogInformation($"State changed from ({last.state}, {last.role}, {last.sessionId}) to ({state}, {role}, {sessionId})");
+			return continueProvider?.ShouldContinue() ?? true;
 		}
 
 		private async Task HandleSession() {

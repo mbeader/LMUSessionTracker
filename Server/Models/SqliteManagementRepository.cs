@@ -32,5 +32,17 @@ namespace LMUSessionTracker.Server.Models {
 			}
 			return sessionId;
 		}
+
+		public async Task UpdateSession(Guid sessionId, SessionInfo info) {
+			using SqliteContext context = await contextFactory.CreateDbContextAsync();
+			DateTime timestamp = DateTime.UtcNow;
+			using(var transaction = await context.Database.BeginTransactionAsync()) {
+				SessionState state = await context.SessionStates.SingleAsync(x => x.SessionId == sessionId);
+				state.From(info);
+				state.Timestamp = timestamp;
+				await context.SaveChangesAsync();
+				await transaction.CommitAsync();
+			}
+		}
 	}
 }

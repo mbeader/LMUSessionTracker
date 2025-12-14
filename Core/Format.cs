@@ -6,12 +6,12 @@ namespace LMUSessionTracker.Core {
 			return laps > 0 ? $"{laps} L" : time.ToString("0.000");
 		}
 
-		public static string Percent(double value) {
-			return value.ToString("P2");
+		public static string Percent(double? value) {
+			return !value.HasValue ? "" : value.Value.ToString("P2");
 		}
 
-		public static string Time(double time) {
-			return new TimeSpan((long)Math.Round(time * 1000) * TimeSpan.TicksPerMillisecond).ToString("hh':'mm':'ss'.'fff");
+		public static string Time(double? time) {
+			return !time.HasValue ? "" : new TimeSpan((long)Math.Round(time.Value * 1000) * TimeSpan.TicksPerMillisecond).ToString("hh':'mm':'ss'.'fff");
 		}
 
 		public static string LapTime(double laptime) {
@@ -26,8 +26,10 @@ namespace LMUSessionTracker.Core {
 			return ts.ToString(format);
 		}
 
-		public static string Temp(double c) {
-			double f = c * 9.0 / 5.0 + 32;
+		public static string Temp(double? c) {
+			if(!c.HasValue)
+				return "";
+			double f = c.Value * 9.0 / 5.0 + 32;
 			return $"{c:N1} °C ({f:N1} °F)";
 		}
 	}

@@ -5,5 +5,6 @@
 		public bool LMULoggingOnly { get; set; } = false;
 		public bool UseReplay { get; set; } = false;
 		public bool SendReplay { get; set; } = false;
+		public bool RecreateDatabaseOnStartup { get; set; } = false;
 	}
 }

@@ -4,6 +4,7 @@ using LMUSessionTracker.Server.Models;
 using LMUSessionTracker.Server.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace LMUSessionTracker.Server.Controllers {
 			return View(vm);
 		}
 
-		public IActionResult Session() {
+		public async Task<IActionResult> Session(Guid sessionId) {
 			//SessionViewModel vm = new SessionViewModel() { Info = viewer.Info, Standings = viewer.Standings, History = viewer.History.GetAllHistory() };
 			//Dictionary<string, List<CarKey>> classes = new Dictionary<string, List<CarKey>>();
 			//if(vm.Standings != null) {
@@ -40,7 +41,10 @@ namespace LMUSessionTracker.Server.Controllers {
 			//	for(int i = 0; i < classes[classname].Count; i++)
 			//		vm.PositionInClass.Add(classes[classname][i], i+1);
 			//return View(vm);
-			return View(new SessionViewModel());
+			SessionViewModel vm = new SessionViewModel();
+			vm.Session = await sessionRepo.GetSession(sessionId);
+			vm.SessionState = await sessionRepo.GetSessionState(sessionId);
+			return View(vm);
 		}
 
 		public IActionResult Laps(string id) {

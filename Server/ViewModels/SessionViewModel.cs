@@ -8,5 +8,8 @@ namespace LMUSessionTracker.Server.ViewModels {
 		public List<Standing> Standings { get; set; }
 		public List<CarHistory> History { get; set; }
 		public Dictionary<CarKey, int> PositionInClass { get; } = new Dictionary<CarKey, int>();
+
+		public Models.Session Session { get; set; }
+		public Models.SessionState SessionState { get; set; }
 	}
 }
