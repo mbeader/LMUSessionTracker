@@ -68,10 +68,14 @@ namespace LMUSessionTracker.Server {
 						builder.Services.AddHostedService<ClientService>();
 				}
 			}
-			if(serverOptions.RejectAllClients)
+			if(serverOptions.RejectAllClients) {
 				builder.Services.AddSingleton<ProtocolServer, AutoRejectServer>();
-			else
-				builder.Services.AddSingleton<ProtocolServer, SessionArbiter>();
+				builder.Services.AddScoped<SessionObserver, DefaultSessionObserver>();
+			} else {
+				builder.Services.AddSingleton<SessionArbiter>();
+				builder.Services.AddSingleton<ProtocolServer, SessionArbiter>(provider => provider.GetRequiredService<SessionArbiter>());
+				builder.Services.AddScoped<SessionObserver, SessionArbiterObserver>();
+			}
 			builder.Services.AddScoped<SessionRepository, SqliteSessionRepository>();
 			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
 			//builder.Services.AddHostedService<SessionService>();

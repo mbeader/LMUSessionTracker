@@ -12,6 +12,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public bool Online { get; private set; }
 		public Dictionary<string, bool> RoleChanges { get; private set; }
 		public SessionInfo LastInfo { get; private set; }
+		public List<Standing> LastStandings { get; private set; }
 
 		public static Session Create(string sessionId, SessionInfo info) {
 			return new Session() {
@@ -84,8 +85,10 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public bool IsSecondary(string clientId) => SecondaryClientIds.Contains(clientId);
 
-		public void Update(SessionInfo info) {
+		public void Update(SessionInfo info, List<Standing> standings) {
 			LastInfo = info;
+			LastStandings = standings;
+			standings?.Sort((a, b) => a.position.CompareTo(b.position));
 		}
 
 		public bool IsSameSession(SessionInfo info) {
@@ -100,6 +103,12 @@ namespace LMUSessionTracker.Core.Tracking {
 			double last = LastInfo.raceCompletion.timeCompletion;
 			double curr = info.raceCompletion.timeCompletion;
 			return last == -1 || curr == -1 || last <= curr;
+		}
+
+		public Session Clone() {
+			Session session = Create(SessionId, LastInfo);
+			session.Update(LastInfo, LastStandings);
+			return session;
 		}
 	}
 }

@@ -73,7 +73,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				if(session.IsSecondary(client.ClientId))
 					return new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Secondary, SessionId = data.SessionId };
 				await managementRepo.UpdateSession(session.SessionId, data.SessionInfo);
-				session.Update(data.SessionInfo);
+				session.Update(data.SessionInfo, data.Standings);
 				return new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = data.SessionId };
 			} else {
 				logger.LogInformation($"Client {client.ClientId} has invalid session {data.SessionId}");
@@ -90,6 +90,13 @@ namespace LMUSessionTracker.Core.Tracking {
 				Result = isPrimary ? ProtocolResult.Promoted : ProtocolResult.Demoted,
 				Role = isPrimary ? ProtocolRole.Primary : ProtocolRole.Secondary,
 				SessionId = sessionId };
+		}
+
+		public Session CloneSession(string sessionId) {
+			if(activeSessions.TryGetValue(sessionId, out Session session)) {
+				return session.Clone();
+			}
+			return null;
 		}
 	}
 }
