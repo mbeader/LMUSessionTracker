@@ -2,7 +2,6 @@
 using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Tracking;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -66,6 +65,8 @@ namespace LMUSessionTracker.Server.Models {
 						allDbLaps.Add(car.Key, dbLaps);
 					}
 					foreach(var lap in car.Laps) {
+						if(lap == null)
+							continue;
 						if(!dbLaps.TryGetValue(lap.LapNumber, out Lap dbLap)) {
 							dbLap = new Lap() { SessionId = sessionId };
 							dbLaps.Add(lap.LapNumber, dbLap);

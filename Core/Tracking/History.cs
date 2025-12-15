@@ -6,10 +6,34 @@ namespace LMUSessionTracker.Core.Tracking {
 	public class History {
 		private readonly Dictionary<CarKey, CarHistory> cars = new Dictionary<CarKey, CarHistory>();
 
-		public History(List<CarHistory> history = null) {
+		public History(List<CarHistory> history = null, EntryList entries = null) {
 			if(history != null)
 				foreach(CarHistory car in history)
 					cars.Add(new CarKey() { SlotId = car.Car.SlotId, Veh = car.Car.Veh ?? "" }, car);
+			if(entries != null)
+				LoadEntryList(entries);
+		}
+
+		private void LoadEntryList(EntryList entries) {
+			foreach(int slotId in entries.Slots.Keys) {
+				Entry entry = entries.Slots[slotId];
+				CarKey key = new CarKey() { SlotId = slotId, Veh = entry.Vehicle };
+				Car car = new Car() {
+					SlotId = slotId,
+					Veh = entry.Vehicle,
+					TeamName = entry.Name,
+					Number = entry.Number,
+					Id = entry.Id,
+				};
+				if(cars.TryGetValue(key, out CarHistory carHistory)) {
+					carHistory.Car.TeamName = car.TeamName;
+					carHistory.Car.Number = car.Number;
+					carHistory.Car.Id = car.Id;
+				} else {
+					carHistory = new CarHistory(key, car);
+					cars.Add(key, carHistory);
+				}
+			}
 		}
 
 		public void Update(List<Standing> standings) {

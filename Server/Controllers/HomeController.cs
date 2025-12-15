@@ -49,6 +49,7 @@ namespace LMUSessionTracker.Server.Controllers {
 			foreach(string classname in classes.Keys)
 				for(int i = 0; i < classes[classname].Count; i++)
 					vm.PositionInClass.Add(classes[classname][i], i+1);
+			vm.History?.ForEach(x => vm.Entries.Add(x.Key, x.Car));
 			return View(vm);
 		}
 

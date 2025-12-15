@@ -38,6 +38,8 @@ namespace LMUSessionTracker.Core.Tracking {
 			//}
 			if(standing.lapsCompleted > 0)
 				AddLap(new Lap(standing));
+			else
+				Car.Merge(new Car(standing));
 		}
 
 		public void FixLaps() {

@@ -80,9 +80,9 @@
     if(hasStandings) {
         <div><a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#history">Show history</a></div>
         <div class="collapse" id="history">
-            <partial name="HistoryPartial" model="(Model.Session.SessionId, Model.History)" />
+            <partial name="HistoryPartial" model="Model" />
         </div>
     } else {
-        <partial name="HistoryPartial" model="(Model.Session.SessionId, Model.History)" />
+        <partial name="HistoryPartial" model="Model" />
     }
 }

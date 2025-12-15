@@ -23,6 +23,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		public void Merge(Car from) {
+			VehicleName = Merge(VehicleName, from.VehicleName);
 			TeamName = Merge(TeamName, from.TeamName);
 			Class = Merge(Class, from.Class);
 			Number = Merge(Number, from.Number);

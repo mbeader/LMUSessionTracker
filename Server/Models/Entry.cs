@@ -10,6 +10,8 @@ namespace LMUSessionTracker.Server.Models {
 		public string SessionId { get; set; }
 
 		[Required]
+		public string SlotId { get; set; }
+		[Required]
 		public string Id { get; set; }
 		[Required]
 		public string Number { get; set; }

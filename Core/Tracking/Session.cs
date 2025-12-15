@@ -13,17 +13,21 @@ namespace LMUSessionTracker.Core.Tracking {
 		public Dictionary<string, bool> RoleChanges { get; private set; }
 		public SessionInfo LastInfo { get; private set; }
 		public List<Standing> LastStandings { get; private set; }
+		public EntryList Entries { get; private set; }
 		public History History { get; private set; }
 
-		public static Session Create(string sessionId, SessionInfo info, List<CarHistory> history = null) {
+		public static Session Create(string sessionId, SessionInfo info, MultiplayerTeams teams = null, List<CarHistory> history = null) {
+			EntryList entries = new EntryList(teams);
 			return new Session() {
 				SessionId = sessionId,
 				SecondaryClientIds = new List<string>(),
 				Track = info.trackName,
 				Type = info.session,
+				Online = teams != null,
 				RoleChanges = new Dictionary<string, bool>(),
 				LastInfo = info,
-				History = new History(history)
+				Entries = entries,
+				History = new History(history, entries)
 			};
 		}
 
@@ -111,7 +115,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		public Session Clone() {
-			Session session = Create(SessionId, LastInfo, History.GetAllHistory().ConvertAll(x => x.Clone()));
+			Session session = Create(SessionId, LastInfo, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()));
 			session.Update(LastInfo, LastStandings);
 			return session;
 		}
