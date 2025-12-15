@@ -25,7 +25,7 @@ namespace LMUSessionTracker.Server.Controllers {
 			return View(vm);
 		}
 
-		public async Task<IActionResult> Session(Guid sessionId) {
+		public async Task<IActionResult> Session(string sessionId) {
 			//SessionViewModel vm = new SessionViewModel() { Info = viewer.Info, Standings = viewer.Standings, History = viewer.History.GetAllHistory() };
 			//Dictionary<string, List<CarKey>> classes = new Dictionary<string, List<CarKey>>();
 			//if(vm.Standings != null) {

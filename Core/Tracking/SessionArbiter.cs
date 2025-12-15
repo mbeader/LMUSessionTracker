@@ -28,7 +28,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			client.LastSeen = DateTime.UtcNow;
 			if(data.SessionId == null) {
 				if(data.SessionInfo != null) {
-					Guid sessionId = (await managementRepo.CreateSession(data.SessionInfo));
+					string sessionId = (await managementRepo.CreateSession(data.SessionInfo));
 					Session session = Session.Create(sessionId, data.SessionInfo);
 					activeSessions.Add(session.SessionId, session);
 					bool isPrimary = session.RegisterClient(client.ClientId);
@@ -53,7 +53,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				if(!session.IsSameSession(data.SessionInfo)) {
 					session.UnregisterClient(data.ClientId);
 					client.LeaveSession();
-					Guid sessionId = (await managementRepo.CreateSession(data.SessionInfo));
+					string sessionId = (await managementRepo.CreateSession(data.SessionInfo));
 					session = Session.Create(sessionId, data.SessionInfo);
 					activeSessions.Add(session.SessionId, session);
 					bool isPrimary = session.RegisterClient(client.ClientId);
@@ -72,7 +72,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				}
 				if(session.IsSecondary(client.ClientId))
 					return new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Secondary, SessionId = data.SessionId };
-				await managementRepo.UpdateSession(session.Guid, data.SessionInfo);
+				await managementRepo.UpdateSession(session.SessionId, data.SessionInfo);
 				session.Update(data.SessionInfo);
 				return new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = data.SessionId };
 			} else {

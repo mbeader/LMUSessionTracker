@@ -16,9 +16,9 @@ namespace LMUSessionTracker.Server.Models {
 			this.contextFactory = contextFactory;
 		}
 
-		public async Task<Guid> CreateSession(SessionInfo info) {
+		public async Task<string> CreateSession(SessionInfo info) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
-			Guid sessionId = GuidHelpers.CreateVersion7();
+			string sessionId = GuidHelpers.CreateVersion7().ToString("N");
 			DateTime timestamp = DateTime.UtcNow;
 			Session session = new Session() { SessionId = sessionId, Timestamp = timestamp };
 			session.From(info);
@@ -33,7 +33,7 @@ namespace LMUSessionTracker.Server.Models {
 			return sessionId;
 		}
 
-		public async Task UpdateSession(Guid sessionId, SessionInfo info) {
+		public async Task UpdateSession(string sessionId, SessionInfo info) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			DateTime timestamp = DateTime.UtcNow;
 			using(var transaction = await context.Database.BeginTransactionAsync()) {

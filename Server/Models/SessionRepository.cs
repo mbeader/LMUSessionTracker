@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Server.Models {
 	public interface SessionRepository {
-		public Task<Session> GetSession(Guid sessionId);
+		public Task<Session> GetSession(string sessionId);
 		public Task<List<Session>> GetSessions();
-		public Task<SessionState> GetSessionState(Guid sessionId);
+		public Task<SessionState> GetSessionState(string sessionId);
 	}
 
 	public class SqliteSessionRepository : SessionRepository {
@@ -20,7 +19,7 @@ namespace LMUSessionTracker.Server.Models {
 			this.context = context;
 		}
 
-		public Task<Session> GetSession(Guid sessionId) {
+		public Task<Session> GetSession(string sessionId) {
 			return context.Sessions.SingleAsync(x => x.SessionId == sessionId);
 		}
 
@@ -28,7 +27,7 @@ namespace LMUSessionTracker.Server.Models {
 			return context.Sessions.ToListAsync();
 		}
 
-		public Task<SessionState> GetSessionState(Guid sessionId) {
+		public Task<SessionState> GetSessionState(string sessionId) {
 			return context.SessionStates.SingleAsync(x => x.SessionId == sessionId);
 		}
 	}

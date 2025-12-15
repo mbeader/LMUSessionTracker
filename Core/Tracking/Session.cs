@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace LMUSessionTracker.Core.Tracking {
 	public class Session {
-		public Guid Guid { get; private set; }
 		public string SessionId { get; private set; }
 		public string PrimaryClientId { get; private set; }
 		public List<string> SecondaryClientIds { get; private set; }
@@ -14,10 +13,9 @@ namespace LMUSessionTracker.Core.Tracking {
 		public Dictionary<string, bool> RoleChanges { get; private set; }
 		public SessionInfo LastInfo { get; private set; }
 
-		public static Session Create(Guid sessionId, SessionInfo info) {
+		public static Session Create(string sessionId, SessionInfo info) {
 			return new Session() {
-				Guid = sessionId,
-				SessionId = sessionId.ToString("N"),
+				SessionId = sessionId,
 				SecondaryClientIds = new List<string>(),
 				Track = info.trackName,
 				Type = info.session,

@@ -15,7 +15,7 @@ namespace LMUSessionTracker.Server.Migrations
                 name: "Sessions",
                 columns: table => new
                 {
-                    SessionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
                     IsClosed = table.Column<bool>(type: "INTEGER", nullable: false),
                     EndEventTime = table.Column<double>(type: "REAL", nullable: false),
@@ -42,7 +42,7 @@ namespace LMUSessionTracker.Server.Migrations
                 {
                     ChatId = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SessionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
                     Message = table.Column<string>(type: "TEXT", nullable: true),
                     Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
@@ -63,7 +63,7 @@ namespace LMUSessionTracker.Server.Migrations
                 {
                     EntryId = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SessionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Number = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
@@ -86,7 +86,7 @@ namespace LMUSessionTracker.Server.Migrations
                 {
                     LapId = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SessionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
                     SlotId = table.Column<int>(type: "INTEGER", nullable: false),
                     Veh = table.Column<string>(type: "TEXT", nullable: false),
                     LapNumber = table.Column<int>(type: "INTEGER", nullable: false),
@@ -127,7 +127,7 @@ namespace LMUSessionTracker.Server.Migrations
                 {
                     SessionStateId = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SessionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
                     AmbientTemp = table.Column<double>(type: "REAL", nullable: false),
                     AveragePathWetness = table.Column<double>(type: "REAL", nullable: false),
@@ -172,7 +172,7 @@ namespace LMUSessionTracker.Server.Migrations
                     MemberId = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     EntryId = table.Column<long>(type: "INTEGER", nullable: false),
-                    SessionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: true),
                     Badge = table.Column<string>(type: "TEXT", nullable: true),
                     Nationality = table.Column<string>(type: "TEXT", nullable: true),

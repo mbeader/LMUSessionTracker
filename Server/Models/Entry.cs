@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,7 +7,7 @@ namespace LMUSessionTracker.Server.Models {
 		[Key, Required]
 		public long EntryId { get; set; }
 		[ForeignKey(nameof(Session)), Required]
-		public Guid SessionId { get; set; }
+		public string SessionId { get; set; }
 
 		[Required]
 		public string Id { get; set; }

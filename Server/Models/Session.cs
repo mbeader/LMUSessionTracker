@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 namespace LMUSessionTracker.Server.Models {
 	public class Session {
 		[Key, Required]
-		public Guid SessionId { get; set; }
+		public string SessionId { get; set; }
 
 		public DateTime Timestamp { get; set; }
 		public bool IsClosed { get; set; }

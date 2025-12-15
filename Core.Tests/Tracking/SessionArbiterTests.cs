@@ -3,7 +3,6 @@ using LMUSessionTracker.Core.Protocol;
 using LMUSessionTracker.Core.Tracking;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tests.Tracking {
@@ -15,7 +14,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 
 		public SessionArbiterTests() {
 			managementRepo = new Mock<ManagementRespository>();
-			managementRepo.Setup(x => x.CreateSession(It.IsAny<SessionInfo>())).ReturnsAsync(() => new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ++sessionCount));
+			managementRepo.Setup(x => x.CreateSession(It.IsAny<SessionInfo>())).ReturnsAsync(() => SessionId(++sessionCount));
 			arbiter = new SessionArbiter(Mock.Of<ILogger<SessionArbiter>>(), managementRepo.Object);
 		}
 

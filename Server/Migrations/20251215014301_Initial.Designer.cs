@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMUSessionTracker.Server.Migrations
 {
     [DbContext(typeof(SqliteContext))]
-    [Migration("20251211184543_Initial")]
+    [Migration("20251215014301_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -29,7 +29,8 @@ namespace LMUSessionTracker.Server.Migrations
                     b.Property<string>("Message")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("SessionId")
+                    b.Property<string>("SessionId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Timestamp")
@@ -63,7 +64,8 @@ namespace LMUSessionTracker.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("SessionId")
+                    b.Property<string>("SessionId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Vehicle")
@@ -128,7 +130,8 @@ namespace LMUSessionTracker.Server.Migrations
                     b.Property<double>("Sector3")
                         .HasColumnType("REAL");
 
-                    b.Property<Guid>("SessionId")
+                    b.Property<string>("SessionId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("SlotId")
@@ -187,7 +190,8 @@ namespace LMUSessionTracker.Server.Migrations
                     b.Property<string>("Nationality")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("SessionId")
+                    b.Property<string>("SessionId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("MemberId");
@@ -201,8 +205,7 @@ namespace LMUSessionTracker.Server.Migrations
 
             modelBuilder.Entity("LMUSessionTracker.Server.Models.Session", b =>
                 {
-                    b.Property<Guid>("SessionId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("SessionId")
                         .HasColumnType("TEXT");
 
                     b.Property<double>("EndEventTime")
@@ -306,7 +309,8 @@ namespace LMUSessionTracker.Server.Migrations
                     b.Property<string>("Sector3Flag")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("SessionId")
+                    b.Property<string>("SessionId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("StartLightFrame")

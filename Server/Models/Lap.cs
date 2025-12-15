@@ -7,7 +7,7 @@ namespace LMUSessionTracker.Server.Models {
 		[Key, Required]
 		public long LapId { get; set; }
 		[ForeignKey(nameof(Session)), Required]
-		public Guid SessionId { get; set; }
+		public string SessionId { get; set; }
 
 		[Required]
 		public int SlotId { get; set; }

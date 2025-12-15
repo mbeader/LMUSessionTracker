@@ -9,7 +9,7 @@ namespace LMUSessionTracker.Server.Models {
 		[Key, Required]
 		public long ChatId { get; set; }
 		[ForeignKey(nameof(Session)), Required]
-		public Guid SessionId { get; set; }
+		public string SessionId { get; set; }
 
 		public string Message { get; set; }
 		public DateTime Timestamp { get; set; }

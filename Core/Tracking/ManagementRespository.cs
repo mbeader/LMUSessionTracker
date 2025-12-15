@@ -1,10 +1,9 @@
 ﻿using LMUSessionTracker.Core.LMU;
-using System;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tracking {
 	public interface ManagementRespository {
-		public Task<Guid> CreateSession(SessionInfo info);
-		public Task UpdateSession(Guid sessionId, SessionInfo info);
+		public Task<string> CreateSession(SessionInfo info);
+		public Task UpdateSession(string sessionId, SessionInfo info);
 	}
 }
