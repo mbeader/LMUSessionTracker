@@ -74,6 +74,7 @@ namespace LMUSessionTracker.Core.Tracking {
 					return new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Secondary, SessionId = data.SessionId };
 				await managementRepo.UpdateSession(session.SessionId, data.SessionInfo);
 				session.Update(data.SessionInfo, data.Standings);
+				await managementRepo.UpdateLaps(session.SessionId, session.History.GetAllHistory());
 				return new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = data.SessionId };
 			} else {
 				logger.LogInformation($"Client {client.ClientId} has invalid session {data.SessionId}");

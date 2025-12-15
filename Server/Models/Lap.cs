@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LMUSessionTracker.Core.LMU;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -37,5 +38,32 @@ namespace LMUSessionTracker.Server.Models {
 		public DateTime? Timestamp { get; set; }
 
 		public Session Session { get; set; }
+
+		public void From(Core.Tracking.Car car, Core.Tracking.Lap lap) {
+			if(LapNumber > 0 && (SlotId != car.SlotId || Veh != car.Veh || LapNumber != lap.LapNumber))
+				throw new InvalidOperationException($"Cannot change lap from {SlotId}-{Veh} L{LapNumber} to {car.SlotId}-{car.Veh} L{lap.LapNumber}");
+			SlotId = car.SlotId;
+			Veh = car.Veh;
+			LapNumber = lap.LapNumber;
+			CarClass = car.Class;
+			Vehicle = car.VehicleName;
+			Team = car.TeamName;
+			Driver = lap.Driver;
+			FinishStatus = lap.FinishStatus;
+			TotalTime = lap.TotalTime;
+			Sector1 = lap.Sector1;
+			Sector2 = lap.Sector2;
+			Sector3 = lap.Sector3;
+			IsValid = lap.IsValid;
+			Position = lap.Position;
+			Pit = lap.Pit;
+			Fuel = lap.Fuel;
+			VirtualEnergy = lap.VirtualEnergy;
+			LFTire = lap.LFTire;
+			RFTire = lap.RFTire;
+			LRTire = lap.LRTire;
+			RRTire = lap.RRTire;
+			Timestamp = lap.Timestamp;
+		}
 	}
 }

@@ -2,8 +2,11 @@
 using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Tracking;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Server.Models {
@@ -40,6 +43,37 @@ namespace LMUSessionTracker.Server.Models {
 				SessionState state = await context.SessionStates.SingleAsync(x => x.SessionId == sessionId);
 				state.From(info);
 				state.Timestamp = timestamp;
+				await context.SaveChangesAsync();
+				await transaction.CommitAsync();
+			}
+		}
+
+		public async Task UpdateLaps(string sessionId, List<CarHistory> cars) {
+			using SqliteContext context = await contextFactory.CreateDbContextAsync();
+			using(var transaction = await context.Database.BeginTransactionAsync()) {
+				Dictionary<CarKey, Dictionary<int, Lap>> allDbLaps = new Dictionary<CarKey, Dictionary<int, Lap>>();
+				foreach(Lap dbLap in await context.Laps.Where(x => x.SessionId == sessionId).ToListAsync()) {
+					CarKey key = new CarKey() { SlotId = dbLap.SlotId, Veh = dbLap.Veh };
+					if(!allDbLaps.TryGetValue(key, out Dictionary<int, Lap> dbLaps)) {
+						dbLaps = new Dictionary<int, Lap>();
+						allDbLaps.Add(key, dbLaps);
+					}
+					dbLaps.Add(dbLap.LapNumber, dbLap);
+				}
+				foreach(CarHistory car in cars) {
+					if(!allDbLaps.TryGetValue(car.Key, out Dictionary<int, Lap> dbLaps)) {
+						dbLaps = new Dictionary<int, Lap>();
+						allDbLaps.Add(car.Key, dbLaps);
+					}
+					foreach(var lap in car.Laps) {
+						if(!dbLaps.TryGetValue(lap.LapNumber, out Lap dbLap)) {
+							dbLap = new Lap() { SessionId = sessionId };
+							dbLaps.Add(lap.LapNumber, dbLap);
+							context.Laps.Add(dbLap);
+						}
+						dbLap.From(car.Car, lap);
+					}
+				}
 				await context.SaveChangesAsync();
 				await transaction.CommitAsync();
 			}

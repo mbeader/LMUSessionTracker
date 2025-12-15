@@ -7,18 +7,37 @@ namespace LMUSessionTracker.Core.Tracking {
 		public CarKey Key { get; private set; }
 		public Car Car { get; private set; }
 		public List<Lap> Laps { get; } = new List<Lap>();
+		public int LapsCompleted { get; private set; }
 
 		public CarHistory(CarKey key, Car car) {
 			Key = key;
 			Car = car;
 		}
 
-		public void Update(Standing standing) {
-			if(standing.lapsCompleted > 0 && (Laps.Count == 0 || standing.lapsCompleted > Laps[^1].LapNumber)) {
-				while(Laps.Count <= standing.lapsCompleted)
-					Laps.Add(Lap.Default(Laps.Count + 1));
-				Laps.Add(new Lap(standing));
+		private void AddLap(Lap lap) {
+			while(lap.LapNumber > Laps.Count)
+				Laps.Add(null);
+			if(Laps[lap.LapNumber - 1] == null) {
+				Laps[lap.LapNumber - 1] = lap;
+				lap.Timestamp = DateTime.UtcNow;
 			}
+			LapsCompleted = Laps.Count;
+		}
+
+		public Lap GetLap(int lapNumber) {
+			if(lapNumber > Laps.Count)
+				return null;
+			return Laps[lapNumber - 1] ?? Lap.Default(lapNumber);
+		}
+
+		public void Update(Standing standing) {
+			//if(standing.lapsCompleted > 0 && (Laps.Count == 0 || standing.lapsCompleted > Laps[^1].LapNumber)) {
+			//	while(Laps.Count <= standing.lapsCompleted)
+			//		Laps.Add(Lap.Default(Laps.Count + 1));
+			//	Laps.Add(new Lap(standing));
+			//}
+			if(standing.lapsCompleted > 0)
+				AddLap(new Lap(standing));
 		}
 
 		public void FixLaps() {
@@ -56,7 +75,6 @@ namespace LMUSessionTracker.Core.Tracking {
 				if(laps.TryGetValue(lap.LapNumber, out Lap existing)) {
 					if(existing.HasNoTime()) {
 						lap.Driver = string.IsNullOrEmpty(lap.Driver) ? existing.Driver : lap.Driver;
-						lap.SteamId = lap.SteamId <= 0 ? existing.SteamId : lap.SteamId;
 						laps[lap.LapNumber] = lap;
 					} else {
 						laps.Add(lap.LapNumber, lap);
@@ -92,7 +110,6 @@ namespace LMUSessionTracker.Core.Tracking {
 					Sector2 = lap.Sector2,
 					Sector3 = lap.Sector3,
 					Driver = lap.Driver,
-					SteamId = lap.SteamId,
 				});
 			}
 			return car;
