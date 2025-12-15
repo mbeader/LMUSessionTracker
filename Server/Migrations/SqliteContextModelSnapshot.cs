@@ -65,6 +65,9 @@ namespace LMUSessionTracker.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SlotId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Vehicle")
                         .IsRequired()
                         .HasColumnType("TEXT");

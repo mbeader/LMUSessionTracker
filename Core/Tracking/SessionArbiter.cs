@@ -30,6 +30,8 @@ namespace LMUSessionTracker.Core.Tracking {
 				if(data.SessionInfo != null) {
 					string sessionId = (await managementRepo.CreateSession(data.SessionInfo));
 					Session session = Session.Create(sessionId, data.SessionInfo, data.MultiplayerTeams);
+					if(session.Online)
+						await managementRepo.UpdateEntries(sessionId, session.Entries);
 					activeSessions.Add(session.SessionId, session);
 					bool isPrimary = session.RegisterClient(client.ClientId);
 					logger.LogInformation($"New session created: {session.SessionId}");

@@ -64,6 +64,7 @@ namespace LMUSessionTracker.Server.Migrations
                     EntryId = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     SessionId = table.Column<string>(type: "TEXT", nullable: false),
+                    SlotId = table.Column<int>(type: "INTEGER", nullable: false),
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Number = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),

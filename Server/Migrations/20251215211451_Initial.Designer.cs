@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMUSessionTracker.Server.Migrations
 {
     [DbContext(typeof(SqliteContext))]
-    [Migration("20251215014301_Initial")]
+    [Migration("20251215211451_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -67,6 +67,9 @@ namespace LMUSessionTracker.Server.Migrations
                     b.Property<string>("SessionId")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("SlotId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Vehicle")
                         .IsRequired()

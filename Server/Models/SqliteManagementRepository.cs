@@ -79,5 +79,23 @@ namespace LMUSessionTracker.Server.Models {
 				await transaction.CommitAsync();
 			}
 		}
+
+		public async Task UpdateEntries(string sessionId, EntryList entries) {
+			using SqliteContext context = await contextFactory.CreateDbContextAsync();
+			using(var transaction = await context.Database.BeginTransactionAsync()) {
+				foreach(int slotId in entries.Slots.Keys) {
+					Entry entry = new Entry() { SessionId = sessionId };
+					entry.From(entries.Slots[slotId]);
+					context.Entries.Add(entry);
+					foreach(Core.Tracking.Member coreMember in entries.Slots[slotId].Members) {
+						Member member = new Member() { SessionId = sessionId };
+						member.From(coreMember);
+						entry.Members.Add(member);
+					}
+				}
+				await context.SaveChangesAsync();
+				await transaction.CommitAsync();
+			}
+		}
 	}
 }

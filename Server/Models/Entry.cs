@@ -10,7 +10,7 @@ namespace LMUSessionTracker.Server.Models {
 		public string SessionId { get; set; }
 
 		[Required]
-		public string SlotId { get; set; }
+		public int SlotId { get; set; }
 		[Required]
 		public string Id { get; set; }
 		[Required]
@@ -22,5 +22,13 @@ namespace LMUSessionTracker.Server.Models {
 
 		public Session Session { get; set; }
 		public ICollection<Member> Members { get; } = new List<Member>();
+
+		public void From(Core.Tracking.Entry entry) {
+			SlotId = entry.SlotId;
+			Id = entry.Id;
+			Number = entry.Number;
+			Name = entry.Name;
+			Vehicle = entry.Vehicle;
+		}
 	}
 }

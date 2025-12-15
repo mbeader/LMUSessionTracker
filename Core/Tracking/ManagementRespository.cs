@@ -7,5 +7,6 @@ namespace LMUSessionTracker.Core.Tracking {
 		public Task<string> CreateSession(SessionInfo info);
 		public Task UpdateSession(string sessionId, SessionInfo info);
 		public Task UpdateLaps(string sessionId, List<CarHistory> cars);
+		public Task UpdateEntries(string sessionId, EntryList entries);
 	}
 }

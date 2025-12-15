@@ -19,5 +19,14 @@ namespace LMUSessionTracker.Server.Models {
 
 		public Entry Entry { get; set; }
 		public Session Session { get; set; }
+
+		public void From(Core.Tracking.Member member) {
+			Name = member.Name;
+			Badge = member.Badge;
+			Nationality = member.Nationality;
+			IsDriver = member.IsDriver;
+			IsEngineer = member.IsEngineer;
+			IsAdmin = member.IsAdmin;
+		}
 	}
 }
