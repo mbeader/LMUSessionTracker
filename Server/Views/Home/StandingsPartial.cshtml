@@ -22,7 +22,7 @@
         @foreach(Standing car in Model.Standings) {
             CarKey id = new CarKey() { SlotId = car.slotID, Veh = car.vehicleFilename };
             <tr>
-                <td><a asp-action="laps" asp-route-id="@id.Id()">@car.position</a></td>
+                <td><a asp-action="Laps" asp-route-sessionId="@Model.Session.SessionId" asp-route-carId="@id.Id()">@car.position</a></td>
                 <td>@(Model.PositionInClass.TryGetValue(id, out int pic) ? pic : "")</td>
                 <td>@car.carClass</td>
                 <td>@car.carNumber</td>

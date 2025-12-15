@@ -73,5 +73,29 @@ namespace LMUSessionTracker.Core.Tracking {
 					Laps.Add(Lap.Default(i));
 			}
 		}
+
+		public CarHistory Clone() {
+			CarHistory car = new CarHistory(Key, new Car() {
+				SlotId = Car.SlotId,
+				Veh = Car.Veh,
+				VehicleName = Car.VehicleName,
+				TeamName = Car.TeamName,
+				Class = Car.Class,
+				Number = Car.Number,
+				Id = Car.Id,
+			});
+			foreach(Lap lap in Laps) {
+				car.Laps.Add(new Lap() {
+					LapNumber = lap.LapNumber,
+					TotalTime = lap.TotalTime,
+					Sector1 = lap.Sector1,
+					Sector2 = lap.Sector2,
+					Sector3 = lap.Sector3,
+					Driver = lap.Driver,
+					SteamId = lap.SteamId,
+				});
+			}
+			return car;
+		}
 	}
 }

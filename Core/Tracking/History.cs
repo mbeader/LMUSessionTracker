@@ -7,7 +7,8 @@ namespace LMUSessionTracker.Core.Tracking {
 		private readonly Dictionary<CarKey, CarHistory> cars = new Dictionary<CarKey, CarHistory>();
 
 		public History(List<CarHistory> history = null) {
-			if(history != null) 				foreach(CarHistory car in history)
+			if(history != null)
+				foreach(CarHistory car in history)
 					cars.Add(new CarKey() { SlotId = car.Car.SlotId, Veh = car.Car.Veh ?? "" }, car);
 		}
 

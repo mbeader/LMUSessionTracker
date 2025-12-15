@@ -1,5 +1,5 @@
 @using LMUSessionTracker.Core.Tracking
-@model List<CarHistory>
+@model (string sessionId, List<CarHistory> history)
 @{
     SortedSet<string> drivers = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
 }
@@ -17,7 +17,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(CarHistory car in Model) {
+        @foreach(CarHistory car in Model.history) {
             drivers.Clear();
             car.Laps.ForEach(lap => { if(!string.IsNullOrEmpty(lap.Driver)) drivers.Add(lap.Driver); });
             <tr>
@@ -26,7 +26,7 @@
                 <td>@car.Car.TeamName</td>
                 <td>@string.Join(", ", drivers)</td>
                 <td>@car.Car.VehicleName</td>
-                <td><a asp-action="laps" asp-route-id="@car.Key.Id()">@(car.Laps?.Count > 0 ? car.Laps[^1].LapNumber : 0)</a></td>
+                <td><a asp-action="Laps" asp-route-sessionId="@Model.sessionId" asp-route-carId="@car.Key.Id()">@(car.Laps?.Count > 0 ? car.Laps[^1].LapNumber : 0)</a></td>
             </tr>
         }
     </tbody>

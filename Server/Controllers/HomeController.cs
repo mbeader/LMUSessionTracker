@@ -28,10 +28,14 @@ namespace LMUSessionTracker.Server.Controllers {
 		}
 
 		public async Task<IActionResult> Session(string sessionId) {
+			if(!ModelState.IsValid)
+				return BadRequest();
 			SessionViewModel vm = new SessionViewModel();
 			vm.Session = await sessionRepo.GetSession(sessionId);
 			vm.SessionState = await sessionRepo.GetSessionState(sessionId);
-			vm.Standings = sessionObserver.GetSession(sessionId)?.LastStandings;
+			Core.Tracking.Session session = sessionObserver.GetSession(sessionId);
+			vm.Standings = session?.LastStandings;
+			vm.History = session?.History?.GetAllHistory();
 			Dictionary<string, List<CarKey>> classes = new Dictionary<string, List<CarKey>>();
 			if(vm.Standings != null) {
 				foreach(Standing standings in vm.Standings) {
@@ -48,12 +52,13 @@ namespace LMUSessionTracker.Server.Controllers {
 			return View(vm);
 		}
 
-		public IActionResult Laps(string id) {
-			//CarHistory car = viewer.History?.GetAllHistory().Find(x => x.Key.Matches(id));
-			//if(car == null)
-			//	return NotFound();
-			//return View(car);
-			return View((CarHistory)null);
+		public IActionResult Laps(string sessionId, string carId) {
+			if(!ModelState.IsValid)
+				return BadRequest();
+			CarHistory car = sessionObserver.GetSession(sessionId)?.History?.GetAllHistory().Find(x => x.Key.Matches(carId));
+			if(car == null)
+				return NotFound();
+			return View(car);
 		}
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

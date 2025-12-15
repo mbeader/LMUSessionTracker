@@ -13,15 +13,17 @@ namespace LMUSessionTracker.Core.Tracking {
 		public Dictionary<string, bool> RoleChanges { get; private set; }
 		public SessionInfo LastInfo { get; private set; }
 		public List<Standing> LastStandings { get; private set; }
+		public History History { get; private set; }
 
-		public static Session Create(string sessionId, SessionInfo info) {
+		public static Session Create(string sessionId, SessionInfo info, List<CarHistory> history = null) {
 			return new Session() {
 				SessionId = sessionId,
 				SecondaryClientIds = new List<string>(),
 				Track = info.trackName,
 				Type = info.session,
 				RoleChanges = new Dictionary<string, bool>(),
-				LastInfo = info
+				LastInfo = info,
+				History = new History(history)
 			};
 		}
 
@@ -86,9 +88,12 @@ namespace LMUSessionTracker.Core.Tracking {
 		public bool IsSecondary(string clientId) => SecondaryClientIds.Contains(clientId);
 
 		public void Update(SessionInfo info, List<Standing> standings) {
-			LastInfo = info;
-			LastStandings = standings;
-			standings?.Sort((a, b) => a.position.CompareTo(b.position));
+			LastInfo = info ?? LastInfo;
+			LastStandings = standings ?? LastStandings;
+			if(standings != null) {
+				standings.Sort((a, b) => a.position.CompareTo(b.position));
+				History.Update(standings);
+			}
 		}
 
 		public bool IsSameSession(SessionInfo info) {
@@ -106,7 +111,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		public Session Clone() {
-			Session session = Create(SessionId, LastInfo);
+			Session session = Create(SessionId, LastInfo, History.GetAllHistory().ConvertAll(x => x.Clone()));
 			session.Update(LastInfo, LastStandings);
 			return session;
 		}
