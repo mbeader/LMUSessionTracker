@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LMUSessionTracker.Core.Session {
+namespace LMUSessionTracker.Core.Tracking {
 	public class Client {
 		public string ClientId { get; private init; }
 		public bool IsConnected { get; private set; }

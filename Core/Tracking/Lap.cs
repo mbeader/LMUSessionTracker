@@ -1,6 +1,6 @@
 ﻿using LMUSessionTracker.Core.LMU;
 
-namespace LMUSessionTracker.Core.Session {
+namespace LMUSessionTracker.Core.Tracking {
 	public class Lap {
 		public int LapNumber { get; set; }
 		public double TotalTime { get; set; }

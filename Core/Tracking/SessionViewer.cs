@@ -1,7 +1,7 @@
 ﻿using LMUSessionTracker.Core.LMU;
 using System.Collections.Generic;
 
-namespace LMUSessionTracker.Core.Session {
+namespace LMUSessionTracker.Core.Tracking {
 	public class SessionViewer {
 		private readonly SessionManager manager;
 

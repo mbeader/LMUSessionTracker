@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace LMUSessionTracker.Core.Session {
+namespace LMUSessionTracker.Core.Tracking {
 	public class SessionArbiter : ProtocolServer {
 		private readonly ILogger<SessionArbiter> logger;
 		private readonly ManagementRespository managementRepo;

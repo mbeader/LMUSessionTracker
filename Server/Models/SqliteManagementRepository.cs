@@ -1,6 +1,6 @@
 ﻿using LMUSessionTracker.Core;
 using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Session;
+using LMUSessionTracker.Core.Tracking;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;

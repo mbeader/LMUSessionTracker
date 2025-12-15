@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 
-namespace LMUSessionTracker.Core.Session {
+namespace LMUSessionTracker.Core.Tracking {
 	public class SessionManager {
 		private static readonly TimeSpan writeDelay = new TimeSpan(0, 0, 10);
 		private readonly ILogger<SessionService> logger;

@@ -1,5 +1,5 @@
 using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Session;
+using LMUSessionTracker.Core.Tracking;
 using LMUSessionTracker.Server.Models;
 using LMUSessionTracker.Server.ViewModels;
 using Microsoft.AspNetCore.Mvc;

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace LMUSessionTracker.Core.Session {
+namespace LMUSessionTracker.Core.Tracking {
 	public class SessionState {
 		private static readonly Regex filenamePattern = new Regex(@"^\d{17}-[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\.json$", RegexOptions.Compiled);
 		private static readonly string datadir = "data";

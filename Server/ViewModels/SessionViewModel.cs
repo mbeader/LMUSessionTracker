@@ -1,5 +1,5 @@
 ﻿using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Session;
+using LMUSessionTracker.Core.Tracking;
 using System.Collections.Generic;
 
 namespace LMUSessionTracker.Server.ViewModels {

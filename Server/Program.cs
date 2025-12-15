@@ -4,7 +4,7 @@ using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Protocol;
 using LMUSessionTracker.Core.Replay;
 using LMUSessionTracker.Core.Services;
-using LMUSessionTracker.Core.Session;
+using LMUSessionTracker.Core.Tracking;
 using LMUSessionTracker.Server.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;

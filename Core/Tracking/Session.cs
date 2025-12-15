@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LMUSessionTracker.Core.Session {
+namespace LMUSessionTracker.Core.Tracking {
 	public class Session {
 		public Guid Guid { get; private set; }
 		public string SessionId { get; private set; }

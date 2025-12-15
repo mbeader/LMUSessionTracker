@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LMUSessionTracker.Core.Session {
+namespace LMUSessionTracker.Core.Tracking {
 	public class History {
 		private readonly Dictionary<CarKey, CarHistory> cars = new Dictionary<CarKey, CarHistory>();
 

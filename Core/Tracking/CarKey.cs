@@ -1,4 +1,4 @@
-﻿namespace LMUSessionTracker.Core.Session {
+﻿namespace LMUSessionTracker.Core.Tracking {
 	public readonly struct CarKey {
 		public int SlotId { get; init; }
 		public string Veh { get; init; }

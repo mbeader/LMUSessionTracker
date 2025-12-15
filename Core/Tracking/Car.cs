@@ -1,6 +1,6 @@
 ﻿using LMUSessionTracker.Core.LMU;
 
-namespace LMUSessionTracker.Core.Session {
+namespace LMUSessionTracker.Core.Tracking {
 	public class Car {
 		public int SlotId { get; set; }
 		public string Veh { get; set; }

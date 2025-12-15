@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LMUSessionTracker.Core.Session {
+namespace LMUSessionTracker.Core.Tracking {
 	public class CarHistory {
 		public CarKey Key { get; private set; }
 		public Car Car { get; private set; }

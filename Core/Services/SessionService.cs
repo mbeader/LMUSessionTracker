@@ -1,5 +1,5 @@
 ﻿using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Session;
+using LMUSessionTracker.Core.Tracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;

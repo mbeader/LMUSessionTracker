@@ -1,12 +1,12 @@
 using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Protocol;
-using LMUSessionTracker.Core.Session;
+using LMUSessionTracker.Core.Tracking;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Threading.Tasks;
 
-namespace LMUSessionTracker.Core.Tests.Session {
+namespace LMUSessionTracker.Core.Tests.Tracking {
 	public class SessionArbiterTests {
 		private readonly Mock<ManagementRespository> managementRepo;
 		private readonly SessionArbiter arbiter;
