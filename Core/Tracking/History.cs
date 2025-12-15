@@ -52,11 +52,12 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public List<CarHistory> GetAllHistory() {
 			List<CarHistory> res = new List<CarHistory>(cars.Values);
+			NaturalSortStringComparer comparer = NaturalSortStringComparer.OrdinalIgnoreCase;
 			res.Sort((a, b) =>
 				a.Car.Class != b.Car.Class ? ClassId(a.Car.Class).CompareTo(ClassId(b.Car.Class)) :
-				a.Car.Number != b.Car.Number ? string.Compare(a.Car.Number, b.Car.Number, StringComparison.OrdinalIgnoreCase) :
-				a.Car.TeamName != b.Car.TeamName ? string.Compare(a.Car.TeamName, b.Car.TeamName, StringComparison.OrdinalIgnoreCase) :
-				string.Compare(a.Car.VehicleName, b.Car.VehicleName, StringComparison.OrdinalIgnoreCase)
+				a.Car.Number != b.Car.Number ? comparer.Compare(a.Car.Number, b.Car.Number) :
+				a.Car.TeamName != b.Car.TeamName ? comparer.Compare(a.Car.TeamName, b.Car.TeamName) :
+				comparer.Compare(a.Car.VehicleName, b.Car.VehicleName)
 			);
 			return res;
 		}
