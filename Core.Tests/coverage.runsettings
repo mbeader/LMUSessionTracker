@@ -7,7 +7,7 @@
           <Format>cobertura</Format>
           <Exclude></Exclude> 
           <Include>[LMUSessionTracker.Core]LMUSessionTracker.*,[LMUSessionTracker.Core.Tests]LMUSessionTracker.*</Include> 
-          <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
+          <ExcludeByAttribute></ExcludeByAttribute>
           <ExcludeByFile></ExcludeByFile> 
           <IncludeDirectory></IncludeDirectory>
           <SingleHit>false</SingleHit>
