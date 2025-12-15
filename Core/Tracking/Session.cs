@@ -100,10 +100,13 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 		}
 
-		public bool IsSameSession(SessionInfo info) {
-			return Track == info.trackName &&
+		public bool IsSameSession(SessionInfo info, MultiplayerTeams teams = null) {
+			bool same = Track == info.trackName &&
 				Type == info.session &&
 				CompletionNotDecreased(info);
+			if(!same || Online != (teams != null))
+				return false;
+			return Entries.IsSameEntryList(new EntryList(teams));
 		}
 
 		private bool CompletionNotDecreased(SessionInfo info) {

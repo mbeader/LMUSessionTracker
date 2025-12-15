@@ -22,5 +22,17 @@ namespace LMUSessionTracker.Core.Tracking {
 				Members.Add(new Member(member, team.drivers[member]));
 			}
 		}
+
+		public bool IsSameEntry(Entry otherEntry) {
+			return SlotId == otherEntry.SlotId &&
+				Id == otherEntry.Id &&
+				Number == otherEntry.Number &&
+				Name == otherEntry.Name &&
+				Vehicle == otherEntry.Vehicle &&
+				Members.TrueForAll(member => {
+					Member otherMember = otherEntry.Members.Find(otherMember => member.Name == otherMember.Name);
+					return otherMember != null && member.IsSameMember(otherMember);
+				});
+		}
 	}
 }

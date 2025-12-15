@@ -1,4 +1,5 @@
 ﻿using LMUSessionTracker.Core.LMU;
+using System;
 using System.Collections.Generic;
 
 namespace LMUSessionTracker.Core.Tracking {
@@ -44,6 +45,15 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(IsDriver)
 				roles.Add(RoleDriver);
 			return roles;
+		}
+
+		public bool IsSameMember(Member otherMember) {
+			return Name == otherMember.Name &&
+				Badge == otherMember.Badge &&
+				Nationality == otherMember.Nationality &&
+				IsAdmin == otherMember.IsAdmin &&
+				IsDriver == otherMember.IsDriver &&
+				IsEngineer == otherMember.IsEngineer;
 		}
 	}
 }

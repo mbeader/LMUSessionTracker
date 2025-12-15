@@ -52,7 +52,7 @@ namespace LMUSessionTracker.Core.Tracking {
 					logger.LogInformation($"Client {client.ClientId} observed paused session {session.SessionId}");
 					return new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = data.SessionId };
 				}
-				if(!session.IsSameSession(data.SessionInfo)) {
+				if(!session.IsSameSession(data.SessionInfo, data.MultiplayerTeams)) {
 					session.UnregisterClient(data.ClientId);
 					client.LeaveSession();
 					string sessionId = (await managementRepo.CreateSession(data.SessionInfo));

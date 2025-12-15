@@ -84,5 +84,58 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new SessionInfo() }));
 			Assert.Equivalent(Status.Rejected(), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = null }));
 		}
+
+		private MultiplayerTeams MultiplayerTeams() {
+			return new() {
+				teams = new() {
+					{ "utid0", new() {
+						name = "team1",
+						vehicle = "someveh",
+						drivers = new() {
+							{ "driver1", new() {
+								roles = new() { "Driver" }
+							} }
+						}
+					} }
+				}
+			};
+		}
+
+		[Fact]
+		public async Task Receive_OnlineData_Creates() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
+		public async Task Receive_SuccessiveSameSessionOnlineData_Accepts() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
+		public async Task Receive_SuccessiveSameSessionPausedOnlineData_Accepts() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { gamePhase = 9 }, MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
+		public async Task Receive_SuccessiveDifferentSessionOnlineData_Creates() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { trackName = "Sebring", session = "QUALIFY1" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { trackName = "Sebring", session = "RACE1" }, MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
+		public async Task Receive_SuccessiveDifferentEntryListOnlineData_Creates() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			MultiplayerTeams teams2 = MultiplayerTeams();
+			teams2.teams["utid0"].vehicle = "someotherveh";
+			Assert.Equivalent(Status.ChangedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = teams2 }));
+		}
+
+		[Fact]
+		public async Task Receive_ExistingSessionNoDataOnline_Rejects() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.Rejected(), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = null }));
+		}
 	}
 }

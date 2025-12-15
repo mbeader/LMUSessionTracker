@@ -45,5 +45,19 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 			return teams;
 		}
+
+		public bool IsSameEntryList(EntryList other) {
+			if(Slots.Count == other.Slots.Count) {
+				foreach(int slotId in Slots.Keys) {
+					if(other.Slots.TryGetValue(slotId, out Entry otherEntry)) {
+						if(!Slots[slotId].IsSameEntry(otherEntry))
+							return false;
+					} else
+						return false;
+				}
+				return true;
+			} else
+				return false;
+		}
 	}
 }
