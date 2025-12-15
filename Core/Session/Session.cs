@@ -12,6 +12,7 @@ namespace LMUSessionTracker.Core.Session {
 		public string Type { get; private set; }
 		public bool Online { get; private set; }
 		public Dictionary<string, bool> RoleChanges { get; private set; }
+		public SessionInfo LastInfo { get; private set; }
 
 		public static Session Create(Guid sessionId, SessionInfo info) {
 			return new Session() {
@@ -20,7 +21,8 @@ namespace LMUSessionTracker.Core.Session {
 				SecondaryClientIds = new List<string>(),
 				Track = info.trackName,
 				Type = info.session,
-				RoleChanges = new Dictionary<string, bool>()
+				RoleChanges = new Dictionary<string, bool>(),
+				LastInfo = info
 			};
 		}
 
@@ -84,8 +86,22 @@ namespace LMUSessionTracker.Core.Session {
 
 		public bool IsSecondary(string clientId) => SecondaryClientIds.Contains(clientId);
 
-		public bool IsSameSession() {
-			return true;
+		public void Update(SessionInfo info) {
+			LastInfo = info;
+		}
+
+		public bool IsSameSession(SessionInfo info) {
+			return Track == info.trackName &&
+				Type == info.session &&
+				CompletionNotDecreased(info);
+		}
+
+		private bool CompletionNotDecreased(SessionInfo info) {
+			if(LastInfo.raceCompletion == null || info.raceCompletion == null)
+				return true;
+			double last = LastInfo.raceCompletion.timeCompletion;
+			double curr = info.raceCompletion.timeCompletion;
+			return last == -1 || curr == -1 || last <= curr;
 		}
 	}
 }

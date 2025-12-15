@@ -17,7 +17,7 @@ namespace LMUSessionTracker.Core.Session {
 		}
 
 		public async Task<ProtocolStatus> Receive(ProtocolMessage data) {
-			if(data.ClientId == null)
+			if(data?.ClientId == null)
 				return Reject();
 			Client client;
 			if(!clients.TryGetValue(data.ClientId, out client)) {
@@ -46,10 +46,20 @@ namespace LMUSessionTracker.Core.Session {
 					logger.LogInformation($"Client {client.ClientId} left session {session.SessionId}");
 					return Reject();
 				}
-				if(!session.IsSameSession()) {
-					// create/find new session
-					logger.LogInformation($"Session {session.SessionId} transitioned via client {client.ClientId}");
-					return new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = data.SessionId };
+				if(data.SessionInfo.gamePhase == 9) {
+					logger.LogInformation($"Client {client.ClientId} observed paused session {session.SessionId}");
+					return new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = data.SessionId };
+				}
+				if(!session.IsSameSession(data.SessionInfo)) {
+					session.UnregisterClient(data.ClientId);
+					client.LeaveSession();
+					Guid sessionId = (await managementRepo.CreateSession(data.SessionInfo));
+					session = Session.Create(sessionId, data.SessionInfo);
+					activeSessions.Add(session.SessionId, session);
+					bool isPrimary = session.RegisterClient(client.ClientId);
+					logger.LogInformation($"New session created: {session.SessionId}");
+					logger.LogInformation($"Client {client.ClientId} transitioned from session {data.SessionId} to session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
+					return new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = session.SessionId };
 				}
 				bool? isPrimaryChange = session.AcknowledgeRole(client.ClientId);
 				if(isPrimaryChange.HasValue) {
@@ -63,6 +73,7 @@ namespace LMUSessionTracker.Core.Session {
 				if(session.IsSecondary(client.ClientId))
 					return new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Secondary, SessionId = data.SessionId };
 				await managementRepo.UpdateSession(session.Guid, data.SessionInfo);
+				session.Update(data.SessionInfo);
 				return new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = data.SessionId };
 			} else {
 				logger.LogInformation($"Client {client.ClientId} has invalid session {data.SessionId}");
