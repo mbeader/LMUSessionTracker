@@ -20,7 +20,7 @@ namespace LMUSessionTracker.Server.Models {
 		}
 
 		public Task<Session> GetSession(string sessionId) {
-			return context.Sessions.SingleAsync(x => x.SessionId == sessionId);
+			return context.Sessions.SingleOrDefaultAsync(x => x.SessionId == sessionId);
 		}
 
 		public Task<List<Session>> GetSessions() {
@@ -28,7 +28,7 @@ namespace LMUSessionTracker.Server.Models {
 		}
 
 		public Task<SessionState> GetSessionState(string sessionId) {
-			return context.SessionStates.SingleAsync(x => x.SessionId == sessionId);
+			return context.SessionStates.SingleOrDefaultAsync(x => x.SessionId == sessionId);
 		}
 	}
 }
