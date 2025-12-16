@@ -1,5 +1,4 @@
-﻿using LMUSessionTracker.Core;
-using LMUSessionTracker.Core.LMU;
+﻿using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Tracking;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,9 +17,8 @@ namespace LMUSessionTracker.Server.Models {
 			this.contextFactory = contextFactory;
 		}
 
-		public async Task<string> CreateSession(SessionInfo info, DateTime timestamp) {
+		public async Task CreateSession(string sessionId, SessionInfo info, DateTime timestamp) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
-			string sessionId = GuidHelpers.CreateVersion7().ToString("N");
 			Session session = new Session() { SessionId = sessionId, Timestamp = timestamp };
 			session.From(info);
 			SessionState state = new SessionState() { SessionId = sessionId, Timestamp = timestamp };
@@ -31,7 +29,6 @@ namespace LMUSessionTracker.Server.Models {
 				await context.SaveChangesAsync();
 				await transaction.CommitAsync();
 			}
-			return sessionId;
 		}
 
 		public async Task UpdateSession(string sessionId, SessionInfo info, DateTime timestamp) {

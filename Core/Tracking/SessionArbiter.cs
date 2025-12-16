@@ -10,13 +10,15 @@ namespace LMUSessionTracker.Core.Tracking {
 		private readonly ILogger<SessionArbiter> logger;
 		private readonly ManagementRespository managementRepo;
 		private readonly DateTimeProvider dateTimeProvider;
+		private readonly UuidVersion7Provider uuidProvider;
 		private readonly Dictionary<string, Session> activeSessions = new Dictionary<string, Session>();
 		private readonly Dictionary<string, Client> clients = new Dictionary<string, Client>();
 
-		public SessionArbiter(ILogger<SessionArbiter> logger, ManagementRespository managementRepo, DateTimeProvider dateTimeProvider) {
+		public SessionArbiter(ILogger<SessionArbiter> logger, ManagementRespository managementRepo, DateTimeProvider dateTimeProvider, UuidVersion7Provider uuidProvider) {
 			this.logger = logger;
 			this.managementRepo = managementRepo;
 			this.dateTimeProvider = dateTimeProvider;
+			this.uuidProvider = uuidProvider;
 		}
 
 		public async Task<ProtocolStatus> Receive(ProtocolMessage data) {
@@ -36,7 +38,8 @@ namespace LMUSessionTracker.Core.Tracking {
 					if(existingSession != null) {
 						return new ProtocolStatus() { Result = ProtocolResult.Changed, Role = existingSession.IsPrimary(client.ClientId) ? ProtocolRole.Primary : ProtocolRole.Secondary, SessionId = existingSession.SessionId };
 					}
-					string sessionId = (await managementRepo.CreateSession(data.SessionInfo, now));
+					string sessionId = uuidProvider.CreateVersion7(now).ToString("N");
+					await managementRepo.CreateSession(sessionId, data.SessionInfo, now);
 					Session session = Session.Create(sessionId, data.SessionInfo, data.MultiplayerTeams);
 					if(session.Online)
 						await managementRepo.UpdateEntries(sessionId, session.Entries);
@@ -63,7 +66,8 @@ namespace LMUSessionTracker.Core.Tracking {
 				if(!session.IsSameSession(data.SessionInfo, data.MultiplayerTeams)) {
 					session.UnregisterClient(data.ClientId);
 					client.LeaveSession();
-					string sessionId = (await managementRepo.CreateSession(data.SessionInfo, now));
+					string sessionId = uuidProvider.CreateVersion7(now).ToString("N");
+					await managementRepo.CreateSession(sessionId, data.SessionInfo, now);
 					session = Session.Create(sessionId, data.SessionInfo);
 					activeSessions.Add(session.SessionId, session);
 					bool isPrimary = session.RegisterClient(client.ClientId);

@@ -9,20 +9,24 @@ using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tests.Tracking {
 	public class SessionArbiterTests {
+		private static readonly DateTime baseTimestamp = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
 		private readonly Mock<ManagementRespository> managementRepo;
 		private readonly Mock<DateTimeProvider> dateTimeProvider;
+		private readonly Mock<UuidVersion7Provider> uuidProvider;
 		private readonly SessionArbiter arbiter;
 		private string clientId = "t";
 		private string clientI2 = "q";
 		private byte sessionCount = 0;
-		private DateTime lastTimestamp = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+		private DateTime lastTimestamp = baseTimestamp;
 
 		public SessionArbiterTests() {
 			managementRepo = new Mock<ManagementRespository>();
-			managementRepo.Setup(x => x.CreateSession(It.IsAny<SessionInfo>(), It.IsAny<DateTime>())).ReturnsAsync(() => SessionId(++sessionCount));
+			managementRepo.Setup(x => x.CreateSession(It.IsAny<string>(), It.IsAny<SessionInfo>(), It.IsAny<DateTime>()));
 			dateTimeProvider = new Mock<DateTimeProvider>();
 			dateTimeProvider.Setup(x => x.UtcNow).Returns(() => lastTimestamp).Callback(() => { lastTimestamp += new TimeSpan(0, 0, 1); });
-			arbiter = new SessionArbiter(Mock.Of<ILogger<SessionArbiter>>(), managementRepo.Object, dateTimeProvider.Object);
+			uuidProvider = new Mock<UuidVersion7Provider>();
+			uuidProvider.Setup(x => x.CreateVersion7(It.IsAny<DateTime>())).Returns(() => Guid.Parse(SessionId(++sessionCount)));
+			arbiter = new SessionArbiter(Mock.Of<ILogger<SessionArbiter>>(), managementRepo.Object, dateTimeProvider.Object, uuidProvider.Object);
 		}
 
 		public static string SessionId(byte sessionId) => $"000000000000000000000000000000{sessionId:x2}";
