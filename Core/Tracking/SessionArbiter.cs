@@ -66,9 +66,15 @@ namespace LMUSessionTracker.Core.Tracking {
 				if(!session.IsSameSession(data.SessionInfo, data.MultiplayerTeams)) {
 					session.UnregisterClient(data.ClientId);
 					client.LeaveSession();
+					Session existingSession = FindExistingSession(client, data);
+					if(existingSession != null) {
+						return new ProtocolStatus() { Result = ProtocolResult.Changed, Role = existingSession.IsPrimary(client.ClientId) ? ProtocolRole.Primary : ProtocolRole.Secondary, SessionId = existingSession.SessionId };
+					}
 					string sessionId = uuidProvider.CreateVersion7(now).ToString("N");
 					await managementRepo.CreateSession(sessionId, data.SessionInfo, now);
-					session = Session.Create(sessionId, data.SessionInfo);
+					session = Session.Create(sessionId, data.SessionInfo, data.MultiplayerTeams);
+					if(session.Online)
+						await managementRepo.UpdateEntries(sessionId, session.Entries);
 					activeSessions.Add(session.SessionId, session);
 					bool isPrimary = session.RegisterClient(client.ClientId);
 					logger.LogInformation($"New session created: {session.SessionId}");
