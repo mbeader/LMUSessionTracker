@@ -9,7 +9,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public double Sector2 { get; set; }
 		public double Sector3 { get; set; }
 		public string Driver { get; set; }
-		public bool IsValid => TotalTime == -1.0 || Sector1 == -1.0 || Sector2 == -1.0 || Sector3 == -1.0;
+		public bool IsValid => TotalTime != -1.0 && Sector1 != -1.0 && Sector2 != -1.0 && Sector3 != -1.0;
 		public int Position { get; set; }
 		public bool Pit { get; set; }
 		public double Fuel { get; set; }
