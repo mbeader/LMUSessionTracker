@@ -33,7 +33,7 @@ namespace LMUSessionTracker.Server.Controllers {
 			SessionViewModel vm = new SessionViewModel();
 			vm.Session = await sessionRepo.GetSession(sessionId);
 			vm.SessionState = await sessionRepo.GetSessionState(sessionId);
-			Core.Tracking.Session session = sessionObserver.GetSession(sessionId);
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId);
 			vm.Standings = session?.LastStandings;
 			vm.History = session?.History?.GetAllHistory();
 			Dictionary<string, List<CarKey>> classes = new Dictionary<string, List<CarKey>>();
@@ -53,10 +53,10 @@ namespace LMUSessionTracker.Server.Controllers {
 			return View(vm);
 		}
 
-		public IActionResult Laps(string sessionId, string carId) {
+		public async Task<IActionResult> Laps(string sessionId, string carId) {
 			if(!ModelState.IsValid)
 				return BadRequest();
-			CarHistory car = sessionObserver.GetSession(sessionId)?.History?.GetAllHistory().Find(x => x.Key.Matches(carId));
+			CarHistory car = (await sessionObserver.GetSession(sessionId))?.History?.GetAllHistory().Find(x => x.Key.Matches(carId));
 			if(car == null)
 				return NotFound();
 			return View(car);

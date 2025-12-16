@@ -3,6 +3,7 @@ using LMUSessionTracker.Core.Services;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tracking {
@@ -11,6 +12,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		private readonly ManagementRespository managementRepo;
 		private readonly DateTimeProvider dateTimeProvider;
 		private readonly UuidVersion7Provider uuidProvider;
+		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private readonly Dictionary<string, Session> activeSessions = new Dictionary<string, Session>();
 		private readonly Dictionary<string, Client> clients = new Dictionary<string, Client>();
 
@@ -26,6 +28,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(data?.ClientId == null)
 				return Reject();
 			try {
+				await semaphore.WaitAsync();
 				Client client;
 				if(!clients.TryGetValue(data.ClientId, out client)) {
 					client = new Client(data.ClientId);
@@ -42,6 +45,8 @@ namespace LMUSessionTracker.Core.Tracking {
 				}
 			} catch(Exception e) {
 				logger.LogError(e, $"Failed to process message from client {data.ClientId}");
+			} finally {
+				semaphore.Release();
 			}
 			return Reject();
 		}
@@ -160,11 +165,14 @@ namespace LMUSessionTracker.Core.Tracking {
 			};
 		}
 
-		public Session CloneSession(string sessionId) {
+		public async Task<Session> CloneSession(string sessionId) {
+			await semaphore.WaitAsync();
+			Session clonedSession = null;
 			if(activeSessions.TryGetValue(sessionId, out Session session)) {
-				return session.Clone();
+				clonedSession = session.Clone();
 			}
-			return null;
+			semaphore.Release();
+			return clonedSession;
 		}
 	}
 }

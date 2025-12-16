@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tracking {
 	public interface SessionObserver {
-		public Session GetSession(string sessionId);
+		public Task<Session> GetSession(string sessionId);
 	}
 
 	public class SessionArbiterObserver : SessionObserver {
@@ -14,14 +15,14 @@ namespace LMUSessionTracker.Core.Tracking {
 			this.arbiter = arbiter;
 		}
 
-		public Session GetSession(string sessionId) {
+		public Task<Session> GetSession(string sessionId) {
 			return arbiter.CloneSession(sessionId);
 		}
 	}
 
 	public class DefaultSessionObserver : SessionObserver {
-		public Session GetSession(string sessionId) {
-			return null;
+		public Task<Session> GetSession(string sessionId) {
+			return Task.FromResult<Session>(null);
 		}
 	}
 }
