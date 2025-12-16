@@ -28,6 +28,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			client.LastSeen = DateTime.UtcNow;
 			if(data.SessionId == null) {
 				if(data.SessionInfo != null) {
+					Session existingSession = FindExistingSession(client, data);
+					if(existingSession != null) {
+						return new ProtocolStatus() { Result = ProtocolResult.Changed, Role = existingSession.IsPrimary(client.ClientId) ? ProtocolRole.Primary : ProtocolRole.Secondary, SessionId = existingSession.SessionId };
+					}
 					string sessionId = (await managementRepo.CreateSession(data.SessionInfo));
 					Session session = Session.Create(sessionId, data.SessionInfo, data.MultiplayerTeams);
 					if(session.Online)
@@ -82,6 +86,19 @@ namespace LMUSessionTracker.Core.Tracking {
 				logger.LogInformation($"Client {client.ClientId} has invalid session {data.SessionId}");
 				return Reject();
 			}
+		}
+
+		private Session FindExistingSession(Client client, ProtocolMessage data) {
+			foreach(string sessionId in activeSessions.Keys) {
+				Session session = activeSessions[sessionId];
+				if(session.Online && session.IsSameSession(data.SessionInfo, data.MultiplayerTeams)) {
+					bool isPrimary = session.RegisterClient(client.ClientId);
+					client.JoinSession(session, isPrimary);
+					logger.LogInformation($"Client {client.ClientId} joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
+					return session;
+				}
+			}
+			return null;
 		}
 
 		private ProtocolStatus Reject() {
