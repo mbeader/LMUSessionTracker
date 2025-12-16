@@ -1,11 +1,12 @@
 ﻿using LMUSessionTracker.Core.LMU;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tracking {
 	public interface ManagementRespository {
-		public Task<string> CreateSession(SessionInfo info);
-		public Task UpdateSession(string sessionId, SessionInfo info);
+		public Task<string> CreateSession(SessionInfo info, DateTime timestamp);
+		public Task UpdateSession(string sessionId, SessionInfo info, DateTime timestamp);
 		public Task UpdateLaps(string sessionId, List<CarHistory> cars);
 		public Task UpdateEntries(string sessionId, EntryList entries);
 	}

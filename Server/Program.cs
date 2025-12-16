@@ -43,6 +43,7 @@ namespace LMUSessionTracker.Server {
 
 			//builder.Services.AddSingleton<SessionManager>();
 			//builder.Services.AddScoped<SessionViewer>();
+			builder.Services.AddSingleton<DateTimeProvider, DefaultDateTimeProvider>();
 			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled))) {
 				SchemaValidation.LoadJsonSchemas();
 				builder.Services.AddScoped<SchemaValidator, SchemaValidation.Validator>();

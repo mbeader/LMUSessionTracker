@@ -15,6 +15,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public List<Standing> LastStandings { get; private set; }
 		public EntryList Entries { get; private set; }
 		public History History { get; private set; }
+		public DateTime LastUpdate { get; private set; }
 
 		public static Session Create(string sessionId, SessionInfo info, MultiplayerTeams teams = null, List<CarHistory> history = null) {
 			EntryList entries = new EntryList(teams);
@@ -91,13 +92,14 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public bool IsSecondary(string clientId) => SecondaryClientIds.Contains(clientId);
 
-		public void Update(SessionInfo info, List<Standing> standings) {
+		public void Update(SessionInfo info, List<Standing> standings, DateTime timestamp) {
 			LastInfo = info ?? LastInfo;
 			LastStandings = standings ?? LastStandings;
 			if(standings != null) {
 				standings.Sort((a, b) => a.position.CompareTo(b.position));
-				History.Update(standings);
+				History.Update(standings, timestamp);
 			}
+			LastUpdate = timestamp;
 		}
 
 		public bool IsSameSession(SessionInfo info, MultiplayerTeams teams = null) {
@@ -119,7 +121,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public Session Clone() {
 			Session session = Create(SessionId, LastInfo, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()));
-			session.Update(LastInfo, LastStandings);
+			session.Update(LastInfo, LastStandings, LastUpdate);
 			return session;
 		}
 	}

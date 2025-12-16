@@ -1,22 +1,28 @@
 using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Protocol;
+using LMUSessionTracker.Core.Services;
 using LMUSessionTracker.Core.Tracking;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tests.Tracking {
 	public class SessionArbiterTests {
 		private readonly Mock<ManagementRespository> managementRepo;
+		private readonly Mock<DateTimeProvider> dateTimeProvider;
 		private readonly SessionArbiter arbiter;
 		private string clientId = "t";
 		private string clientI2 = "q";
 		private byte sessionCount = 0;
+		private DateTime lastTimestamp = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
 
 		public SessionArbiterTests() {
 			managementRepo = new Mock<ManagementRespository>();
-			managementRepo.Setup(x => x.CreateSession(It.IsAny<SessionInfo>())).ReturnsAsync(() => SessionId(++sessionCount));
-			arbiter = new SessionArbiter(Mock.Of<ILogger<SessionArbiter>>(), managementRepo.Object);
+			managementRepo.Setup(x => x.CreateSession(It.IsAny<SessionInfo>(), It.IsAny<DateTime>())).ReturnsAsync(() => SessionId(++sessionCount));
+			dateTimeProvider = new Mock<DateTimeProvider>();
+			dateTimeProvider.Setup(x => x.UtcNow).Returns(() => lastTimestamp).Callback(() => { lastTimestamp += new TimeSpan(0, 0, 1); });
+			arbiter = new SessionArbiter(Mock.Of<ILogger<SessionArbiter>>(), managementRepo.Object, dateTimeProvider.Object);
 		}
 
 		public static string SessionId(byte sessionId) => $"000000000000000000000000000000{sessionId:x2}";

@@ -94,7 +94,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				});
 				standings.Sort((a, b) => a.position.CompareTo(b.position));
 				lastStandings = standings;
-				history.Update(standings);
+				history.Update(standings, DateTime.UtcNow);
 			} else
 				return false;
 			return true;

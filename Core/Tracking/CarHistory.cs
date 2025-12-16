@@ -14,12 +14,12 @@ namespace LMUSessionTracker.Core.Tracking {
 			Car = car;
 		}
 
-		private void AddLap(Lap lap) {
+		private void AddLap(Lap lap, DateTime timestamp) {
 			while(lap.LapNumber > Laps.Count)
 				Laps.Add(null);
 			if(Laps[lap.LapNumber - 1] == null) {
 				Laps[lap.LapNumber - 1] = lap;
-				lap.Timestamp = DateTime.UtcNow;
+				lap.Timestamp = timestamp;
 			}
 			LapsCompleted = Laps.Count;
 		}
@@ -30,14 +30,14 @@ namespace LMUSessionTracker.Core.Tracking {
 			return Laps[lapNumber - 1] ?? Lap.Default(lapNumber);
 		}
 
-		public void Update(Standing standing) {
+		public void Update(Standing standing, DateTime timestamp) {
 			//if(standing.lapsCompleted > 0 && (Laps.Count == 0 || standing.lapsCompleted > Laps[^1].LapNumber)) {
 			//	while(Laps.Count <= standing.lapsCompleted)
 			//		Laps.Add(Lap.Default(Laps.Count + 1));
 			//	Laps.Add(new Lap(standing));
 			//}
 			if(standing.lapsCompleted > 0)
-				AddLap(new Lap(standing));
+				AddLap(new Lap(standing), timestamp);
 			else
 				Car.Merge(new Car(standing));
 		}

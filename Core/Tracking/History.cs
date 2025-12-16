@@ -36,18 +36,18 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 		}
 
-		public void Update(List<Standing> standings) {
+		public void Update(List<Standing> standings, DateTime timestamp) {
 			foreach(Standing standing in standings)
-				Update(standing);
+				Update(standing, timestamp);
 		}
 
-		private void Update(Standing standing) {
+		private void Update(Standing standing, DateTime timestamp) {
 			CarKey key = new CarKey() { SlotId = standing.slotID, Veh = standing.vehicleFilename };
 			if(!cars.TryGetValue(key, out CarHistory car)) {
 				car = new CarHistory(key, new Car(standing));
 				cars.Add(key, car);
 			}
-			car.Update(standing);
+			car.Update(standing, timestamp);
 		}
 
 		public List<CarHistory> GetAllHistory() {
