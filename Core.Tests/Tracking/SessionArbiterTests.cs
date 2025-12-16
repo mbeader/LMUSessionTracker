@@ -21,7 +21,6 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 
 		public SessionArbiterTests() {
 			managementRepo = new Mock<ManagementRespository>();
-			managementRepo.Setup(x => x.CreateSession(It.IsAny<string>(), It.IsAny<SessionInfo>(), It.IsAny<DateTime>()));
 			dateTimeProvider = new Mock<DateTimeProvider>();
 			dateTimeProvider.Setup(x => x.UtcNow).Returns(() => lastTimestamp).Callback(() => { lastTimestamp += new TimeSpan(0, 0, 1); });
 			uuidProvider = new Mock<UuidVersion7Provider>();
@@ -65,6 +64,12 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[Fact]
 		public async Task Receive_InvalidSessionData_Rejects() {
 			Assert.Equivalent(Status.Rejected(), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new SessionInfo() }));
+		}
+
+		[Fact]
+		public async Task Receive_Failure_Rejects() {
+			managementRepo.Setup(x => x.CreateSession(It.IsAny<string>(), It.IsAny<SessionInfo>(), It.IsAny<DateTime>())).ThrowsAsync(new Exception("foo"));
+			Assert.Equivalent(Status.Rejected(), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new SessionInfo() }));
 		}
 
 		[Fact]
