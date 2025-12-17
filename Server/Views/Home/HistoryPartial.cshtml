@@ -13,7 +13,7 @@
             <th>Team</td>
             <th>Drivers</td>
             <th>Vehicle</td>
-            <th>Laps</td>
+            <th class="text-end">Laps</td>
         </tr>
     </thead>
     <tbody>
@@ -26,7 +26,7 @@
                 <td>@car.Car.TeamName</td>
                 <td>@string.Join(", ", drivers)</td>
                 <td>@car.Car.VehicleName</td>
-                <td><a asp-action="Laps" asp-route-sessionId="@Model.Session.SessionId" asp-route-carId="@car.Key.Id()">@(car.Laps?.Count > 0 ? car.Laps[^1].LapNumber : 0)</a></td>
+                <td class="text-end"><a asp-action="Laps" asp-route-sessionId="@Model.Session.SessionId" asp-route-carId="@car.Key.Id()">@(car.Laps?.Count > 0 ? car.Laps[^1].LapNumber : 0)</a></td>
             </tr>
         }
     </tbody>

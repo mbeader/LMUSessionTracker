@@ -35,22 +35,5 @@ namespace LMUSessionTracker.Core.LMU {
 		public double trackTemp { get; set; }
 		public Velocity windSpeed { get; set; }
 		public string yellowFlagState { get; set; }
-
-		public string PhaseName() {
-			switch(gamePhase) {
-				case 0: return "Starting";
-				case 1: return "Reconnaissance laps";
-				case 2: return "Grid";
-				case 3: return "Formation lap";
-				case 4: return "Countdown";
-				case 5: return "Green";
-				case 6: return "FCY";
-				case 7: return "Session stopped";
-				case 8: return "Checkered";
-				case 9: return "Paused";
-				default: return $"Unknown ({gamePhase})";
-			}
-		}
 	}
-
 }

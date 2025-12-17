@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LMUSessionTracker.Core.LMU;
+using System;
 
 namespace LMUSessionTracker.Core {
 	public static class Format {
@@ -11,7 +12,7 @@ namespace LMUSessionTracker.Core {
 		}
 
 		public static string Time(double? time) {
-			return !time.HasValue ? "" : new TimeSpan((long)Math.Round(time.Value * 1000) * TimeSpan.TicksPerMillisecond).ToString("hh':'mm':'ss'.'fff");
+			return !time.HasValue ? "" : new TimeSpan((long)Math.Round(time.Value * 1000) * TimeSpan.TicksPerMillisecond).ToString("hh':'mm':'ss");
 		}
 
 		public static string LapTime(double laptime) {
@@ -31,6 +32,40 @@ namespace LMUSessionTracker.Core {
 				return "";
 			double f = c.Value * 9.0 / 5.0 + 32;
 			return $"{c:N1} °C ({f:N1} °F)";
+		}
+
+		public static string Phase(int? gamePhase) {
+			switch(gamePhase) {
+				case 0: return "Starting";
+				case 1: return "Reconnaissance laps";
+				case 2: return "Grid";
+				case 3: return "Formation lap";
+				case 4: return "Countdown";
+				case 5: return "Green";
+				case 6: return "FCY";
+				case 7: return "Session stopped";
+				case 8: return "Checkered";
+				case 9: return "Paused";
+				default: return $"Unknown ({gamePhase})";
+			}
+		}
+
+		// indicating pit should be done on lap with entering status
+		public static string Status(Standing standing) {
+			if(standing.inGarageStall)
+				return "Gar";
+			else if(standing.pitState == "NONE")
+				return "Run";
+			else if(standing.pitState == "ENTERING")
+				return "In";
+			else if(standing.pitState == "EXITING")
+				return "Out";
+			else if(standing.pitState == "STOPPED")
+				return "Pit";
+			else if(standing.pitState == "REQUEST")
+				return "Req";
+			else
+				return "???";
 		}
 	}
 }

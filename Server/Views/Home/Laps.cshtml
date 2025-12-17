@@ -3,32 +3,24 @@
 @{
     ViewData["Title"] = "Laps";
 }
-<h1>@ViewData["Title"]</h1>
+<h3>@ViewData["Title"]</h3>
 
-<div class="row">
-    <div class="col">
-        <dl>
-            <dt>Slot ID</dt>
-            <dd>@Model.Car.SlotId</dd>
-            <dt>Class</dt>
-            <dd>@Model.Car.Class</dd>
-            <dt>Number</dt>
-            <dd>@Model.Car.Number</dd>
-            <dt>Team</dt>
-            <dd>@Model.Car.TeamName</dd>
-        </dl>
-    </div>
-    <div class="col">
-        <dl>
-            <dt>Vehicle</dt>
-            <dd>@Model.Car.VehicleName</dd>
-            <dt>Veh</dt>
-            <dd>@Model.Car.Veh</dd>
-            <dt>ID</dt>
-            <dd>@Model.Car.Id</dd>
-        </dl>
-    </div>
-</div>
+<dl class="row">
+    <dt class="col-lg-1 col-2">Slot ID</dt>
+    <dd class="col-lg-1 col-3">@Model.Car.SlotId</dd>
+    <dt class="col-lg-1 col-2">Veh</dt>
+    <dd class="col-lg-4 col-5">@Model.Car.Veh</dd>
+    <dt class="col-lg-1 col-2">Vehicle</dt>
+    <dd class="col-lg-4 col-10">@Model.Car.VehicleName</dd>
+    <dt class="col-lg-1 col-2">Number</dt>
+    <dd class="col-lg-1 col-3">@Model.Car.Number</dd>
+    <dt class="col-lg-1 col-2">Class</dt>
+    <dd class="col-lg-1 col-5 text-truncate">@Model.Car.Class</dd>
+    <dt class="col-lg-1 col-2">Team</dt>
+    <dd class="col-lg-3 col-10">@Model.Car.TeamName</dd>
+    <dt class="col-lg-1 col-2">ID</dt>
+    <dd class="col-lg-3 col-10 text-truncate">@Model.Car.Id</dd>
+</dl>
 
 <table class="table table-sm table-striped table-hover">
     <thead>

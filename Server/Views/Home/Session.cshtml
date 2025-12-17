@@ -5,71 +5,61 @@
 }
 
 @if(Model.SessionState != null) {
-<div class="row">
-<div class="col">
-<h3>Session</h3>
-<div>
-    <dl>
-        <dt>Server</dt>
-        <dd>@Model.Session.ServerName</dd>
-        <dt>Track</dt>
-        <dd>@Model.Session.TrackName</dd>
-        <dt>Session</dt>
-        <dd>@Model.Session.SessionType</dd>
-        <dt>Phase</dt>
-        <dd>@Model.SessionState.GamePhase</dd>
-        <dt>Yellow state</dt>
-        <dd>@Model.SessionState.YellowFlagState</dd>
-        <dt>Sectors</dt>
-        <dd>@Model.SessionState.Sector1Flag @Model.SessionState.Sector2Flag @Model.SessionState.Sector3Flag</dd>
-    </dl>
-</div>
-</div>
+    <div class="row">
+        <div class="col-xxl">
+            <h3>Session</h3>
+            <dl class="row">
+                <dt class="col-xxl-3 col-lg-1 col-3">Track</dt>
+                <dd class="col-xxl-9 col-lg-3 col-9">@Model.Session.TrackName</dd>
+                <dt class="col-xxl-3 col-lg-2 col-3">Session</dt>
+                <dd class="col-xxl-3 col-lg-2 col-3">@Model.Session.SessionType</dd>
+                <dt class="col-xxl-3 col-lg-2 col-3">Phase</dt>
+                <dd class="col-xxl-3 col-lg-2 col-3">@Format.Phase(Model.SessionState.GamePhase)</dd>
+                <dt class="col-xxl-3 col-lg-1 col-3">Players</dt>
+                <dd class="col-xxl-3 col-lg-1 col-3">@Model.SessionState.NumberOfPlayers</dd>
+                <dt class="col-xxl-3 col-lg-2 col-3">Caution</dt>
+                <dd class="col-xxl-3 col-lg-2 col-3">@Model.SessionState.YellowFlagState</dd>
+                <dt class="col-xxl-3 col-lg-2 col-3">Sector flags</dt>
+                <dd class="col-xxl-9 col-lg-4 col-9">@Model.SessionState.Sector1Flag @Model.SessionState.Sector2Flag @Model.SessionState.Sector3Flag</dd>
+            </dl>
+        </div>
 
-<div class="col">
-<h3>Timing</h3>
-<div>
-    <dl>
-        <dt>Time remaining</dt>
-        <dd>@Format.Time(Model.SessionState.TimeRemainingInGamePhase)</dd>
-        <dt>Start time</dt>
-        <dd>@Format.Time(Model.Session.StartEventTime)</dd>
-        <dt>Current time</dt>
-        <dd>@Format.Time(Model.SessionState.CurrentEventTime)</dd>
-        <dt>End time</dt>
-        <dd>@Format.Time(Model.Session.EndEventTime)</dd>
-        <dt>Completion</dt>
-        <dd>@Format.Percent(Model.SessionState.RaceCompletion)</dd>
-        <dt>Max time</dt>
-        <dd>@Format.Time(Model.Session.MaxTime)</dd>
-    </dl>
-</div>
-</div>
+        <div class="col-lg">
+        <h3>Timing</h3>
+            <dl class="row">
+                <dt class="col-3">Elapsed</dt>
+                <dd class="col-3">@Format.Time(Model.SessionState.CurrentEventTime)</dd>
+                <dt class="col-3">Remaining</dt>
+                <dd class="col-3">@Format.Time(Model.SessionState.TimeRemainingInGamePhase)</dd>
+                <dt class="col-3">Start time</dt>
+                <dd class="col-3">@Format.Time(Model.Session.StartEventTime)</dd>
+                <dt class="col-3">End time</dt>
+                <dd class="col-3">@Format.Time(Model.Session.EndEventTime)</dd>
+                <dt class="col-3">Completion</dt>
+                <dd class="col-3">@Format.Percent(Model.SessionState.RaceCompletion)</dd>
+                <dt class="col-3">Max time</dt>
+                <dd class="col-3">@Format.Time(Model.Session.MaxTime)</dd>
+            </dl>
+        </div>
 
-<div class="col">
-<h3>Conditions</h3>
-<div>
-    <dl>
-        <dt>Ambient temp</dt>
-        <dd>@Format.Temp(Model.SessionState.AmbientTemp)</dd>
-        <dt>Track temp</dt>
-        <dd>@Format.Temp(Model.SessionState.TrackTemp)</dd>
-        <dt>Dark cloud</dt>
-        <dd>@Format.Percent(Model.SessionState.DarkCloud)</dd>
-        <dt>Wetness (min)</dt>
-        <dd>@Format.Percent(Model.SessionState.MinPathWetness)</dd>
-        <dt>Wetness (avg)</dt>
-        <dd>@Format.Percent(Model.SessionState.AveragePathWetness)</dd>
-        <dt>Wetness (max)</dt>
-        <dd>@Format.Percent(Model.SessionState.MaxPathWetness)</dd>
-        <dt>Raining</dt>
-        <dd>@Format.Percent(Model.SessionState.Raining)</dd>
-        <dt>Wind</dt>
-        <dd>@Model.SessionState.WindVelocity?.ToString("N1")</dd>
-    </dl>
-</div>
-</div>
-</div>
+        <div class="col-lg">
+            <h3>Conditions</h3>
+            <dl class="row">
+                <dt class="col-lg-2 col-3 order-1">Ambient</dt>
+                <dd class="col-lg-4 col-3 order-1">@Format.Temp(Model.SessionState.AmbientTemp)</dd>
+                <dt class="col-lg-2 col-3 order-2">Track</dt>
+                <dd class="col-lg-4 col-3 order-2">@Format.Temp(Model.SessionState.TrackTemp)</dd>
+                <dt class="col-lg-2 col-3 order-3">Raining</dt>
+                <dd class="col-lg-4 col-3 order-3">@Format.Percent(Model.SessionState.Raining)</dd>
+                <dt class="col-lg-4 col-3 order-1">Wetness (min)</dt>
+                <dd class="col-lg-2 col-3 order-1">@Format.Percent(Model.SessionState.MinPathWetness)</dd>
+                <dt class="col-lg-4 col-3 order-2">Wetness (avg)</dt>
+                <dd class="col-lg-2 col-3 order-2">@Format.Percent(Model.SessionState.AveragePathWetness)</dd>
+                <dt class="col-lg-4 col-3 order-3">Wetness (max)</dt>
+                <dd class="col-lg-2 col-3 order-3">@Format.Percent(Model.SessionState.MaxPathWetness)</dd>
+            </dl>
+        </div>
+    </div>
 }
 
 @if(hasStandings) {

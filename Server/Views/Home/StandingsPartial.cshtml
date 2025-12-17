@@ -11,10 +11,10 @@
             <th>Number</td>
             <th>Team</td>
             <th>Driver</td>
-            <th>Behind</td>
-            <th>Int</td>
-            <th>Laps</td>
-            <th>Fuel</td>
+            <th class="text-end">Behind</td>
+            <th class="text-end">Int</td>
+            <th class="text-end">Laps</td>
+            <th class="text-end">Fuel</td>
             <th>Status</td>
         </tr>
     </thead>
@@ -33,7 +33,7 @@
                 <td class="text-end">@Format.Diff(standing.lapsBehindNext, standing.timeBehindNext)</td>
                 <td class="text-end">@standing.lapsCompleted</td>
                 <td class="text-end">@Format.Percent(standing.fuelFraction)</td>
-                <td>@standing.Status()</td>
+                <td>@Format.Status(standing)</td>
             </tr>
         }
     </tbody>

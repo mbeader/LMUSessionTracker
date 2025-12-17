@@ -58,23 +58,5 @@
 		public string upgradePack { get; set; }
 		public string vehicleFilename { get; set; }
 		public string vehicleName { get; set; }
-		
-		// indicating pit should be done on lap with entering status
-		public string Status() {
-			if(inGarageStall)
-				return "Gar";
-			else if(pitState == "NONE")
-				return "Run";
-			else if(pitState == "ENTERING")
-				return "In";
-			else if(pitState == "EXITING")
-				return "Out";
-			else if(pitState == "STOPPED")
-				return "Pit";
-			else if(pitState == "REQUEST")
-				return "Req";
-			else
-				return "???";
-		}
 	}
 }
