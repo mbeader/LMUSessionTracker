@@ -73,6 +73,7 @@ namespace LMUSessionTracker.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Entries", x => x.EntryId);
+                    table.UniqueConstraint("AK_Entries_SessionId_EntryId", x => new { x.SessionId, x.EntryId });
                     table.ForeignKey(
                         name: "FK_Entries_Sessions_SessionId",
                         column: x => x.SessionId,
@@ -144,11 +145,12 @@ namespace LMUSessionTracker.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cars", x => x.CarId);
+                    table.UniqueConstraint("AK_Cars_SessionId_CarId", x => new { x.SessionId, x.CarId });
                     table.ForeignKey(
-                        name: "FK_Cars_Entries_EntryId",
-                        column: x => x.EntryId,
+                        name: "FK_Cars_Entries_SessionId_EntryId",
+                        columns: x => new { x.SessionId, x.EntryId },
                         principalTable: "Entries",
-                        principalColumn: "EntryId");
+                        principalColumns: new[] { "SessionId", "EntryId" });
                     table.ForeignKey(
                         name: "FK_Cars_Sessions_SessionId",
                         column: x => x.SessionId,
@@ -176,10 +178,10 @@ namespace LMUSessionTracker.Server.Migrations
                 {
                     table.PrimaryKey("PK_Members", x => x.MemberId);
                     table.ForeignKey(
-                        name: "FK_Members_Entries_EntryId",
-                        column: x => x.EntryId,
+                        name: "FK_Members_Entries_SessionId_EntryId",
+                        columns: x => new { x.SessionId, x.EntryId },
                         principalTable: "Entries",
-                        principalColumn: "EntryId",
+                        principalColumns: new[] { "SessionId", "EntryId" },
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Members_Sessions_SessionId",
@@ -219,10 +221,10 @@ namespace LMUSessionTracker.Server.Migrations
                 {
                     table.PrimaryKey("PK_Laps", x => x.LapId);
                     table.ForeignKey(
-                        name: "FK_Laps_Cars_CarId",
-                        column: x => x.CarId,
+                        name: "FK_Laps_Cars_SessionId_CarId",
+                        columns: x => new { x.SessionId, x.CarId },
                         principalTable: "Cars",
-                        principalColumn: "CarId",
+                        principalColumns: new[] { "SessionId", "CarId" },
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Laps_Sessions_SessionId",
@@ -233,15 +235,10 @@ namespace LMUSessionTracker.Server.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cars_EntryId",
+                name: "IX_Cars_SessionId_EntryId",
                 table: "Cars",
-                column: "EntryId",
+                columns: new[] { "SessionId", "EntryId" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Cars_SessionId",
-                table: "Cars",
-                column: "SessionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Chats_SessionId",
@@ -255,29 +252,14 @@ namespace LMUSessionTracker.Server.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Entries_SessionId",
-                table: "Entries",
-                column: "SessionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Laps_CarId",
+                name: "IX_Laps_SessionId_CarId",
                 table: "Laps",
-                column: "CarId");
+                columns: new[] { "SessionId", "CarId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Laps_SessionId",
-                table: "Laps",
-                column: "SessionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Members_EntryId",
+                name: "IX_Members_SessionId_EntryId",
                 table: "Members",
-                column: "EntryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Members_SessionId",
-                table: "Members",
-                column: "SessionId");
+                columns: new[] { "SessionId", "EntryId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_SessionStates_SessionId",

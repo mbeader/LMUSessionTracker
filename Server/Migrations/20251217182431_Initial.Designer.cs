@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMUSessionTracker.Server.Migrations
 {
     [DbContext(typeof(SqliteContext))]
-    [Migration("20251217164820_Initial")]
+    [Migration("20251217182431_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -57,10 +57,8 @@ namespace LMUSessionTracker.Server.Migrations
 
                     b.HasKey("CarId");
 
-                    b.HasIndex("EntryId")
+                    b.HasIndex("SessionId", "EntryId")
                         .IsUnique();
-
-                    b.HasIndex("SessionId");
 
                     b.ToTable("Cars");
                 });
@@ -121,8 +119,6 @@ namespace LMUSessionTracker.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("EntryId");
-
-                    b.HasIndex("SessionId");
 
                     b.ToTable("Entries");
                 });
@@ -193,9 +189,7 @@ namespace LMUSessionTracker.Server.Migrations
 
                     b.HasKey("LapId");
 
-                    b.HasIndex("CarId");
-
-                    b.HasIndex("SessionId");
+                    b.HasIndex("SessionId", "CarId");
 
                     b.ToTable("Laps");
                 });
@@ -233,9 +227,7 @@ namespace LMUSessionTracker.Server.Migrations
 
                     b.HasKey("MemberId");
 
-                    b.HasIndex("EntryId");
-
-                    b.HasIndex("SessionId");
+                    b.HasIndex("SessionId", "EntryId");
 
                     b.ToTable("Members");
                 });
@@ -387,15 +379,16 @@ namespace LMUSessionTracker.Server.Migrations
 
             modelBuilder.Entity("LMUSessionTracker.Server.Models.Car", b =>
                 {
-                    b.HasOne("LMUSessionTracker.Server.Models.Entry", "Entry")
-                        .WithOne("Car")
-                        .HasForeignKey("LMUSessionTracker.Server.Models.Car", "EntryId");
-
                     b.HasOne("LMUSessionTracker.Server.Models.Session", "Session")
                         .WithMany("Cars")
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("LMUSessionTracker.Server.Models.Entry", "Entry")
+                        .WithOne("Car")
+                        .HasForeignKey("LMUSessionTracker.Server.Models.Car", "SessionId", "EntryId")
+                        .HasPrincipalKey("LMUSessionTracker.Server.Models.Entry", "SessionId", "EntryId");
 
                     b.Navigation("Entry");
 
@@ -426,15 +419,16 @@ namespace LMUSessionTracker.Server.Migrations
 
             modelBuilder.Entity("LMUSessionTracker.Server.Models.Lap", b =>
                 {
-                    b.HasOne("LMUSessionTracker.Server.Models.Car", "Car")
-                        .WithMany("Laps")
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("LMUSessionTracker.Server.Models.Session", "Session")
                         .WithMany("Laps")
                         .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LMUSessionTracker.Server.Models.Car", "Car")
+                        .WithMany("Laps")
+                        .HasForeignKey("SessionId", "CarId")
+                        .HasPrincipalKey("SessionId", "CarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -445,15 +439,16 @@ namespace LMUSessionTracker.Server.Migrations
 
             modelBuilder.Entity("LMUSessionTracker.Server.Models.Member", b =>
                 {
-                    b.HasOne("LMUSessionTracker.Server.Models.Entry", "Entry")
-                        .WithMany("Members")
-                        .HasForeignKey("EntryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("LMUSessionTracker.Server.Models.Session", "Session")
                         .WithMany("Members")
                         .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LMUSessionTracker.Server.Models.Entry", "Entry")
+                        .WithMany("Members")
+                        .HasForeignKey("SessionId", "EntryId")
+                        .HasPrincipalKey("SessionId", "EntryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
