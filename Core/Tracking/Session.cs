@@ -16,33 +16,30 @@ namespace LMUSessionTracker.Core.Tracking {
 		public EntryList Entries { get; private set; }
 		public History History { get; private set; }
 		public DateTime LastUpdate { get; private set; }
+		public bool Finished { get; private set; }
+
+		private Session(string sessionId, SessionInfo info, EntryList entries, List<CarHistory> history) {
+			SessionId = sessionId;
+			SecondaryClientIds = new List<string>();
+			Track = info.trackName;
+			Type = info.session;
+			RoleChanges = new Dictionary<string, bool>();
+			LastInfo = info;
+			Entries = entries;
+			History = new History(history, entries);
+			Finished = IsFinished(info);
+		}
 
 		public static Session Create(string sessionId, SessionInfo info, MultiplayerTeams teams = null, List<CarHistory> history = null) {
 			EntryList entries = new EntryList(teams);
-			return new Session() {
-				SessionId = sessionId,
-				SecondaryClientIds = new List<string>(),
-				Track = info.trackName,
-				Type = info.session,
-				Online = teams != null,
-				RoleChanges = new Dictionary<string, bool>(),
-				LastInfo = info,
-				Entries = entries,
-				History = new History(history, entries)
+			return new Session(sessionId, info, entries, history) {
+				Online = teams != null
 			};
 		}
 
 		public static Session Create(string sessionId, SessionInfo info, EntryList entries, List<CarHistory> history) {
-			return new Session() {
-				SessionId = sessionId,
-				SecondaryClientIds = new List<string>(),
-				Track = info.trackName,
-				Type = info.session,
-				Online = entries != null,
-				RoleChanges = new Dictionary<string, bool>(),
-				LastInfo = info,
-				Entries = entries,
-				History = new History(history, entries)
+			return new Session(sessionId, info, entries, history) {
+				Online = entries != null
 			};
 		}
 
@@ -114,12 +111,22 @@ namespace LMUSessionTracker.Core.Tracking {
 				History.Update(standings, timestamp);
 			}
 			LastUpdate = timestamp;
+			Finished = IsFinished(info);
+		}
+
+		public void Close() {
+			Finished = true;
+		}
+
+		private bool IsFinished(SessionInfo info) {
+			return Finished || (info != null && info.gamePhase == (int)GamePhase.Checkered);
 		}
 
 		public bool IsSameSession(SessionInfo info, MultiplayerTeams teams = null) {
 			bool same = Track == info.trackName &&
 				Type == info.session &&
-				CompletionNotDecreased(info);
+				CompletionNotDecreased(info) &&
+				IsValidPhaseTransition(info);
 			if(!same || Online != (teams != null))
 				return false;
 			return Entries.IsSameEntryList(new EntryList(teams));
@@ -131,6 +138,31 @@ namespace LMUSessionTracker.Core.Tracking {
 			double last = LastInfo.raceCompletion.timeCompletion;
 			double curr = info.raceCompletion.timeCompletion;
 			return last == -1 || curr == -1 || last <= curr;
+		}
+
+		/// <summary>
+		/// For this purpose, valid transitions are:<br/>
+		///	&gt; no change<br/>
+		///	&gt; advancing anywhere in starting sequence from starting to green (or a main phase)<br/>
+		///	&gt; changing between any two main phases<br/>
+		///	&gt; between checkered and paused but only between these two once checkered the first time<br/>
+		///	&gt; between paused and anything else (technically this has potential to go backwards in starting sequence)<br/>
+		/// </summary>
+		private bool IsValidPhaseTransition(SessionInfo info) {
+			return LastInfo.gamePhase == info.gamePhase ||
+				(InStartingSequence(LastInfo.gamePhase) && LastInfo.gamePhase < info.gamePhase) ||
+				(InMainPhase(LastInfo.gamePhase) && InMainPhase(info.gamePhase) && !Finished) ||
+				(LastInfo.gamePhase == (int)GamePhase.Paused && info.gamePhase < (int)GamePhase.Checkered && !Finished) ||
+				(LastInfo.gamePhase == (int)GamePhase.Checkered && info.gamePhase == (int)GamePhase.Paused) ||
+				(LastInfo.gamePhase == (int)GamePhase.Paused && info.gamePhase == (int)GamePhase.Checkered);
+		}
+
+		private bool InStartingSequence(int phase) {
+			return phase >= (int)GamePhase.Starting && phase <= (int)GamePhase.Green;
+		}
+
+		private bool InMainPhase(int phase) {
+			return phase >= (int)GamePhase.Green && phase <= (int)GamePhase.Paused && phase != (int)GamePhase.Checkered;
 		}
 
 		public Session Clone() {

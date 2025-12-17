@@ -11,6 +11,7 @@
                 <th>Start time</th>
                 <th>Track</th>
                 <th>Type</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -19,6 +20,7 @@
                     <td><a asp-action="Session" asp-route-sessionId="@session.SessionId">@session.Timestamp.ToString("yyyy-MM-dd HH:mm")</a></td>
                     <td>@session.TrackName</td>
                     <td>@session.SessionType</td>
+                    <td>@(session.IsClosed ? "Closed" : "Active")</td>
                 </tr>
             }
         </tbody>

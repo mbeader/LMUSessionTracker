@@ -58,6 +58,56 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			Assert.False(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.4 } }));
 		}
 
+		[Theory]
+		[InlineData(nameof(GamePhase.Green), nameof(GamePhase.Green))]
+		[InlineData(nameof(GamePhase.Green), nameof(GamePhase.FCY))]
+		[InlineData(nameof(GamePhase.Starting), nameof(GamePhase.Paused))]
+		[InlineData(nameof(GamePhase.Green), nameof(GamePhase.Paused))]
+		[InlineData(nameof(GamePhase.Checkered), nameof(GamePhase.Paused))]
+		public void IsSameSession_OfflineReversiblePhaseTransition_ReturnsTrue(string prev, string next) {
+			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) });
+			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }));
+			session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) });
+			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }));
+		}
+
+		[Theory]
+		[InlineData(nameof(GamePhase.Starting), nameof(GamePhase.ReconnaissanceLaps))]
+		[InlineData(nameof(GamePhase.Starting), nameof(GamePhase.Grid))]
+		[InlineData(nameof(GamePhase.Starting), nameof(GamePhase.FormationLap))]
+		[InlineData(nameof(GamePhase.Starting), nameof(GamePhase.Countdown))]
+		[InlineData(nameof(GamePhase.Starting), nameof(GamePhase.Green))]
+		[InlineData(nameof(GamePhase.FormationLap), nameof(GamePhase.Green))]
+		[InlineData(nameof(GamePhase.Starting), nameof(GamePhase.Checkered))]
+		[InlineData(nameof(GamePhase.Green), nameof(GamePhase.Checkered))]
+		public void IsSameSession_OfflineOneWayPhaseTransition_ReturnsTrueThenFalse(string prev, string next) {
+			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) });
+			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }));
+			session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) });
+			Assert.False(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }));
+		}
+
+		[Theory]
+		[InlineData(nameof(GamePhase.Checkered), nameof(GamePhase.Paused), nameof(GamePhase.Checkered))]
+		[InlineData(nameof(GamePhase.Paused), nameof(GamePhase.Checkered), nameof(GamePhase.Paused))]
+		public void IsSameSession_OfflineValidPhaseTransition_ReturnsTrue(string prev, string inter, string next) {
+			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) });
+			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }));
+			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, baseTimestamp);
+			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }));
+		}
+
+		[Theory]
+		[InlineData(nameof(GamePhase.Checkered), nameof(GamePhase.Paused), nameof(GamePhase.Starting))]
+		[InlineData(nameof(GamePhase.Checkered), nameof(GamePhase.Paused), nameof(GamePhase.Green))]
+		[InlineData(nameof(GamePhase.Checkered), nameof(GamePhase.Paused), nameof(GamePhase.FCY))]
+		public void IsSameSession_OfflineInvalidPhaseTransition_ReturnsFalse(string prev, string inter, string next) {
+			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) });
+			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }));
+			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, baseTimestamp);
+			Assert.False(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }));
+		}
+
 		[Fact]
 		public void IsSameSession_OnlineIdentical_ReturnsTrue() {
 			SessionInfo info = new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.5 } };

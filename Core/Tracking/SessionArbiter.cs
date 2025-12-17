@@ -14,6 +14,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		private readonly UuidVersion7Provider uuidProvider;
 		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private readonly Dictionary<string, Session> activeSessions = new Dictionary<string, Session>();
+		private readonly Dictionary<string, Session> pendingSessions = new Dictionary<string, Session>();
 		private readonly Dictionary<string, Client> clients = new Dictionary<string, Client>();
 
 		public SessionArbiter(ILogger<SessionArbiter> logger, ManagementRespository managementRepo, DateTimeProvider dateTimeProvider, UuidVersion7Provider uuidProvider) {
@@ -53,8 +54,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		private async Task<ProtocolStatus> HandleNoSession(Client client, ProtocolMessage data, DateTime now) {
 			if(data.SessionInfo != null) {
-				Session session = FindExistingSession(client, data) ?? await ChangeSession(client, data, now);
-				return Change(session.SessionId, session.IsPrimary(client.ClientId));
+				return await JoinNewOrExistingSession(client, data, now);
 			} else {
 				logger.LogInformation($"Client has no data no session: {client.ClientId}");
 				return Reject();
@@ -69,6 +69,9 @@ namespace LMUSessionTracker.Core.Tracking {
 				return Reject();
 			}
 
+			if(session.LastInfo?.gamePhase != data.SessionInfo.gamePhase)
+				logger.LogDebug($"Client {client.ClientId} in session {session.SessionId} phase changed from {Format.Phase(session.LastInfo?.gamePhase)} to {Format.Phase(data.SessionInfo.gamePhase)}");
+
 			if(data.SessionInfo.gamePhase == 9) {
 				logger.LogInformation($"Client {client.ClientId} observed paused session {session.SessionId}");
 				return Accept(data.SessionId, true);
@@ -77,8 +80,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(!session.IsSameSession(data.SessionInfo, data.MultiplayerTeams)) {
 				session.UnregisterClient(data.ClientId);
 				client.LeaveSession();
-				session = FindExistingSession(client, data) ?? await ChangeSession(client, data, now);
-				return Change(session.SessionId, session.IsPrimary(client.ClientId));
+				return await JoinNewOrExistingSession(client, data, now);
 			}
 
 			bool? isPrimaryChange = session.AcknowledgeRole(client.ClientId);
@@ -97,12 +99,28 @@ namespace LMUSessionTracker.Core.Tracking {
 			await managementRepo.UpdateSession(session.SessionId, data.SessionInfo, now);
 			session.Update(data.SessionInfo, data.Standings, now);
 			await managementRepo.UpdateLaps(session.SessionId, session.History.GetAllHistory());
+			if(session.Finished && !pendingSessions.ContainsKey(session.SessionId)) {
+				pendingSessions.Add(session.SessionId, session);
+				await managementRepo.CloseSession(session.SessionId);
+				logger.LogInformation($"Session {session.SessionId} is pending closure");
+			}
 			return Accept(data.SessionId, true);
 		}
 
 		private ProtocolStatus HandleInvalid(Client client, ProtocolMessage data, DateTime now) {
 			logger.LogInformation($"Client {client.ClientId} has invalid session {data.SessionId}");
 			return Reject();
+		}
+
+		private async Task<ProtocolStatus> JoinNewOrExistingSession(Client client, ProtocolMessage data, DateTime now) {
+			Session session = FindExistingSession(client, data);
+			if(session == null)
+				session = await ChangeSession(client, data, now);
+			else if(pendingSessions.ContainsKey(session.SessionId)) {
+				logger.LogInformation($"Client {client.ClientId} attempted to join closed session {session.SessionId}");
+				return Reject();
+			}
+			return Change(session.SessionId, session.IsPrimary(client.ClientId));
 		}
 
 		private Session FindExistingSession(Client client, ProtocolMessage data) {
@@ -184,8 +202,8 @@ namespace LMUSessionTracker.Core.Tracking {
 			activeSessions.Clear();
 			clients.Clear();
 			foreach(Session session in await managementRepo.GetSessions()) {
-				// check if active
-				activeSessions.Add(session.SessionId, await managementRepo.GetSession(session.SessionId));
+				if(!session.Finished)
+					activeSessions.Add(session.SessionId, await managementRepo.GetSession(session.SessionId));
 			}
 			logger.LogInformation($"Loaded {activeSessions.Count} sessions");
 			semaphore.Release();
