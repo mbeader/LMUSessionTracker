@@ -19,7 +19,7 @@
     <tbody>
         @foreach(CarHistory car in Model.History) {
             drivers.Clear();
-            car.Laps.ForEach(lap => { if(!string.IsNullOrEmpty(lap.Driver)) drivers.Add(lap.Driver); });
+            car.Laps.ForEach(lap => { if(!string.IsNullOrEmpty(lap?.Driver)) drivers.Add(lap.Driver); });
             <tr>
                 <td>@car.Car.Class</td>
                 <td>@car.Car.Number</td>

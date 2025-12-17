@@ -14,22 +14,6 @@ namespace LMUSessionTracker.Core.Tracking {
 				LoadEntryList(entries);
 		}
 
-		public History(EntryList entries, List<(Car, Lap)> laps) {
-			Dictionary<CarKey, (Car car, List<Lap> laps)> history = new Dictionary<CarKey, (Car car, List<Lap> laps)>();
-			foreach((Car car, Lap lap) in laps) {
-				CarKey key = new CarKey() { SlotId = car.SlotId, Veh = car.Veh };
-				if(!history.TryGetValue(key, out (Car car, List<Lap> laps) carHistory)) {
-					carHistory = (car, new List<Lap>());
-					history.Add(key, carHistory);
-				} else
-					carHistory.car.Merge(car);
-				carHistory.laps.Add(lap);
-			}
-			foreach(CarKey key in history.Keys) {
-				cars.Add(key, new CarHistory(key, history[key].car, history[key].laps));
-			}
-		}
-
 		private void LoadEntryList(EntryList entries) {
 			foreach(int slotId in entries.Slots.Keys) {
 				Entry entry = entries.Slots[slotId];

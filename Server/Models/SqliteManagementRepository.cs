@@ -45,29 +45,36 @@ namespace LMUSessionTracker.Server.Models {
 		public async Task UpdateLaps(string sessionId, List<CarHistory> cars) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			using(var transaction = await context.Database.BeginTransactionAsync()) {
+				Dictionary<CarKey, Car> dbCars = new Dictionary<CarKey, Car>();
 				Dictionary<CarKey, Dictionary<int, Lap>> allDbLaps = new Dictionary<CarKey, Dictionary<int, Lap>>();
-				foreach(Lap dbLap in await context.Laps.Where(x => x.SessionId == sessionId).ToListAsync()) {
-					CarKey key = new CarKey() { SlotId = dbLap.SlotId, Veh = dbLap.Veh };
-					if(!allDbLaps.TryGetValue(key, out Dictionary<int, Lap> dbLaps)) {
-						dbLaps = new Dictionary<int, Lap>();
-						allDbLaps.Add(key, dbLaps);
-					}
-					dbLaps.Add(dbLap.LapNumber, dbLap);
+				foreach(Car dbCar in await context.Cars.Include(x => x.Laps).Where(x => x.SessionId == sessionId).ToListAsync()) {
+					CarKey key = new CarKey() { SlotId = dbCar.SlotId, Veh = dbCar.Veh };
+					dbCars.Add(key, dbCar);
+					Dictionary<int, Lap> dbLaps = new Dictionary<int, Lap>();
+					allDbLaps.Add(key, dbLaps);
+					foreach(Lap dbLap in dbCar.Laps)
+						dbLaps.Add(dbLap.LapNumber, dbLap);
 				}
 				foreach(CarHistory car in cars) {
+					if(!dbCars.TryGetValue(car.Key, out Car dbCar)) {
+						dbCar = new Car() { SessionId = sessionId };
+						context.Cars.Add(dbCar);
+					}
+					dbCar.From(car.Car);
 					if(!allDbLaps.TryGetValue(car.Key, out Dictionary<int, Lap> dbLaps)) {
 						dbLaps = new Dictionary<int, Lap>();
 						allDbLaps.Add(car.Key, dbLaps);
 					}
-					foreach(var lap in car.Laps) {
+					foreach(Core.Tracking.Lap lap in car.Laps) {
 						if(lap == null)
 							continue;
 						if(!dbLaps.TryGetValue(lap.LapNumber, out Lap dbLap)) {
 							dbLap = new Lap() { SessionId = sessionId };
 							dbLaps.Add(lap.LapNumber, dbLap);
-							context.Laps.Add(dbLap);
+							//context.Laps.Add(dbLap);
+							dbCar.Laps.Add(dbLap);
 						}
-						dbLap.From(car.Car, lap);
+						dbLap.From(lap);
 					}
 				}
 				await context.SaveChangesAsync();
@@ -106,9 +113,10 @@ namespace LMUSessionTracker.Server.Models {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			Session session = await context.Sessions
 				.Include(x => x.LastState)
-				.Include(x => x.Laps)
+				.Include(x => x.Cars)
+				.ThenInclude(x => x.Laps)
 				.Include(x => x.Entries)
-				.Include(x => x.Members)
+				.ThenInclude(x => x.Members)
 				.AsSplitQuery()
 				.SingleOrDefaultAsync(x => x.SessionId == sessionId);
 			return session.To();

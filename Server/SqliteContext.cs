@@ -8,6 +8,7 @@ namespace LMUSessionTracker.Server {
 
 		public DbSet<Session> Sessions { get; set; }
 		public DbSet<SessionState> SessionStates { get; set; }
+		public DbSet<Car> Cars { get; set; }
 		public DbSet<Lap> Laps { get; set; }
 		public DbSet<Entry> Entries { get; set; }
 		public DbSet<Member> Members { get; set; }

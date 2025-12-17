@@ -82,47 +82,6 @@ namespace LMUSessionTracker.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Laps",
-                columns: table => new
-                {
-                    LapId = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
-                    SlotId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Veh = table.Column<string>(type: "TEXT", nullable: false),
-                    LapNumber = table.Column<int>(type: "INTEGER", nullable: false),
-                    CarClass = table.Column<string>(type: "TEXT", nullable: true),
-                    Vehicle = table.Column<string>(type: "TEXT", nullable: true),
-                    Team = table.Column<string>(type: "TEXT", nullable: true),
-                    Driver = table.Column<string>(type: "TEXT", nullable: true),
-                    FinishStatus = table.Column<string>(type: "TEXT", nullable: true),
-                    TotalTime = table.Column<double>(type: "REAL", nullable: false),
-                    Sector1 = table.Column<double>(type: "REAL", nullable: false),
-                    Sector2 = table.Column<double>(type: "REAL", nullable: false),
-                    Sector3 = table.Column<double>(type: "REAL", nullable: false),
-                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Position = table.Column<int>(type: "INTEGER", nullable: false),
-                    Pit = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Fuel = table.Column<double>(type: "REAL", nullable: false),
-                    VirtualEnergy = table.Column<double>(type: "REAL", nullable: false),
-                    LFTire = table.Column<double>(type: "REAL", nullable: false),
-                    RFTire = table.Column<double>(type: "REAL", nullable: false),
-                    LRTire = table.Column<double>(type: "REAL", nullable: false),
-                    RRTire = table.Column<double>(type: "REAL", nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Laps", x => x.LapId);
-                    table.ForeignKey(
-                        name: "FK_Laps_Sessions_SessionId",
-                        column: x => x.SessionId,
-                        principalTable: "Sessions",
-                        principalColumn: "SessionId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SessionStates",
                 columns: table => new
                 {
@@ -167,6 +126,38 @@ namespace LMUSessionTracker.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Cars",
+                columns: table => new
+                {
+                    CarId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
+                    EntryId = table.Column<long>(type: "INTEGER", nullable: true),
+                    SlotId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Veh = table.Column<string>(type: "TEXT", nullable: false),
+                    VehicleName = table.Column<string>(type: "TEXT", nullable: true),
+                    TeamName = table.Column<string>(type: "TEXT", nullable: true),
+                    Class = table.Column<string>(type: "TEXT", nullable: true),
+                    Number = table.Column<string>(type: "TEXT", nullable: true),
+                    Id = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cars", x => x.CarId);
+                    table.ForeignKey(
+                        name: "FK_Cars_Entries_EntryId",
+                        column: x => x.EntryId,
+                        principalTable: "Entries",
+                        principalColumn: "EntryId");
+                    table.ForeignKey(
+                        name: "FK_Cars_Sessions_SessionId",
+                        column: x => x.SessionId,
+                        principalTable: "Sessions",
+                        principalColumn: "SessionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Members",
                 columns: table => new
                 {
@@ -198,6 +189,60 @@ namespace LMUSessionTracker.Server.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Laps",
+                columns: table => new
+                {
+                    LapId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
+                    CarId = table.Column<long>(type: "INTEGER", nullable: false),
+                    LapNumber = table.Column<int>(type: "INTEGER", nullable: false),
+                    Driver = table.Column<string>(type: "TEXT", nullable: true),
+                    FinishStatus = table.Column<string>(type: "TEXT", nullable: true),
+                    TotalTime = table.Column<double>(type: "REAL", nullable: false),
+                    Sector1 = table.Column<double>(type: "REAL", nullable: false),
+                    Sector2 = table.Column<double>(type: "REAL", nullable: false),
+                    Sector3 = table.Column<double>(type: "REAL", nullable: false),
+                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Position = table.Column<int>(type: "INTEGER", nullable: false),
+                    Pit = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Fuel = table.Column<double>(type: "REAL", nullable: false),
+                    VirtualEnergy = table.Column<double>(type: "REAL", nullable: false),
+                    LFTire = table.Column<double>(type: "REAL", nullable: false),
+                    RFTire = table.Column<double>(type: "REAL", nullable: false),
+                    LRTire = table.Column<double>(type: "REAL", nullable: false),
+                    RRTire = table.Column<double>(type: "REAL", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Laps", x => x.LapId);
+                    table.ForeignKey(
+                        name: "FK_Laps_Cars_CarId",
+                        column: x => x.CarId,
+                        principalTable: "Cars",
+                        principalColumn: "CarId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Laps_Sessions_SessionId",
+                        column: x => x.SessionId,
+                        principalTable: "Sessions",
+                        principalColumn: "SessionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_EntryId",
+                table: "Cars",
+                column: "EntryId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_SessionId",
+                table: "Cars",
+                column: "SessionId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Chats_SessionId",
                 table: "Chats",
@@ -213,6 +258,11 @@ namespace LMUSessionTracker.Server.Migrations
                 name: "IX_Entries_SessionId",
                 table: "Entries",
                 column: "SessionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Laps_CarId",
+                table: "Laps",
+                column: "CarId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Laps_SessionId",
@@ -232,7 +282,8 @@ namespace LMUSessionTracker.Server.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_SessionStates_SessionId",
                 table: "SessionStates",
-                column: "SessionId");
+                column: "SessionId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -249,6 +300,9 @@ namespace LMUSessionTracker.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "SessionStates");
+
+            migrationBuilder.DropTable(
+                name: "Cars");
 
             migrationBuilder.DropTable(
                 name: "Entries");

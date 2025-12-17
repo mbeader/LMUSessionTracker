@@ -8,16 +8,11 @@ namespace LMUSessionTracker.Server.Models {
 		public long LapId { get; set; }
 		[ForeignKey(nameof(Session)), Required]
 		public string SessionId { get; set; }
+		[ForeignKey(nameof(Car)), Required]
+		public long CarId { get; set; }
 
 		[Required]
-		public int SlotId { get; set; }
-		[Required]
-		public string Veh { get; set; }
-		[Required]
 		public int LapNumber { get; set; }
-		public string CarClass { get; set; }
-		public string Vehicle { get; set; }
-		public string Team { get; set; }
 		public string Driver { get; set; }
 		public string FinishStatus { get; set; }
 		public double TotalTime { get; set; }
@@ -37,16 +32,12 @@ namespace LMUSessionTracker.Server.Models {
 		public DateTime? Timestamp { get; set; }
 
 		public Session Session { get; set; }
+		public Car Car { get; set; }
 
-		public void From(Core.Tracking.Car car, Core.Tracking.Lap lap) {
-			if(LapNumber > 0 && (SlotId != car.SlotId || Veh != car.Veh || LapNumber != lap.LapNumber))
-				throw new InvalidOperationException($"Cannot change lap from {SlotId}-{Veh} L{LapNumber} to {car.SlotId}-{car.Veh} L{lap.LapNumber}");
-			SlotId = car.SlotId;
-			Veh = car.Veh;
+		public void From(Core.Tracking.Lap lap) {
+			if(LapNumber > 0 && LapNumber != lap.LapNumber)
+				throw new InvalidOperationException($"Cannot change lap from L{LapNumber} to L{lap.LapNumber}");
 			LapNumber = lap.LapNumber;
-			CarClass = car.Class;
-			Vehicle = car.VehicleName;
-			Team = car.TeamName;
 			Driver = lap.Driver;
 			FinishStatus = lap.FinishStatus;
 			TotalTime = lap.TotalTime;
@@ -65,14 +56,8 @@ namespace LMUSessionTracker.Server.Models {
 			Timestamp = lap.Timestamp;
 		}
 
-		public (Core.Tracking.Car, Core.Tracking.Lap) To() {
-			return (new Core.Tracking.Car() {
-				SlotId = SlotId,
-				Veh = Veh,
-				VehicleName = Vehicle,
-				TeamName = Team,
-				Class = CarClass,
-			}, new Core.Tracking.Lap() {
+		public Core.Tracking.Lap To() {
+			return new Core.Tracking.Lap() {
 				LapNumber = LapNumber,
 				TotalTime = TotalTime,
 				Sector1 = Sector1,
@@ -89,7 +74,7 @@ namespace LMUSessionTracker.Server.Models {
 				RRTire = RRTire,
 				FinishStatus = FinishStatus,
 				Timestamp = Timestamp,
-			});
+			};
 		}
 	}
 }

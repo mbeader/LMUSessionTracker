@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace LMUSessionTracker.Server.Models {
 	public class Session {
@@ -11,7 +10,7 @@ namespace LMUSessionTracker.Server.Models {
 
 		public DateTime Timestamp { get; set; }
 		public bool IsClosed { get; set; }
-		
+
 		public double EndEventTime { get; set; }
 		public string GameMode { get; set; }
 		public double LapDistance { get; set; }
@@ -26,6 +25,7 @@ namespace LMUSessionTracker.Server.Models {
 		public string TrackName { get; set; }
 
 		public SessionState LastState { get; set; }
+		public ICollection<Car> Cars { get; } = new List<Car>();
 		public ICollection<Lap> Laps { get; } = new List<Lap>();
 		public ICollection<Entry> Entries { get; } = new List<Entry>();
 		public ICollection<Member> Members { get; } = new List<Member>();
@@ -55,10 +55,18 @@ namespace LMUSessionTracker.Server.Models {
 					coreEntries.Add(entry.To());
 				entries = new Core.Tracking.EntryList(coreEntries);
 			}
-			List<(Core.Tracking.Car, Core.Tracking.Lap)> laps = new List<(Core.Tracking.Car, Core.Tracking.Lap)>();
-			foreach(Lap lap in Laps)
-				laps.Add(lap.To());
-			Core.Tracking.Session session = Core.Tracking.Session.Create(SessionId, info, entries, laps);
+			List<Core.Tracking.CarHistory> carHistories = null;
+			if(Cars != null) {
+				carHistories = new List<Core.Tracking.CarHistory>();
+				foreach(Car car in Cars) {
+					Core.Tracking.CarKey key = new Core.Tracking.CarKey() { SlotId = car.SlotId, Veh = car.Veh };
+					List<Core.Tracking.Lap> laps = new List<Core.Tracking.Lap>();
+					foreach(Lap lap in car.Laps)
+						laps.Add(lap.To());
+					carHistories.Add(new Core.Tracking.CarHistory(key, car.To(), laps));
+				}
+			}
+			Core.Tracking.Session session = Core.Tracking.Session.Create(SessionId, info, entries, carHistories);
 			session.Update(info, null, Timestamp);
 			return session;
 		}

@@ -32,7 +32,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			};
 		}
 
-		public static Session Create(string sessionId, SessionInfo info, EntryList entries, List<(Car, Lap)> laps) {
+		public static Session Create(string sessionId, SessionInfo info, EntryList entries, List<CarHistory> history) {
 			return new Session() {
 				SessionId = sessionId,
 				SecondaryClientIds = new List<string>(),
@@ -42,7 +42,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				RoleChanges = new Dictionary<string, bool>(),
 				LastInfo = info,
 				Entries = entries,
-				History = new History(entries, laps)
+				History = new History(history, entries)
 			};
 		}
 

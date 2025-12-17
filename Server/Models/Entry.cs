@@ -21,6 +21,7 @@ namespace LMUSessionTracker.Server.Models {
 		public string Vehicle { get; set; }
 
 		public Session Session { get; set; }
+		public Car Car { get; set; }
 		public ICollection<Member> Members { get; } = new List<Member>();
 
 		public void From(Core.Tracking.Entry entry) {

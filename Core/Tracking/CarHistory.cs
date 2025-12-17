@@ -109,7 +109,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				Id = Car.Id,
 			});
 			foreach(Lap lap in Laps) {
-				car.Laps.Add(new Lap() {
+				car.Laps.Add(lap == null ? null : new Lap() {
 					LapNumber = lap.LapNumber,
 					TotalTime = lap.TotalTime,
 					Sector1 = lap.Sector1,

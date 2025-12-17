@@ -17,6 +17,51 @@ namespace LMUSessionTracker.Server.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.22");
 
+            modelBuilder.Entity("LMUSessionTracker.Server.Models.Car", b =>
+                {
+                    b.Property<long>("CarId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Class")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("EntryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Number")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SlotId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TeamName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Veh")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VehicleName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CarId");
+
+                    b.HasIndex("EntryId")
+                        .IsUnique();
+
+                    b.HasIndex("SessionId");
+
+                    b.ToTable("Cars");
+                });
+
             modelBuilder.Entity("LMUSessionTracker.Server.Models.Chat", b =>
                 {
                     b.Property<long>("ChatId")
@@ -85,8 +130,8 @@ namespace LMUSessionTracker.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("CarClass")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CarId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Driver")
                         .HasColumnType("TEXT");
@@ -134,29 +179,18 @@ namespace LMUSessionTracker.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("SlotId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Team")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime?>("Timestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<double>("TotalTime")
                         .HasColumnType("REAL");
 
-                    b.Property<string>("Veh")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Vehicle")
-                        .HasColumnType("TEXT");
-
                     b.Property<double>("VirtualEnergy")
                         .HasColumnType("REAL");
 
                     b.HasKey("LapId");
+
+                    b.HasIndex("CarId");
 
                     b.HasIndex("SessionId");
 
@@ -342,9 +376,27 @@ namespace LMUSessionTracker.Server.Migrations
 
                     b.HasKey("SessionStateId");
 
-                    b.HasIndex("SessionId");
+                    b.HasIndex("SessionId")
+                        .IsUnique();
 
                     b.ToTable("SessionStates");
+                });
+
+            modelBuilder.Entity("LMUSessionTracker.Server.Models.Car", b =>
+                {
+                    b.HasOne("LMUSessionTracker.Server.Models.Entry", "Entry")
+                        .WithOne("Car")
+                        .HasForeignKey("LMUSessionTracker.Server.Models.Car", "EntryId");
+
+                    b.HasOne("LMUSessionTracker.Server.Models.Session", "Session")
+                        .WithMany("Cars")
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Entry");
+
+                    b.Navigation("Session");
                 });
 
             modelBuilder.Entity("LMUSessionTracker.Server.Models.Chat", b =>
@@ -371,11 +423,19 @@ namespace LMUSessionTracker.Server.Migrations
 
             modelBuilder.Entity("LMUSessionTracker.Server.Models.Lap", b =>
                 {
+                    b.HasOne("LMUSessionTracker.Server.Models.Car", "Car")
+                        .WithMany("Laps")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("LMUSessionTracker.Server.Models.Session", "Session")
                         .WithMany("Laps")
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Car");
 
                     b.Navigation("Session");
                 });
@@ -402,26 +462,37 @@ namespace LMUSessionTracker.Server.Migrations
             modelBuilder.Entity("LMUSessionTracker.Server.Models.SessionState", b =>
                 {
                     b.HasOne("LMUSessionTracker.Server.Models.Session", "Session")
-                        .WithMany()
-                        .HasForeignKey("SessionId")
+                        .WithOne("LastState")
+                        .HasForeignKey("LMUSessionTracker.Server.Models.SessionState", "SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Session");
                 });
 
+            modelBuilder.Entity("LMUSessionTracker.Server.Models.Car", b =>
+                {
+                    b.Navigation("Laps");
+                });
+
             modelBuilder.Entity("LMUSessionTracker.Server.Models.Entry", b =>
                 {
+                    b.Navigation("Car");
+
                     b.Navigation("Members");
                 });
 
             modelBuilder.Entity("LMUSessionTracker.Server.Models.Session", b =>
                 {
+                    b.Navigation("Cars");
+
                     b.Navigation("Chats");
 
                     b.Navigation("Entries");
 
                     b.Navigation("Laps");
+
+                    b.Navigation("LastState");
 
                     b.Navigation("Members");
                 });

@@ -251,7 +251,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[Fact]
 		public void Create_ReloadDataOnline_ReturnsIdenticalSession() {
 			Session s1 = Session.Create(id1, FullSessionInfo(), FullMultiplayerTeams(), FullCarHistories());
-			Session s2 = Session.Create(id1, FullSessionInfo(), FullEntryList(), FullLaps());
+			Session s2 = Session.Create(id1, FullSessionInfo(), FullEntryList(), FullCarHistories());
 			Assert.Equivalent(s1, s2);
 			Assert.Equivalent(s1.History.GetAllHistory(), s1.History.GetAllHistory());
 		}
