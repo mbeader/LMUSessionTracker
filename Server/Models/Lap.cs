@@ -1,5 +1,4 @@
-﻿using LMUSessionTracker.Core.LMU;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -64,6 +63,33 @@ namespace LMUSessionTracker.Server.Models {
 			LRTire = lap.LRTire;
 			RRTire = lap.RRTire;
 			Timestamp = lap.Timestamp;
+		}
+
+		public (Core.Tracking.Car, Core.Tracking.Lap) To() {
+			return (new Core.Tracking.Car() {
+				SlotId = SlotId,
+				Veh = Veh,
+				VehicleName = Vehicle,
+				TeamName = Team,
+				Class = CarClass,
+			}, new Core.Tracking.Lap() {
+				LapNumber = LapNumber,
+				TotalTime = TotalTime,
+				Sector1 = Sector1,
+				Sector2 = Sector2,
+				Sector3 = Sector3,
+				Driver = Driver,
+				Position = Position,
+				Pit = Pit,
+				Fuel = Fuel,
+				VirtualEnergy = VirtualEnergy,
+				LFTire = LFTire,
+				RFTire = RFTire,
+				LRTire = LRTire,
+				RRTire = RRTire,
+				FinishStatus = FinishStatus,
+				Timestamp = Timestamp,
+			});
 		}
 	}
 }

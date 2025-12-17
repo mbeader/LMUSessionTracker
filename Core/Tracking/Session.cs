@@ -32,6 +32,20 @@ namespace LMUSessionTracker.Core.Tracking {
 			};
 		}
 
+		public static Session Create(string sessionId, SessionInfo info, EntryList entries, List<(Car, Lap)> laps) {
+			return new Session() {
+				SessionId = sessionId,
+				SecondaryClientIds = new List<string>(),
+				Track = info.trackName,
+				Type = info.session,
+				Online = entries != null,
+				RoleChanges = new Dictionary<string, bool>(),
+				LastInfo = info,
+				Entries = entries,
+				History = new History(entries, laps)
+			};
+		}
+
 		public bool RegisterClient(string clientId) {
 			if(string.IsNullOrEmpty(clientId))
 				throw new ArgumentException("Cannot be null or empty", nameof(clientId));

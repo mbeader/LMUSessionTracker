@@ -92,5 +92,26 @@ namespace LMUSessionTracker.Server.Models {
 				await transaction.CommitAsync();
 			}
 		}
+
+		public async Task<List<Core.Tracking.Session>> GetSessions() {
+			using SqliteContext context = await contextFactory.CreateDbContextAsync();
+			List<Core.Tracking.Session> sessions = new List<Core.Tracking.Session>();
+			foreach(Session session in await context.Sessions.Include(x => x.LastState).ToListAsync()) {
+				sessions.Add(session.To());
+			}
+			return sessions;
+		}
+
+		public async Task<Core.Tracking.Session> GetSession(string sessionId) {
+			using SqliteContext context = await contextFactory.CreateDbContextAsync();
+			Session session = await context.Sessions
+				.Include(x => x.LastState)
+				.Include(x => x.Laps)
+				.Include(x => x.Entries)
+				.Include(x => x.Members)
+				.AsSplitQuery()
+				.SingleOrDefaultAsync(x => x.SessionId == sessionId);
+			return session.To();
+		}
 	}
 }

@@ -12,6 +12,13 @@ namespace LMUSessionTracker.Core.Tracking {
 				Populate(teams);
 		}
 
+		public EntryList(List<Entry> entries) {
+			Slots = new Dictionary<int, Entry>();
+			if(entries != null)
+				foreach(Entry entry in entries)
+					Slots.Add(entry.SlotId, entry);
+		}
+
 		private void Populate(MultiplayerTeams teams) {
 			foreach(string team in teams.teams.Keys) {
 				if(!team.StartsWith("utid"))

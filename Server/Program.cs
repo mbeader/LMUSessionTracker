@@ -80,6 +80,7 @@ namespace LMUSessionTracker.Server {
 			}
 			builder.Services.AddScoped<SessionRepository, SqliteSessionRepository>();
 			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
+			builder.Services.AddHostedService<SessionLoaderService>();
 			//builder.Services.AddHostedService<SessionService>();
 			//builder.Services.AddHostedService<ReplayService>();
 

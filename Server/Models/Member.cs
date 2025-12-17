@@ -28,5 +28,16 @@ namespace LMUSessionTracker.Server.Models {
 			IsEngineer = member.IsEngineer;
 			IsAdmin = member.IsAdmin;
 		}
+
+		public Core.Tracking.Member To() {
+			return new Core.Tracking.Member() {
+				Name = Name,
+				Badge = Badge,
+				Nationality = Nationality,
+				IsDriver = IsDriver,
+				IsEngineer = IsEngineer,
+				IsAdmin = IsAdmin,
+			};
+		}
 	}
 }

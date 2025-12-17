@@ -9,9 +9,13 @@ namespace LMUSessionTracker.Core.Tracking {
 		public List<Lap> Laps { get; } = new List<Lap>();
 		public int LapsCompleted { get; private set; }
 
-		public CarHistory(CarKey key, Car car) {
+		public CarHistory(CarKey key, Car car, List<Lap> laps = null) {
 			Key = key;
 			Car = car;
+			if(laps != null) {
+				Laps.AddRange(laps);
+				LapsCompleted = Laps.Count;
+			}
 		}
 
 		private void AddLap(Lap lap, DateTime timestamp) {

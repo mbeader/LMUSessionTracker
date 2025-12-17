@@ -174,5 +174,21 @@ namespace LMUSessionTracker.Core.Tracking {
 			semaphore.Release();
 			return clonedSession;
 		}
+
+		public async Task Load() {
+			await semaphore.WaitAsync();
+			if(activeSessions.Count > 0)
+				logger.LogWarning($"Found {activeSessions.Count} sessions when loading state");
+			if(clients.Count > 0)
+				logger.LogWarning($"Found {clients.Count} clients when loading state");
+			activeSessions.Clear();
+			clients.Clear();
+			foreach(Session session in await managementRepo.GetSessions()) {
+				// check if active
+				activeSessions.Add(session.SessionId, await managementRepo.GetSession(session.SessionId));
+			}
+			logger.LogInformation($"Loaded {activeSessions.Count} sessions");
+			semaphore.Release();
+		}
 	}
 }

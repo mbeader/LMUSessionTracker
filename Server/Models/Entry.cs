@@ -30,5 +30,18 @@ namespace LMUSessionTracker.Server.Models {
 			Name = entry.Name;
 			Vehicle = entry.Vehicle;
 		}
+
+		public Core.Tracking.Entry To() {
+			Core.Tracking.Entry entry = new Core.Tracking.Entry() {
+				SlotId = SlotId,
+				Id = Id,
+				Number = Number,
+				Name = Name,
+				Vehicle = Vehicle
+			};
+			foreach(Member member in Members)
+				entry.Members.Add(member.To());
+			return entry;
+		}
 	}
 }
