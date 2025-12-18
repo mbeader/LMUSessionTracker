@@ -21,6 +21,7 @@ namespace LMUSessionTracker.Server {
 		public static void Main(string[] args) {
 			var logger = ConfigureLogging();
 			logger.Information($"Working directory: {Directory.GetCurrentDirectory()}");
+			Directory.CreateDirectory("data");
 
 			var builder = WebApplication.CreateBuilder(args);
 
