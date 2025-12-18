@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 namespace LMUSessionTracker.Core.Tracking {
 	public class Session {
+		private static readonly double fuzziness = 5;
+
 		public string SessionId { get; private set; }
 		public string PrimaryClientId { get; private set; }
 		public List<string> SecondaryClientIds { get; private set; }
@@ -134,8 +136,10 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public bool IsSameSession(SessionInfo info, MultiplayerTeams teams = null) {
 			bool same = Track == info.trackName &&
-				Type == info.session &&
-				CompletionNotDecreased(info) &&
+				Type == info.session && (
+					CompletionNotDecreased(info) || (
+						IsWithinFuzziness(LastInfo.currentEventTime, info.currentEventTime) &&
+						IsWithinFuzziness(LastInfo.timeRemainingInGamePhase, info.timeRemainingInGamePhase))) &&
 				IsValidPhaseTransition(info);
 			if(!same || Online != (teams != null))
 				return false;
@@ -148,6 +152,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			double last = LastInfo.raceCompletion.timeCompletion;
 			double curr = info.raceCompletion.timeCompletion;
 			return last == -1 || curr == -1 || last <= curr;
+		}
+
+		private bool IsWithinFuzziness(double last, double curr) {
+			return Math.Abs(curr - last) <= fuzziness;
 		}
 
 		/// <summary>

@@ -206,6 +206,12 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public async Task Receive_MultiClientSameSessionOnlineWithinFuzziness_CreatesOne() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { timeRemainingInGamePhase = 55, raceCompletion = new() { timeCompletion = 0.45 } }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedSecondary(1), await arbiter.Receive(new() { ClientId = clientI2, SessionInfo = new() { timeRemainingInGamePhase = 60, raceCompletion = new() { timeCompletion = 0.40 } }, MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
 		public async Task Receive_MultiClientClosedSessionOnlineData_AcceptsExistingRejectsNew() {
 			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
 			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { gamePhase = 8 }, MultiplayerTeams = MultiplayerTeams() }));

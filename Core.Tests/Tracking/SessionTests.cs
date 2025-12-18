@@ -53,9 +53,21 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
-		public void IsSameSession_OfflineLowerCompletion_ReturnsFalse() {
-			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.5 } }, baseTimestamp);
-			Assert.False(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.4 } }));
+		public void IsSameSession_OfflineSessionLowerCompletionElapsedWithinFuzziness_ReturnsTrue() {
+			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", currentEventTime = 55, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.55 } }, baseTimestamp);
+			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", currentEventTime = 50, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.5 } }));
+		}
+
+		[Fact]
+		public void IsSameSession_OfflineSessionLowerCompletionRemainingWithinFuzziness_ReturnsTrue() {
+			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", currentEventTime = 55, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.55 } }, baseTimestamp);
+			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", currentEventTime = 50, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.5 } }));
+		}
+
+		[Fact]
+		public void IsSameSession_OfflineSessionLowerCompletionElapsedOutisdeFuzziness_ReturnsFalse() {
+			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", currentEventTime = 55, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.55 } }, baseTimestamp);
+			Assert.False(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", currentEventTime = 49, timeRemainingInGamePhase = 51, raceCompletion = new() { timeCompletion = 0.5 } }));
 		}
 
 		[Theory]
