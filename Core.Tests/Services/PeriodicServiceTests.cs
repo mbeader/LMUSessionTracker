@@ -1,5 +1,3 @@
-using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Protocol;
 using LMUSessionTracker.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -34,7 +32,7 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			public Task End();
 		}
 
-		public PeriodicServiceTests() {
+		public PeriodicServiceTests(LoggingFixture loggingFixture) {
 			dep = new Mock<FakeDep>();
 			dep.Setup(x => x.Do()).ReturnsAsync(true);
 			dep.Setup(x => x.CalculateDelay()).Returns(0);
@@ -43,7 +41,7 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
 			Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
 			serviceProvider.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(scopeFactory.Object);
-			service = new FakeService(Mock.Of<ILogger<FakeService>>(), serviceProvider.Object, dep.Object);
+			service = new FakeService(loggingFixture.LoggerFactory.CreateLogger<FakeService>(), serviceProvider.Object, dep.Object);
 		}
 
 		[Fact(Timeout = 5000)]

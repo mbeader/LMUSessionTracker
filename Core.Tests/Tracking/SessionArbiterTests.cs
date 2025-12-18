@@ -19,13 +19,13 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		private byte sessionCount = 0;
 		private DateTime lastTimestamp = baseTimestamp;
 
-		public SessionArbiterTests() {
+		public SessionArbiterTests(LoggingFixture loggingFixture) {
 			managementRepo = new Mock<ManagementRespository>();
 			dateTimeProvider = new Mock<DateTimeProvider>();
 			dateTimeProvider.Setup(x => x.UtcNow).Returns(() => lastTimestamp).Callback(() => { lastTimestamp += new TimeSpan(0, 0, 1); });
 			uuidProvider = new Mock<UuidVersion7Provider>();
 			uuidProvider.Setup(x => x.CreateVersion7(It.IsAny<DateTime>())).Returns(() => Guid.Parse(SessionId(++sessionCount)));
-			arbiter = new SessionArbiter(Mock.Of<ILogger<SessionArbiter>>(), managementRepo.Object, dateTimeProvider.Object, uuidProvider.Object);
+			arbiter = new SessionArbiter(loggingFixture.LoggerFactory.CreateLogger<SessionArbiter>(), managementRepo.Object, dateTimeProvider.Object, uuidProvider.Object);
 		}
 
 		public static string SessionId(byte sessionId) => $"000000000000000000000000000000{sessionId:x2}";

@@ -15,7 +15,7 @@ namespace LMUSessionTracker.Core.Tests.Services {
 		private readonly ClientService service;
 		private string clientId;
 
-		public ClientServiceTests() {
+		public ClientServiceTests(LoggingFixture loggingFixture) {
 			lmuClient = new Mock<LMUClient>();
 			protocolClient = new Mock<ProtocolClient>();
 			scope = new Mock<IServiceScope>();
@@ -25,7 +25,7 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
 			Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
 			serviceProvider.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(scopeFactory.Object);
-			service = new ClientService(Mock.Of<ILogger<ClientService>>(), serviceProvider.Object);
+			service = new ClientService(loggingFixture.LoggerFactory.CreateLogger<ClientService>(), serviceProvider.Object);
 			clientId = "t";
 		}
 
