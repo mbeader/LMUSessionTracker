@@ -66,9 +66,9 @@ namespace LMUSessionTracker.Server.Models {
 					carHistories.Add(new Core.Tracking.CarHistory(key, car.To(), laps));
 				}
 			}
-			Core.Tracking.Session session = Core.Tracking.Session.Create(SessionId, info, entries, carHistories);
-			session.Update(info, null, Timestamp);
-			session.Close();
+			Core.Tracking.Session session = Core.Tracking.Session.Create(SessionId, info, Timestamp, entries, carHistories);
+			if(IsClosed)
+				session.Close();
 			return session;
 		}
 

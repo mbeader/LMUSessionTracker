@@ -18,7 +18,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public DateTime LastUpdate { get; private set; }
 		public bool Finished { get; private set; }
 
-		private Session(string sessionId, SessionInfo info, EntryList entries, List<CarHistory> history) {
+		private Session(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history) {
 			SessionId = sessionId;
 			SecondaryClientIds = new List<string>();
 			Track = info.trackName;
@@ -27,20 +27,25 @@ namespace LMUSessionTracker.Core.Tracking {
 			LastInfo = info;
 			Entries = entries;
 			History = new History(history, entries);
+			LastUpdate = timestamp;
 			Finished = IsFinished(info);
 		}
 
-		public static Session Create(string sessionId, SessionInfo info, MultiplayerTeams teams = null, List<CarHistory> history = null) {
+		public static Session Create(string sessionId, SessionInfo info, DateTime timestamp, MultiplayerTeams teams = null, List<CarHistory> history = null) {
 			EntryList entries = new EntryList(teams);
-			return new Session(sessionId, info, entries, history) {
+			return new Session(sessionId, info, timestamp, entries, history) {
 				Online = teams != null
 			};
 		}
 
-		public static Session Create(string sessionId, SessionInfo info, EntryList entries, List<CarHistory> history) {
-			return new Session(sessionId, info, entries, history) {
+		public static Session Create(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history) {
+			return new Session(sessionId, info, timestamp, entries, history) {
 				Online = entries != null
 			};
+		}
+
+		public bool HasClient() {
+			return PrimaryClientId != null && SecondaryClientIds.Count > 0;
 		}
 
 		public bool RegisterClient(string clientId) {
@@ -114,8 +119,13 @@ namespace LMUSessionTracker.Core.Tracking {
 			Finished = IsFinished(info);
 		}
 
-		public void Close() {
+		public List<string> Close() {
 			Finished = true;
+			List<string> clients = new List<string>();
+			if(PrimaryClientId != null)
+				clients.Add(PrimaryClientId);
+			clients.AddRange(SecondaryClientIds);
+			return clients;
 		}
 
 		private bool IsFinished(SessionInfo info) {
@@ -166,7 +176,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		public Session Clone() {
-			Session session = Create(SessionId, LastInfo, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()));
+			Session session = Create(SessionId, LastInfo, LastUpdate, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()));
 			session.Update(LastInfo, LastStandings, LastUpdate);
 			return session;
 		}

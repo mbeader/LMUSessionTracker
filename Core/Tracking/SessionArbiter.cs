@@ -8,13 +8,15 @@ using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tracking {
 	public class SessionArbiter : ProtocolServer {
+		private static readonly TimeSpan pruneLimit = new TimeSpan(0, 20, 0);
+		private static readonly TimeSpan activeLimit = new TimeSpan(0, 10, 0);
 		private readonly ILogger<SessionArbiter> logger;
 		private readonly ManagementRespository managementRepo;
 		private readonly DateTimeProvider dateTimeProvider;
 		private readonly UuidVersion7Provider uuidProvider;
 		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private readonly Dictionary<string, Session> activeSessions = new Dictionary<string, Session>();
-		private readonly Dictionary<string, Session> pendingSessions = new Dictionary<string, Session>();
+		private readonly Dictionary<string, Session> inactiveSessions = new Dictionary<string, Session>();
 		private readonly Dictionary<string, Client> clients = new Dictionary<string, Client>();
 
 		public SessionArbiter(ILogger<SessionArbiter> logger, ManagementRespository managementRepo, DateTimeProvider dateTimeProvider, UuidVersion7Provider uuidProvider) {
@@ -30,6 +32,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				return Reject();
 			try {
 				await semaphore.WaitAsync();
+				await Prune(now);
 				Client client;
 				if(!clients.TryGetValue(data.ClientId, out client)) {
 					client = new Client(data.ClientId);
@@ -99,8 +102,8 @@ namespace LMUSessionTracker.Core.Tracking {
 			await managementRepo.UpdateSession(session.SessionId, data.SessionInfo, now);
 			session.Update(data.SessionInfo, data.Standings, now);
 			await managementRepo.UpdateLaps(session.SessionId, session.History.GetAllHistory());
-			if(session.Finished && !pendingSessions.ContainsKey(session.SessionId)) {
-				pendingSessions.Add(session.SessionId, session);
+			if(session.Finished && !inactiveSessions.ContainsKey(session.SessionId)) {
+				inactiveSessions.Add(session.SessionId, session);
 				await managementRepo.CloseSession(session.SessionId);
 				logger.LogInformation($"Session {session.SessionId} is pending closure");
 			}
@@ -116,9 +119,19 @@ namespace LMUSessionTracker.Core.Tracking {
 			Session session = FindExistingSession(client, data);
 			if(session == null)
 				session = await ChangeSession(client, data, now);
-			else if(pendingSessions.ContainsKey(session.SessionId)) {
+			else if(session.Finished) {
 				logger.LogInformation($"Client {client.ClientId} attempted to join closed session {session.SessionId}");
 				return Reject();
+			} else {
+				bool isPrimary = session.RegisterClient(client.ClientId);
+				client.JoinSession(session, isPrimary);
+				if(inactiveSessions.Remove(session.SessionId)) {
+					logger.LogInformation($"Session {session.SessionId} marked as active");
+				}
+				if(data.SessionId == null)
+					logger.LogInformation($"Client {client.ClientId} joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
+				else
+					logger.LogInformation($"Client {client.ClientId} transitioned from session {data.SessionId} to session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
 			}
 			return Change(session.SessionId, session.IsPrimary(client.ClientId));
 		}
@@ -127,12 +140,6 @@ namespace LMUSessionTracker.Core.Tracking {
 			foreach(string sessionId in activeSessions.Keys) {
 				Session session = activeSessions[sessionId];
 				if(session.Online && session.IsSameSession(data.SessionInfo, data.MultiplayerTeams)) {
-					bool isPrimary = session.RegisterClient(client.ClientId);
-					client.JoinSession(session, isPrimary);
-					if(data.SessionId == null)
-						logger.LogInformation($"Client {client.ClientId} joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
-					else
-						logger.LogInformation($"Client {client.ClientId} transitioned from session {data.SessionId} to session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
 					return session;
 				}
 			}
@@ -142,7 +149,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		private async Task<Session> ChangeSession(Client client, ProtocolMessage data, DateTime now) {
 			string sessionId = uuidProvider.CreateVersion7(now).ToString("N");
 			await managementRepo.CreateSession(sessionId, data.SessionInfo, now);
-			Session session = Session.Create(sessionId, data.SessionInfo, data.MultiplayerTeams);
+			Session session = Session.Create(sessionId, data.SessionInfo, now, data.MultiplayerTeams);
 			if(session.Online)
 				await managementRepo.UpdateEntries(sessionId, session.Entries);
 			activeSessions.Add(session.SessionId, session);
@@ -181,6 +188,41 @@ namespace LMUSessionTracker.Core.Tracking {
 				Role = isPrimary ? ProtocolRole.Primary : ProtocolRole.Secondary,
 				SessionId = sessionId
 			};
+		}
+
+		private async Task Prune(DateTime now) {
+			List<string> pendingSessionIds = new List<string>();
+			foreach(string sessionId in inactiveSessions.Keys) {
+				Session session = inactiveSessions[sessionId];
+				if(now - session.LastUpdate > pruneLimit) {
+					if(!session.Finished) {
+						List<string> clientIds = session.Close();
+						foreach(string clientId in clientIds) {
+							clients[clientId].LeaveSession();
+							logger.LogInformation($"Client {clientId} left session {session.SessionId} by force");
+						}
+						await managementRepo.CloseSession(session.SessionId);
+						logger.LogInformation($"Closing session {sessionId}");
+					}
+					if(session.HasClient())
+						throw new Exception($"Cannot prune session {sessionId} due to presence of clients");
+					logger.LogInformation($"Pruning session {sessionId}");
+					pendingSessionIds.Add(sessionId);
+				}
+			}
+			foreach(string sessionId in pendingSessionIds) {
+				activeSessions.Remove(sessionId);
+				inactiveSessions.Remove(sessionId);
+			}
+
+			pendingSessionIds.Clear();
+			foreach(string sessionId in activeSessions.Keys) {
+				Session session = activeSessions[sessionId];
+				if(!inactiveSessions.ContainsKey(sessionId) && now - session.LastUpdate > activeLimit) {
+					logger.LogInformation($"Marking session {sessionId} as inactive");
+					inactiveSessions.Add(sessionId, session);
+				}
+			}
 		}
 
 		public async Task<Session> CloneSession(string sessionId) {

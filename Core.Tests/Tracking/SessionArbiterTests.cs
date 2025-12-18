@@ -212,5 +212,42 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { gamePhase = 8 }, MultiplayerTeams = MultiplayerTeams() }));
 			Assert.Equivalent(Status.Rejected(), await arbiter.Receive(new() { ClientId = clientI2, SessionInfo = new() { gamePhase = 8 }, MultiplayerTeams = MultiplayerTeams() }));
 		}
+
+		[Fact]
+		public async Task Receive_SessionInactiveForLongerThanLimit_Prunes() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { trackName = "a" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { trackName = "b" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.NotNull(await arbiter.CloneSession(SessionId(1)));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 5, 1);
+			Assert.Equivalent(Status.AcceptedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(2), SessionInfo = new() { trackName = "b" }, MultiplayerTeams = MultiplayerTeams() }));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 10, 1);
+			Assert.Equivalent(Status.AcceptedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(2), SessionInfo = new() { trackName = "b" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.NotNull(await arbiter.CloneSession(SessionId(1)));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 15, 1);
+			Assert.Equivalent(Status.AcceptedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(2), SessionInfo = new() { trackName = "b" }, MultiplayerTeams = MultiplayerTeams() }));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 20, 1);
+			Assert.Equivalent(Status.AcceptedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(2), SessionInfo = new() { trackName = "b" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Null(await arbiter.CloneSession(SessionId(1)));
+		}
+
+		[Fact]
+		public async Task Receive_SessionInactiveForLongerThanLimitWithExistingClient_Prunes() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { trackName = "a" }, MultiplayerTeams = MultiplayerTeams() }));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 20, 1);
+			Assert.Equivalent(Status.ChangedPrimary(2), await arbiter.Receive(new() { ClientId = clientI2, SessionInfo = new() { trackName = "b" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.NotNull(await arbiter.CloneSession(SessionId(1)));
+			Assert.Equivalent(Status.AcceptedPrimary(2), await arbiter.Receive(new() { ClientId = clientI2, SessionId = SessionId(2), SessionInfo = new() { trackName = "b" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Null(await arbiter.CloneSession(SessionId(1)));
+		}
+
+		[Fact]
+		public async Task Receive_SessionInactiveForShorterThanLimit_Accepts() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { trackName = "a" }, MultiplayerTeams = MultiplayerTeams() }));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 10, 1);
+			Assert.Equivalent(Status.ChangedPrimary(2), await arbiter.Receive(new() { ClientId = clientI2, SessionInfo = new() { trackName = "b" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.NotNull(await arbiter.CloneSession(SessionId(1)));
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { trackName = "a" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.NotNull(await arbiter.CloneSession(SessionId(1)));
+		}
 	}
 }
