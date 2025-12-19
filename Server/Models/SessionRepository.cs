@@ -22,7 +22,14 @@ namespace LMUSessionTracker.Server.Models {
 		}
 
 		public async Task<Session> GetSession(string sessionId) {
-			return await context.Sessions.SingleOrDefaultAsync(x => x.SessionId == sessionId);
+			return await context.Sessions
+				.Include(x => x.LastState)
+				.Include(x => x.Cars)
+				.ThenInclude(x => x.Laps)
+				.Include(x => x.Entries)
+				.ThenInclude(x => x.Members)
+				.AsSplitQuery()
+				.SingleOrDefaultAsync(x => x.SessionId == sessionId);
 		}
 
 		public async Task<List<Core.Tracking.SessionSummary>> GetSessions() {

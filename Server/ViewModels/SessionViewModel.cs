@@ -11,6 +11,6 @@ namespace LMUSessionTracker.Server.ViewModels {
 		public Dictionary<CarKey, Car> Entries { get; } = new Dictionary<CarKey, Car>();
 
 		public Models.Session Session { get; set; }
-		public Models.SessionState SessionState { get; set; }
+		public Models.SessionState SessionState => Session.LastState;
 	}
 }
