@@ -24,6 +24,14 @@ namespace LMUSessionTracker.Server.Controllers {
 		public async Task<IActionResult> Index() {
 			IndexViewModel vm = new IndexViewModel();
 			vm.Sessions = await sessionRepo.GetSessions();
+			List<SessionSummary> activeSessions = await sessionObserver.GetSessions();
+			for(int i = 0; i < vm.Sessions.Count; i++) {
+				SessionSummary activeSession = activeSessions.Find(x => x.SessionId == vm.Sessions[i].SessionId);
+				if(activeSession != null) {
+					activeSession.Timestamp = vm.Sessions[i].Timestamp;
+					vm.Sessions[i] = activeSession;
+				}
+			}
 			return View(vm);
 		}
 

@@ -235,6 +235,16 @@ namespace LMUSessionTracker.Core.Tracking {
 			return clonedSession;
 		}
 
+		public async Task<List<SessionSummary>> SummarizeSessions() {
+			await semaphore.WaitAsync();
+			List<SessionSummary> summaries = new List<SessionSummary>();
+			foreach(string sessionId in activeSessions.Keys) {
+				summaries.Add(activeSessions[sessionId].Summarize(!inactiveSessions.ContainsKey(sessionId)));
+			}
+			semaphore.Release();
+			return summaries;
+		}
+
 		public async Task Load() {
 			await semaphore.WaitAsync();
 			if(activeSessions.Count > 0)

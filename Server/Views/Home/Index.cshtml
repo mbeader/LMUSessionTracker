@@ -1,4 +1,3 @@
-@using Session = LMUSessionTracker.Server.Models.Session
 @model IndexViewModel
 @{
     ViewData["Title"] = "Sessions";
@@ -11,16 +10,20 @@
                 <th>Start time</th>
                 <th>Track</th>
                 <th>Type</th>
+                <th>Remaining</th>
+                <th>Cars</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            @foreach(Session session in Model.Sessions) {
+            @foreach(SessionSummary session in Model.Sessions) {
                 <tr>
                     <td><a asp-action="Session" asp-route-sessionId="@session.SessionId">@session.Timestamp.ToString("yyyy-MM-dd HH:mm")</a></td>
-                    <td>@session.TrackName</td>
-                    <td>@session.SessionType</td>
-                    <td>@(session.IsClosed ? "Closed" : "Active")</td>
+                    <td>@session.Track</td>
+                    <td>@session.Type</td>
+                    <td>@(session.Active ? Format.Time(session.Remaining) : "Complete")</td>
+                    <td>@session.CarCount</td>
+                    <td>@(session.Active && session.Finished ? "Finished" : session.Active && session.ClientCount > 0 ? "Active" : session.Finished ? "Closed" : "Inactive")</td>
                 </tr>
             }
         </tbody>

@@ -1,8 +1,8 @@
-﻿using LMUSessionTracker.Server.Models;
+﻿using LMUSessionTracker.Core.Tracking;
 using System.Collections.Generic;
 
 namespace LMUSessionTracker.Server.ViewModels {
 	public class IndexViewModel {
-		public List<Session> Sessions { get; set; }
+		public List<SessionSummary> Sessions { get; set; }
 	}
 }

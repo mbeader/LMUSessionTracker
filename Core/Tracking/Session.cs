@@ -188,5 +188,21 @@ namespace LMUSessionTracker.Core.Tracking {
 			session.Update(LastInfo, LastStandings, LastUpdate);
 			return session;
 		}
+
+		public SessionSummary Summarize(bool active) {
+			return new SessionSummary() {
+				SessionId = SessionId,
+				PrimaryClientId = PrimaryClientId,
+				SecondaryClientIds = new List<string>(SecondaryClientIds),
+				Track = Track,
+				Type = Type,
+				Online = Online,
+				LastUpdate = LastUpdate,
+				Finished = Finished,
+				Active = active,
+				CarCount = Math.Max(Math.Max(History.Count, Entries.Slots.Count), LastStandings?.Count ?? 0),
+				Remaining = LastInfo?.timeRemainingInGamePhase ?? 0,
+			};
+		}
 	}
 }
