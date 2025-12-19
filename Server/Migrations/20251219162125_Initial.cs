@@ -17,6 +17,7 @@ namespace LMUSessionTracker.Server.Migrations
                 {
                     SessionId = table.Column<string>(type: "TEXT", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsOnline = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsClosed = table.Column<bool>(type: "INTEGER", nullable: false),
                     EndEventTime = table.Column<double>(type: "REAL", nullable: false),
                     GameMode = table.Column<string>(type: "TEXT", nullable: true),

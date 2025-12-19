@@ -9,6 +9,7 @@ namespace LMUSessionTracker.Server.Models {
 		public string SessionId { get; set; }
 
 		public DateTime Timestamp { get; set; }
+		public bool IsOnline { get; set; }
 		public bool IsClosed { get; set; }
 
 		public double EndEventTime { get; set; }
@@ -54,7 +55,8 @@ namespace LMUSessionTracker.Server.Models {
 				foreach(Entry entry in Entries)
 					coreEntries.Add(entry.To());
 				entries = new Core.Tracking.EntryList(coreEntries);
-			}
+			} else if(IsOnline)
+				entries = new Core.Tracking.EntryList();
 			List<Core.Tracking.CarHistory> carHistories = null;
 			if(Cars != null) {
 				carHistories = new List<Core.Tracking.CarHistory>();

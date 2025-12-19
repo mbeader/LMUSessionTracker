@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMUSessionTracker.Server.Migrations
 {
     [DbContext(typeof(SqliteContext))]
-    [Migration("20251217182431_Initial")]
+    [Migration("20251219162125_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -244,6 +244,9 @@ namespace LMUSessionTracker.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsClosed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsOnline")
                         .HasColumnType("INTEGER");
 
                     b.Property<double>("LapDistance")

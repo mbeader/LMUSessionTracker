@@ -1,6 +1,7 @@
 @model IndexViewModel
 @{
-    ViewData["Title"] = "Sessions";
+	ViewData["Title"] = "Sessions";
+	DateTime now = DateTime.UtcNow;
 }
 
 <h3>Sessions</h3>
@@ -8,8 +9,10 @@
         <thead>
             <tr>
                 <th>Start time</th>
+                <th>Network</th>
                 <th>Track</th>
                 <th>Type</th>
+                <th>Phase</th>
                 <th>Remaining</th>
                 <th>Cars</th>
                 <th>Status</th>
@@ -19,11 +22,13 @@
             @foreach(SessionSummary session in Model.Sessions) {
                 <tr>
                     <td><a asp-action="Session" asp-route-sessionId="@session.SessionId">@session.Timestamp.ToString("yyyy-MM-dd HH:mm")</a></td>
+                    <td>@(session.Online ? "Online" : "Offline")</td>
                     <td>@session.Track</td>
                     <td>@session.Type</td>
+                    <td>@(session.Active && session.Phase >= 0 ? Format.Phase(session.Phase) : "")</td>
                     <td>@(session.Active ? Format.Time(session.Remaining) : "Complete")</td>
                     <td>@session.CarCount</td>
-                    <td>@(session.Active && session.Finished ? "Finished" : session.Active && session.ClientCount > 0 ? "Active" : session.Finished ? "Closed" : "Inactive")</td>
+                    <td title="@Format.RelativeTimestamp(now, session.LastUpdate)">@(session.Active && session.Finished ? "Finished" : session.Active && session.ClientCount > 0 ? "Active" : session.Finished ? "Closed" : "Inactive")</td>
                 </tr>
             }
         </tbody>

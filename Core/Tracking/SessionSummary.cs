@@ -16,5 +16,6 @@ namespace LMUSessionTracker.Core.Tracking {
 		public bool Active { get; set; }
 		public int CarCount { get; set; }
 		public double Remaining { get; set; }
+		public int Phase { get; set; }
 	}
 }

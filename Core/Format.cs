@@ -67,5 +67,21 @@ namespace LMUSessionTracker.Core {
 			else
 				return "???";
 		}
+
+		public static string RelativeTimestamp(DateTime now, DateTime timestamp) {
+			TimeSpan span = now - timestamp;
+			if(span.TotalSeconds < 10)
+				return "now";
+			else if(span.TotalMinutes < 1)
+				return $"{span.TotalSeconds:N0} seconds ago";
+			else if(span.TotalHours < 1)
+				return $"{span.TotalMinutes:N0} minutes ago";
+			else if(span.TotalDays < 1)
+				return $"{span.TotalHours:N0} hours ago";
+			else if(span.TotalDays < 31)
+				return $"{span.TotalDays:N0} days ago";
+			else
+				return "long ago";
+		}
 	}
 }

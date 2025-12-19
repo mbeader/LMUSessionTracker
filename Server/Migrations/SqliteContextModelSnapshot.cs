@@ -243,6 +243,9 @@ namespace LMUSessionTracker.Server.Migrations
                     b.Property<bool>("IsClosed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("INTEGER");
+
                     b.Property<double>("LapDistance")
                         .HasColumnType("REAL");
 

@@ -17,6 +17,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public List<Standing> LastStandings { get; private set; }
 		public EntryList Entries { get; private set; }
 		public History History { get; private set; }
+		public DateTime Timestamp { get; private set; }
 		public DateTime LastUpdate { get; private set; }
 		public bool Finished { get; private set; }
 
@@ -29,6 +30,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			LastInfo = info;
 			Entries = entries;
 			History = new History(history, entries);
+			Timestamp = timestamp;
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
 		}
@@ -184,7 +186,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		public Session Clone() {
-			Session session = Create(SessionId, LastInfo, LastUpdate, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()));
+			Session session = Create(SessionId, LastInfo, Timestamp, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()));
 			session.Update(LastInfo, LastStandings, LastUpdate);
 			return session;
 		}
@@ -197,11 +199,13 @@ namespace LMUSessionTracker.Core.Tracking {
 				Track = Track,
 				Type = Type,
 				Online = Online,
+				Timestamp = Timestamp,
 				LastUpdate = LastUpdate,
 				Finished = Finished,
 				Active = active,
-				CarCount = Math.Max(Math.Max(History.Count, Entries.Slots.Count), LastStandings?.Count ?? 0),
+				CarCount = Math.Max(Math.Max(History.Count, Entries?.Slots.Count ?? 0), LastStandings?.Count ?? 0),
 				Remaining = LastInfo?.timeRemainingInGamePhase ?? 0,
+				Phase = LastInfo?.gamePhase ?? -1,
 			};
 		}
 	}

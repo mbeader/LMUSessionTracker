@@ -44,12 +44,14 @@ namespace LMUSessionTracker.Server.Models {
 					SecondaryClientIds = new List<string>(),
 					Track = session.TrackName,
 					Type = session.SessionType,
+					Online = session.IsOnline,
 					Timestamp = session.Timestamp,
 					LastUpdate = session.LastState?.Timestamp ?? session.Timestamp,
 					Finished = session.IsClosed,
 					Active = false,
 					CarCount = Math.Max(cars.Find(x => x.SessionId == session.SessionId)?.Count ?? 0, entries.Find(x => x.SessionId == session.SessionId)?.Count ?? 0),
 					Remaining = session.LastState?.TimeRemainingInGamePhase ?? 0,
+					Phase = session.LastState?.GamePhase ?? -1,
 				});
 			}
 			return summaries;
