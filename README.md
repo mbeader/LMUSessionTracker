@@ -55,6 +55,8 @@ It receives data from the LMUSessionTracker client, provides a web interface, an
 * Run `dotnet LMUSessionTracker.Server.dll`
 * The web interface is `http://localhost:5000` by default
 
+See [HOSTING.md](HOSTING.md) for more information.
+
 ## Notes
 
 ### Event support

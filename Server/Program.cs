@@ -8,6 +8,7 @@ using LMUSessionTracker.Core.Services;
 using LMUSessionTracker.Core.Tracking;
 using LMUSessionTracker.Server.Models;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -107,7 +108,14 @@ namespace LMUSessionTracker.Server {
 			}
 
 			// Configure the HTTP request pipeline.
+			app.UseForwardedHeaders(new ForwardedHeadersOptions {
+				ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+			});
+
 			if(!app.Environment.IsDevelopment()) {
+				if(serverOptions.UseHttpsRedirection)
+					app.UseHttpsRedirection();
+				app.UseHsts();
 				app.UseExceptionHandler("/Home/Error");
 			}
 			app.UseStaticFiles();
