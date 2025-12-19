@@ -1,4 +1,5 @@
-﻿using LMUSessionTracker.Core.Http;
+﻿using LMUSessionTracker.Core;
+using LMUSessionTracker.Core.Http;
 using LMUSessionTracker.Core.Json;
 using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Protocol;
@@ -19,10 +20,14 @@ namespace LMUSessionTracker.Client {
 			var logger = ConfigureLogging();
 			logger.Information($"Working directory: {Directory.GetCurrentDirectory()}");
 
-			HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+			HostApplicationBuilder builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings() {
+				Args = args,
+				ContentRootPath = Directory.GetCurrentDirectory(),
+				EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+			});
 
 			var clientConfig = builder.Configuration.GetSection("Client");
-			var clientOptions = clientConfig.Get<ClientOptions>();
+			var clientOptions = clientConfig.GetSection("Options").Get<ClientOptions>();
 			builder.Services.Configure<ClientOptions>(clientConfig.GetSection("Options"));
 			builder.Services.Configure<LMUClientOptions>(clientConfig.GetSection("LMU"));
 			builder.Services.Configure<ProtocolClientOptions>(clientConfig.GetSection("Protocol"));
@@ -33,6 +38,7 @@ namespace LMUSessionTracker.Client {
 				SchemaValidation.LoadJsonSchemas();
 				builder.Services.AddScoped<SchemaValidator, SchemaValidation.Validator>();
 			}
+			builder.Services.AddSingleton<ClientInfo>(new ClientInfo() { ClientId = "t" });
 			if(clientOptions.UseReplay) {
 				builder.Services.AddScoped<ReplayLMUClient>();
 				if(clientOptions.SendReplay) {

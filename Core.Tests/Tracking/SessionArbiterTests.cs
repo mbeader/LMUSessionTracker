@@ -212,6 +212,22 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public async Task Receive_MultiClientSessionTransitionPrimaryFirst_CreatesOne() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { session = "QUALIFY1" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedSecondary(1), await arbiter.Receive(new() { ClientId = clientI2, SessionInfo = new() { session = "QUALIFY1" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedSecondary(2), await arbiter.Receive(new() { ClientId = clientI2, SessionId = SessionId(1), SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
+		public async Task Receive_MultiClientSessionTransitionSecondaryFirst_CreatesOne() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { session = "QUALIFY1" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedSecondary(1), await arbiter.Receive(new() { ClientId = clientI2, SessionInfo = new() { session = "QUALIFY1" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedPrimary(2), await arbiter.Receive(new() { ClientId = clientI2, SessionId = SessionId(1), SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedSecondary(2), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
 		public async Task Receive_MultiClientClosedSessionOnlineData_AcceptsExistingRejectsNew() {
 			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
 			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { gamePhase = 8 }, MultiplayerTeams = MultiplayerTeams() }));

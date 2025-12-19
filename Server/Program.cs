@@ -1,3 +1,4 @@
+using LMUSessionTracker.Core;
 using LMUSessionTracker.Core.Http;
 using LMUSessionTracker.Core.Json;
 using LMUSessionTracker.Core.LMU;
@@ -51,6 +52,7 @@ namespace LMUSessionTracker.Server {
 				builder.Services.AddScoped<SchemaValidator, SchemaValidation.Validator>();
 			}
 			if(serverOptions.UseLocalClient) {
+				builder.Services.AddSingleton<ClientInfo>(new ClientInfo() { ClientId = "t" });
 				if(serverOptions.UseReplay) {
 					builder.Services.AddScoped<ReplayLMUClient>();
 					if(serverOptions.SendReplay) {

@@ -17,7 +17,7 @@
 		/// </summary>
 		Demoted,
 		/// <summary>
-		/// Session changed, roles unchanged
+		/// Session changed, possible role change
 		/// </summary>
 		Changed
 	}

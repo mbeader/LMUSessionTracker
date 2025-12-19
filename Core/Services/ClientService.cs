@@ -7,20 +7,21 @@ using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Services {
 	public class ClientService : PeriodicService<ClientService> {
+		private readonly ClientInfo client;
 		private LMUClient lmuClient;
 		private ProtocolClient protocolClient;
 		private ContinueProvider<ClientService> continueProvider;
 		private ClientState state = ClientState.Idle;
 		private ProtocolRole role = ProtocolRole.None;
 		private string sessionId;
-		private string clientId = "t";
 
 		public ClientState State => state;
 		public ProtocolRole Role => role;
 		public string SessionId => sessionId;
-		public string ClientId => clientId;
+		public string ClientId => client.ClientId;
 
-		public ClientService(ILogger<ClientService> logger, IServiceProvider serviceProvider) : base(logger, serviceProvider) {
+		public ClientService(ILogger<ClientService> logger, IServiceProvider serviceProvider, ClientInfo client) : base(logger, serviceProvider) {
+			this.client = client;
 		}
 
 		public override int CalculateDelay() {
@@ -56,7 +57,7 @@ namespace LMUSessionTracker.Core.Services {
 		}
 
 		private async Task HandleSession() {
-			ProtocolMessage message = new ProtocolMessage() { ClientId = clientId, SessionId = sessionId };
+			ProtocolMessage message = new ProtocolMessage() { ClientId = client.ClientId, SessionId = sessionId };
 			message.SessionInfo = await lmuClient.GetSessionInfo();
 			if(message.SessionInfo == null && state == ClientState.Idle) {
 				return;
@@ -97,21 +98,15 @@ namespace LMUSessionTracker.Core.Services {
 				case (ClientState.Working, ProtocolResult.Accepted, false):
 					break;
 				case (ClientState.Idle, ProtocolResult.Changed, true):
+				case (ClientState.Idle, ProtocolResult.Changed, false):
+				case (ClientState.Working, ProtocolResult.Changed, true):
+				case (ClientState.Connected, ProtocolResult.Changed, true):
+				case (ClientState.Working, ProtocolResult.Changed, false):
 					role = result.Role;
 					if(role == ProtocolRole.Primary)
 						state = ClientState.Working;
 					else
 						state = ClientState.Connected;
-					sessionId = result.SessionId;
-					break;
-				case (ClientState.Idle, ProtocolResult.Changed, false):
-					role = result.Role;
-					state = ClientState.Working;
-					sessionId = result.SessionId;
-					break;
-				case (ClientState.Working, ProtocolResult.Changed, true):
-				case (ClientState.Connected, ProtocolResult.Changed, true):
-				case (ClientState.Working, ProtocolResult.Changed, false):
 					sessionId = result.SessionId;
 					break;
 				case (ClientState.Working, ProtocolResult.Demoted, true):
