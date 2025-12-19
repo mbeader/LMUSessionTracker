@@ -1,7 +1,6 @@
 using LMUSessionTracker.Core.Protocol;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Server.Controllers {
@@ -18,8 +17,6 @@ namespace LMUSessionTracker.Server.Controllers {
 
 		[HttpPost]
 		public async Task<IActionResult> Index([FromBody] ProtocolMessage data) {
-			if(!IPAddress.IsLoopback(HttpContext.Connection.RemoteIpAddress))
-				return StatusCode(403);
 			if(!ModelState.IsValid)
 				return BadRequest();
 			return Ok(await arbiter.Receive(data));
