@@ -39,6 +39,7 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			public static TestState OnlineWaiting(string sessionId) => new TestState() { State = ClientService.ClientState.Connected, Role = ProtocolRole.None, SessionId = sessionId };
 			public static TestState OnlineWorking(string sessionId) => new TestState() { State = ClientService.ClientState.Working, Role = ProtocolRole.Primary, SessionId = sessionId };
 			public static TestState OnlineConnected(string sessionId) => new TestState() { State = ClientService.ClientState.Connected, Role = ProtocolRole.Secondary, SessionId = sessionId };
+			public static TestState Disconnected(string sessionId = null, ProtocolRole role = ProtocolRole.None) => new TestState() { State = ClientService.ClientState.Disconnected, Role = role, SessionId = sessionId };
 		}
 
 		private void AssertState(TestState ex) {
@@ -123,6 +124,45 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Rejected, Role = ProtocolRole.None, SessionId = null });
 			await service.Do();
 			AssertState(TestState.Idle());
+		}
+
+		[Fact]
+		public async Task Do_OfflineSessionNewFailure_IsDisconnected() {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync((ProtocolStatus)null);
+			await service.Start(scope.Object);
+			AssertState(TestState.Idle());
+			await service.Do();
+			AssertState(TestState.Disconnected());
+		}
+
+		[Fact]
+		public async Task Do_OfflineSessionFailure_IsDisconnected() {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
+			await service.Start(scope.Object);
+			AssertState(TestState.Idle());
+			await service.Do();
+			AssertState(TestState.OfflineWorking("s1"));
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync((ProtocolStatus)null);
+			await service.Do();
+			AssertState(TestState.Disconnected("s1", ProtocolRole.Primary));
+		}
+
+		[Fact]
+		public async Task Do_OfflineSessionReconnect_IsWorking() {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
+			await service.Start(scope.Object);
+			AssertState(TestState.Idle());
+			await service.Do();
+			AssertState(TestState.OfflineWorking("s1"));
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync((ProtocolStatus)null);
+			await service.Do();
+			AssertState(TestState.Disconnected("s1", ProtocolRole.Primary));
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = "s1" });
+			await service.Do();
+			AssertState(TestState.OfflineWorking("s1"));
 		}
 
 		[Fact]

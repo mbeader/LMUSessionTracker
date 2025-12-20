@@ -83,6 +83,7 @@ namespace LMUSessionTracker.Core.Services {
 					message.Chat = await lmuClient.GetChat();
 					break;
 				case ClientState.Disconnected:
+					break;
 				default:
 					throw new Exception("Invalid pre-state");
 			}
@@ -123,6 +124,20 @@ namespace LMUSessionTracker.Core.Services {
 					role = result.Role;
 					state = ClientState.Idle;
 					sessionId = null;
+					break;
+				case (ClientState.Disconnected, ProtocolResult.Accepted, true):
+				case (ClientState.Disconnected, ProtocolResult.Changed, true):
+				case (ClientState.Disconnected, ProtocolResult.Promoted, true):
+				case (ClientState.Disconnected, ProtocolResult.Demoted, true):
+				case (ClientState.Disconnected, ProtocolResult.Rejected, true):
+				case (ClientState.Disconnected, ProtocolResult.Accepted, false):
+				case (ClientState.Disconnected, ProtocolResult.Changed, false):
+				case (ClientState.Disconnected, ProtocolResult.Promoted, false):
+				case (ClientState.Disconnected, ProtocolResult.Demoted, false):
+				case (ClientState.Disconnected, ProtocolResult.Rejected, false):
+					role = result.Role;
+					state = role == ProtocolRole.Primary ? ClientState.Working : ClientState.Connected;
+					sessionId = result.SessionId;
 					break;
 				default:
 					throw new Exception($"Invalid state. Online: {online}, Client: {state}, Result: {result.Result}");
