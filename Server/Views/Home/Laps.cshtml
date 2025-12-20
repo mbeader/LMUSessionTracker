@@ -1,48 +1,49 @@
 @using LMUSessionTracker.Core.Tracking
 @model CarHistory
 @{
-    ViewData["Title"] = "Laps";
+	ViewData["Title"] = "Laps";
 }
 <h3>@ViewData["Title"]</h3>
 
 <dl class="row">
-    <dt class="col-lg-1 col-2">Slot ID</dt>
-    <dd class="col-lg-1 col-3">@Model.Car.SlotId</dd>
-    <dt class="col-lg-1 col-2">Veh</dt>
-    <dd class="col-lg-4 col-5">@Model.Car.Veh</dd>
-    <dt class="col-lg-1 col-2">Vehicle</dt>
-    <dd class="col-lg-4 col-10">@Model.Car.VehicleName</dd>
-    <dt class="col-lg-1 col-2">Number</dt>
-    <dd class="col-lg-1 col-3">@Model.Car.Number</dd>
-    <dt class="col-lg-1 col-2">Class</dt>
-    <dd class="col-lg-1 col-5 text-truncate">@Model.Car.Class</dd>
-    <dt class="col-lg-1 col-2">Team</dt>
-    <dd class="col-lg-3 col-10">@Model.Car.TeamName</dd>
-    <dt class="col-lg-1 col-2">ID</dt>
-    <dd class="col-lg-3 col-10 text-truncate">@Model.Car.Id</dd>
+	<dt class="col-lg-1 col-2">Slot ID</dt>
+	<dd class="col-lg-1 col-3">@Model.Car.SlotId</dd>
+	<dt class="col-lg-1 col-2">Veh</dt>
+	<dd class="col-lg-4 col-5">@Model.Car.Veh</dd>
+	<dt class="col-lg-1 col-2">Vehicle</dt>
+	<dd class="col-lg-4 col-10">@Model.Car.VehicleName</dd>
+	<dt class="col-lg-1 col-2">Number</dt>
+	<dd class="col-lg-1 col-3">@Model.Car.Number</dd>
+	<dt class="col-lg-1 col-2">Class</dt>
+	<dd class="col-lg-1 col-5 text-truncate">@Model.Car.Class</dd>
+	<dt class="col-lg-1 col-2">Team</dt>
+	<dd class="col-lg-3 col-10">@Model.Car.TeamName</dd>
+	<dt class="col-lg-1 col-2">ID</dt>
+	<dd class="col-lg-3 col-10 text-truncate">@Model.Car.Id</dd>
 </dl>
 
 <table class="table table-sm table-striped table-hover">
-    <thead>
-        <tr>
-            <th>Lap</th>
-            <th>Driver</th>
-            <th class="text-end">Time</th>
-            <th class="text-end">S1</th>
-            <th class="text-end">S2</th>
-            <th class="text-end">S3</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach(Lap lap in Model.Laps) {
-            <tr>
-                <td>@lap.LapNumber</td>
-                <td>@lap.Driver</td>
-                <td class="text-end">@Format.LapTime(lap.TotalTime)</td>
-                <td class="text-end">@Format.LapTime(lap.Sector1)</td>
-                <td class="text-end">@Format.LapTime(lap.Sector2)</td>
-                <td class="text-end">@Format.LapTime(lap.Sector3)</td>
-            </tr>
-        }
-    </tbody>
+	<thead>
+		<tr>
+			<th>Lap</th>
+			<th>Driver</th>
+			<th class="text-end">Time</th>
+			<th class="text-end">S1</th>
+			<th class="text-end">S2</th>
+			<th class="text-end">S3</th>
+		</tr>
+	</thead>
+	<tbody>
+		@for(int i = 0; i < Model.Laps.Count; i++) {
+			Lap lap = Model.Laps[i] ?? Lap.Default(i+1);
+			<tr>
+				<td>@lap.LapNumber</td>
+				<td>@lap.Driver</td>
+				<td class="text-end">@Format.LapTime(lap.TotalTime)</td>
+				<td class="text-end">@Format.LapTime(lap.Sector1)</td>
+				<td class="text-end">@Format.LapTime(lap.Sector2)</td>
+				<td class="text-end">@Format.LapTime(lap.Sector3)</td>
+			</tr>
+		}
+	</tbody>
 </table>
