@@ -1,0 +1,28 @@
+{
+	"$id": "ProfileInfo",
+	"type": "object",
+	"properties": {
+		"language": {
+			"type": "string"
+		},
+		"name": {
+			"type": "string"
+		},
+		"nationality": {
+			"type": "string"
+		},
+		"nick": {
+			"type": "string"
+		},
+		"steamID": {
+			"type": "string"
+		}
+	},
+	"required": [
+		"language",
+		"name",
+		"nationality",
+		"nick",
+		"steamID"
+	]
+}

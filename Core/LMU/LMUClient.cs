@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.LMU {
@@ -14,11 +13,11 @@ namespace LMUSessionTracker.Core.LMU {
 
 		public Task<MultiplayerTeams> GetMultiplayerTeams();
 
-		public Task<JObject> GetProfileInfo();
+		public Task<ProfileInfo> GetProfileInfo();
 
-		public Task<JObject> GetGameState();
+		public Task<GameState> GetGameState();
 
-		public Task<JObject> GetSessionsInfoForEvent();
+		public Task<SessionsInfoForEvent> GetSessionsInfoForEvent();
 
 		public Task<List<TeamStrategy>> GetStrategy();
 

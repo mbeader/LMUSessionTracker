@@ -27,6 +27,9 @@ namespace LMUSessionTracker.Core.Json {
 			typeof(StandingsHistory),
 			typeof(TeamStrategy[]),
 			typeof(StrategyUsage),
+			typeof(ProfileInfo),
+			typeof(SessionsInfoForEvent),
+			typeof(GameState),
 		};
 		private static readonly Dictionary<string, JSchema> schemas = new Dictionary<string, JSchema>();
 		private static bool loaded = false;

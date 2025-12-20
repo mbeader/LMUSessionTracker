@@ -117,16 +117,16 @@ namespace LMUSessionTracker.Core.Replay {
 			return Get<MultiplayerTeams>("/rest/multiplayer/teams");
 		}
 
-		public Task<JObject> GetProfileInfo() {
-			return Get<JObject>("/rest/profile/profileInfo/getProfileInfo");
+		public Task<ProfileInfo> GetProfileInfo() {
+			return Get<ProfileInfo>("/rest/profile/profileInfo/getProfileInfo");
 		}
 
-		public Task<JObject> GetGameState() {
-			return Get<JObject>("/rest/sessions/GetGameState");
+		public Task<GameState> GetGameState() {
+			return Get<GameState>("/rest/sessions/GetGameState");
 		}
 
-		public Task<JObject> GetSessionsInfoForEvent() {
-			return Get<JObject>("/rest/sessions/GetSessionsInfoForEvent");
+		public Task<SessionsInfoForEvent> GetSessionsInfoForEvent() {
+			return Get<SessionsInfoForEvent>("/rest/sessions/GetSessionsInfoForEvent");
 		}
 
 		public Task<List<TeamStrategy>> GetStrategy() {

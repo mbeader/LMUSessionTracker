@@ -1,0 +1,26 @@
+{
+	"$id": "ScheduledSession",
+	"type": "object",
+	"properties": {
+		"airTemp": {
+			"type": "integer"
+		},
+		"lengthTime": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"name": {
+			"type": "string"
+		},
+		"rainChance": {
+			"type": "integer",
+			"minimum": 0
+		}
+	},
+	"required": [
+		"airTemp",
+		"lengthTime",
+		"name",
+		"rainChance"
+	]
+}

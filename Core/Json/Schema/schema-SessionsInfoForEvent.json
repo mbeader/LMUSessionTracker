@@ -1,0 +1,16 @@
+{
+	"$id": "SessionsInfoForEvent",
+	"type": "object",
+	"properties": {
+		"scheduledSessions": {
+			"$id": "ScheduledSession[]",
+			"type": "array",
+			"items": {
+				"$ref": "schema-ScheduledSession.json"
+			}
+		}
+	},
+	"required": [
+		"scheduledSessions"
+	]
+}

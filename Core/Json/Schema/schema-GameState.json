@@ -1,0 +1,60 @@
+{
+	"$id": "GameState",
+	"type": "object",
+	"properties": {
+		"multiStintState": {
+			"type": "string"
+		},
+		"pitEntryDist": {
+			"type": "number",
+			"minimum": 0
+		},
+		"pitState": {
+			"type": "string"
+		},
+		"closeestWeatherNode": {
+			"$ref": "schema-WeatherNode.json"
+		},
+		"gamePhase": {
+			"type": "string"
+		},
+		"haveILoadedAllMyTiresYet": {
+			"type": "boolean"
+		},
+		"inControlOfVehicle": {
+			"type": "boolean"
+		},
+		"inMonitor": {
+			"type": "boolean"
+		},
+		"isReplayActive": {
+			"type": "boolean"
+		},
+		"playerVehicleLoaded": {
+			"type": "boolean"
+		},
+		"raceFinished": {
+			"type": "boolean"
+		},
+		"teamVehicleState": {
+			"type": "string"
+		},
+		"timeOfDay": {
+			"type": "number",
+			"minimum": 0
+		}
+	},
+	"required": [
+		"multiStintState",
+		"closeestWeatherNode",
+		"gamePhase",
+		"haveILoadedAllMyTiresYet",
+		"inControlOfVehicle",
+		"inMonitor",
+		"isReplayActive",
+		"playerVehicleLoaded",
+		"raceFinished",
+		"teamVehicleState",
+		"timeOfDay"
+	]
+}
