@@ -145,7 +145,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				IsValidPhaseTransition(info);
 			if(!same || Online != (teams != null))
 				return false;
-			return Entries.IsSameEntryList(new EntryList(teams));
+			return Entries.HasAnyMatch(new EntryList(teams));
 		}
 
 		private bool CompletionNotDecreased(SessionInfo info) {

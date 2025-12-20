@@ -66,5 +66,25 @@ namespace LMUSessionTracker.Core.Tracking {
 			} else
 				return false;
 		}
+
+		public (int same, int removed, int changed, int added) CalculateChange(EntryList other) {
+			int same = 0, removed = 0, changed = 0, added = 0;
+			foreach(int slotId in Slots.Keys) {
+				if(other.Slots.TryGetValue(slotId, out Entry otherEntry)) {
+					if(!Slots[slotId].IsSameEntry(otherEntry))
+						changed++;
+					else
+						same++;
+				} else
+					removed++;
+			}
+			added = other.Slots.Keys.Count - same - changed;
+			return (same, removed, changed, added);
+		}
+
+		public bool HasAnyMatch(EntryList other) {
+			(int same, int removed, int changed, int added) = CalculateChange(other);
+			return same != 0 || (same + removed + changed + added == 0);
+		}
 	}
 }

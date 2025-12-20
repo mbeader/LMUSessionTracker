@@ -8,7 +8,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public string Number { get; set; }
 		public string Name { get; set; }
 		public string Vehicle { get; set; }
-		public List<Member> Members { get; } = new List<Member>();
+		public List<Member> Members { get; init; } = new List<Member>();
 
 		public Entry() { }
 
