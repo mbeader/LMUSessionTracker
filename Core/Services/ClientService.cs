@@ -28,11 +28,11 @@ namespace LMUSessionTracker.Core.Services {
 			switch(state) {
 				case ClientState.Idle:
 				case ClientState.Working:
-					return 0;
+					return 1000;
 				case ClientState.Connected:
 				case ClientState.Disconnected:
 				default:
-					return 0;
+					return 1000;
 			}
 		}
 
