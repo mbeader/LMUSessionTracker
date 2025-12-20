@@ -32,12 +32,16 @@ namespace LMUSessionTracker.Core.Services {
 
 		private async Task MakeRequests() {
 			await lmuClient.GetSessionInfo();
+			await lmuClient.GetMultiplayerJoinState();
 			await lmuClient.GetMultiplayerTeams();
 			await lmuClient.GetStandings();
 			await lmuClient.GetChat();
 			await lmuClient.GetStrategy();
 			await lmuClient.GetStrategyUsage();
 			await lmuClient.GetStandingsHistory();
+			//await lmuClient.GetProfileInfo();
+			await lmuClient.GetGameState();
+			await lmuClient.GetSessionsInfoForEvent();
 			//await lmuClient.GetTrackMap();
 		}
 

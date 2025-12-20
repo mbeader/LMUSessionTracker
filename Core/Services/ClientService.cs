@@ -3,6 +3,7 @@ using LMUSessionTracker.Core.Protocol;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Services {
@@ -60,27 +61,44 @@ namespace LMUSessionTracker.Core.Services {
 			ProtocolMessage message = new ProtocolMessage() { ClientId = client.ClientId, SessionId = sessionId };
 			message.SessionInfo = await lmuClient.GetSessionInfo();
 			if(message.SessionInfo == null && state == ClientState.Idle) {
+				// TODO temporarily gets all data for debugging
+				await GetAllData(message);
 				return;
 			} else if(message.SessionInfo == null && state != ClientState.Idle) {
 				state = ClientState.Idle;
 				role = ProtocolRole.None;
 				sessionId = null;
 				await protocolClient.Send(message);
+				// TODO temporarily gets all data for debugging
+				await GetAllData(message);
 				return;
 			}
 			await HandleActiveSession(message);
 		}
 
+		private async Task GetAllData(ProtocolMessage message) {
+			List<Task> tasks = new List<Task>() {
+				Task.Run(async () => { message.MultiplayerTeams = await lmuClient.GetMultiplayerTeams(); }),
+				Task.Run(async () => { message.Standings = await lmuClient.GetStandings(); }),
+				Task.Run(async () => { message.TeamStrategy = await lmuClient.GetStrategy(); }),
+				Task.Run(async () => { message.Chat = await lmuClient.GetChat(); }),
+				Task.Run(async () => { await lmuClient.GetStrategyUsage(); }),
+				Task.Run(async () => { await lmuClient.GetStandingsHistory(); }),
+				Task.Run(async () => { await lmuClient.GetMultiplayerJoinState(); }),
+				Task.Run(async () => { await lmuClient.GetGameState(); }),
+				Task.Run(async () => { await lmuClient.GetSessionsInfoForEvent(); }),
+			};
+			await Task.WhenAll(tasks);
+		}
+
 		private async Task HandleActiveSession(ProtocolMessage message) {
-			message.MultiplayerTeams = await lmuClient.GetMultiplayerTeams();
+			// TODO temporarily gets all data for debugging
+			await GetAllData(message);
 			switch(state) {
 				case ClientState.Idle:
 				case ClientState.Connected:
 					break;
 				case ClientState.Working:
-					message.Standings = await lmuClient.GetStandings();
-					message.TeamStrategy = await lmuClient.GetStrategy();
-					message.Chat = await lmuClient.GetChat();
 					break;
 				case ClientState.Disconnected:
 					break;

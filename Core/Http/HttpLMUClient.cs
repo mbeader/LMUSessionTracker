@@ -3,6 +3,7 @@ using LMUSessionTracker.Core.LMU;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -114,8 +115,24 @@ namespace LMUSessionTracker.Core.Http {
 			return Get<List<Chat>>("/rest/chat");
 		}
 
+		public Task<string> GetMultiplayerJoinState() {
+			return Get<string>("/rest/multiplayer/join/state");
+		}
+
 		public Task<MultiplayerTeams> GetMultiplayerTeams() {
 			return Get<MultiplayerTeams>("/rest/multiplayer/teams");
+		}
+
+		public Task<JObject> GetProfileInfo() {
+			return Get<JObject>("/rest/profile/profileInfo/getProfileInfo");
+		}
+
+		public Task<JObject> GetGameState() {
+			return Get<JObject>("/rest/sessions/GetGameState");
+		}
+
+		public Task<JObject> GetSessionsInfoForEvent() {
+			return Get<JObject>("/rest/sessions/GetSessionsInfoForEvent");
 		}
 
 		public Task<List<TeamStrategy>> GetStrategy() {
