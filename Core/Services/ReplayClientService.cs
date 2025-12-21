@@ -1,5 +1,4 @@
-﻿using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Replay;
+﻿using LMUSessionTracker.Core.Replay;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -11,9 +10,11 @@ namespace LMUSessionTracker.Core.Services {
 		private readonly ReplayOptions options;
 		private ReplayLMUClient lmuClient;
 		private int completed = 0;
+		private DateTime last;
 
 		public ReplayClientService(ILogger<ResponseLoggerService> logger, IServiceProvider serviceProvider, IOptions<ReplayOptions> options) : base(logger, serviceProvider) {
 			this.options = options.Value ?? new ReplayOptions();
+			last = DateTime.UtcNow;
 		}
 
 		public override int CalculateDelay() {
@@ -33,6 +34,11 @@ namespace LMUSessionTracker.Core.Services {
 			} finally {
 				lmuClient.CloseContext();
 			}
+			DateTime now = DateTime.UtcNow;
+			if((now - last).TotalSeconds >= 10.0) {
+				last = now;
+				logger.LogDebug($"Completed {completed} ({completed/((double)completed+lmuClient.Remaining):P0})");
+			}
 			return lmuClient.Remaining > 0;
 		}
 
@@ -44,6 +50,9 @@ namespace LMUSessionTracker.Core.Services {
 			await lmuClient.GetStrategy();
 			await lmuClient.GetStrategyUsage();
 			await lmuClient.GetStandingsHistory();
+			await lmuClient.GetMultiplayerJoinState();
+			await lmuClient.GetGameState();
+			await lmuClient.GetSessionsInfoForEvent();
 			//await lmuClient.GetTrackMap();
 		}
 
