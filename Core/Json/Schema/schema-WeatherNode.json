@@ -2,45 +2,46 @@
 	"$id": "WeatherNode",
 	"type": "object",
 	"properties": {
-		"duration": {
+		"Duration": {
 			"type": "integer",
 			"minimum": 0
 		},
-		"humidity": {
+		"Humidity": {
 			"type": "integer",
 			"minimum": 0
 		},
-		"rainChance": {
+		"RainChance": {
 			"type": "integer",
 			"minimum": 0
 		},
-		"sky": {
+		"Sky": {
 			"type": "integer",
 			"minimum": 0
 		},
-		"startTime": {
+		"StartTime": {
 			"type": "integer",
 			"minimum": 0
 		},
-		"temperature": {
+		"Temperature": {
 			"type": "integer"
 		},
-		"windDirection": {
+		"WindDirection": {
 			"type": "integer"
 		},
-		"windSpeed": {
+		"WindSpeed": {
 			"type": "integer",
 			"minimum": 0
 		}
 	},
+	"additionalProperties": false,
 	"required": [
-		"duration",
-		"humidity",
-		"rainChance",
-		"sky",
-		"startTime",
-		"temperature",
-		"windDirection",
-		"windSpeed"
+		"Duration",
+		"Humidity",
+		"RainChance",
+		"Sky",
+		"StartTime",
+		"Temperature",
+		"WindDirection",
+		"WindSpeed"
 	]
 }

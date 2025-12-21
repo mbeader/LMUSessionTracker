@@ -10,13 +10,14 @@
 			"minimum": 0
 		},
 		"name": {
-			"type": "string"
+			"enum": [ "PRACTICE", "QUALIFYING", "RACE" ]
 		},
 		"rainChance": {
 			"type": "integer",
 			"minimum": 0
 		}
 	},
+	"additionalProperties": false,
 	"required": [
 		"airTemp",
 		"lengthTime",

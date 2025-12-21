@@ -4,12 +4,13 @@
 	"properties": {
 		"scheduledSessions": {
 			"$id": "ScheduledSession[]",
-			"type": "array",
+			"type": [ "array", "null" ],
 			"items": {
 				"$ref": "schema-ScheduledSession.json"
 			}
 		}
 	},
+	"additionalProperties": false,
 	"required": [
 		"scheduledSessions"
 	]

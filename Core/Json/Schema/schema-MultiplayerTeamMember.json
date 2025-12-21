@@ -3,15 +3,18 @@
 	"type": "object",
 	"properties": {
 		"badge": {
+			"description": "Always none in online practices.",
 			"enum": [ "none", "sr-noob", "sr-rookie", "sr-clean", "sr-saint", "sr-warning", "sr-danger", "sr-probation", "irl-driver", "content-creator" ]
 		},
 		"nationality": {
+			"description": "May be empty.",
 			"type": "string"
 		},
 		"roles": {
+			"description": "Only the admin driver uses the Admin role. Online practices include Owner.",
 			"type": "array",
 			"items": {
-				"enum": [ "Admin", "Race Engineer", "Driver" ]
+				"enum": [ "Admin", "Race Engineer", "Driver", "Owner" ]
 			}
 		}
 	},

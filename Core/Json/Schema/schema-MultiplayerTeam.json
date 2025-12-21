@@ -3,10 +3,13 @@
 	"type": "object",
 	"properties": {
 		"Id": {
-			"type": "string"
+			"description": "Team uuid in online events. Integer in online practices.",
+			"type": "string",
+			"pattern": "^(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(?:[0-9]{22})$"
 		},
 		"carNumber": {
-			"type": "string"
+			"type": "string",
+			"pattern": "^[0-9]{0,3}$"
 		},
 		"drivers": {
 			"type": "object",
@@ -18,9 +21,11 @@
 			"additionalProperties": false
 		},
 		"name": {
+			"description": "Limited to 25 characters in online practices.",
 			"type": "string"
 		},
 		"vehicle": {
+			"descriptions": "veh file.",
 			"type": "string"
 		}
 	},

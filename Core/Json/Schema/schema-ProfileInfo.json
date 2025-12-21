@@ -18,6 +18,7 @@
 			"type": "string"
 		}
 	},
+	"additionalProperties": false,
 	"required": [
 		"language",
 		"name",

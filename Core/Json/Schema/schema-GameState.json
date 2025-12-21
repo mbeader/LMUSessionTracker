@@ -2,21 +2,22 @@
 	"$id": "GameState",
 	"type": "object",
 	"properties": {
-		"multiStintState": {
-			"type": "string"
+		"MultiStintState": {
+			"enum": [ "DISABLED", "LOADING", "MONITOR_MENU", "DRIVING", "END_OF_RACE_GRACE", "PAUSED" ]
 		},
-		"pitEntryDist": {
-			"type": "number",
-			"minimum": 0
+		"PitEntryDist": {
+			"description": "Only present when in session.",
+			"type": "number"
 		},
-		"pitState": {
+		"PitState": {
+			"description": "Only present when in session.",
 			"type": "string"
 		},
 		"closeestWeatherNode": {
 			"$ref": "schema-WeatherNode.json"
 		},
 		"gamePhase": {
-			"type": "string"
+			"enum": [ "GPHASE_BEFORE", "GPHASE_FORMATION", "GPHASE_GREEN", "GPHASE_CHECKERED" ]
 		},
 		"haveILoadedAllMyTiresYet": {
 			"type": "boolean"
@@ -37,15 +38,16 @@
 			"type": "boolean"
 		},
 		"teamVehicleState": {
-			"type": "string"
+			"enum": [ "NO VEHICLE", "VEHICLE AVAILABLE", "WAITING TO GET_IN", "IN CONTROL", "OTHER TEAMMATE DRIVING" ]
 		},
 		"timeOfDay": {
 			"type": "number",
 			"minimum": 0
 		}
 	},
+	"additionalProperties": false,
 	"required": [
-		"multiStintState",
+		"MultiStintState",
 		"closeestWeatherNode",
 		"gamePhase",
 		"haveILoadedAllMyTiresYet",

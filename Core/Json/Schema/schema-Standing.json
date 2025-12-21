@@ -68,7 +68,7 @@
 			"type": "number"
 		},
 		"finishStatus": {
-			"enum": [ "FSTAT_NONE", "FSTAT_CHECKERED", "FSTAT_DNF", "FSTAT_DQ" ]
+			"enum": [ "FSTAT_NONE", "FSTAT_FINISHED", "FSTAT_CHECKERED", "FSTAT_DNF", "FSTAT_DQ" ]
 		},
 		"flag": {
 			"enum": [ "GREEN", "BLUE" ]
@@ -157,8 +157,8 @@
 			"minimum": 1
 		},
 		"qualification": {
-			"type": "integer",
-			"minimum": 1
+			"description": "May be -1.",
+			"type": "integer"
 		},
 		"sector": {
 			"enum": [ "SECTOR1", "SECTOR2", "SECTOR3" ]

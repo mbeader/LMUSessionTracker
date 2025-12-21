@@ -6,5 +6,6 @@ namespace LMUSessionTracker.Core.LMU {
 		public string compound { get; set; }
 		[JsonProperty("new")]
 		public bool New { get; set; }
+		public double? usage { get; set; }
 	}
 }

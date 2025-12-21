@@ -10,6 +10,12 @@
 		},
 		"new": {
 			"type": "boolean"
+		},
+		"usage": {
+			"description": "Only present on player car.",
+			"type": "number",
+			"maximum": 100,
+			"minimum": 0
 		}
 	},
 	"additionalProperties": false,

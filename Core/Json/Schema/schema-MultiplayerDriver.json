@@ -1,30 +1,40 @@
 {
 	"$id": "MultiplayerDriver",
 	"type": "object",
+	"description": "MultiplayerTeam drivers. This map contains an admin driver not part of a team.",
 	"properties": {
 		"badge": {
+			"description": "Not present for admin driver. Always none in online practices.",
 			"enum": [ "none", "sr-noob", "sr-rookie", "sr-clean", "sr-saint", "sr-warning", "sr-danger", "sr-probation", "irl-driver", "content-creator" ]
 		},
 		"isConnected": {
+			"description": "Should always be true for humans in online practices.",
 			"type": "boolean"
 		},
 		"nationality": {
+			"description": "May be empty.",
 			"type": "string"
 		},
 		"roles": {
-			"type": "array",
+			"description": "Only the admin driver uses the Admin role. Online practices include Owner and may be null.",
+			"type": [ "array", "null" ],
 			"items": {
-				"enum": [ "Admin", "Race Engineer", "Driver" ]
+				"enum": [ "Admin", "Race Engineer", "Driver", "Owner" ]
 			}
 		},
 		"teamId": {
-			"type": "string"
+			"description": "Not present for admin driver.",
+			"type": "string",
+			"pattern": "^(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(?:[0-9]{22})$"
 		},
 		"teamName": {
+			"description": "Not present for admin driver.",
 			"type": "string"
 		},
 		"uniqueTeamId": {
-			"type": "string"
+			"description": "Not present for admin driver.",
+			"type": "string",
+			"pattern": "^utid[0-9]+$"
 		}
 	},
 	"additionalProperties": false,

@@ -8,6 +8,12 @@
 		"driverSwap": {
 			"type": "boolean"
 		},
+		"fuel": {
+			"description": "Only present on player car.",
+			"type": "number",
+			"maximum": 1,
+			"minimum": 0
+		},
 		"lap": {
 			"type": "integer",
 			"minimum": 0
