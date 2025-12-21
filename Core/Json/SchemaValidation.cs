@@ -32,6 +32,7 @@ namespace LMUSessionTracker.Core.Json {
 			typeof(GameState),
 		};
 		private static readonly Dictionary<string, JSchema> schemas = new Dictionary<string, JSchema>();
+		private static readonly Dictionary<string, JSchema> listSchemas = new Dictionary<string, JSchema>();
 		private static bool loaded = false;
 
 		public static void GenerateJsonSchema() {
@@ -62,8 +63,12 @@ namespace LMUSessionTracker.Core.Json {
 						BaseUri = new Uri(Path.GetFullPath(filename))
 					});
 					schemas.Add(type.FullName, schema);
+					if(type.BaseType == typeof(Array)) {
+						listSchemas.Add(type.GetElementType().FullName, schema);
+					}
 				}
 			}
+			schemas.Add(typeof(string).FullName, JSchema.Parse("{\"type\":\"string\"}"));
 			loaded = true;
 		}
 
@@ -71,9 +76,10 @@ namespace LMUSessionTracker.Core.Json {
 			if(!loaded)
 				throw new Exception("Schemas not loaded");
 			try {
+				bool isList = type.UnderlyingSystemType?.Name == "List`1";
 				JToken obj = JToken.Parse(json);
 				JSchema schema;
-				if(!schemas.TryGetValue(type.FullName, out schema)) {
+				if(isList ? !listSchemas.TryGetValue(type.GenericTypeArguments[0].FullName, out schema) : !schemas.TryGetValue(type.FullName, out schema)) {
 					logger?.LogDebug($"Missing schema for type: {type.FullName}");
 					return false;
 				}
@@ -88,7 +94,7 @@ namespace LMUSessionTracker.Core.Json {
 					sb.AppendLine();
 					sb.AppendLine(obj.ToString());
 					string runId = id ?? DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
-					File.WriteAllText(Path.Join("logs", "schema", $"{runId}-invalid-{type.Name}.txt"), sb.ToString());
+					File.WriteAllText(Path.Join("logs", "schema", $"{runId}-invalid-{(isList ? $"{type.GenericTypeArguments[0].Name}[]" : type.Name)}.txt"), sb.ToString());
 				}
 				return res;
 			} catch(Exception e) {
