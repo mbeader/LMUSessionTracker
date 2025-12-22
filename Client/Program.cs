@@ -1,10 +1,6 @@
 ﻿using LMUSessionTracker.Core;
-using LMUSessionTracker.Core.Http;
+using LMUSessionTracker.Core.Client;
 using LMUSessionTracker.Core.Json;
-using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Protocol;
-using LMUSessionTracker.Core.Replay;
-using LMUSessionTracker.Core.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,10 +24,7 @@ namespace LMUSessionTracker.Client {
 
 			var clientConfig = builder.Configuration.GetSection("Client");
 			var clientOptions = clientConfig.GetSection("Options").Get<ClientOptions>();
-			builder.Services.Configure<ClientOptions>(clientConfig.GetSection("Options"));
-			builder.Services.Configure<LMUClientOptions>(clientConfig.GetSection("LMU"));
-			builder.Services.Configure<ProtocolClientOptions>(clientConfig.GetSection("Protocol"));
-			builder.Services.Configure<ReplayOptions>(clientConfig.GetSection("Replay"));
+			builder.Services.ConfigureClient(clientConfig);
 			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
 
 			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled))) {
@@ -43,26 +36,7 @@ namespace LMUSessionTracker.Client {
 				OverrideDelay = clientOptions.UseReplay,
 				Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
 			};
-			builder.Services.AddSingleton<ClientInfo>(clientInfo);
-			if(clientOptions.UseReplay) {
-				builder.Services.AddScoped<ReplayLMUClient>();
-				if(clientOptions.SendReplay) {
-					builder.Services.AddScoped<LMUClient>(provider => provider.GetRequiredService<ReplayLMUClient>());
-					builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
-					builder.Services.AddSingleton<SimpleContinueProvider<ClientService>>();
-					builder.Services.AddSingleton<ContinueProvider<ClientService>>(provider => provider.GetRequiredService<SimpleContinueProvider<ClientService>>());
-					builder.Services.AddSingleton<ContinueProviderSource>(provider => provider.GetRequiredService<SimpleContinueProvider<ClientService>>());
-					builder.Services.AddHostedService<ClientService>();
-				} else
-					builder.Services.AddHostedService<ReplayClientService>();
-			} else {
-				builder.Services.AddScoped<LMUClient, HttpLMUClient>();
-				builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
-				if(clientOptions.LMULoggingOnly)
-					builder.Services.AddHostedService<ResponseLoggerService>();
-				else
-					builder.Services.AddHostedService<ClientService>();
-			}
+			builder.Services.AddClient(clientInfo, clientOptions);
 
 			builder.Logging.ClearProviders();
 			builder.Services.AddSerilog((services, lc) => lc
