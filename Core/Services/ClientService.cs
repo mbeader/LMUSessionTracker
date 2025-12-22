@@ -1,4 +1,5 @@
-﻿using LMUSessionTracker.Core.LMU;
+﻿using LMUSessionTracker.Core.Client;
+using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Protocol;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,14 +14,12 @@ namespace LMUSessionTracker.Core.Services {
 		private LMUClient lmuClient;
 		private ProtocolClient protocolClient;
 		private ContinueProvider<ClientService> continueProvider;
-		private ClientState state = ClientState.Idle;
-		private ProtocolRole role = ProtocolRole.None;
-		private string sessionId;
+		private ClientHandler handler;
 
-		public ClientState State => state;
-		public ProtocolRole Role => role;
-		public string SessionId => sessionId;
-		public string ClientId => client.ClientId;
+		public ClientState State => handler.State;
+		public ProtocolRole Role => handler.Role;
+		public string SessionId => handler.SessionId;
+		public string ClientId => handler.ClientId;
 
 		public ClientService(ILogger<ClientService> logger, IServiceProvider serviceProvider, ClientInfo client) : base(logger, serviceProvider) {
 			this.client = client;
@@ -28,7 +27,7 @@ namespace LMUSessionTracker.Core.Services {
 		}
 
 		public override int CalculateDelay() {
-			switch(state) {
+			switch(handler.State) {
 				case ClientState.Idle:
 				case ClientState.Working:
 				case ClientState.Connected:
@@ -42,148 +41,25 @@ namespace LMUSessionTracker.Core.Services {
 			lmuClient = scope.ServiceProvider.GetRequiredService<LMUClient>();
 			protocolClient = scope.ServiceProvider.GetRequiredService<ProtocolClient>();
 			continueProvider = scope.ServiceProvider.GetService<ContinueProvider<ClientService>>();
+			handler = new ClientHandler(lmuClient, protocolClient, client);
 			return Task.CompletedTask;
 		}
 
 		public override async Task<bool> Do() {
-			(ClientState state, ProtocolRole role, string sessionId) last = (state, role, sessionId);
+			(ClientState state, ProtocolRole role, string sessionId) last = (handler.State, handler.Role, handler.SessionId);
 			lmuClient.OpenContext();
 			try {
-				await HandleSession();
+				await handler.HandleSession();
 			} finally {
 				lmuClient.CloseContext();
 			}
-			if(last.state != state || last.role != role || last.sessionId != sessionId)
-				logger.LogInformation($"State changed from ({last.state}, {last.role}, {last.sessionId}) to ({state}, {role}, {sessionId})");
+			if(last.state != handler.State || last.role != handler.Role || last.sessionId != handler.SessionId)
+				logger.LogInformation($"State changed from ({last.state}, {last.role}, {last.sessionId}) to ({handler.State}, {handler.Role}, {handler.SessionId})");
 			return continueProvider?.ShouldContinue() ?? true;
-		}
-
-		private async Task HandleSession() {
-			ProtocolMessage message = new ProtocolMessage() { ClientId = client.ClientId, SessionId = sessionId };
-			message.SessionInfo = await lmuClient.GetSessionInfo();
-			if(message.SessionInfo == null && state == ClientState.Idle) {
-				// TODO temporarily gets all data for debugging
-				await GetAllData(message);
-				return;
-			} else if(message.SessionInfo == null && state != ClientState.Idle) {
-				state = ClientState.Idle;
-				role = ProtocolRole.None;
-				sessionId = null;
-				await protocolClient.Send(message);
-				// TODO temporarily gets all data for debugging
-				await GetAllData(message);
-				return;
-			}
-			await HandleActiveSession(message);
-		}
-
-		private async Task GetAllData(ProtocolMessage message) {
-			List<Task> tasks = new List<Task>() {
-				Task.Run(async () => { message.MultiplayerTeams = await lmuClient.GetMultiplayerTeams(); }),
-				Task.Run(async () => { message.Standings = await lmuClient.GetStandings(); }),
-				Task.Run(async () => { message.TeamStrategy = await lmuClient.GetStrategy(); }),
-				Task.Run(async () => { message.Chat = await lmuClient.GetChat(); }),
-				Task.Run(async () => { await lmuClient.GetStrategyUsage(); }),
-				Task.Run(async () => { await lmuClient.GetStandingsHistory(); }),
-				Task.Run(async () => { await lmuClient.GetMultiplayerJoinState(); }),
-				Task.Run(async () => { await lmuClient.GetGameState(); }),
-				Task.Run(async () => { await lmuClient.GetSessionsInfoForEvent(); }),
-			};
-			await Task.WhenAll(tasks);
-		}
-
-		private async Task HandleActiveSession(ProtocolMessage message) {
-			// TODO temporarily gets all data for debugging
-			await GetAllData(message);
-			switch(state) {
-				case ClientState.Idle:
-				case ClientState.Connected:
-					break;
-				case ClientState.Working:
-					break;
-				case ClientState.Disconnected:
-					break;
-				default:
-					throw new Exception("Invalid pre-state");
-			}
-			ProtocolStatus result = await protocolClient.Send(message);
-			if(result == null) {
-				state = ClientState.Disconnected;
-				return;
-			}
-			bool online = message.MultiplayerTeams != null;
-			switch((state, result.Result, online)) {
-				case (ClientState.Working, ProtocolResult.Accepted, true):
-				case (ClientState.Connected, ProtocolResult.Accepted, true):
-				case (ClientState.Working, ProtocolResult.Accepted, false):
-					break;
-				case (ClientState.Idle, ProtocolResult.Changed, true):
-				case (ClientState.Idle, ProtocolResult.Changed, false):
-				case (ClientState.Working, ProtocolResult.Changed, true):
-				case (ClientState.Connected, ProtocolResult.Changed, true):
-				case (ClientState.Working, ProtocolResult.Changed, false):
-					role = result.Role;
-					if(role == ProtocolRole.Primary)
-						state = ClientState.Working;
-					else
-						state = ClientState.Connected;
-					sessionId = result.SessionId;
-					break;
-				case (ClientState.Working, ProtocolResult.Demoted, true):
-					role = result.Role;
-					state = ClientState.Connected;
-					break;
-				case (ClientState.Connected, ProtocolResult.Promoted, true):
-					role = result.Role;
-					state = ClientState.Working;
-					break;
-				case (ClientState.Working, ProtocolResult.Rejected, true):
-				case (ClientState.Connected, ProtocolResult.Rejected, true):
-				case (ClientState.Working, ProtocolResult.Rejected, false):
-					role = result.Role;
-					state = ClientState.Idle;
-					sessionId = null;
-					break;
-				case (ClientState.Disconnected, ProtocolResult.Accepted, true):
-				case (ClientState.Disconnected, ProtocolResult.Changed, true):
-				case (ClientState.Disconnected, ProtocolResult.Promoted, true):
-				case (ClientState.Disconnected, ProtocolResult.Demoted, true):
-				case (ClientState.Disconnected, ProtocolResult.Rejected, true):
-				case (ClientState.Disconnected, ProtocolResult.Accepted, false):
-				case (ClientState.Disconnected, ProtocolResult.Changed, false):
-				case (ClientState.Disconnected, ProtocolResult.Promoted, false):
-				case (ClientState.Disconnected, ProtocolResult.Demoted, false):
-				case (ClientState.Disconnected, ProtocolResult.Rejected, false):
-					role = result.Role;
-					state = role == ProtocolRole.Primary ? ClientState.Working : ClientState.Connected;
-					sessionId = result.SessionId;
-					break;
-				default:
-					throw new Exception($"Invalid state. Online: {online}, Client: {state}, Result: {result.Result}");
-			}
 		}
 
 		public override Task End() {
 			return Task.CompletedTask;
-		}
-
-		public enum ClientState {
-			/// <summary>
-			/// LMU is not in an active session, no data to send, not connected to ST server
-			/// </summary>
-			Idle,
-			/// <summary>
-			/// LMU is in an active session, connected to ST server but not primary data provider
-			/// </summary>
-			Connected,
-			/// <summary>
-			/// LMU is in an active session, not connected to ST server
-			/// </summary>
-			Disconnected,
-			/// <summary>
-			/// LMU is in an active session, connected to ST server as primary data provider
-			/// </summary>
-			Working
 		}
 	}
 }

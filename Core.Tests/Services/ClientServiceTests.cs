@@ -1,3 +1,4 @@
+using LMUSessionTracker.Core.Client;
 using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Protocol;
 using LMUSessionTracker.Core.Services;
@@ -30,16 +31,16 @@ namespace LMUSessionTracker.Core.Tests.Services {
 		}
 
 		private class TestState {
-			public ClientService.ClientState State { get; set; }
+			public ClientState State { get; set; }
 			public ProtocolRole Role { get; set; }
 			public string SessionId { get; set; }
 
-			public static TestState Idle() => new TestState() { State = ClientService.ClientState.Idle, Role = ProtocolRole.None, SessionId = null };
-			public static TestState OfflineWorking(string sessionId) => new TestState() { State = ClientService.ClientState.Working, Role = ProtocolRole.Primary, SessionId = sessionId };
-			public static TestState OnlineWaiting(string sessionId) => new TestState() { State = ClientService.ClientState.Connected, Role = ProtocolRole.None, SessionId = sessionId };
-			public static TestState OnlineWorking(string sessionId) => new TestState() { State = ClientService.ClientState.Working, Role = ProtocolRole.Primary, SessionId = sessionId };
-			public static TestState OnlineConnected(string sessionId) => new TestState() { State = ClientService.ClientState.Connected, Role = ProtocolRole.Secondary, SessionId = sessionId };
-			public static TestState Disconnected(string sessionId = null, ProtocolRole role = ProtocolRole.None) => new TestState() { State = ClientService.ClientState.Disconnected, Role = role, SessionId = sessionId };
+			public static TestState Idle() => new TestState() { State = ClientState.Idle, Role = ProtocolRole.None, SessionId = null };
+			public static TestState OfflineWorking(string sessionId) => new TestState() { State = ClientState.Working, Role = ProtocolRole.Primary, SessionId = sessionId };
+			public static TestState OnlineWaiting(string sessionId) => new TestState() { State = ClientState.Connected, Role = ProtocolRole.None, SessionId = sessionId };
+			public static TestState OnlineWorking(string sessionId) => new TestState() { State = ClientState.Working, Role = ProtocolRole.Primary, SessionId = sessionId };
+			public static TestState OnlineConnected(string sessionId) => new TestState() { State = ClientState.Connected, Role = ProtocolRole.Secondary, SessionId = sessionId };
+			public static TestState Disconnected(string sessionId = null, ProtocolRole role = ProtocolRole.None) => new TestState() { State = ClientState.Disconnected, Role = role, SessionId = sessionId };
 		}
 
 		private void AssertState(TestState ex) {
