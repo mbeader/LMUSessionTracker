@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Core.Services {
 	public class ClientService : PeriodicService<ClientService> {
 		private readonly ClientInfo client;
+		private readonly int delay;
 		private LMUClient lmuClient;
 		private ProtocolClient protocolClient;
 		private ContinueProvider<ClientService> continueProvider;
@@ -23,17 +24,17 @@ namespace LMUSessionTracker.Core.Services {
 
 		public ClientService(ILogger<ClientService> logger, IServiceProvider serviceProvider, ClientInfo client) : base(logger, serviceProvider) {
 			this.client = client;
+			delay = client.OverrideDelay && client.Delay.HasValue ? client.Delay.Value : 1000;
 		}
 
 		public override int CalculateDelay() {
 			switch(state) {
 				case ClientState.Idle:
 				case ClientState.Working:
-					return 1000;
 				case ClientState.Connected:
 				case ClientState.Disconnected:
 				default:
-					return 1000;
+					return delay;
 			}
 		}
 

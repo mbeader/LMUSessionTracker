@@ -38,7 +38,12 @@ namespace LMUSessionTracker.Client {
 				SchemaValidation.LoadJsonSchemas();
 				builder.Services.AddScoped<SchemaValidator, SchemaValidation.Validator>();
 			}
-			builder.Services.AddSingleton<ClientInfo>(new ClientInfo() { ClientId = "t" });
+			ClientInfo clientInfo = new ClientInfo() {
+				ClientId = "t",
+				OverrideDelay = clientOptions.UseReplay,
+				Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
+			};
+			builder.Services.AddSingleton<ClientInfo>(clientInfo);
 			if(clientOptions.UseReplay) {
 				builder.Services.AddScoped<ReplayLMUClient>();
 				if(clientOptions.SendReplay) {

@@ -53,7 +53,12 @@ namespace LMUSessionTracker.Server {
 				builder.Services.AddScoped<SchemaValidator, SchemaValidation.Validator>();
 			}
 			if(serverOptions.UseLocalClient) {
-				builder.Services.AddSingleton<ClientInfo>(new ClientInfo() { ClientId = "t" });
+				ClientInfo clientInfo = new ClientInfo() {
+					ClientId = "t",
+					OverrideDelay = serverOptions.UseReplay,
+					Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
+				};
+				builder.Services.AddSingleton<ClientInfo>(clientInfo);
 				if(serverOptions.UseReplay) {
 					builder.Services.AddScoped<ReplayLMUClient>();
 					if(serverOptions.SendReplay) {
