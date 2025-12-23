@@ -101,6 +101,12 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			Assert.Equivalent(Status.Rejected(), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = null }));
 		}
 
+		[Fact]
+		public async Task Receive_RepeatInitialOfflineData_Creates() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new SessionInfo() }));
+			Assert.Equivalent(Status.ChangedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new SessionInfo() }));
+		}
+
 		private MultiplayerTeams MultiplayerTeams() {
 			return new() {
 				teams = new() {

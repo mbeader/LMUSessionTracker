@@ -23,7 +23,8 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		public void LeaveSession() {
-			LastSession = CurrentSession;
+			LastSession = CurrentSession ?? LastSession;
+			CurrentSession = null;
 			IsActive = false;
 		}
 

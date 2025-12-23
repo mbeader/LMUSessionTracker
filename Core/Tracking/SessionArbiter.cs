@@ -117,6 +117,14 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		private async Task<ProtocolStatus> JoinNewOrExistingSession(Client client, ProtocolMessage data, DateTime now) {
 			Session session = FindExistingSession(client, data);
+			if(client.CurrentSession != null) {
+				string oldSessionId = client.CurrentSession.SessionId;
+				if(activeSessions.TryGetValue(oldSessionId, out Session oldSession)) {
+					oldSession.UnregisterClient(data.ClientId);
+				}
+				client.LeaveSession();
+				logger.LogInformation($"Client {client.ClientId} left session {oldSessionId} (stale)");
+			}
 			if(session == null)
 				session = await ChangeSession(client, data, now);
 			else if(session.Finished) {
@@ -154,6 +162,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				await managementRepo.UpdateEntries(sessionId, session.Entries);
 			activeSessions.Add(session.SessionId, session);
 			bool isPrimary = session.RegisterClient(client.ClientId);
+			client.JoinSession(session, isPrimary);
 			logger.LogInformation($"New session created: {session.SessionId}");
 			if(data.SessionId == null)
 				logger.LogInformation($"Client {client.ClientId} joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
