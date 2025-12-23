@@ -37,13 +37,8 @@ namespace LMUSessionTracker.Server {
 			builder.Services.Configure<ServerOptions>(serverConfig);
 			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
 
-			//builder.Services.AddDbContext<SqliteContext>(options =>
-			//	options.UseSqlite(builder.Configuration["ConnectionStrings:Sqlite"]),
-			//	ServiceLifetime.Scoped);
 			builder.Services.AddDbContextFactory<SqliteContext>(options => options.UseSqlite(builder.Configuration["ConnectionStrings:Sqlite"]));
 
-			//builder.Services.AddSingleton<SessionManager>();
-			//builder.Services.AddScoped<SessionViewer>();
 			builder.Services.AddSingleton<DateTimeProvider, DefaultDateTimeProvider>();
 			builder.Services.AddSingleton<UuidVersion7Provider, DefaultUuidVersion7Provider>();
 			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled))) {
@@ -70,12 +65,9 @@ namespace LMUSessionTracker.Server {
 			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
 			builder.Services.AddSingleton<ProtocolAuthenticator, DefaultProtocolAuthenticator>();
 			builder.Services.AddHostedService<SessionLoaderService>();
-			//builder.Services.AddHostedService<SessionService>();
-			//builder.Services.AddHostedService<ReplayService>();
 
 
 			builder.Logging.ClearProviders();
-			//builder.Logging.AddLog4Net();
 			builder.Services.AddSerilog((services, lc) => lc
 				.ReadFrom.Configuration(builder.Configuration)
 				.ReadFrom.Services(services)
@@ -120,11 +112,6 @@ namespace LMUSessionTracker.Server {
 		}
 
 		private static Serilog.ILogger ConfigureLogging() {
-			// log4net leftovers
-			//var logger = LoggerFactory.Create(config => {
-			//	config.AddConsole();
-			//	config.AddLog4Net();
-			//}).CreateLogger(nameof(Program));
 			var configuration = new ConfigurationBuilder()
 				.SetBasePath(Directory.GetCurrentDirectory())
 				.AddJsonFile("appsettings.json")
