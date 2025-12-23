@@ -18,6 +18,7 @@ namespace LMUSessionTracker.Core {
 
 		public static IServiceCollection AddClient(this IServiceCollection services, ClientInfo clientInfo, ClientOptions options) {
 			services.AddSingleton<ClientInfo>(clientInfo);
+			services.AddSingleton<ProtocolSigningKey>(new ProtocolSigningKey() { Key = clientInfo.ClientId.PrivateKey });
 			if(options.UseReplay) {
 				services.AddScoped<ReplayLMUClient>();
 				if(options.SendReplay) {

@@ -9,17 +9,32 @@ namespace LMUSessionTracker.Server.Controllers {
 	public class DataController : ControllerBase {
 		private readonly ILogger<DataController> _logger;
 		private readonly ProtocolServer arbiter;
+		private readonly ProtocolAuthenticator authenticator;
 
-		public DataController(ILogger<DataController> logger, ProtocolServer arbiter) {
+		public DataController(ILogger<DataController> logger, ProtocolServer arbiter, ProtocolAuthenticator authenticator) {
 			_logger = logger;
 			this.arbiter = arbiter;
+			this.authenticator = authenticator;
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> Index([FromBody] ProtocolMessage data) {
 			if(!ModelState.IsValid)
 				return BadRequest();
-			return Ok(await arbiter.Receive(data));
+			bool? verified = await authenticator.Verify(Request, data);
+			if(!verified.HasValue)
+				return StatusCode(401);
+			if(verified.Value)
+				return Ok(await arbiter.Receive(data));
+			else
+				return StatusCode(403);
+		}
+
+		[HttpPost("{action}")]
+		public async Task<IActionResult> Authenticate([FromBody] string encodedPublicKey) {
+			if(!ModelState.IsValid)
+				return BadRequest();
+			return Ok(await authenticator.Authenticate(Request, encodedPublicKey));
 		}
 	}
 }

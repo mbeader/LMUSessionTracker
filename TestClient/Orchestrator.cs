@@ -53,6 +53,7 @@ namespace LMUSessionTracker.TestClient {
 				Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
 			};
 			logger.LogInformation($"Creating client {i} with id {clientInfo.ClientId.Hash}");
+			ProtocolSigningKey signingKey = new ProtocolSigningKey() { Key = clientInfo.ClientId.PrivateKey };
 			LMUClient lmuClient = null;
 			if(clientOptions.UseReplay) {
 				if(clientOptions.SingleReplay) {
@@ -69,7 +70,7 @@ namespace LMUSessionTracker.TestClient {
 			} else {
 				lmuClient = new HttpLMUClient(loggerFactory.CreateLogger<HttpLMUClient>(), null, lmuClientOptions);
 			}
-			HttpProtocolClient protocolClient = new HttpProtocolClient(loggerFactory.CreateLogger<HttpProtocolClient>(), protocolClientOptions);
+			HttpProtocolClient protocolClient = new HttpProtocolClient(loggerFactory.CreateLogger<HttpProtocolClient>(), signingKey, protocolClientOptions);
 			return new ClientHandler(lmuClient, protocolClient, clientInfo);
 		}
 

@@ -6,6 +6,7 @@ using LMUSessionTracker.Core.Services;
 using LMUSessionTracker.Core.Tracking;
 using LMUSessionTracker.Server.Models;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -67,6 +68,7 @@ namespace LMUSessionTracker.Server {
 			}
 			builder.Services.AddScoped<SessionRepository, SqliteSessionRepository>();
 			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
+			builder.Services.AddSingleton<ProtocolAuthenticator, DefaultProtocolAuthenticator>();
 			builder.Services.AddHostedService<SessionLoaderService>();
 			//builder.Services.AddHostedService<SessionService>();
 			//builder.Services.AddHostedService<ReplayService>();
@@ -102,6 +104,11 @@ namespace LMUSessionTracker.Server {
 				app.UseExceptionHandler("/Home/Error");
 			}
 			app.UseStaticFiles();
+
+			app.Use(async (context, next) => {
+				context.Request.EnableBuffering();
+				await next();
+			});
 
 			app.UseRouting();
 
