@@ -48,10 +48,11 @@ namespace LMUSessionTracker.TestClient {
 			IOptions<ReplayOptions> replayOptions = Options.Create(clientConfig.GetSection("Replay").Get<ReplayOptions>());
 
 			ClientInfo clientInfo = new ClientInfo() {
-				ClientId = $"client{i}",
+				ClientId = ClientId.Create(false),
 				OverrideDelay = clientOptions.UseReplay,
 				Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
 			};
+			logger.LogInformation($"Creating client {i} with id {clientInfo.ClientId.Hash}");
 			LMUClient lmuClient = null;
 			if(clientOptions.UseReplay) {
 				if(clientOptions.SingleReplay) {

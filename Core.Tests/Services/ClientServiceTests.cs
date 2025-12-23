@@ -10,11 +10,18 @@ using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tests.Services {
 	public class ClientServiceTests {
+		private static readonly string publicKey = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0NCk1Db3dCUVlESzJWd0F5RUFTZkR4YUxxV1IxUmMzaVY4ZGxUQVRONW80UmhISTN5YUxhT2RBOGk3OUpjPQ0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tDQo=";
+		private static readonly string privateKey = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNQzRDQVFBd0JRWURLMlZ3QkNJRUlMNTZOVk5Sa2dFdGxUbS9sY0lmK1FsaWM3YlAySEc2dVVSQUNsekZPdnQ4DQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tDQo=";
+		private static readonly ClientId clientId;
+
+		static ClientServiceTests() {
+			clientId = ClientId.Import(Convert.FromBase64String(privateKey));
+		}
+
 		private readonly Mock<LMUClient> lmuClient;
 		private readonly Mock<ProtocolClient> protocolClient;
 		private readonly Mock<IServiceScope> scope;
 		private readonly ClientService service;
-		private string clientId;
 
 		public ClientServiceTests(LoggingFixture loggingFixture) {
 			lmuClient = new Mock<LMUClient>();
@@ -26,7 +33,6 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
 			Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
 			serviceProvider.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(scopeFactory.Object);
-			clientId = "t";
 			service = new ClientService(loggingFixture.LoggerFactory.CreateLogger<ClientService>(), serviceProvider.Object, new ClientInfo() { ClientId = clientId });
 		}
 
@@ -47,7 +53,7 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			Assert.Equal(ex.State, service.State);
 			Assert.Equal(ex.Role, service.Role);
 			Assert.Equal(ex.SessionId, service.SessionId);
-			Assert.Equal(clientId, service.ClientId);
+			Assert.Equal(clientId.Hash, service.ClientId);
 		}
 
 		[Fact]

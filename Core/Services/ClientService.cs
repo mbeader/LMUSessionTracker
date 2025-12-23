@@ -4,7 +4,6 @@ using LMUSessionTracker.Core.Protocol;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Services {
@@ -42,6 +41,7 @@ namespace LMUSessionTracker.Core.Services {
 			protocolClient = scope.ServiceProvider.GetRequiredService<ProtocolClient>();
 			continueProvider = scope.ServiceProvider.GetService<ContinueProvider<ClientService>>();
 			handler = new ClientHandler(lmuClient, protocolClient, client);
+			logger.LogInformation($"Starting client as {handler.ClientId}");
 			return Task.CompletedTask;
 		}
 

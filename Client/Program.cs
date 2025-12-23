@@ -32,7 +32,7 @@ namespace LMUSessionTracker.Client {
 				builder.Services.AddScoped<SchemaValidator, SchemaValidation.Validator>();
 			}
 			ClientInfo clientInfo = new ClientInfo() {
-				ClientId = "t",
+				ClientId = ClientId.LoadOrCreate(clientOptions.PrivateKeyFile),
 				OverrideDelay = clientOptions.UseReplay,
 				Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
 			};

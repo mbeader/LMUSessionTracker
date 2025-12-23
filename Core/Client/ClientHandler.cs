@@ -16,7 +16,7 @@ namespace LMUSessionTracker.Core.Client {
 		public ClientState State => state;
 		public ProtocolRole Role => role;
 		public string SessionId => sessionId;
-		public string ClientId => client.ClientId;
+		public string ClientId => client.ClientId.Hash;
 
 		public ClientHandler(LMUClient lmuClient, ProtocolClient protocolClient, ClientInfo client) {
 			this.lmuClient = lmuClient;
@@ -25,7 +25,7 @@ namespace LMUSessionTracker.Core.Client {
 		}
 
 		public async Task HandleSession() {
-			ProtocolMessage message = new ProtocolMessage() { ClientId = client.ClientId, SessionId = sessionId };
+			ProtocolMessage message = new ProtocolMessage() { ClientId = client.ClientId.Hash, SessionId = sessionId };
 			message.SessionInfo = await lmuClient.GetSessionInfo();
 			if(message.SessionInfo == null && state == ClientState.Idle) {
 				// TODO temporarily gets all data for debugging

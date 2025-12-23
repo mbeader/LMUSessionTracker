@@ -1,6 +1,8 @@
-﻿namespace LMUSessionTracker.Core {
+﻿using LMUSessionTracker.Core.Client;
+
+namespace LMUSessionTracker.Core {
 	public class ClientInfo {
-		public string ClientId { get; init; }
+		public ClientId ClientId { get; init; }
 		public bool OverrideDelay { get; init; }
 		public int? Delay { get; init; }
 	}

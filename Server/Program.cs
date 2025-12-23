@@ -51,7 +51,7 @@ namespace LMUSessionTracker.Server {
 			}
 			if(serverOptions.UseLocalClient) {
 				ClientInfo clientInfo = new ClientInfo() {
-					ClientId = "t",
+					ClientId = ClientId.LoadOrCreate(clientOptions.PrivateKeyFile),
 					OverrideDelay = clientOptions.UseReplay,
 					Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
 				};
