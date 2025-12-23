@@ -1,23 +1,16 @@
-﻿using LMUSessionTracker.Core;
-using LMUSessionTracker.Core.Http;
-using LMUSessionTracker.Core.Json;
-using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Protocol;
-using LMUSessionTracker.Core.Replay;
-using LMUSessionTracker.Core.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Extensions.Logging;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace LMUSessionTracker.TestClient {
 	internal class Program {
-		static void Main(string[] args) {
+		static async Task Main(string[] args) {
 			var logger = ConfigureLogging();
+			var loggerFactory = new SerilogLoggerFactory(logger);
 			logger.Information($"Working directory: {Directory.GetCurrentDirectory()}");
 
 			HostApplicationBuilder builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings() {
@@ -26,48 +19,9 @@ namespace LMUSessionTracker.TestClient {
 				EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
 			});
 
-			var clientConfig = builder.Configuration.GetSection("Client");
-			var clientOptions = clientConfig.GetSection("Options").Get<TestClientOptions>();
-			builder.Services.Configure<TestClientOptions>(clientConfig.GetSection("Options"));
-			builder.Services.Configure<LMUClientOptions>(clientConfig.GetSection("LMU"));
-			builder.Services.Configure<ProtocolClientOptions>(clientConfig.GetSection("Protocol"));
-			builder.Services.Configure<ReplayOptions>(clientConfig.GetSection("Replay"));
-			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
-
-			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled))) {
-				SchemaValidation.LoadJsonSchemas();
-				builder.Services.AddScoped<SchemaValidator, SchemaValidation.Validator>();
-			}
-			ClientInfo clientInfo = new ClientInfo() {
-				ClientId = "t",
-				OverrideDelay = clientOptions.UseReplay,
-				Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
-			};
-			builder.Services.AddSingleton<ClientInfo>(clientInfo);
-			if(clientOptions.UseReplay) {
-				builder.Services.AddScoped<ReplayLMUClient>();
-				builder.Services.AddScoped<LMUClient>(provider => provider.GetRequiredService<ReplayLMUClient>());
-				builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
-				builder.Services.AddSingleton<SimpleContinueProvider<ClientService>>();
-				builder.Services.AddSingleton<ContinueProvider<ClientService>>(provider => provider.GetRequiredService<SimpleContinueProvider<ClientService>>());
-				builder.Services.AddSingleton<ContinueProviderSource>(provider => provider.GetRequiredService<SimpleContinueProvider<ClientService>>());
-				builder.Services.AddHostedService<ClientService>();
-			} else {
-				builder.Services.AddScoped<LMUClient, HttpLMUClient>();
-				builder.Services.AddScoped<ProtocolClient, HttpProtocolClient>();
-				builder.Services.AddHostedService<ClientService>();
-			}
-
-			builder.Logging.ClearProviders();
-			builder.Services.AddSerilog((services, lc) => lc
-				.ReadFrom.Configuration(builder.Configuration)
-				.ReadFrom.Services(services)
-				.Enrich.FromLogContext()
-				.Enrich.WithThreadId());
-
-			var host = builder.Build();
-
-			host.Run();
+			Orchestrator orchestrator = new Orchestrator(builder.Configuration, loggerFactory);
+			orchestrator.Configure();
+			await orchestrator.Run();
 		}
 
 		private static Serilog.ILogger ConfigureLogging() {
