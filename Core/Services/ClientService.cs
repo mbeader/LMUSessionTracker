@@ -44,6 +44,9 @@ namespace LMUSessionTracker.Core.Services {
 			lmuClient.OpenContext();
 			try {
 				await handler.Handle();
+			} catch(Exception e) {
+				logger.LogWarning(e, "Client run failed");
+				handler.Reset();
 			} finally {
 				lmuClient.CloseContext();
 			}

@@ -13,6 +13,7 @@ namespace LMUSessionTracker.Core.Client {
 		public string ClientId { get; }
 
 		public Task Handle();
+		public void Reset();
 	}
 
 	public class DefaultClientHandler : ClientHandler {
@@ -150,6 +151,8 @@ namespace LMUSessionTracker.Core.Client {
 					role = result.Role;
 					state = ClientState.Working;
 					break;
+				case (ClientState.Idle, ProtocolResult.Rejected, true):
+				case (ClientState.Idle, ProtocolResult.Rejected, false):
 				case (ClientState.Working, ProtocolResult.Rejected, true):
 				case (ClientState.Connected, ProtocolResult.Rejected, true):
 				case (ClientState.Working, ProtocolResult.Rejected, false):
@@ -174,6 +177,12 @@ namespace LMUSessionTracker.Core.Client {
 				default:
 					throw new Exception($"Invalid state. Online: {online}, Client: {state}, Result: {result.Result}");
 			}
+		}
+
+		public void Reset() {
+			role = ProtocolRole.None;
+			state = ClientState.Idle;
+			sessionId = null;
 		}
 	}
 }

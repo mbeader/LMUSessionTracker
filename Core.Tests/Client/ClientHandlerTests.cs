@@ -73,6 +73,16 @@ namespace LMUSessionTracker.Core.Tests.Client {
 		}
 
 		[Fact]
+		public async Task Handle_OfflineSessionNewFailure_IsRejected() {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Rejected, Role = ProtocolRole.None, SessionId = null });
+			AssertState(TestState.Idle());
+			await handler.Handle();
+			AssertState(TestState.Idle());
+		}
+
+		[Fact]
 		public async Task Handle_OfflineSessionNew_IsWorking() {
 			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
 			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
