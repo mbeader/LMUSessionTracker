@@ -43,7 +43,6 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(LMUClient))).Returns(lmuClient.Object);
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(ProtocolClient))).Returns(protocolClient.Object);
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(ClientHandlerFactory))).Returns(handlerFactory.Object);
-			scope.Setup(x => x.ServiceProvider.GetService(typeof(DateTimeProvider))).Returns(dateTime.Object);
 			service = CreateService(clientInfo);
 		}
 
@@ -52,7 +51,7 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
 			Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
 			serviceProvider.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(scopeFactory.Object);
-			return new ClientService(loggingFixture.LoggerFactory.CreateLogger<ClientService>(), serviceProvider.Object, client);
+			return new ClientService(loggingFixture.LoggerFactory.CreateLogger<ClientService>(), serviceProvider.Object, dateTime.Object, client);
 		}
 
 		private class TestState {
@@ -79,18 +78,6 @@ namespace LMUSessionTracker.Core.Tests.Services {
 		public async Task Start_InitialState_IsIdle() {
 			await service.Start(scope.Object);
 			AssertState(TestState.Idle());
-		}
-
-		[Theory]
-		[InlineData(1000, 0, 1000)]
-		[InlineData(1000, 200, 800)]
-		[InlineData(1000, 1000, 0)]
-		[InlineData(1000, 2000, 0)]
-		public async Task CalculateDelay_GivenIntervalAndElapsed(int interval, int elapsed, int expected) {
-			ClientService service = CreateService(new ClientInfo() { ClientId = clientId, Interval = interval });
-			await service.Start(scope.Object);
-			dateTime.Setup(x => x.UtcNow).Returns(baseTimestamp.AddMilliseconds(elapsed));
-			Assert.Equal(expected, service.CalculateDelay());
 		}
 
 		[Fact]

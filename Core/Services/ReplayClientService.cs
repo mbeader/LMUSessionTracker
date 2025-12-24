@@ -12,25 +12,21 @@ namespace LMUSessionTracker.Core.Services {
 		private readonly ReplayOptions options;
 		private readonly ReplayCollection collection;
 		private ReplayLMUClient lmuClient;
-		private DateTimeProvider dateTime;
 		private int completed = 0;
 		private DateTime last;
 
-		public ReplayClientService(ILogger<ResponseLoggerService> logger, IServiceProvider serviceProvider, IOptions<ReplayOptions> options) : base(logger, serviceProvider) {
+		public ReplayClientService(ILogger<ResponseLoggerService> logger, IServiceProvider serviceProvider, DateTimeProvider dateTime, IOptions<ReplayOptions> options) : base(logger, serviceProvider, dateTime) {
 			this.options = options.Value ?? new ReplayOptions();
 			collection = new ReplayCollection();
 			last = DateTime.UtcNow;
 		}
 
-		public override int CalculateDelay() {
-			DateTime now = dateTime.UtcNow;
-			int toNextInterval = options.Interval - (int)(now - last).TotalMilliseconds;
-			return toNextInterval < 0 ? 0 : toNextInterval;
+		public override int GetInterval() {
+			return options.Interval;
 		}
 
 		public override Task Start(IServiceScope scope) {
 			lmuClient = scope.ServiceProvider.GetRequiredService<ReplayLMUClient>();
-			dateTime = scope.ServiceProvider.GetRequiredService<DateTimeProvider>();
 			last = dateTime.UtcNow;
 			return Task.CompletedTask;
 		}
@@ -43,7 +39,7 @@ namespace LMUSessionTracker.Core.Services {
 			} finally {
 				lmuClient.CloseContext();
 			}
-			DateTime now = DateTime.UtcNow;
+			DateTime now = dateTime.UtcNow;
 			if((now - last).TotalSeconds >= 10.0) {
 				last = now;
 				logger.LogDebug($"Completed {completed} ({completed/((double)completed+lmuClient.Remaining):P0})");

@@ -8,22 +8,16 @@ namespace LMUSessionTracker.Core.Services {
 	public class ResponseLoggerService : PeriodicService<ResponseLoggerService> {
 		private static readonly int interval = 1000;
 		private LMUClient lmuClient;
-		private DateTimeProvider dateTime;
-		private DateTime last;
 
-		public ResponseLoggerService(ILogger<ResponseLoggerService> logger, IServiceProvider serviceProvider) : base(logger, serviceProvider) {
+		public ResponseLoggerService(ILogger<ResponseLoggerService> logger, IServiceProvider serviceProvider, DateTimeProvider dateTime) : base(logger, serviceProvider, dateTime) {
 		}
 
-		public override int CalculateDelay() {
-			DateTime now = dateTime.UtcNow;
-			int toNextInterval = interval - (int)(now - last).TotalMilliseconds;
-			return toNextInterval < 0 ? 0 : toNextInterval;
+		public override int GetInterval() {
+			return interval;
 		}
 
 		public override Task Start(IServiceScope scope) {
 			lmuClient = scope.ServiceProvider.GetRequiredService<LMUClient>();
-			dateTime = scope.ServiceProvider.GetRequiredService<DateTimeProvider>();
-			last = dateTime.UtcNow;
 			return Task.CompletedTask;
 		}
 
