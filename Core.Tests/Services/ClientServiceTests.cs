@@ -22,21 +22,29 @@ namespace LMUSessionTracker.Core.Tests.Services {
 		private readonly LoggingFixture loggingFixture;
 		private readonly Mock<LMUClient> lmuClient;
 		private readonly Mock<ProtocolClient> protocolClient;
+		private readonly Mock<ClientHandler> handler;
+		private readonly Mock<ClientHandlerFactory> handlerFactory;
 		private readonly Mock<DateTimeProvider> dateTime;
 		private readonly Mock<IServiceScope> scope;
 		private readonly ClientService service;
 
 		public ClientServiceTests(LoggingFixture loggingFixture) {
 			this.loggingFixture = loggingFixture;
+			ClientInfo clientInfo = new ClientInfo() { ClientId = clientId };
 			lmuClient = new Mock<LMUClient>();
 			protocolClient = new Mock<ProtocolClient>();
+			handler = new Mock<ClientHandler>();
+			handler.Setup(x => x.ClientId).Returns(clientInfo.ClientId.Hash);
+			handlerFactory = new Mock<ClientHandlerFactory>();
+			handlerFactory.Setup(x => x.Create(It.IsAny<LMUClient>(), It.IsAny<ProtocolClient>(), It.IsAny<ClientInfo>())).Returns(handler.Object);
 			dateTime = new Mock<DateTimeProvider>();
 			dateTime.Setup(x => x.UtcNow).Returns(baseTimestamp);
 			scope = new Mock<IServiceScope>();
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(LMUClient))).Returns(lmuClient.Object);
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(ProtocolClient))).Returns(protocolClient.Object);
+			scope.Setup(x => x.ServiceProvider.GetService(typeof(ClientHandlerFactory))).Returns(handlerFactory.Object);
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(DateTimeProvider))).Returns(dateTime.Object);
-			service = CreateService(new ClientInfo() { ClientId = clientId });
+			service = CreateService(clientInfo);
 		}
 
 		private ClientService CreateService(ClientInfo client) {
@@ -91,313 +99,6 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			AssertState(TestState.Idle());
 			await service.Do();
 			AssertState(TestState.Idle());
-		}
-
-		[Fact]
-		public async Task Do_OfflineSessionNew_IsWorking() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OfflineWorking("s1"));
-		}
-
-		[Fact]
-		public async Task Do_OfflineSession_IsWorking() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OfflineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Do();
-			AssertState(TestState.OfflineWorking("s1"));
-		}
-
-		[Fact]
-		public async Task Do_OfflineSessionChanged_IsWorking() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OfflineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s2" });
-			await service.Do();
-			AssertState(TestState.OfflineWorking("s2"));
-		}
-
-		[Fact]
-		public async Task Do_OfflineSessionClosed_IsIdle() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OfflineWorking("s1"));
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync((SessionInfo)null);
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = null });
-			await service.Do();
-			AssertState(TestState.Idle());
-		}
-
-		[Fact]
-		public async Task Do_OfflineSessionRejected_IsIdle() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OfflineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Rejected, Role = ProtocolRole.None, SessionId = null });
-			await service.Do();
-			AssertState(TestState.Idle());
-		}
-
-		[Fact]
-		public async Task Do_OfflineSessionNewFailure_IsDisconnected() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync((ProtocolStatus)null);
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.Disconnected());
-		}
-
-		[Fact]
-		public async Task Do_OfflineSessionFailure_IsDisconnected() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OfflineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync((ProtocolStatus)null);
-			await service.Do();
-			AssertState(TestState.Disconnected("s1", ProtocolRole.Primary));
-		}
-
-		[Fact]
-		public async Task Do_OfflineSessionReconnect_IsWorking() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OfflineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync((ProtocolStatus)null);
-			await service.Do();
-			AssertState(TestState.Disconnected("s1", ProtocolRole.Primary));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Do();
-			AssertState(TestState.OfflineWorking("s1"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionNew_IsWorking() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s1"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionNew_IsConnected() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s1"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSession_IsWorking() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s1"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSession_IsConnected() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Secondary, SessionId = "s1" });
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s1"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionDemoted_IsConnected() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Demoted, Role = ProtocolRole.Secondary, SessionId = "s1" });
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s1"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionPromoted_IsWorking() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Promoted, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s1"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionPrimaryChanged_IsWorking() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s2" });
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s2"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionPrimaryChanged_IsConnected() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = "s2" });
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s2"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionPrimaryClosed_Idle() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s1"));
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync((SessionInfo)null);
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.None, SessionId = null });
-			await service.Do();
-			AssertState(TestState.Idle());
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionPrimaryRejected_Idle() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Rejected, Role = ProtocolRole.None, SessionId = null });
-			await service.Do();
-			AssertState(TestState.Idle());
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionSecondaryChanged_IsWorking() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s2" });
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s2"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionSecondaryChanged_IsConnected() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = "s2" });
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s2"));
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionSecondaryClosed_Idle() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s1"));
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync((SessionInfo)null);
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.None, SessionId = null });
-			await service.Do();
-			AssertState(TestState.Idle());
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionSecondaryRejected_IsIdle() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineConnected("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Rejected, Role = ProtocolRole.None, SessionId = null });
-			await service.Do();
-			AssertState(TestState.Idle());
-		}
-
-		[Fact]
-		public async Task Do_OnlineSessionInvalidState_Throws() {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await service.Start(scope.Object);
-			AssertState(TestState.Idle());
-			await service.Do();
-			AssertState(TestState.OnlineWorking("s1"));
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Promoted, Role = ProtocolRole.Primary, SessionId = "s1" });
-			await Assert.ThrowsAsync<Exception>(service.Do);
 		}
 	}
 }

@@ -41,12 +41,13 @@ namespace LMUSessionTracker.Core.Services {
 		}
 
 		public override Task Start(IServiceScope scope) {
+			ClientHandlerFactory handlerFactory = scope.ServiceProvider.GetRequiredService<ClientHandlerFactory>();
 			lmuClient = scope.ServiceProvider.GetRequiredService<LMUClient>();
 			protocolClient = scope.ServiceProvider.GetRequiredService<ProtocolClient>();
 			continueProvider = scope.ServiceProvider.GetService<ContinueProvider<ClientService>>();
 			dateTime = scope.ServiceProvider.GetRequiredService<DateTimeProvider>();
 			last = dateTime.UtcNow;
-			handler = new ClientHandler(lmuClient, protocolClient, client);
+			handler = handlerFactory.Create(lmuClient, protocolClient, client);
 			logger.LogInformation($"Starting client as {handler.ClientId}");
 			return Task.CompletedTask;
 		}
@@ -55,7 +56,7 @@ namespace LMUSessionTracker.Core.Services {
 			(ClientState state, ProtocolRole role, string sessionId) last = (handler.State, handler.Role, handler.SessionId);
 			lmuClient.OpenContext();
 			try {
-				await handler.HandleSession();
+				await handler.Handle();
 			} finally {
 				lmuClient.CloseContext();
 			}

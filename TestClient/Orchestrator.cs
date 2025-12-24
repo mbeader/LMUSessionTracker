@@ -71,7 +71,7 @@ namespace LMUSessionTracker.TestClient {
 				lmuClient = new HttpLMUClient(loggerFactory.CreateLogger<HttpLMUClient>(), null, lmuClientOptions);
 			}
 			HttpProtocolClient protocolClient = new HttpProtocolClient(loggerFactory.CreateLogger<HttpProtocolClient>(), signingKey, protocolClientOptions);
-			return new ClientHandler(lmuClient, protocolClient, clientInfo);
+			return new DefaultClientHandler(lmuClient, protocolClient, clientInfo);
 		}
 
 		public async Task Run() {
@@ -91,7 +91,7 @@ namespace LMUSessionTracker.TestClient {
 			try {
 				List<Task> tasks = new List<Task>();
 				foreach(ClientHandler handler in clients)
-					tasks.Add(Task.Delay(RandomDelay()).ContinueWith(async t => await handler.HandleSession()));
+					tasks.Add(Task.Delay(RandomDelay()).ContinueWith(async t => await handler.Handle()));
 				await Task.WhenAll(tasks);
 			} finally {
 				replayLMUClient?.CloseContext();

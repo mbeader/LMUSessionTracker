@@ -5,7 +5,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Client {
-	public class ClientHandler {
+	public interface ClientHandler {
+		public ClientState State { get; }
+		public ProtocolRole Role { get; }
+		public string SessionId { get; }
+		public string ClientId { get; }
+
+		public Task Handle();
+	}
+
+	public class DefaultClientHandler : ClientHandler {
 		private readonly ClientInfo client;
 		private readonly LMUClient lmuClient;
 		private readonly ProtocolClient protocolClient;
@@ -18,13 +27,13 @@ namespace LMUSessionTracker.Core.Client {
 		public string SessionId => sessionId;
 		public string ClientId => client.ClientId.Hash;
 
-		public ClientHandler(LMUClient lmuClient, ProtocolClient protocolClient, ClientInfo client) {
+		public DefaultClientHandler(LMUClient lmuClient, ProtocolClient protocolClient, ClientInfo client) {
 			this.lmuClient = lmuClient;
 			this.protocolClient = protocolClient;
 			this.client = client;
 		}
 
-		public async Task HandleSession() {
+		public async Task Handle() {
 			ProtocolMessage message = new ProtocolMessage() { ClientId = client.ClientId.Hash, SessionId = sessionId };
 			message.SessionInfo = await lmuClient.GetSessionInfo();
 			if(message.SessionInfo == null && state == ClientState.Idle) {
