@@ -10,11 +10,14 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace LMUSessionTracker.Client {
 	internal class Program {
 		static void Main(string[] args) {
 			var logger = ConfigureLogging();
+			AssemblyName assembly = Assembly.GetExecutingAssembly().GetName();
+			logger.Information($"Starting {assembly.Name} {assembly.Version}");
 			logger.Information($"Working directory: {Directory.GetCurrentDirectory()}");
 
 			HostApplicationBuilder builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings() {

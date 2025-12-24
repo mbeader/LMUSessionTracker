@@ -16,11 +16,14 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace LMUSessionTracker.Server {
 	public class Program {
 		public static void Main(string[] args) {
 			var logger = ConfigureLogging();
+			AssemblyName assembly = Assembly.GetExecutingAssembly().GetName();
+			logger.Information($"Starting {assembly.Name} {assembly.Version}");
 			logger.Information($"Working directory: {Directory.GetCurrentDirectory()}");
 			Directory.CreateDirectory("data");
 
