@@ -71,7 +71,7 @@ namespace LMUSessionTracker.TestClient {
 				lmuClient = new HttpLMUClient(loggerFactory.CreateLogger<HttpLMUClient>(), null, lmuClientOptions);
 			}
 			HttpProtocolClient protocolClient = new HttpProtocolClient(loggerFactory.CreateLogger<HttpProtocolClient>(), signingKey, protocolClientOptions);
-			return new DefaultClientHandler(lmuClient, protocolClient, clientInfo);
+			return new DefaultClientHandler(loggerFactory.CreateLogger<DefaultClientHandler>(), lmuClient, protocolClient, clientInfo);
 		}
 
 		public async Task Run() {

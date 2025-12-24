@@ -1,5 +1,6 @@
 ﻿using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Protocol;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace LMUSessionTracker.Core.Client {
 	}
 
 	public class DefaultClientHandler : ClientHandler {
+		private readonly ILogger<DefaultClientHandler> logger;
 		private readonly ClientInfo client;
 		private readonly LMUClient lmuClient;
 		private readonly ProtocolClient protocolClient;
@@ -27,7 +29,8 @@ namespace LMUSessionTracker.Core.Client {
 		public string SessionId => sessionId;
 		public string ClientId => client.ClientId.Hash;
 
-		public DefaultClientHandler(LMUClient lmuClient, ProtocolClient protocolClient, ClientInfo client) {
+		public DefaultClientHandler(ILogger<DefaultClientHandler> logger, LMUClient lmuClient, ProtocolClient protocolClient, ClientInfo client) {
+			this.logger = logger;
 			this.lmuClient = lmuClient;
 			this.protocolClient = protocolClient;
 			this.client = client;

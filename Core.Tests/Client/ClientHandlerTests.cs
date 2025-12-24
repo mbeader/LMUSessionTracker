@@ -29,7 +29,7 @@ namespace LMUSessionTracker.Core.Tests.Client {
 			ClientInfo clientInfo = new ClientInfo() { ClientId = clientId };
 			lmuClient = new Mock<LMUClient>();
 			protocolClient = new Mock<ProtocolClient>();
-			handler = new DefaultClientHandler(lmuClient.Object, protocolClient.Object, clientInfo);
+			handler = new DefaultClientHandler(loggingFixture.LoggerFactory.CreateLogger<DefaultClientHandler>(), lmuClient.Object, protocolClient.Object, clientInfo);
 		}
 
 		private class TestState {
