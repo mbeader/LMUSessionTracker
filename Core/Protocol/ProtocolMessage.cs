@@ -6,7 +6,11 @@ namespace LMUSessionTracker.Core.Protocol {
 		public string ClientId { get; set; }
 		public string SessionId { get; set; }
 		public ProtocolMessageType MessageType { get; set; }
+
 		public SessionInfo SessionInfo { get; set; }
+		public string MultiplayerJoinState { get; set; }
+		public GameState GameState { get; set; }
+
 		public MultiplayerTeams MultiplayerTeams { get; set; }
 		public List<Standing> Standings { get; set; }
 		public List<TeamStrategy> TeamStrategy { get; set; }

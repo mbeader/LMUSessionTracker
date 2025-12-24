@@ -3,7 +3,6 @@ using LMUSessionTracker.Core.LMU;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -83,7 +82,7 @@ namespace LMUSessionTracker.Core.Http {
 			try {
 				if(!Directory.Exists(logPath))
 					Directory.CreateDirectory(logPath);
-				File.WriteAllText(Path.Join(logPath, $"{contextId}-obj.json"), JsonConvert.SerializeObject(objContext, Formatting.Indented, serializerSettings));
+				//File.WriteAllText(Path.Join(logPath, $"{contextId}-obj.json"), JsonConvert.SerializeObject(objContext, Formatting.Indented, serializerSettings));
 				File.WriteAllText(Path.Join(logPath, $"{contextId}-raw.json"), JsonConvert.SerializeObject(rawContext, serializerSettings));
 			} catch(Exception e) {
 				logger.LogWarning(e, "Failed to write request debug file");
