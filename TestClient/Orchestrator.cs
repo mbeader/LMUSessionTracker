@@ -49,8 +49,8 @@ namespace LMUSessionTracker.TestClient {
 
 			ClientInfo clientInfo = new ClientInfo() {
 				ClientId = ClientId.Create(false),
-				OverrideDelay = clientOptions.UseReplay,
-				Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
+				OverrideInterval = clientOptions.UseReplay,
+				Interval = clientConfig.GetSection("Replay")?.GetValue<int>("Interval")
 			};
 			logger.LogInformation($"Creating client {i} with id {clientInfo.ClientId.Hash}");
 			ProtocolSigningKey signingKey = new ProtocolSigningKey() { Key = clientInfo.ClientId.PrivateKey };

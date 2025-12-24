@@ -12,6 +12,7 @@ namespace LMUSessionTracker.Core.Services {
 		private readonly ReplayOptions options;
 		private readonly ReplayCollection collection;
 		private ReplayLMUClient lmuClient;
+		private DateTimeProvider dateTime;
 		private int completed = 0;
 		private DateTime last;
 
@@ -22,11 +23,15 @@ namespace LMUSessionTracker.Core.Services {
 		}
 
 		public override int CalculateDelay() {
-			return options.Delay;
+			DateTime now = dateTime.UtcNow;
+			int toNextInterval = options.Interval - (int)(now - last).TotalMilliseconds;
+			return toNextInterval < 0 ? 0 : toNextInterval;
 		}
 
 		public override Task Start(IServiceScope scope) {
 			lmuClient = scope.ServiceProvider.GetRequiredService<ReplayLMUClient>();
+			dateTime = scope.ServiceProvider.GetRequiredService<DateTimeProvider>();
+			last = dateTime.UtcNow;
 			return Task.CompletedTask;
 		}
 

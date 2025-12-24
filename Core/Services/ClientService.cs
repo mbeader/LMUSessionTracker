@@ -9,11 +9,13 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Core.Services {
 	public class ClientService : PeriodicService<ClientService> {
 		private readonly ClientInfo client;
-		private readonly int delay;
+		private readonly int interval;
 		private LMUClient lmuClient;
 		private ProtocolClient protocolClient;
 		private ContinueProvider<ClientService> continueProvider;
+		private DateTimeProvider dateTime;
 		private ClientHandler handler;
+		private DateTime last;
 
 		public ClientState State => handler.State;
 		public ProtocolRole Role => handler.Role;
@@ -22,17 +24,19 @@ namespace LMUSessionTracker.Core.Services {
 
 		public ClientService(ILogger<ClientService> logger, IServiceProvider serviceProvider, ClientInfo client) : base(logger, serviceProvider) {
 			this.client = client;
-			delay = client.OverrideDelay && client.Delay.HasValue ? client.Delay.Value : 1000;
+			interval = client.OverrideInterval && client.Interval.HasValue ? client.Interval.Value : 1000;
 		}
 
 		public override int CalculateDelay() {
+			DateTime now = dateTime.UtcNow;
+			int toNextInterval = interval - (int)(now - last).TotalMilliseconds;
 			switch(handler.State) {
 				case ClientState.Idle:
 				case ClientState.Working:
 				case ClientState.Connected:
 				case ClientState.Disconnected:
 				default:
-					return delay;
+					return toNextInterval < 0 ? 0 : toNextInterval;
 			}
 		}
 
@@ -40,6 +44,8 @@ namespace LMUSessionTracker.Core.Services {
 			lmuClient = scope.ServiceProvider.GetRequiredService<LMUClient>();
 			protocolClient = scope.ServiceProvider.GetRequiredService<ProtocolClient>();
 			continueProvider = scope.ServiceProvider.GetService<ContinueProvider<ClientService>>();
+			dateTime = scope.ServiceProvider.GetRequiredService<DateTimeProvider>();
+			last = dateTime.UtcNow;
 			handler = new ClientHandler(lmuClient, protocolClient, client);
 			logger.LogInformation($"Starting client as {handler.ClientId}");
 			return Task.CompletedTask;

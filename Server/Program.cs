@@ -48,8 +48,8 @@ namespace LMUSessionTracker.Server {
 			if(serverOptions.UseLocalClient) {
 				ClientInfo clientInfo = new ClientInfo() {
 					ClientId = ClientId.LoadOrCreate(clientOptions.PrivateKeyFile),
-					OverrideDelay = clientOptions.UseReplay,
-					Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
+					OverrideInterval = clientOptions.UseReplay,
+					Interval = clientConfig.GetSection("Replay")?.GetValue<int>("Interval")
 				};
 				builder.Services.AddClient(clientInfo, clientOptions);
 			}

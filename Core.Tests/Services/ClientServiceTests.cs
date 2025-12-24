@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tests.Services {
 	public class ClientServiceTests {
+		private static readonly DateTime baseTimestamp = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
 		private static readonly string publicKey = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0NCk1Db3dCUVlESzJWd0F5RUFTZkR4YUxxV1IxUmMzaVY4ZGxUQVRONW80UmhISTN5YUxhT2RBOGk3OUpjPQ0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tDQo=";
 		private static readonly string privateKey = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNQzRDQVFBd0JRWURLMlZ3QkNJRUlMNTZOVk5Sa2dFdGxUbS9sY0lmK1FsaWM3YlAySEc2dVVSQUNsekZPdnQ4DQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tDQo=";
 		private static readonly ClientId clientId;
@@ -18,22 +19,32 @@ namespace LMUSessionTracker.Core.Tests.Services {
 			clientId = ClientId.Import(Convert.FromBase64String(privateKey));
 		}
 
+		private readonly LoggingFixture loggingFixture;
 		private readonly Mock<LMUClient> lmuClient;
 		private readonly Mock<ProtocolClient> protocolClient;
+		private readonly Mock<DateTimeProvider> dateTime;
 		private readonly Mock<IServiceScope> scope;
 		private readonly ClientService service;
 
 		public ClientServiceTests(LoggingFixture loggingFixture) {
+			this.loggingFixture = loggingFixture;
 			lmuClient = new Mock<LMUClient>();
 			protocolClient = new Mock<ProtocolClient>();
+			dateTime = new Mock<DateTimeProvider>();
+			dateTime.Setup(x => x.UtcNow).Returns(baseTimestamp);
 			scope = new Mock<IServiceScope>();
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(LMUClient))).Returns(lmuClient.Object);
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(ProtocolClient))).Returns(protocolClient.Object);
+			scope.Setup(x => x.ServiceProvider.GetService(typeof(DateTimeProvider))).Returns(dateTime.Object);
+			service = CreateService(new ClientInfo() { ClientId = clientId });
+		}
+
+		private ClientService CreateService(ClientInfo client) {
 			Mock<IServiceScopeFactory> scopeFactory = new Mock<IServiceScopeFactory>();
 			scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
 			Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
 			serviceProvider.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(scopeFactory.Object);
-			service = new ClientService(loggingFixture.LoggerFactory.CreateLogger<ClientService>(), serviceProvider.Object, new ClientInfo() { ClientId = clientId });
+			return new ClientService(loggingFixture.LoggerFactory.CreateLogger<ClientService>(), serviceProvider.Object, client);
 		}
 
 		private class TestState {
@@ -60,6 +71,18 @@ namespace LMUSessionTracker.Core.Tests.Services {
 		public async Task Start_InitialState_IsIdle() {
 			await service.Start(scope.Object);
 			AssertState(TestState.Idle());
+		}
+
+		[Theory]
+		[InlineData(1000, 0, 1000)]
+		[InlineData(1000, 200, 800)]
+		[InlineData(1000, 1000, 0)]
+		[InlineData(1000, 2000, 0)]
+		public async Task CalculateDelay_GivenIntervalAndElapsed(int interval, int elapsed, int expected) {
+			ClientService service = CreateService(new ClientInfo() { ClientId = clientId, Interval = interval });
+			await service.Start(scope.Object);
+			dateTime.Setup(x => x.UtcNow).Returns(baseTimestamp.AddMilliseconds(elapsed));
+			Assert.Equal(expected, service.CalculateDelay());
 		}
 
 		[Fact]

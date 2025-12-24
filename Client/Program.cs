@@ -1,6 +1,7 @@
 ﻿using LMUSessionTracker.Core;
 using LMUSessionTracker.Core.Client;
 using LMUSessionTracker.Core.Json;
+using LMUSessionTracker.Core.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,14 +28,15 @@ namespace LMUSessionTracker.Client {
 			builder.Services.ConfigureClient(clientConfig);
 			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
 
+			builder.Services.AddSingleton<DateTimeProvider, DefaultDateTimeProvider>();
 			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled))) {
 				SchemaValidation.LoadJsonSchemas();
 				builder.Services.AddScoped<SchemaValidator, SchemaValidation.Validator>();
 			}
 			ClientInfo clientInfo = new ClientInfo() {
 				ClientId = ClientId.LoadOrCreate(clientOptions.PrivateKeyFile),
-				OverrideDelay = clientOptions.UseReplay,
-				Delay = clientConfig.GetSection("Replay")?.GetValue<int>("Delay")
+				OverrideInterval = clientOptions.UseReplay,
+				Interval = clientConfig.GetSection("Replay")?.GetValue<int>("Interval")
 			};
 			builder.Services.AddClient(clientInfo, clientOptions);
 
