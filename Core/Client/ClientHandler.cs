@@ -23,6 +23,10 @@ namespace LMUSessionTracker.Core.Client {
 		private ClientState state = ClientState.Idle;
 		private ProtocolRole role = ProtocolRole.None;
 		private string sessionId;
+		private string lastMultiplayerJoinState;
+		private string lastMultiStintState;
+		private string lastLongState;
+		private int lastLongStateCount;
 
 		public ClientState State => state;
 		public ProtocolRole Role => role;
@@ -39,7 +43,25 @@ namespace LMUSessionTracker.Core.Client {
 		public async Task Handle() {
 			ProtocolMessage message = new ProtocolMessage() { ClientId = client.ClientId.Hash, SessionId = sessionId };
 			await GetMainData(message);
-			if(message.SessionInfo == null && state == ClientState.Idle) {
+
+			if(lastMultiplayerJoinState != message.MultiplayerJoinState || lastMultiStintState != message.GameState?.MultiStintState) {
+				logger.LogInformation($"Game state changed from ({lastMultiplayerJoinState}, {lastMultiStintState}) to ({message.MultiplayerJoinState}, {message.GameState?.MultiStintState})");
+				lastMultiplayerJoinState = message.MultiplayerJoinState;
+				lastMultiStintState = message.GameState?.MultiStintState;
+			}
+
+			if(client.DebugMode) {
+				string currLongState = $"{(message.SessionInfo != null ? "S" : " ")}{(message.MultiplayerJoinState != null ? "M" : " ")}{(message.GameState != null ? "G" : " ")} " +
+				$"{message.SessionInfo?.session} {message.MultiplayerJoinState} {message.GameState?.MultiStintState}";
+				if(lastLongState != currLongState) {
+					logger.LogDebug($"{(lastLongStateCount > 999 ? 999 : lastLongStateCount):000} {currLongState}");
+					lastLongState = currLongState;
+					lastLongStateCount = 1;
+				} else
+					lastLongStateCount++;
+			}
+
+			if(message.GameState == null || (message.SessionInfo == null && state == ClientState.Idle)) {
 				if(client.DebugMode)
 					await GetAllData(message);
 				return;
@@ -82,6 +104,10 @@ namespace LMUSessionTracker.Core.Client {
 				await GetAllData(message);
 			else
 				message.MultiplayerTeams = await lmuClient.GetMultiplayerTeams();
+			if(message.MultiplayerTeams == null && message.MultiplayerJoinState == "JOIN_JOINED_SERVER") {
+				logger.LogDebug("Missing multiplayer teams");
+				return;
+			}
 			switch(state) {
 				case ClientState.Idle:
 				case ClientState.Connected:
