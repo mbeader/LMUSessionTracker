@@ -18,8 +18,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			Number = string.IsNullOrEmpty(team.carNumber) ? null : team.carNumber;
 			Name = string.IsNullOrEmpty(team.name) ? null : team.name;
 			Vehicle = string.IsNullOrEmpty(team.vehicle) ? null : team.vehicle;
-			foreach(string member in team.drivers.Keys) {
-				Members.Add(new Member(member, team.drivers[member]));
+			if(team.drivers != null) {
+				foreach(string member in team.drivers.Keys) {
+					Members.Add(new Member(member, team.drivers[member]));
+				}
 			}
 		}
 

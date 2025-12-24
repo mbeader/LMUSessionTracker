@@ -21,17 +21,19 @@ namespace LMUSessionTracker.Core.Tracking {
 			Name = name;
 			Badge = string.IsNullOrEmpty(member.badge) ? null : member.badge;
 			Nationality = string.IsNullOrEmpty(member.nationality) ? null : member.nationality;
-			foreach(string role in member.roles) {
-				switch(role) {
-					case RoleAdmin:
-						IsAdmin = true;
-						break;
-					case RoleDriver:
-						IsDriver = true;
-						break;
-					case RoleEngineer:
-						IsEngineer = true;
-						break;
+			if(member.roles != null) {
+				foreach(string role in member.roles) {
+					switch(role) {
+						case RoleAdmin:
+							IsAdmin = true;
+							break;
+						case RoleDriver:
+							IsDriver = true;
+							break;
+						case RoleEngineer:
+							IsEngineer = true;
+							break;
+					}
 				}
 			}
 		}

@@ -1,3 +1,4 @@
+using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Tracking;
 using System;
 using System.Collections.Generic;
@@ -62,6 +63,49 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			return new EntryList(new List<Entry>() {
 				One(), Two()
 			});
+		}
+
+		private MultiplayerTeams MultiplayerTeamsOneEntry() {
+			return new MultiplayerTeams() {
+				teams = new Dictionary<string, MultiplayerTeam>() {
+					{ "utid0", new MultiplayerTeam() {
+						Id = "id1",
+						carNumber = "1",
+						name = "team1",
+						vehicle = "veh1",
+						drivers = new Dictionary<string, MultiplayerTeamMember>() {
+							{ "driver1", new MultiplayerTeamMember() {
+								badge = "sr-saint",
+								nationality = "US",
+								roles = new List<string>() { "Driver" }
+							} }
+						}
+					} }
+				}
+			};
+		}
+
+		[Fact]
+		public void Construct_FromMultiplayerTeamsOneEntry() {
+			Assert.Equivalent(OneEntry(), new EntryList(MultiplayerTeamsOneEntry()));
+		}
+
+		[Fact]
+		public void Construct_FromMultiplayerTeamsOneEntryNullRoles() {
+			EntryList ex = OneEntry();
+			ex.Slots[0].Members[0].IsDriver = false;
+			MultiplayerTeams teams = MultiplayerTeamsOneEntry();
+			teams.teams["utid0"].drivers["driver1"].roles = null;
+			Assert.Equivalent(ex, new EntryList(teams));
+		}
+
+		[Fact]
+		public void Construct_FromMultiplayerTeamsOneEntryNullDrivers() {
+			EntryList ex = OneEntry();
+			ex.Slots[0].Members.Clear();
+			MultiplayerTeams teams = MultiplayerTeamsOneEntry();
+			teams.teams["utid0"].drivers = null;
+			Assert.Equivalent(ex, new EntryList(teams));
 		}
 
 		[Fact]
