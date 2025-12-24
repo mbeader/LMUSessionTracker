@@ -111,7 +111,7 @@ namespace LMUSessionTracker.Core.Http {
 		}
 
 		public Task<List<Chat>> GetChat() {
-			return Get<List<Chat>>("/rest/chat");
+			return Get<List<Chat>>("/rest/chat/");
 		}
 
 		public Task<string> GetMultiplayerJoinState() {
