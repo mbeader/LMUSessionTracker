@@ -341,6 +341,22 @@ namespace LMUSessionTracker.Core.Tests.Client {
 		}
 
 		[Fact]
+		public async Task Handle_OnlineSessionPrimaryIgnoreNoSessionInfo_Idle() {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
+			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
+			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
+			AssertState(TestState.Idle());
+			await handler.Handle();
+			AssertState(TestState.OnlineWorking("s1"));
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync((SessionInfo)null);
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.None, SessionId = null });
+			await handler.Handle();
+			AssertState(TestState.OnlineWorking("s1"));
+		}
+
+		[Fact]
 		public async Task Handle_OnlineSessionPrimaryClosed_Idle() {
 			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
 			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
@@ -351,6 +367,7 @@ namespace LMUSessionTracker.Core.Tests.Client {
 			await handler.Handle();
 			AssertState(TestState.OnlineWorking("s1"));
 			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync((SessionInfo)null);
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "DISABLED" });
 			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.None, SessionId = null });
 			await handler.Handle();
 			AssertState(TestState.Idle());
@@ -402,6 +419,22 @@ namespace LMUSessionTracker.Core.Tests.Client {
 		}
 
 		[Fact]
+		public async Task Handle_OnlineSessionSecondaryIgnoreNoSessionInfo_Idle() {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
+			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
+			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = "s1" });
+			AssertState(TestState.Idle());
+			await handler.Handle();
+			AssertState(TestState.OnlineConnected("s1"));
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync((SessionInfo)null);
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.None, SessionId = null });
+			await handler.Handle();
+			AssertState(TestState.OnlineConnected("s1"));
+		}
+
+		[Fact]
 		public async Task Handle_OnlineSessionSecondaryClosed_Idle() {
 			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
 			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
@@ -412,6 +445,7 @@ namespace LMUSessionTracker.Core.Tests.Client {
 			await handler.Handle();
 			AssertState(TestState.OnlineConnected("s1"));
 			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync((SessionInfo)null);
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "DISABLED" });
 			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.None, SessionId = null });
 			await handler.Handle();
 			AssertState(TestState.Idle());
