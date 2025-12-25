@@ -235,6 +235,8 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		public async Task<Session> CloneSession(string sessionId) {
+			if(sessionId == null)
+				return null;
 			await semaphore.WaitAsync();
 			Session clonedSession = null;
 			if(activeSessions.TryGetValue(sessionId, out Session session)) {

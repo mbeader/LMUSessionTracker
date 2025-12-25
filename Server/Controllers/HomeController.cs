@@ -4,8 +4,8 @@ using LMUSessionTracker.Server.Models;
 using LMUSessionTracker.Server.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -35,11 +35,13 @@ namespace LMUSessionTracker.Server.Controllers {
 			return View(vm);
 		}
 
-		public async Task<IActionResult> Session(string sessionId) {
+		public async Task<IActionResult> Session([Required] string sessionId) {
 			if(!ModelState.IsValid)
 				return BadRequest();
 			SessionViewModel vm = new SessionViewModel();
 			vm.Session = await sessionRepo.GetSession(sessionId);
+			if(vm.Session == null)
+				return NotFound();
 			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId);
 			if(session != null) {
 				vm.Standings = session.LastStandings;
@@ -65,10 +67,12 @@ namespace LMUSessionTracker.Server.Controllers {
 			return View(vm);
 		}
 
-		public async Task<IActionResult> Laps(string sessionId, string carId) {
+		public async Task<IActionResult> Laps([Required] string sessionId, [Required] string carId) {
 			if(!ModelState.IsValid)
 				return BadRequest();
-			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId)).To();
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
+			if(session == null)
+				return NotFound();
 			CarHistory car = session?.History.GetAllHistory().Find(x => x.Key.Matches(carId));
 			if(car == null)
 				return NotFound();
