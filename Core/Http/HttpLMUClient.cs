@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -19,8 +20,8 @@ namespace LMUSessionTracker.Core.Http {
 		private readonly JsonSerializerSettings serializerSettings;
 		private readonly string logPath;
 		private string contextId = null;
-		private Dictionary<string, object> objContext = new Dictionary<string, object>();
-		private Dictionary<string, string> rawContext = new Dictionary<string, string>();
+		//private readonly ConcurrentDictionary<string, object> objContext = new ConcurrentDictionary<string, object>();
+		private readonly ConcurrentDictionary<string, string> rawContext = new ConcurrentDictionary<string, string>();
 
 		public HttpLMUClient(ILogger<HttpLMUClient> logger, SchemaValidator schemaValidator = null, IOptions<LMUClientOptions> options = null) {
 			this.logger = logger;
@@ -43,13 +44,13 @@ namespace LMUSessionTracker.Core.Http {
 				if(res.StatusCode == System.Net.HttpStatusCode.OK && res.Content != null) {
 					string body = await res.Content.ReadAsStringAsync();
 					if(options.LogResponses)
-						rawContext.Add(path, body);
+						rawContext.TryAdd(path, body);
 					if(!string.IsNullOrEmpty(body)) {
 						T result = JsonConvert.DeserializeObject<T>(body, serializerSettings);
 						if(result != null && options.ValidateResponses && schemaValidator != null)
 							schemaValidator.Validate(body, typeof(T));
-						if(options.LogResponses)
-							objContext.Add(path, result);
+						//if(options.LogResponses)
+						//	objContext.Add(path, result);
 						return result;
 					}
 				}
@@ -106,7 +107,7 @@ namespace LMUSessionTracker.Core.Http {
 
 		private void ResetContext() {
 			contextId = null;
-			objContext.Clear();
+			//objContext.Clear();
 			rawContext.Clear();
 		}
 

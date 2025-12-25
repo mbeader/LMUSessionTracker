@@ -71,7 +71,7 @@ namespace LMUSessionTracker.Core.Replay {
 				}
 				return Task.FromResult<T>(default);
 			} catch(Exception e) {
-				logger.LogError(e, $"Read failed for endpoint: {path}");
+				logger.LogError(e, $"Read failed for endpoint: {path}, context: {ContextId}");
 				return Task.FromResult<T>(default);
 			}
 		}
