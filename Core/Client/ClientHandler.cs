@@ -62,7 +62,7 @@ namespace LMUSessionTracker.Core.Client {
 					lastLongStateCount++;
 			}
 
-			if(message.GameState == null || (message.SessionInfo == null && state == ClientState.Idle)) {
+			if(message.GameState == null || (message.SessionInfo == null && (state == ClientState.Idle || (message.MultiplayerJoinState == "JOIN_IDLE" && message.GameState.MultiStintState != "DISABLED")))) {
 				if(client.DebugMode)
 					await GetAllData(message);
 				return;
