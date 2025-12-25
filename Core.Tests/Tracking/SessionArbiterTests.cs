@@ -5,6 +5,7 @@ using LMUSessionTracker.Core.Tracking;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tests.Tracking {
@@ -276,6 +277,24 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			Assert.NotNull(await arbiter.CloneSession(SessionId(1)));
 			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { trackName = "a" }, MultiplayerTeams = MultiplayerTeams() }));
 			Assert.NotNull(await arbiter.CloneSession(SessionId(1)));
+		}
+
+		[Fact]
+		public async Task Receive_JoinLoadedSession_Accepts() {
+			managementRepo.Setup(x => x.GetSessions()).ReturnsAsync(new List<Session>() { Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams()) });
+			managementRepo.Setup(x => x.GetSession(SessionId(1))).ReturnsAsync(Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams()));
+			await arbiter.Load();
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
+		public async Task Receive_JoinReloadedSession_Accepts() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			managementRepo.Setup(x => x.GetSessions()).ReturnsAsync(new List<Session>() { Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams()) });
+			managementRepo.Setup(x => x.GetSession(SessionId(1))).ReturnsAsync(Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams()));
+			await arbiter.Load();
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
 		}
 	}
 }
