@@ -109,8 +109,10 @@ namespace LMUSessionTracker.Core.Client {
 		private async Task HandleActiveSession(ProtocolMessage message) {
 			if(client.DebugMode)
 				await GetAllData(message);
-			else
+			else {
+				message.Standings = await lmuClient.GetStandings();
 				message.MultiplayerTeams = await lmuClient.GetMultiplayerTeams();
+			}
 			if(message.MultiplayerTeams == null && message.MultiplayerJoinState == "JOIN_JOINED_SERVER") {
 				logger.LogDebug("Missing multiplayer teams");
 				return;
