@@ -11,11 +11,16 @@
             <th>Number</td>
             <th>Team</td>
             <th>Driver</td>
+            <th class="text-end">Laps</td>
             <th class="text-end">Behind</td>
             <th class="text-end">Int</td>
-            <th class="text-end">Laps</td>
+            <th class="text-end">Best</td>
+            <th class="text-end">Last</td>
+            <th class="text-end">S1</td>
+            <th class="text-end">S2</td>
+            <th class="text-end">S3</td>
             <th class="text-end">Fuel</td>
-            <th>Status</td>
+            <th class="text-center">Status</td>
         </tr>
     </thead>
     <tbody>
@@ -29,11 +34,16 @@
                 <td>@(!string.IsNullOrEmpty(car.Number) ? car.Number : standing.carNumber)</td>
                 <td>@(!string.IsNullOrEmpty(car.TeamName) ? car.TeamName : (string.IsNullOrEmpty(standing.fullTeamName) ? standing.vehicleName : standing.fullTeamName))</td>
                 <td>@standing.driverName</td>
+                <td class="text-end">@standing.lapsCompleted</td>
                 <td class="text-end">@Format.Diff(standing.lapsBehindLeader, standing.timeBehindLeader)</td>
                 <td class="text-end">@Format.Diff(standing.lapsBehindNext, standing.timeBehindNext)</td>
-                <td class="text-end">@standing.lapsCompleted</td>
+                <td class="text-end">@Format.LapTime(standing.bestLapTime)</td>
+                <td class="text-end">@Format.LapTime(standing.lastLapTime)</td>
+                <td class="text-end">@Format.SectorTime(0.0, standing.lastSectorTime1)</td>
+                <td class="text-end">@Format.SectorTime(standing.lastSectorTime1, standing.lastSectorTime2)</td>
+                <td class="text-end">@Format.SectorTime(standing.lastSectorTime2, standing.lastLapTime)</td>
                 <td class="text-end">@Format.Percent(standing.fuelFraction)</td>
-                <td>@Format.Status(standing)</td>
+                <td class="text-center">@Format.Status(standing)</td>
             </tr>
         }
     </tbody>

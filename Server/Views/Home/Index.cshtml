@@ -15,6 +15,7 @@
                 <th>Phase</th>
                 <th>Remaining</th>
                 <th>Cars</th>
+                <th>Laps</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -28,6 +29,7 @@
                     <td>@(session.Active && session.Phase >= 0 ? Format.Phase(session.Phase) : "")</td>
                     <td>@(session.Active ? Format.Time(session.Remaining) : "Complete")</td>
                     <td>@session.CarCount</td>
+                    <td>@session.LapCount</td>
                     <td title="@Format.RelativeTimestamp(now, session.LastUpdate)">@(session.Active && session.Finished ? "Finished" : session.Active && session.ClientCount > 0 ? "Active" : session.Finished ? "Closed" : "Inactive")</td>
                 </tr>
             }

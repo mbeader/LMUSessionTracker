@@ -192,6 +192,11 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		public SessionSummary Summarize(bool active) {
+			int lapCount = 0;
+			foreach(CarHistory car in History.GetAllHistory())
+				foreach(Lap lap in car.Laps)
+					if(lap != null)
+						lapCount++;
 			return new SessionSummary() {
 				SessionId = SessionId,
 				PrimaryClientId = PrimaryClientId,
@@ -204,6 +209,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				Finished = Finished,
 				Active = active,
 				CarCount = Math.Max(Math.Max(History.Count, Entries?.Slots.Count ?? 0), LastStandings?.Count ?? 0),
+				LapCount = lapCount,
 				Remaining = LastInfo?.timeRemainingInGamePhase ?? 0,
 				Phase = LastInfo?.gamePhase ?? -1,
 			};

@@ -70,13 +70,14 @@ namespace LMUSessionTracker.Server.Controllers {
 		public async Task<IActionResult> Laps([Required] string sessionId, [Required] string carId) {
 			if(!ModelState.IsValid)
 				return BadRequest();
-			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
-			if(session == null)
+			LapsViewModel vm = new LapsViewModel();
+			vm.Session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
+			if(vm.Session == null)
 				return NotFound();
-			CarHistory car = session?.History.GetAllHistory().Find(x => x.Key.Matches(carId));
-			if(car == null)
+			vm.Car = vm.Session?.History.GetAllHistory().Find(x => x.Key.Matches(carId));
+			if(vm.Car == null)
 				return NotFound();
-			return View(car);
+			return View(vm);
 		}
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

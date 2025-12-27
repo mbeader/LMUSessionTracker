@@ -37,6 +37,7 @@ namespace LMUSessionTracker.Server.Models {
 			// TODO improve this
 			var cars = await context.Cars.GroupBy(x => new { x.SessionId }).Select(x => new { x.Key.SessionId, Count = x.Count() }).ToListAsync();
 			var entries = await context.Entries.GroupBy(x => new { x.SessionId }).Select(x => new { x.Key.SessionId, Count = x.Count() }).ToListAsync();
+			var laps = await context.Laps.GroupBy(x => new { x.SessionId }).Select(x => new { x.Key.SessionId, Count = x.Count() }).ToListAsync();
 			List<Core.Tracking.SessionSummary> summaries = new List<Core.Tracking.SessionSummary>();
 			foreach(Session session in sessions) {
 				summaries.Add(new Core.Tracking.SessionSummary() {
@@ -50,6 +51,7 @@ namespace LMUSessionTracker.Server.Models {
 					Finished = session.IsClosed,
 					Active = false,
 					CarCount = Math.Max(cars.Find(x => x.SessionId == session.SessionId)?.Count ?? 0, entries.Find(x => x.SessionId == session.SessionId)?.Count ?? 0),
+					LapCount = laps.Find(x => x.SessionId == session.SessionId)?.Count ?? 0,
 					Remaining = session.LastState?.TimeRemainingInGamePhase ?? 0,
 					Phase = session.LastState?.GamePhase ?? -1,
 				});

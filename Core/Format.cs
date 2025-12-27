@@ -27,6 +27,12 @@ namespace LMUSessionTracker.Core {
 			return ts.ToString(format);
 		}
 
+		public static string SectorTime(double start, double end) {
+			if(start < 0.0 || end <= 0.0)
+				return "-";
+			return LapTime(end - start);
+		}
+
 		public static string Temp(double? c) {
 			if(!c.HasValue)
 				return "";
