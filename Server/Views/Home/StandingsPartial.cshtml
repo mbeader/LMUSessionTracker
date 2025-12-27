@@ -9,8 +9,8 @@
             <th>PIC</td>
             <th>Class</td>
             <th>Number</td>
-            <th>Team</td>
-            <th>Driver</td>
+            <th class="team-col">Team</td>
+            <th class="driver-col">Driver</td>
             <th class="text-end">Laps</td>
             <th class="text-end">Behind</td>
             <th class="text-end">Int</td>
@@ -20,29 +20,31 @@
             <th class="text-end">S2</td>
             <th class="text-end">S3</td>
             <th class="text-end">Fuel</td>
+            <th class="text-end">Lap%</td>
             <th class="text-center">Status</td>
         </tr>
     </thead>
     <tbody>
         @foreach(Standing standing in Model.Standings) {
             CarKey id = new CarKey() { SlotId = standing.slotID, Veh = standing.vehicleFilename };
-			Car car = Model.Entries.GetValueOrDefault(id);
-			<tr>
+            Car car = Model.Entries.GetValueOrDefault(id);
+            <tr>
                 <td><a asp-action="Laps" asp-route-sessionId="@Model.Session.SessionId" asp-route-carId="@id.Id()">@standing.position</a></td>
                 <td>@(Model.PositionInClass.TryGetValue(id, out int pic) ? pic : "")</td>
                 <td>@(!string.IsNullOrEmpty(car.Class) ? car.Class : standing.carClass)</td>
                 <td>@(!string.IsNullOrEmpty(car.Number) ? car.Number : standing.carNumber)</td>
-                <td>@(!string.IsNullOrEmpty(car.TeamName) ? car.TeamName : (string.IsNullOrEmpty(standing.fullTeamName) ? standing.vehicleName : standing.fullTeamName))</td>
-                <td>@standing.driverName</td>
+                <td class="team-col text-truncate">@(!string.IsNullOrEmpty(car.TeamName) ? car.TeamName : (string.IsNullOrEmpty(standing.fullTeamName) ? standing.vehicleName : standing.fullTeamName))</td>
+                <td class="driver-col text-truncate">@standing.driverName</td>
                 <td class="text-end">@standing.lapsCompleted</td>
                 <td class="text-end">@Format.Diff(standing.lapsBehindLeader, standing.timeBehindLeader)</td>
                 <td class="text-end">@Format.Diff(standing.lapsBehindNext, standing.timeBehindNext)</td>
                 <td class="text-end">@Format.LapTime(standing.bestLapTime)</td>
                 <td class="text-end">@Format.LapTime(standing.lastLapTime)</td>
                 <td class="text-end">@Format.SectorTime(0.0, standing.lastSectorTime1)</td>
-                <td class="text-end">@Format.SectorTime(standing.lastSectorTime1, standing.lastSectorTime2)</td>
-                <td class="text-end">@Format.SectorTime(standing.lastSectorTime2, standing.lastLapTime)</td>
+                <td class="text-end">@(standing.sector == "SECTOR2" ? "" : Format.SectorTime(standing.lastSectorTime1, standing.lastSectorTime2))</td>
+                <td class="text-end">@(standing.sector != "SECTOR1" ? "" : Format.SectorTime(standing.lastSectorTime2, standing.lastLapTime))</td>
                 <td class="text-end">@Format.Percent(standing.fuelFraction)</td>
+                <td class="text-end">@((standing.lapDistance/Model.Session.LapDistance).ToString("P0"))</td>
                 <td class="text-center">@Format.Status(standing)</td>
             </tr>
         }
