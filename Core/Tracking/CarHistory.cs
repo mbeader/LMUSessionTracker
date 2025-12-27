@@ -116,6 +116,16 @@ namespace LMUSessionTracker.Core.Tracking {
 					Sector2 = lap.Sector2,
 					Sector3 = lap.Sector3,
 					Driver = lap.Driver,
+					Position = lap.Position,
+					Pit = lap.Pit,
+					Fuel = lap.Fuel,
+					VirtualEnergy = lap.VirtualEnergy,
+					LFTire = lap.LFTire,
+					RFTire = lap.RFTire,
+					LRTire = lap.LRTire,
+					RRTire = lap.RRTire,
+					FinishStatus = lap.FinishStatus,
+					Timestamp = lap.Timestamp,
 				});
 			}
 			return car;
