@@ -80,7 +80,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				return Accept(data.SessionId, true);
 			}
 
-			if(!session.IsSameSession(data.SessionInfo, data.MultiplayerTeams)) {
+			if(!session.IsSameSession(data.SessionInfo, data.MultiplayerTeams).IsSame) {
 				session.UnregisterClient(data.ClientId);
 				client.LeaveSession();
 				return await JoinNewOrExistingSession(client, data, now);
@@ -145,13 +145,21 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		private Session FindExistingSession(Client client, ProtocolMessage data) {
+			List<SessionDiff> diffs = new List<SessionDiff>();
+			Session matchedSession = null;
 			foreach(string sessionId in activeSessions.Keys) {
 				Session session = activeSessions[sessionId];
-				if(session.Online && session.IsSameSession(data.SessionInfo, data.MultiplayerTeams)) {
-					return session;
+				SessionDiff diff = session.IsSameSession(data.SessionInfo, data.MultiplayerTeams);
+				diffs.Add(diff);
+				if(matchedSession == null && session.Online && diff.IsSame) {
+					matchedSession = session;
+					break;
 				}
 			}
-			return null;
+			foreach(SessionDiff diff in diffs) {
+				logger.LogDebug($"Client {client.ClientId} diff with session {diff.SessionId} was {diff.Difference}: [{diff.GetMessage()}]");
+			}
+			return matchedSession;
 		}
 
 		private async Task<Session> ChangeSession(Client client, ProtocolMessage data, DateTime now) {

@@ -16,13 +16,13 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		public void IsSameSession_OfflineIdentical_ReturnsTrue() {
 			SessionInfo info = new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.5 } };
 			Session session = Session.Create(id1, info, baseTimestamp);
-			Assert.True(session.IsSameSession(info));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(info).Difference);
 		}
 
 		[Fact]
 		public void IsSameSession_OfflineHigherCompletion_ReturnsTrue() {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.5 } }, baseTimestamp);
-			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.6 } }));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.6 } }).Difference);
 		}
 
 		[Fact]
@@ -30,44 +30,44 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			SessionInfo infoWithValue = new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.5 } };
 			SessionInfo infoWithNull = new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.5 } };
 			SessionInfo infoWithDefault = new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.5 } };
-			Assert.True(Session.Create(id1, infoWithValue, baseTimestamp).IsSameSession(infoWithNull));
-			Assert.True(Session.Create(id1, infoWithValue, baseTimestamp).IsSameSession(infoWithDefault));
-			Assert.True(Session.Create(id1, infoWithNull, baseTimestamp).IsSameSession(infoWithValue));
-			Assert.True(Session.Create(id1, infoWithNull, baseTimestamp).IsSameSession(infoWithNull));
-			Assert.True(Session.Create(id1, infoWithNull, baseTimestamp).IsSameSession(infoWithDefault));
-			Assert.True(Session.Create(id1, infoWithDefault, baseTimestamp).IsSameSession(infoWithValue));
-			Assert.True(Session.Create(id1, infoWithDefault, baseTimestamp).IsSameSession(infoWithNull));
-			Assert.True(Session.Create(id1, infoWithDefault, baseTimestamp).IsSameSession(infoWithDefault));
+			Assert.Equal(SessionDifference.None, Session.Create(id1, infoWithValue, baseTimestamp).IsSameSession(infoWithNull).Difference);
+			Assert.Equal(SessionDifference.None, Session.Create(id1, infoWithValue, baseTimestamp).IsSameSession(infoWithDefault).Difference);
+			Assert.Equal(SessionDifference.None, Session.Create(id1, infoWithNull, baseTimestamp).IsSameSession(infoWithValue).Difference);
+			Assert.Equal(SessionDifference.None, Session.Create(id1, infoWithNull, baseTimestamp).IsSameSession(infoWithNull).Difference);
+			Assert.Equal(SessionDifference.None, Session.Create(id1, infoWithNull, baseTimestamp).IsSameSession(infoWithDefault).Difference);
+			Assert.Equal(SessionDifference.None, Session.Create(id1, infoWithDefault, baseTimestamp).IsSameSession(infoWithValue).Difference);
+			Assert.Equal(SessionDifference.None, Session.Create(id1, infoWithDefault, baseTimestamp).IsSameSession(infoWithNull).Difference);
+			Assert.Equal(SessionDifference.None, Session.Create(id1, infoWithDefault, baseTimestamp).IsSameSession(infoWithDefault).Difference);
 		}
 
 		[Fact]
 		public void IsSameSession_OfflineDifferentTrack_ReturnsFalse() {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1" }, baseTimestamp);
-			Assert.False(session.IsSameSession(new() { trackName = "Fuji", session = "RACE1" }));
+			Assert.Equal(SessionDifference.Track, session.IsSameSession(new() { trackName = "Fuji", session = "RACE1" }).Difference);
 		}
 
 		[Fact]
 		public void IsSameSession_OfflineDifferentType_ReturnsFalse() {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "QUALIFY1" }, baseTimestamp);
-			Assert.False(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1" }));
+			Assert.Equal(SessionDifference.Type, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1" }).Difference);
 		}
 
 		[Fact]
 		public void IsSameSession_OfflineSessionLowerCompletionElapsedWithinFuzziness_ReturnsTrue() {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", currentEventTime = 55, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.55 } }, baseTimestamp);
-			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", currentEventTime = 50, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.5 } }));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", currentEventTime = 50, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.5 } }).Difference);
 		}
 
 		[Fact]
 		public void IsSameSession_OfflineSessionLowerCompletionRemainingWithinFuzziness_ReturnsTrue() {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", currentEventTime = 55, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.55 } }, baseTimestamp);
-			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", currentEventTime = 50, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.5 } }));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", currentEventTime = 50, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.5 } }).Difference);
 		}
 
 		[Fact]
 		public void IsSameSession_OfflineSessionLowerCompletionElapsedOutisdeFuzziness_ReturnsFalse() {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", currentEventTime = 55, timeRemainingInGamePhase = 45, raceCompletion = new() { timeCompletion = 0.55 } }, baseTimestamp);
-			Assert.False(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", currentEventTime = 49, timeRemainingInGamePhase = 51, raceCompletion = new() { timeCompletion = 0.5 } }));
+			Assert.Equal(SessionDifference.Completion, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", currentEventTime = 49, timeRemainingInGamePhase = 51, raceCompletion = new() { timeCompletion = 0.5 } }).Difference);
 		}
 
 		[Theory]
@@ -78,9 +78,9 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[InlineData(nameof(GamePhase.Checkered), nameof(GamePhase.Paused))]
 		public void IsSameSession_OfflineReversiblePhaseTransition_ReturnsTrue(string prev, string next) {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }, baseTimestamp);
-			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }).Difference);
 			session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }, baseTimestamp);
-			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }).Difference);
 		}
 
 		[Theory]
@@ -94,9 +94,9 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[InlineData(nameof(GamePhase.Green), nameof(GamePhase.Checkered))]
 		public void IsSameSession_OfflineOneWayPhaseTransition_ReturnsTrueThenFalse(string prev, string next) {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }, baseTimestamp);
-			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }).Difference);
 			session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }, baseTimestamp);
-			Assert.False(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }));
+			Assert.Equal(SessionDifference.PhaseTransition, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }).Difference);
 		}
 
 		[Theory]
@@ -104,9 +104,9 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[InlineData(nameof(GamePhase.Paused), nameof(GamePhase.Checkered), nameof(GamePhase.Paused))]
 		public void IsSameSession_OfflineValidPhaseTransition_ReturnsTrue(string prev, string inter, string next) {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }, baseTimestamp);
-			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }).Difference);
 			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, baseTimestamp);
-			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }).Difference);
 		}
 
 		[Theory]
@@ -115,9 +115,9 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[InlineData(nameof(GamePhase.Checkered), nameof(GamePhase.Paused), nameof(GamePhase.FCY))]
 		public void IsSameSession_OfflineInvalidPhaseTransition_ReturnsFalse(string prev, string inter, string next) {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }, baseTimestamp);
-			Assert.True(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }).Difference);
 			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, baseTimestamp);
-			Assert.False(session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }));
+			Assert.Equal(SessionDifference.PhaseTransition, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }).Difference);
 		}
 
 		[Fact]
@@ -125,7 +125,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			SessionInfo info = new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.5 } };
 			MultiplayerTeams teams = new() { teams = new() { { "utid0", new() { name = "team1", drivers = new() { { "driver1", new() { roles = new() { "Driver" } } } } } } } };
 			Session session = Session.Create(id1, info, baseTimestamp, teams);
-			Assert.True(session.IsSameSession(info, teams));
+			Assert.Equal(SessionDifference.None, session.IsSameSession(info, teams).Difference);
 		}
 
 		[Fact]
@@ -134,7 +134,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			MultiplayerTeams teams = new() { teams = new() { { "utid0", new() { name = "team1", drivers = new() { { "driver1", new() { roles = new() { "Driver" } } } } } } } };
 			Session session = Session.Create(id1, info, baseTimestamp, teams);
 			teams.teams["utid0"].name = "team2";
-			Assert.False(session.IsSameSession(info, teams));
+			Assert.Equal(SessionDifference.EntryList, session.IsSameSession(info, teams).Difference);
 		}
 
 		[Fact]
@@ -142,7 +142,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			SessionInfo info = new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.5 } };
 			MultiplayerTeams teams = new() { teams = new() { { "utid0", new() { name = "team1", drivers = new() { { "driver1", new() { roles = new() { "Driver" } } } } } } } };
 			Session session = Session.Create(id1, info, baseTimestamp, teams);
-			Assert.False(session.IsSameSession(info));
+			Assert.Equal(SessionDifference.Network, session.IsSameSession(info).Difference);
 		}
 
 		[Fact]
@@ -150,7 +150,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			SessionInfo info = new() { trackName = "Sebring", session = "RACE1", raceCompletion = new() { timeCompletion = 0.5 } };
 			MultiplayerTeams teams = new() { teams = new() { { "utid0", new() { name = "team1", drivers = new() { { "driver1", new() { roles = new() { "Driver" } } } } } } } };
 			Session session = Session.Create(id1, info, baseTimestamp);
-			Assert.False(session.IsSameSession(info, teams));
+			Assert.Equal(SessionDifference.Network, session.IsSameSession(info, teams).Difference);
 		}
 
 		private SessionInfo FullSessionInfo() {

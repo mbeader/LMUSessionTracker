@@ -136,16 +136,44 @@ namespace LMUSessionTracker.Core.Tracking {
 			return Finished || (info != null && info.gamePhase == (int)GamePhase.Checkered);
 		}
 
-		public bool IsSameSession(SessionInfo info, MultiplayerTeams teams = null) {
-			bool same = Track == info.trackName &&
-				Type == info.session && (
-					CompletionNotDecreased(info) || (
-						IsWithinFuzziness(LastInfo.currentEventTime, info.currentEventTime) &&
-						IsWithinFuzziness(LastInfo.timeRemainingInGamePhase, info.timeRemainingInGamePhase))) &&
-				IsValidPhaseTransition(info);
-			if(!same || Online != (teams != null))
-				return false;
-			return Entries.HasAnyMatch(new EntryList(teams));
+		public SessionDiff IsSameSession(SessionInfo info, MultiplayerTeams teams = null) {
+			SessionDiff diff = new SessionDiff() { SessionId = SessionId, Difference = SessionDifference.None, MessageFormat = "Expected: {0}. Actual {1}.", MessageParams = new object[2] };
+			if(Track != info.trackName) {
+				diff.Set(SessionDifference.Track, Track, info.trackName);
+			} else if(Type != info.session) {
+				diff.Set(SessionDifference.Type, Type, info.session);
+			} else {
+				bool completionOk = CompletionNotDecreased(info);
+				bool currentTimeOk = IsWithinFuzziness(LastInfo.currentEventTime, info.currentEventTime);
+				bool remainingTimeOk = IsWithinFuzziness(LastInfo.timeRemainingInGamePhase, info.timeRemainingInGamePhase);
+				if(!completionOk && (!currentTimeOk || !remainingTimeOk))
+					diff.Set(SessionDifference.Completion,
+						(LastInfo.raceCompletion?.timeCompletion, LastInfo.currentEventTime, LastInfo.timeRemainingInGamePhase),
+						(info.raceCompletion?.timeCompletion, info.currentEventTime, info.timeRemainingInGamePhase));
+				else if(!IsValidPhaseTransition(info)) {
+					diff.Difference = SessionDifference.PhaseTransition;
+					diff.MessageFormat = "{0} to {1}{2}";
+					diff.MessageParams = new object[] { LastInfo.gamePhase, info.gamePhase, Finished ? "while finished" : "" };
+				}
+			}
+			if(diff.Difference == SessionDifference.None) {
+				if(Online != (teams != null)) {
+					diff.Set(SessionDifference.Network, Online ? "online" : "offline", teams != null ? "online" : "offline");
+				} else if(!Entries.HasAnyMatch(new EntryList(teams))) {
+					diff.Difference = SessionDifference.EntryList;
+					diff.MessageFormat = "Entrylist has no match";
+				}
+			}
+			//bool same = Track == info.trackName &&
+			//	Type == info.session && (
+			//		CompletionNotDecreased(info) || (
+			//			IsWithinFuzziness(LastInfo.currentEventTime, info.currentEventTime) &&
+			//			IsWithinFuzziness(LastInfo.timeRemainingInGamePhase, info.timeRemainingInGamePhase))) &&
+			//	IsValidPhaseTransition(info);
+			//if(!same || Online != (teams != null))
+			//	return false;
+			//return Entries.HasAnyMatch(new EntryList(teams));
+			return diff;
 		}
 
 		private bool CompletionNotDecreased(SessionInfo info) {
