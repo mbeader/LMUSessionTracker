@@ -69,7 +69,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 
 		[Fact]
 		public async Task Receive_Failure_Rejects() {
-			managementRepo.Setup(x => x.CreateSession(It.IsAny<string>(), It.IsAny<SessionInfo>(), It.IsAny<DateTime>())).ThrowsAsync(new Exception("foo"));
+			managementRepo.Setup(x => x.CreateSession(It.IsAny<string>(), It.IsAny<SessionInfo>(), It.IsAny<DateTime>(), It.IsAny<bool>())).ThrowsAsync(new Exception("foo"));
 			Assert.Equivalent(Status.Rejected(), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new SessionInfo() }));
 		}
 

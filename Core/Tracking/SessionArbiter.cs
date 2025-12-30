@@ -168,8 +168,8 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		private async Task<Session> ChangeSession(Client client, ProtocolMessage data, DateTime now) {
 			string sessionId = uuidProvider.CreateVersion7(now).ToString("N");
-			await managementRepo.CreateSession(sessionId, data.SessionInfo, now);
 			Session session = Session.Create(sessionId, data.SessionInfo, now, data.MultiplayerTeams);
+			await managementRepo.CreateSession(sessionId, data.SessionInfo, now, session.Online);
 			if(session.Online)
 				await managementRepo.UpdateEntries(sessionId, session.Entries);
 			activeSessions.Add(session.SessionId, session);

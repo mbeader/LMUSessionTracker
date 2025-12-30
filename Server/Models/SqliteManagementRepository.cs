@@ -17,9 +17,9 @@ namespace LMUSessionTracker.Server.Models {
 			this.contextFactory = contextFactory;
 		}
 
-		public async Task CreateSession(string sessionId, SessionInfo info, DateTime timestamp) {
+		public async Task CreateSession(string sessionId, SessionInfo info, DateTime timestamp, bool online) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
-			Session session = new Session() { SessionId = sessionId, Timestamp = timestamp };
+			Session session = new Session() { SessionId = sessionId, Timestamp = timestamp, IsOnline = online };
 			session.From(info);
 			SessionState state = new SessionState() { SessionId = sessionId, Timestamp = timestamp };
 			state.From(info);
