@@ -281,8 +281,9 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 
 		[Fact]
 		public async Task Receive_JoinLoadedSession_Accepts() {
-			managementRepo.Setup(x => x.GetSessions()).ReturnsAsync(new List<Session>() { Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams()) });
-			managementRepo.Setup(x => x.GetSession(SessionId(1))).ReturnsAsync(Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams()));
+			Session session = Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams());
+			managementRepo.Setup(x => x.GetSessions()).ReturnsAsync(new List<Session>() { session });
+			managementRepo.Setup(x => x.GetSession(SessionId(1))).ReturnsAsync(session);
 			await arbiter.Load();
 			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
 			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
@@ -290,10 +291,25 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 
 		[Fact]
 		public async Task Receive_JoinReloadedSession_Accepts() {
+			Session session = Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams());
 			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
-			managementRepo.Setup(x => x.GetSessions()).ReturnsAsync(new List<Session>() { Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams()) });
-			managementRepo.Setup(x => x.GetSession(SessionId(1))).ReturnsAsync(Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams()));
+			managementRepo.Setup(x => x.GetSessions()).ReturnsAsync(new List<Session>() { session });
+			managementRepo.Setup(x => x.GetSession(SessionId(1))).ReturnsAsync(session);
 			await arbiter.Load();
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Theory]
+		[InlineData(true)]
+		[InlineData(false)]
+		public async Task Receive_JoinOldestLoadedSession_Accepts(bool ascending) {
+			Session session1 = Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams());
+			Session session2 = Session.Create(SessionId(2), new(), baseTimestamp.AddSeconds(1), MultiplayerTeams());
+			managementRepo.Setup(x => x.GetSessions()).ReturnsAsync(new List<Session>() { ascending ? session1 : session2, ascending ? session2 : session1 });
+			managementRepo.Setup(x => x.GetSession(SessionId(1))).ReturnsAsync(session1);
+			managementRepo.Setup(x => x.GetSession(SessionId(2))).ReturnsAsync(session2);
+			await arbiter.Load();
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
 			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
 		}
 	}

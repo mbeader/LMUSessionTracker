@@ -15,8 +15,8 @@ namespace LMUSessionTracker.Core.Tracking {
 		private readonly DateTimeProvider dateTimeProvider;
 		private readonly UuidVersion7Provider uuidProvider;
 		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
-		private readonly Dictionary<string, Session> activeSessions = new Dictionary<string, Session>();
-		private readonly Dictionary<string, Session> inactiveSessions = new Dictionary<string, Session>();
+		private readonly SortedDictionary<string, Session> activeSessions = new SortedDictionary<string, Session>();
+		private readonly SortedDictionary<string, Session> inactiveSessions = new SortedDictionary<string, Session>();
 		private readonly Dictionary<string, Client> clients = new Dictionary<string, Client>();
 
 		public SessionArbiter(ILogger<SessionArbiter> logger, ManagementRespository managementRepo, DateTimeProvider dateTimeProvider, UuidVersion7Provider uuidProvider) {
