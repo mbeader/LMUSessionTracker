@@ -84,6 +84,10 @@ namespace LMUSessionTracker.Core.Tracking {
 				session.UnregisterClient(data.ClientId);
 				client.LeaveSession();
 				return await JoinNewOrExistingSession(client, data, now);
+			} else if(client.CurrentSession == null) {
+				bool isPrimary = session.RegisterClient(client.ClientId);
+				client.JoinSession(session, isPrimary);
+				logger.LogInformation($"Client {client.ClientId} directly joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
 			}
 
 			bool? isPrimaryChange = session.AcknowledgeRole(client.ClientId);
