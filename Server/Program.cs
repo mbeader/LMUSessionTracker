@@ -69,6 +69,7 @@ namespace LMUSessionTracker.Server {
 			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
 			builder.Services.AddSingleton<ProtocolAuthenticator, DefaultProtocolAuthenticator>();
 			builder.Services.AddHostedService<SessionLoaderService>();
+			builder.Services.AddHostedService<SessionCleanupService>();
 
 
 			builder.Logging.ClearProviders();

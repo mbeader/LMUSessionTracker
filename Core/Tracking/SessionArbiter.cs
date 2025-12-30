@@ -32,7 +32,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				return Reject();
 			try {
 				await semaphore.WaitAsync();
-				await Prune(now);
+				//await Prune(now);
 				Client client;
 				if(!clients.TryGetValue(data.ClientId, out client)) {
 					client = new Client(data.ClientId);
@@ -211,7 +211,8 @@ namespace LMUSessionTracker.Core.Tracking {
 			};
 		}
 
-		private async Task Prune(DateTime now) {
+		public async Task Prune(DateTime now) {
+			await semaphore.WaitAsync();
 			List<string> pendingSessionIds = new List<string>();
 			foreach(string sessionId in inactiveSessions.Keys) {
 				Session session = inactiveSessions[sessionId];
@@ -225,8 +226,6 @@ namespace LMUSessionTracker.Core.Tracking {
 						await managementRepo.CloseSession(session.SessionId);
 						logger.LogInformation($"Closing session {sessionId}");
 					}
-					if(session.HasClient())
-						throw new Exception($"Cannot prune session {sessionId} due to presence of clients");
 					logger.LogInformation($"Pruning session {sessionId}");
 					pendingSessionIds.Add(sessionId);
 				}
@@ -244,6 +243,7 @@ namespace LMUSessionTracker.Core.Tracking {
 					inactiveSessions.Add(sessionId, session);
 				}
 			}
+			semaphore.Release();
 		}
 
 		public async Task<Session> CloneSession(string sessionId) {
