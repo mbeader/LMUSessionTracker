@@ -43,12 +43,22 @@ namespace LMUSessionTracker.Core.Tests.Protocol {
 		}
 
 		private async Task<bool> Authenticate(string publicKey, string signature) {
-			return await protocolAuthenticator.Authenticate(Request(publicKey, signature), publicKey);
+			ProtocolCredential credential = new ProtocolCredential() { EncodedPublicKey = publicKey, Version = new Version(0, 1, 0).ToString() };
+			return await protocolAuthenticator.Authenticate(Request(credential, signature), credential);
+		}
+
+		private async Task<bool> Authenticate(PublicKey publicKey, string signature) {
+			ProtocolCredential credential = new ProtocolCredential(publicKey, new Version(0, 1, 0));
+			return await Authenticate(credential, signature);
+		}
+
+		private async Task<bool> Authenticate(ProtocolCredential credential, string signature) {
+			return await protocolAuthenticator.Authenticate(Request(credential, signature), credential);
 		}
 
 		[Fact]
 		public async Task Authenticate_NullClientId_ReturnsFalse() {
-			Assert.False(await Authenticate(null, null));
+			Assert.False(await Authenticate((string)null, null));
 		}
 
 		[Fact]
@@ -89,20 +99,22 @@ namespace LMUSessionTracker.Core.Tests.Protocol {
 		[Fact]
 		public async Task Authenticate_MismatchSignature_ReturnsFalse() {
 			Key otherKey = Key.Create(algorithm, new KeyCreationParameters() { ExportPolicy = KeyExportPolicies.AllowPlaintextExport });
-			byte[] sig = algorithm.Sign(otherKey, privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText));
-			Assert.False(await Authenticate(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), Convert.ToBase64String(sig)));
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, new Version(0, 1, 0));
+			byte[] sig = algorithm.Sign(otherKey, Body(credential));
+			Assert.False(await Authenticate(credential, Convert.ToBase64String(sig)));
 		}
 
 		[Fact]
 		public async Task Authenticate_ValidSignature_ReturnsTrue() {
-			byte[] sig = algorithm.Sign(privateKey, Body(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText))));
-			Assert.True(await Authenticate(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), Convert.ToBase64String(sig)));
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, new Version(0, 1, 0));
+			byte[] sig = algorithm.Sign(privateKey, Body(credential));
+			Assert.True(await Authenticate(credential, Convert.ToBase64String(sig)));
 		}
 
 		private async Task<bool?> Verify(ProtocolMessage data, string signature, bool preAuthenticate = true) {
 			data ??= new() { ClientId = Convert.ToBase64String(HashAlgorithm.Sha256.Hash(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText))) };
-			string publicKey = Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText));
-			await Authenticate(publicKey, Convert.ToBase64String(algorithm.Sign(privateKey, Body(publicKey))));
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, new Version(0, 1, 0));
+			await Authenticate(credential, Convert.ToBase64String(algorithm.Sign(privateKey, Body(credential))));
 			return await protocolAuthenticator.Verify(Request(data, signature), data);
 		}
 

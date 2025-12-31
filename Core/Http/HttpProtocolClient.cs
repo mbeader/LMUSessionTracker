@@ -7,6 +7,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,6 +18,7 @@ namespace LMUSessionTracker.Core.Http {
 		private readonly ILogger<HttpProtocolClient> logger;
 		private readonly ProtocolSigningKey signingKey;
 		private readonly ProtocolClientOptions options;
+		private readonly Version version;
 
 		public HttpProtocolClient(ILogger<HttpProtocolClient> logger, ProtocolSigningKey signingKey, IOptions<ProtocolClientOptions> options = null) {
 			this.logger = logger;
@@ -26,6 +28,7 @@ namespace LMUSessionTracker.Core.Http {
 				BaseAddress = new Uri(this.options.BaseUri),
 				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond),
 			};
+			version = Assembly.GetExecutingAssembly().GetName().Version;
 		}
 
 		private async Task<T> Post<T, TBody>(string path, TBody body, bool allowAuth = true) {
@@ -68,7 +71,7 @@ namespace LMUSessionTracker.Core.Http {
 		}
 
 		private async Task<bool> Authenticate() {
-			return await Post<bool, string>("api/Data/Authenticate", Convert.ToBase64String(signingKey.Key.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), false);
+			return await Post<bool, ProtocolCredential>("api/Data/Authenticate", new ProtocolCredential(signingKey.Key.PublicKey, version), false);
 		}
 
 		public async Task<ProtocolStatus> Send(ProtocolMessage data) {

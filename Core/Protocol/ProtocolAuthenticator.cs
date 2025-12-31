@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Core.Protocol {
 	public interface ProtocolAuthenticator {
 		public Task<bool?> Verify(HttpRequest request, ProtocolMessage data);
-		public Task<bool> Authenticate(HttpRequest request, string encodedPublicKey);
+		public Task<bool> Authenticate(HttpRequest request, ProtocolCredential credential);
 	}
 
 	public class DefaultProtocolAuthenticator : ProtocolAuthenticator {
@@ -34,20 +34,20 @@ namespace LMUSessionTracker.Core.Protocol {
 			}
 		}
 
-		public async Task<bool> Authenticate(HttpRequest request, string encodedPublicKey) {
+		public async Task<bool> Authenticate(HttpRequest request, ProtocolCredential credential) {
 			try {
 				string signatureHeader = request.Headers["X-Signature"];
-				byte[] publicKeyBytes = Convert.FromBase64String(encodedPublicKey);
-				PublicKey publicKey = PublicKey.Import(algorithm, publicKeyBytes, KeyBlobFormat.PkixPublicKeyText);
+				(byte[] publicKeyBytes, PublicKey publicKey) = credential.Decode(algorithm);
 				byte[] body = await CopyBody(request);
 				if(algorithm.Verify(publicKey, body, Convert.FromBase64String(signatureHeader))) {
 					string hash = Convert.ToBase64String(HashAlgorithm.Sha256.Hash(publicKeyBytes));
 					clientKeys.TryAdd(hash, publicKey);
+					logger.LogInformation($"Authentication successful for client {hash} version {credential.Version}");
 					return true;
 				} else
 					return false;
 			} catch(Exception e) {
-				logger.LogError(e, $"Authentication failed for {encodedPublicKey}");
+				logger.LogError(e, $"Authentication failed for {credential.EncodedPublicKey}");
 				return false;
 			}
 		}

@@ -31,10 +31,10 @@ namespace LMUSessionTracker.Server.Controllers {
 		}
 
 		[HttpPost("{action}")]
-		public async Task<IActionResult> Authenticate([FromBody] string encodedPublicKey) {
+		public async Task<IActionResult> Authenticate([FromBody] ProtocolCredential credential) {
 			if(!ModelState.IsValid)
 				return BadRequest();
-			return Ok(await authenticator.Authenticate(Request, encodedPublicKey));
+			return Ok(await authenticator.Authenticate(Request, credential));
 		}
 	}
 }
