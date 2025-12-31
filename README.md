@@ -2,9 +2,16 @@
 
 LMUSessionTracker is a distributed system that tracks live sessions in Le Mans Ultimate (LMU).
 Without a dedicated server and with the growing significance of official endurance events,
-it is important to have a system with game clients as the ones providing data for something
-that was formerly ubiquitous to self-hosted game servers.
-This is more than just live timing, this is a collaborative means for the aggregation and display of session data.
+there is a need for a system that uses game clients to provide data for something
+that was once ubiquitous to self-hosted game servers.
+LMUSessionTracker is more than just live timing, it is a collaborative means for the aggregation and display of session data.
+
+This repo contains a [client](#client) and a [server](#server).
+
+> [!WARNING]
+> This project is under active development and may change significantly between `0.x` releases
+
+### Goal
 
 The objective of this project is to achieve a unified and consistent view of live team endurance races.
 To achieve this, each member of a team can run the client which will send session data to the server.
@@ -13,13 +20,14 @@ as long as one exists, data will continue to be collected uninterrupted.
 
 ## Client
 
-The client is intended for those playing the game, wether you're driving or spectating.
+The client is intended for those playing the game, whether you're driving or spectating.
 It acquires data from the LMU REST API and simply sends it to an LMUSessionTracker server.
 
 ### Prerequisites
 
 * 64-bit Windows 10 or 11
 * Le Mans Ultimate V1.2+
+* A recent version of the Microsoft Visual C++ 2015-2022 (v14) Redistributable (required by LMU anyway)
 * Compatible LMUSessionTracker server to connect to
 
 ### Setup
@@ -63,7 +71,7 @@ See [HOSTING.md](HOSTING.md) for more information.
 
 * Online
 	* Daily/Weekly/Special Events: supported
-	* Practice sessions: supported (single client only)
+	* Practice sessions: supported
 	* Hosted: untested
 	* Championships: untested
 * Offline
