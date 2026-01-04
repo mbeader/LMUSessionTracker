@@ -18,6 +18,19 @@ To achieve this, each member of a team can run the client which will send sessio
 Regardless of any members role or whether they are currently connected to the server,
 as long as one exists, data will continue to be collected uninterrupted.
 
+## Features
+
+* Unified view of active sessions
+	* Live session conditions
+	* Live timing
+	* Tracking lap times
+	* Multiplayer event resilience
+		* Identification of clients connected to the same session
+			* Whether as drivers or race engineers on the same team or competing teams
+		* Continuous data collection when a client leaves a session where other clients were present
+* Historical view of old sessions
+	* Lap times for each car
+
 ## Client
 
 The client is intended for those playing the game, whether you're driving or spectating.
@@ -83,3 +96,13 @@ See [HOSTING.md](HOSTING.md) for more information.
 Since the client uses the REST API, LMU updates are likely to break things.
 The expected JSON schema is found in `Core/Json/Schema`.
 Validation can be enabled via appsettings to log violations.
+
+### Known issues
+
+* Game API responses
+	* Fuel for the player car is almost always reported by the game as 100%
+	* Some fields may not be updated in realtime, unclear when they actually do
+	* Sectors may have no time despite the lap still being valid
+* Session tracking
+	* During session transitions, the phase changing before the session type may cause an empty new session to be created
+	* When a client already exists in a session, another client joining the server may not match its state by the time it starts sending data
