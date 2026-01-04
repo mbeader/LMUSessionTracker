@@ -53,7 +53,8 @@ namespace LMUSessionTracker.Server {
 					ClientId = ClientId.LoadOrCreate(clientOptions.PrivateKeyFile),
 					OverrideInterval = clientOptions.UseReplay,
 					Interval = clientConfig.GetSection("Replay")?.GetValue<int>("Interval"),
-					DebugMode = clientOptions.DebugMode
+					DebugMode = clientOptions.DebugMode,
+					TraceLogging = clientOptions.TraceLogging
 				};
 				builder.Services.AddClient(clientInfo, clientOptions);
 			}

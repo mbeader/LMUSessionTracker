@@ -6,5 +6,6 @@ namespace LMUSessionTracker.Core {
 		public bool OverrideInterval { get; init; }
 		public int? Interval { get; init; }
 		public bool DebugMode { get; init; }
+		public bool TraceLogging { get; init; }
 	}
 }

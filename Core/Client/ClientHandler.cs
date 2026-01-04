@@ -28,6 +28,8 @@ namespace LMUSessionTracker.Core.Client {
 		private string lastMultiStintState;
 		private string lastLongState;
 		private int lastLongStateCount;
+		private string lastPhase;
+		private int lastPhaseCount;
 
 		public ClientState State => state;
 		public ProtocolRole Role => role;
@@ -51,15 +53,23 @@ namespace LMUSessionTracker.Core.Client {
 				lastMultiStintState = message.GameState?.MultiStintState;
 			}
 
-			if(client.DebugMode) {
+			if(client.TraceLogging) {
 				string currLongState = $"{(message.SessionInfo != null ? "S" : " ")}{(message.MultiplayerJoinState != null ? "M" : " ")}{(message.GameState != null ? "G" : " ")} " +
 				$"{message.SessionInfo?.session} {message.MultiplayerJoinState} {message.GameState?.MultiStintState}";
 				if(lastLongState != currLongState) {
-					logger.LogDebug($"{(lastLongStateCount > 999 ? 999 : lastLongStateCount):000} {currLongState}");
+					logger.LogTrace($"{(lastLongStateCount > 999 ? 999 : lastLongStateCount):000} {currLongState}");
 					lastLongState = currLongState;
 					lastLongStateCount = 1;
 				} else
 					lastLongStateCount++;
+				int? phase = message.SessionInfo?.gamePhase;
+				string currPhase = $"Phase [{(phase.HasValue ? phase >= 0 && phase <= 9 ? Enum.GetName((GamePhase)phase.Value) : phase.Value : "")} {message.GameState?.gamePhase}]";
+				if(lastPhase != currPhase) {
+					logger.LogTrace($"{(lastPhaseCount > 999 ? 999 : lastPhaseCount):000} {currPhase}");
+					lastPhase = currPhase;
+					lastPhaseCount = 1;
+				} else
+					lastPhaseCount++;
 			}
 
 			if(message.GameState == null || (
