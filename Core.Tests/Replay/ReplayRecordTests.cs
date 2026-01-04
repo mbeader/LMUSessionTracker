@@ -84,7 +84,7 @@ namespace LMUSessionTracker.Core.Tests.Replay {
 			OrderedStringRecord record = String(null);
 			Assert.Equal(1, record.NullCount);
 			Assert.Empty(record.Frequency);
-			Assert.Equivalent(new List<string>() { null }, record.Order);
+			Assert.Equivalent(new List<OrderedItem<string>>() { new(null, 1) }, record.Order);
 		}
 
 		[Fact]
@@ -93,7 +93,7 @@ namespace LMUSessionTracker.Core.Tests.Replay {
 			record.Add(null);
 			Assert.Equal(2, record.NullCount);
 			Assert.Empty(record.Frequency);
-			Assert.Equivalent(new List<string>() { null }, record.Order);
+			Assert.Equivalent(new List<OrderedItem<string>>() { new(null, 2) }, record.Order);
 		}
 
 		[Fact]
@@ -101,7 +101,7 @@ namespace LMUSessionTracker.Core.Tests.Replay {
 			OrderedStringRecord record = String("a");
 			Assert.Equal(0, record.NullCount);
 			Assert.Equivalent(new Dictionary<string, int>() { { "a", 1 } }, record.Frequency);
-			Assert.Equivalent(new List<string>() { "a" }, record.Order);
+			Assert.Equivalent(new List<OrderedItem<string>>() { new("a", 1) }, record.Order);
 		}
 
 		[Fact]
@@ -110,7 +110,7 @@ namespace LMUSessionTracker.Core.Tests.Replay {
 			record.Add("a");
 			Assert.Equal(0, record.NullCount);
 			Assert.Equivalent(new Dictionary<string, int>() { { "a", 2 } }, record.Frequency);
-			Assert.Equivalent(new List<string>() { "a" }, record.Order);
+			Assert.Equivalent(new List<OrderedItem<string>>() { new("a", 2) }, record.Order);
 		}
 
 		[Fact]
@@ -119,7 +119,7 @@ namespace LMUSessionTracker.Core.Tests.Replay {
 			record.Add("b");
 			Assert.Equal(0, record.NullCount);
 			Assert.Equivalent(new Dictionary<string, int>() { { "a", 1 }, { "b", 1 } }, record.Frequency);
-			Assert.Equivalent(new List<string>() { "a", "b" }, record.Order);
+			Assert.Equivalent(new List<OrderedItem<string>>() { new("a", 1), new("b", 1) }, record.Order);
 		}
 	}
 }

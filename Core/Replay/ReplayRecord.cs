@@ -27,12 +27,25 @@ namespace LMUSessionTracker.Core.Replay {
 	}
 
 	public abstract class OrderedEnumerableRecord<T> : EnumerableRecord<T> {
-		public List<T> Order { get; } = new List<T>();
+		public List<OrderedItem<T>> Order { get; } = new List<OrderedItem<T>>();
 
 		public override void Add(T value) {
 			base.Add(value);
-			if(Order.Count == 0 || (Order[^1] == null && value != null) || (Order[^1] != null && !Order[^1].Equals(value)))
-				Order.Add(value);
+			if(Order.Count == 0 || (Order[^1].Value == null && value != null) || (Order[^1].Value != null && !Order[^1].Value.Equals(value)))
+				Order.Add(new OrderedItem<T>(value));
+			Order[^1].Count++;
+		}
+	}
+
+	public class OrderedItem<T> {
+		public T Value { get; set; }
+		public int Count { get; set; }
+
+		public OrderedItem() { }
+
+		public OrderedItem(T value, int count = 0) {
+			Value = value;
+			Count = count;
 		}
 	}
 
@@ -42,7 +55,7 @@ namespace LMUSessionTracker.Core.Replay {
 	public class OrderedStringRecord : OrderedEnumerableRecord<string> {
 	}
 
-	public abstract class DiscreteRecord<T> : EnumerableRecord<T?> where T : struct, IBinaryInteger<T> {
+	public abstract class DiscreteRecord<T> : OrderedEnumerableRecord<T?> where T : struct, IBinaryInteger<T> {
 	}
 
 	public abstract class NumericRecord<T> : ReplayRecord<T?> where T : struct, INumber<T> {
