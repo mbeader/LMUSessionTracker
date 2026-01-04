@@ -180,6 +180,8 @@ namespace LMUSessionTracker.Core.Tracking {
 				logger.LogInformation($"Client {client.ClientId} joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
 			else
 				logger.LogInformation($"Client {client.ClientId} transitioned from session {data.SessionId} to session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
+			int? phase = data.SessionInfo?.gamePhase;
+			logger.LogDebug($"Client {client.ClientId} created new session in phase [{(phase.HasValue ? phase >= 0 && phase <= 9 ? Enum.GetName((LMU.GamePhase)phase.Value) : phase.Value : "")} {data.GameState?.gamePhase}]");
 			return session;
 		}
 
