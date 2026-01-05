@@ -46,8 +46,10 @@ namespace LMUSessionTracker.Server {
 			builder.Services.AddSingleton<DateTimeProvider, DefaultDateTimeProvider>();
 			builder.Services.AddSingleton<UuidVersion7Provider, DefaultUuidVersion7Provider>();
 			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled))) {
-				NewtonsoftSchemaValidator.LoadJsonSchemas();
-				builder.Services.AddScoped<SchemaValidator, NewtonsoftSchemaValidator>();
+				//NewtonsoftSchemaValidator.LoadJsonSchemas();
+				//builder.Services.AddScoped<SchemaValidator, NewtonsoftSchemaValidator>();
+				SystemTextJsonSchemaValidator.LoadJsonSchemas();
+				builder.Services.AddScoped<SchemaValidator, SystemTextJsonSchemaValidator>();
 			}
 			if(serverOptions.UseLocalClient) {
 				ClientInfo clientInfo = new ClientInfo() {

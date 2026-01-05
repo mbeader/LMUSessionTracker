@@ -1,4 +1,5 @@
 {
+	"$id": "StandingsHistory",
 	"type": "object",
 	"patternProperties": {
 		"^[0-9]+$": {

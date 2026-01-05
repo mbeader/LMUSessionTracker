@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace LMUSessionTracker.Core.LMU {
 	public class GameState {
-		[JsonProperty("MultiStintState")]
+		[JsonPropertyName("MultiStintState")]
 		public string MultiStintState { get; set; }
-		[JsonProperty("PitEntryDist")]
+		[JsonPropertyName("PitEntryDist")]
 		public double? PitEntryDist { get; set; }
-		[JsonProperty("PitState")]
+		[JsonPropertyName("PitState")]
 		public string PitState { get; set; }
 		public WeatherNode closeestWeatherNode { get; set; }
 		public string gamePhase { get; set; }

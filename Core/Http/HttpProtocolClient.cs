@@ -1,7 +1,6 @@
 ﻿using LMUSessionTracker.Core.Protocol;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using NSec.Cryptography;
 using System;
 using System.Net;
@@ -9,6 +8,7 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Http {
@@ -19,6 +19,7 @@ namespace LMUSessionTracker.Core.Http {
 		private readonly ProtocolSigningKey signingKey;
 		private readonly ProtocolClientOptions options;
 		private readonly Version version;
+		private readonly JsonSerializerOptions serializerOptions;
 
 		public HttpProtocolClient(ILogger<HttpProtocolClient> logger, ProtocolSigningKey signingKey, IOptions<ProtocolClientOptions> options = null) {
 			this.logger = logger;
@@ -29,11 +30,12 @@ namespace LMUSessionTracker.Core.Http {
 				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond),
 			};
 			version = Assembly.GetExecutingAssembly().GetName().Version;
+			serializerOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 		}
 
 		private async Task<T> Post<T, TBody>(string path, TBody body, bool allowAuth = true) {
 			try {
-				string json = JsonConvert.SerializeObject(body);
+				string json = JsonSerializer.Serialize(body);
 				HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, path);
 				req.Content = new StringContent(json, Encoding.UTF8, "application/json");
 				string signatureHeader = Convert.ToBase64String(algorithm.Sign(signingKey.Key, Encoding.UTF8.GetBytes(json)));
@@ -54,7 +56,7 @@ namespace LMUSessionTracker.Core.Http {
 				if(res.StatusCode == HttpStatusCode.OK && res.Content != null) {
 					string content = await res.Content.ReadAsStringAsync();
 					if(!string.IsNullOrEmpty(content)) {
-						T result = JsonConvert.DeserializeObject<T>(content);
+						T result = JsonSerializer.Deserialize<T>(content, serializerOptions);
 						return result;
 					}
 				}

@@ -2,13 +2,13 @@
 using LMUSessionTracker.Core.LMU;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Http {
@@ -17,7 +17,7 @@ namespace LMUSessionTracker.Core.Http {
 		private readonly ILogger<HttpLMUClient> logger;
 		private readonly SchemaValidator schemaValidator;
 		private readonly LMUClientOptions options;
-		private readonly JsonSerializerSettings serializerSettings;
+		private readonly JsonSerializerOptions serializerOptions;
 		private readonly string logPath;
 		private string contextId = null;
 		//private readonly ConcurrentDictionary<string, object> objContext = new ConcurrentDictionary<string, object>();
@@ -31,8 +31,8 @@ namespace LMUSessionTracker.Core.Http {
 				BaseAddress = new Uri(this.options.BaseUri),
 				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond)
 			};
-			serializerSettings = new JsonSerializerSettings();
-			//serializerSettings.Converters.Add(new TeamStrategyConverter());
+			serializerOptions = new JsonSerializerOptions();
+			serializerOptions.Converters.Add(new TeamStrategyConverter());
 			if(this.options.LogResponses && string.IsNullOrEmpty(this.options.LogDirectory))
 				throw new Exception("Directory for response logging must be specified");
 			logPath = Path.GetFullPath(this.options.LogDirectory);
@@ -46,7 +46,7 @@ namespace LMUSessionTracker.Core.Http {
 					if(options.LogResponses)
 						rawContext.TryAdd(path, body);
 					if(!string.IsNullOrEmpty(body)) {
-						T result = JsonConvert.DeserializeObject<T>(body, serializerSettings);
+						T result = JsonSerializer.Deserialize<T>(body, serializerOptions);
 						if(result != null && options.ValidateResponses && schemaValidator != null)
 							schemaValidator.Validate(body, typeof(T));
 						//if(options.LogResponses)
@@ -70,7 +70,7 @@ namespace LMUSessionTracker.Core.Http {
 			try {
 				if(!Directory.Exists(logPath))
 					Directory.CreateDirectory(logPath);
-				string json = JsonConvert.SerializeObject(response, serializerSettings);
+				string json = JsonSerializer.Serialize(response, serializerOptions);
 				File.WriteAllText(Path.Join(logPath, $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}{path.Replace("/", "_")}.json"), json);
 			} catch(Exception e) {
 				logger.LogWarning(e, "Failed to write request debug file");
@@ -83,8 +83,8 @@ namespace LMUSessionTracker.Core.Http {
 			try {
 				if(!Directory.Exists(logPath))
 					Directory.CreateDirectory(logPath);
-				//File.WriteAllText(Path.Join(logPath, $"{contextId}-obj.json"), JsonConvert.SerializeObject(objContext, Formatting.Indented, serializerSettings));
-				File.WriteAllText(Path.Join(logPath, $"{contextId}-raw.json"), JsonConvert.SerializeObject(rawContext, serializerSettings));
+				//File.WriteAllText(Path.Join(logPath, $"{contextId}-obj.json"), JsonSerializer.Serialize(objContext, new JsonSerializerOptions(serializerOptions) { WriteIndented = true }));
+				File.WriteAllText(Path.Join(logPath, $"{contextId}-raw.json"), JsonSerializer.Serialize(rawContext, serializerOptions));
 			} catch(Exception e) {
 				logger.LogWarning(e, "Failed to write request debug file");
 			}

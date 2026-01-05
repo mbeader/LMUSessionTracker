@@ -1,22 +1,22 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace LMUSessionTracker.Core.LMU {
 	public class WeatherNode {
-		[JsonProperty("Duration")]
+		[JsonPropertyName("Duration")]
 		public int Duration { get; set; }
-		[JsonProperty("Humidity")]
+		[JsonPropertyName("Humidity")]
 		public int Humidity { get; set; }
-		[JsonProperty("RainChance")]
+		[JsonPropertyName("RainChance")]
 		public int RainChance { get; set; }
-		[JsonProperty("Sky")]
+		[JsonPropertyName("Sky")]
 		public int Sky { get; set; }
-		[JsonProperty("StartTime")]
+		[JsonPropertyName("StartTime")]
 		public int StartTime { get; set; }
-		[JsonProperty("Temperature")]
+		[JsonPropertyName("Temperature")]
 		public int Temperature { get; set; }
-		[JsonProperty("WindDirection")]
+		[JsonPropertyName("WindDirection")]
 		public int WindDirection { get; set; }
-		[JsonProperty("WindSpeed")]
+		[JsonPropertyName("WindSpeed")]
 		public int WindSpeed { get; set; }
 	}
 }

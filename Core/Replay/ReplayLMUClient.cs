@@ -3,10 +3,10 @@ using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -17,7 +17,7 @@ namespace LMUSessionTracker.Core.Replay {
 		private readonly ReplayOptions options;
 		private readonly SchemaValidator schemaValidator;
 		private readonly ContinueProviderSource continueProviderSource;
-		private readonly JsonSerializerSettings serializerSettings;
+		private readonly JsonSerializerOptions serializerOptions;
 		private readonly string path;
 		private readonly Queue<string> runQueue;
 		private Dictionary<string, string> context;
@@ -36,8 +36,8 @@ namespace LMUSessionTracker.Core.Replay {
 			if(!Directory.Exists(path))
 				throw new Exception($"Replay directory does not exist: {path}");
 			runQueue = LoadDirectory(path);
-			serializerSettings = new JsonSerializerSettings();
-			//serializerSettings.Converters.Add(new TeamStrategyConverter());
+			serializerOptions = new JsonSerializerOptions();
+			serializerOptions.Converters.Add(new TeamStrategyConverter());
 			logger.LogInformation($"Found {runQueue.Count} runs to replay");
 		}
 
@@ -62,7 +62,7 @@ namespace LMUSessionTracker.Core.Replay {
 			try {
 				string body = GetContent(path);
 				if(!string.IsNullOrEmpty(body)) {
-					T result = JsonConvert.DeserializeObject<T>(body, serializerSettings);
+					T result = JsonSerializer.Deserialize<T>(body, serializerOptions);
 					if(result != null && options.ValidateResponses && schemaValidator != null) {
 						string runId = Path.GetFileName(ContextId)[..17];
 						schemaValidator.Validate(body, typeof(T), runId);
@@ -81,10 +81,8 @@ namespace LMUSessionTracker.Core.Replay {
 				ResetContext();
 			}
 			if(runQueue.TryDequeue(out string filename)) {
-				JsonSerializer serializer = new JsonSerializer();
-				using(StreamReader file = File.OpenText(filename))
-				using(JsonTextReader reader = new JsonTextReader(file)) {
-					context = serializer.Deserialize<Dictionary<string, string>>(reader);
+				using(FileStream stream = File.OpenRead(filename)) {
+					context = JsonSerializer.Deserialize<Dictionary<string, string>>(stream);
 					ContextId = filename;
 				}
 			} else

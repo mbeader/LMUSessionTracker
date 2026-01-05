@@ -33,8 +33,8 @@ namespace LMUSessionTracker.Client {
 
 			builder.Services.AddSingleton<DateTimeProvider, DefaultDateTimeProvider>();
 			if(builder.Configuration.GetSection("SchemaValidation").GetValue<bool>(nameof(SchemaValidatorOptions.Enabled))) {
-				//NewtonsoftSchemaValidator.LoadJsonSchemas();
-				//builder.Services.AddScoped<SchemaValidator, NewtonsoftSchemaValidator>();
+				SystemTextJsonSchemaValidator.LoadJsonSchemas();
+				builder.Services.AddScoped<SchemaValidator, SystemTextJsonSchemaValidator>();
 			}
 			ClientInfo clientInfo = new ClientInfo() {
 				ClientId = ClientId.LoadOrCreate(clientOptions.PrivateKeyFile),
