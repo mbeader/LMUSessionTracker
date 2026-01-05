@@ -12,7 +12,7 @@ using System.IO;
 using System.Text;
 
 namespace LMUSessionTracker.Core.Json {
-	public static class SchemaValidation {
+	public class NewtonsoftSchemaValidator : SchemaValidator {
 		private static readonly string filenameformat = "schema-{0}.json";
 		private static readonly List<Type> types = new List<Type>() {
 			typeof(Standing[]),
@@ -113,18 +113,16 @@ namespace LMUSessionTracker.Core.Json {
 			}
 		}
 
-		public class Validator : SchemaValidator {
-			private readonly ILogger<Validator> logger;
-			private readonly SchemaValidatorOptions options;
+		private readonly ILogger<NewtonsoftSchemaValidator> logger;
+		private readonly SchemaValidatorOptions options;
 
-			public Validator(ILogger<Validator> logger, IOptions<SchemaValidatorOptions> options = null) {
-				this.logger = logger;
-				this.options = options?.Value ?? new SchemaValidatorOptions();
-			}
+		public NewtonsoftSchemaValidator(ILogger<NewtonsoftSchemaValidator> logger, IOptions<SchemaValidatorOptions> options = null) {
+			this.logger = logger;
+			this.options = options?.Value ?? new SchemaValidatorOptions();
+		}
 
-			public bool Validate(string json, Type type, string id = null) {
-				return SchemaValidation.Validate(json, type, id, logger);
-			}
+		public bool Validate(string json, Type type, string id = null) {
+			return Validate(json, type, id, logger);
 		}
 	}
 }
