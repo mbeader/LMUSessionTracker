@@ -37,7 +37,7 @@ namespace LMUSessionTracker.Core.Replay {
 				throw new Exception($"Replay directory does not exist: {path}");
 			runQueue = LoadDirectory(path);
 			serializerSettings = new JsonSerializerSettings();
-			serializerSettings.Converters.Add(new TeamStrategyConverter());
+			//serializerSettings.Converters.Add(new TeamStrategyConverter());
 			logger.LogInformation($"Found {runQueue.Count} runs to replay");
 		}
 

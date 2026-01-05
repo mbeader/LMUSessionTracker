@@ -1,4 +1,5 @@
-﻿using LMUSessionTracker.Core.LMU;
+﻿using LMUSessionTracker.Core.Json;
+using LMUSessionTracker.Core.LMU;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -11,7 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace LMUSessionTracker.Core.Json {
+namespace LMUSessionTracker.Server.Json {
 	public class NewtonsoftSchemaValidator : SchemaValidator {
 		private static readonly string filenameformat = "schema-{0}.json";
 		private static readonly List<Type> types = new List<Type>() {

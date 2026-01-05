@@ -4,8 +4,8 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
-namespace LMUSessionTracker.Core.Json {
-	public class TeamStrategyConverter : JsonConverter<TeamStrategy> {
+namespace LMUSessionTracker.Server.Json {
+	public class TeamStrategyNewtonsoftConverter : JsonConverter<TeamStrategy> {
 		public override TeamStrategy ReadJson(JsonReader reader, Type objectType, TeamStrategy existingValue, bool hasExistingValue, JsonSerializer serializer) {
 			TeamStrategy res = new TeamStrategy() { Strategy = new List<Strategy>() };
 			JToken token = JToken.ReadFrom(reader);

@@ -32,7 +32,7 @@ namespace LMUSessionTracker.Core.Http {
 				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond)
 			};
 			serializerSettings = new JsonSerializerSettings();
-			serializerSettings.Converters.Add(new TeamStrategyConverter());
+			//serializerSettings.Converters.Add(new TeamStrategyConverter());
 			if(this.options.LogResponses && string.IsNullOrEmpty(this.options.LogDirectory))
 				throw new Exception("Directory for response logging must be specified");
 			logPath = Path.GetFullPath(this.options.LogDirectory);
