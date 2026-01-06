@@ -31,7 +31,9 @@ namespace LMUSessionTracker.Core.Http {
 				BaseAddress = new Uri(this.options.BaseUri),
 				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond)
 			};
-			serializerOptions = new JsonSerializerOptions();
+			serializerOptions = new JsonSerializerOptions(SourceGenerationContext.Default.Options) {
+				TypeInfoResolver = SourceGenerationContext.Default
+			};
 			serializerOptions.Converters.Add(new TeamStrategyConverter());
 			if(this.options.LogResponses && string.IsNullOrEmpty(this.options.LogDirectory))
 				throw new Exception("Directory for response logging must be specified");
@@ -46,7 +48,7 @@ namespace LMUSessionTracker.Core.Http {
 					if(options.LogResponses)
 						rawContext.TryAdd(path, body);
 					if(!string.IsNullOrEmpty(body)) {
-						T result = JsonSerializer.Deserialize<T>(body, serializerOptions);
+						T result = (T)JsonSerializer.Deserialize(body, serializerOptions.GetTypeInfo(typeof(T)));
 						if(result != null && options.ValidateResponses && schemaValidator != null)
 							schemaValidator.Validate(body, typeof(T));
 						//if(options.LogResponses)
@@ -70,7 +72,7 @@ namespace LMUSessionTracker.Core.Http {
 			try {
 				if(!Directory.Exists(logPath))
 					Directory.CreateDirectory(logPath);
-				string json = JsonSerializer.Serialize(response, serializerOptions);
+				string json = JsonSerializer.Serialize(response, serializerOptions.GetTypeInfo(typeof(T)));
 				File.WriteAllText(Path.Join(logPath, $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}{path.Replace("/", "_")}.json"), json);
 			} catch(Exception e) {
 				logger.LogWarning(e, "Failed to write request debug file");
@@ -84,7 +86,7 @@ namespace LMUSessionTracker.Core.Http {
 				if(!Directory.Exists(logPath))
 					Directory.CreateDirectory(logPath);
 				//File.WriteAllText(Path.Join(logPath, $"{contextId}-obj.json"), JsonSerializer.Serialize(objContext, new JsonSerializerOptions(serializerOptions) { WriteIndented = true }));
-				File.WriteAllText(Path.Join(logPath, $"{contextId}-raw.json"), JsonSerializer.Serialize(rawContext, serializerOptions));
+				File.WriteAllText(Path.Join(logPath, $"{contextId}-raw.json"), JsonSerializer.Serialize(rawContext, serializerOptions.GetTypeInfo(rawContext.GetType())));
 			} catch(Exception e) {
 				logger.LogWarning(e, "Failed to write request debug file");
 			}

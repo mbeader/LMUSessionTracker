@@ -16,7 +16,7 @@ namespace LMUSessionTracker.Core.Json {
 					reader.Read();
 					while(reader.TokenType != JsonTokenType.EndArray) {
 						if(reader.TokenType == JsonTokenType.StartObject) {
-							Strategy strategy = JsonDocument.ParseValue(ref reader).Deserialize<Strategy>(options);
+							Strategy strategy = (Strategy)JsonDocument.ParseValue(ref reader).Deserialize(options.GetTypeInfo(typeof(Strategy)));
 							if(strategy == null)
 								throw new Exception("Failed to deserialize strategy");
 							res.Strategy.Add(strategy);
@@ -33,7 +33,7 @@ namespace LMUSessionTracker.Core.Json {
 			writer.WriteStartArray();
 			writer.WriteStringValue(value.Name);
 			writer.WriteStartArray();
-			JsonSerializer.Serialize(writer, value, typeof(TeamStrategy), options);
+			JsonSerializer.Serialize(writer, value, options.GetTypeInfo(typeof(TeamStrategy)));
 			writer.WriteEndArray();
 			writer.WriteEndArray();
 		}

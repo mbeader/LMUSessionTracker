@@ -36,7 +36,9 @@ namespace LMUSessionTracker.Core.Replay {
 			if(!Directory.Exists(path))
 				throw new Exception($"Replay directory does not exist: {path}");
 			runQueue = LoadDirectory(path);
-			serializerOptions = new JsonSerializerOptions();
+			serializerOptions = new JsonSerializerOptions(SourceGenerationContext.Default.Options) {
+				TypeInfoResolver = SourceGenerationContext.Default
+			};
 			serializerOptions.Converters.Add(new TeamStrategyConverter());
 			logger.LogInformation($"Found {runQueue.Count} runs to replay");
 		}
@@ -62,7 +64,7 @@ namespace LMUSessionTracker.Core.Replay {
 			try {
 				string body = GetContent(path);
 				if(!string.IsNullOrEmpty(body)) {
-					T result = JsonSerializer.Deserialize<T>(body, serializerOptions);
+					T result = (T)JsonSerializer.Deserialize(body, serializerOptions.GetTypeInfo(typeof(T)));
 					if(result != null && options.ValidateResponses && schemaValidator != null) {
 						string runId = Path.GetFileName(ContextId)[..17];
 						schemaValidator.Validate(body, typeof(T), runId);
@@ -82,7 +84,7 @@ namespace LMUSessionTracker.Core.Replay {
 			}
 			if(runQueue.TryDequeue(out string filename)) {
 				using(FileStream stream = File.OpenRead(filename)) {
-					context = JsonSerializer.Deserialize<Dictionary<string, string>>(stream);
+					context = (Dictionary<string, string>)JsonSerializer.Deserialize(stream, serializerOptions.GetTypeInfo(typeof(Dictionary<string, string>)));
 					ContextId = filename;
 				}
 			} else

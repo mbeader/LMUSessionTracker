@@ -6,6 +6,11 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <RootNamespace>LMUSessionTracker.Core</RootNamespace>
     <AssemblyName>LMUSessionTracker.Core</AssemblyName>
+    <IsAotCompatible>true</IsAotCompatible>
+    <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
+    <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.Extensions.Configuration.Binder.SourceGeneration</InterceptorsNamespaces>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

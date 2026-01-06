@@ -36,10 +36,16 @@ namespace LMUSessionTracker.Client {
 				SystemTextJsonSchemaValidator.LoadJsonSchemas();
 				builder.Services.AddScoped<SchemaValidator, SystemTextJsonSchemaValidator>();
 			}
+			// reading replay interval config is separated due to trim warning
+			int? interval = null;
+			var replayConfig = clientConfig.GetSection("Replay");
+			if(replayConfig != null) {
+				interval = replayConfig.GetValue<int>("Interval");
+			}
 			ClientInfo clientInfo = new ClientInfo() {
 				ClientId = ClientId.LoadOrCreate(clientOptions.PrivateKeyFile),
 				OverrideInterval = clientOptions.UseReplay,
-				Interval = clientConfig.GetSection("Replay")?.GetValue<int>("Interval"),
+				Interval = interval,
 				DebugMode = clientOptions.DebugMode,
 				TraceLogging = clientOptions.TraceLogging
 			};

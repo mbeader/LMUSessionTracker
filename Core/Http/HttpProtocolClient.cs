@@ -1,4 +1,5 @@
-﻿using LMUSessionTracker.Core.Protocol;
+﻿using LMUSessionTracker.Core.Json;
+using LMUSessionTracker.Core.Protocol;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSec.Cryptography;
@@ -30,12 +31,15 @@ namespace LMUSessionTracker.Core.Http {
 				Timeout = new TimeSpan(this.options.TimeoutSeconds * TimeSpan.TicksPerSecond),
 			};
 			version = Assembly.GetExecutingAssembly().GetName().Version;
-			serializerOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+			serializerOptions = new JsonSerializerOptions(SourceGenerationContext.Default.Options) {
+				TypeInfoResolver = SourceGenerationContext.Default,
+				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+			};
 		}
 
 		private async Task<T> Post<T, TBody>(string path, TBody body, bool allowAuth = true) {
 			try {
-				string json = JsonSerializer.Serialize(body);
+				string json = JsonSerializer.Serialize(body, serializerOptions.GetTypeInfo(typeof(TBody)));
 				HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, path);
 				req.Content = new StringContent(json, Encoding.UTF8, "application/json");
 				string signatureHeader = Convert.ToBase64String(algorithm.Sign(signingKey.Key, Encoding.UTF8.GetBytes(json)));
@@ -56,7 +60,7 @@ namespace LMUSessionTracker.Core.Http {
 				if(res.StatusCode == HttpStatusCode.OK && res.Content != null) {
 					string content = await res.Content.ReadAsStringAsync();
 					if(!string.IsNullOrEmpty(content)) {
-						T result = JsonSerializer.Deserialize<T>(content, serializerOptions);
+						T result = (T)JsonSerializer.Deserialize(content, serializerOptions.GetTypeInfo(typeof(T)));
 						return result;
 					}
 				}

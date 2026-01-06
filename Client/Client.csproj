@@ -7,6 +7,8 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <RootNamespace>LMUSessionTracker.Client</RootNamespace>
     <AssemblyName>LMUSessionTracker.Client</AssemblyName>
+    <PublishAot>true</PublishAot>
+    <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -68,6 +70,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
+    <TrimmerRootAssembly Include="Serilog.AspNetCore" />
+    <TrimmerRootAssembly Include="Serilog.Sinks.Console" />
+    <TrimmerRootAssembly Include="Serilog.Sinks.File" />
   </ItemGroup>
 
 </Project>

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -20,7 +21,10 @@ namespace LMUSessionTracker.Core.Services {
 		public ReplayClientService(ILogger<ResponseLoggerService> logger, IServiceProvider serviceProvider, DateTimeProvider dateTime, IOptions<ReplayOptions> options) : base(logger, serviceProvider, dateTime) {
 			this.options = options.Value ?? new ReplayOptions();
 			collection = new ReplayCollection();
-			serializerOptions = new JsonSerializerOptions() { WriteIndented = true };
+			serializerOptions = new JsonSerializerOptions(SourceGenerationContext.Default.Options) {
+				TypeInfoResolver = SourceGenerationContext.Default,
+				WriteIndented = true
+			};
 			serializerOptions.Converters.Add(new NullableDictionaryKeyConverter<int, int>());
 			serializerOptions.Converters.Add(new NullableDictionaryKeyConverter<uint, int>());
 			serializerOptions.Converters.Add(new NullableDictionaryKeyConverter<long, int>());
@@ -49,7 +53,7 @@ namespace LMUSessionTracker.Core.Services {
 			DateTime now = dateTime.UtcNow;
 			if((now - last).TotalSeconds >= 10.0) {
 				last = now;
-				logger.LogDebug($"Completed {completed} ({completed/((double)completed+lmuClient.Remaining):P0})");
+				logger.LogDebug($"Completed {completed} ({completed / ((double)completed + lmuClient.Remaining):P0})");
 			}
 			return lmuClient.Remaining > 0;
 		}
@@ -74,7 +78,8 @@ namespace LMUSessionTracker.Core.Services {
 			logger.LogInformation($"Replay finished with {completed} completed runs");
 			string dir = Path.Join("logs", "replay");
 			Directory.CreateDirectory(dir);
-			File.WriteAllText(Path.Join(dir, $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}-replay.json"), JsonSerializer.Serialize(collection.Build(), serializerOptions));
+			SortedDictionary<string, object> result = collection.Build();
+			File.WriteAllText(Path.Join(dir, $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}-replay.json"), JsonSerializer.Serialize(result, serializerOptions.GetTypeInfo(result.GetType())));
 			return Task.CompletedTask;
 		}
 	}

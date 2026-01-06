@@ -30,8 +30,15 @@ namespace LMUSessionTracker.Core.Json {
 		};
 		private static readonly Dictionary<string, JsonSchema> schemas = new Dictionary<string, JsonSchema>();
 		private static readonly Dictionary<string, JsonSchema> listSchemas = new Dictionary<string, JsonSchema>();
-		private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions() { WriteIndented = true };
+		private static readonly JsonSerializerOptions serializerOptions;
 		private static bool loaded = false;
+
+		static SystemTextJsonSchemaValidator() {
+			serializerOptions = new JsonSerializerOptions(SourceGenerationContext.Default.Options) {
+				TypeInfoResolver = SourceGenerationContext.Default,
+				WriteIndented = true
+			};
+		}
 
 		// TODO: figure out why JsonSchema.Net can't actually generate schemas
 		//public static void GenerateJsonSchema() {
@@ -92,7 +99,7 @@ namespace LMUSessionTracker.Core.Json {
 						i = ConcatError(sb, subresult, i);
 					}
 					sb.AppendLine();
-					sb.AppendLine(JsonSerializer.Serialize(obj.RootElement, serializerOptions));
+					sb.AppendLine(JsonSerializer.Serialize(obj.RootElement, serializerOptions.GetTypeInfo(typeof(JsonElement))));
 					string runId = id ?? DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
 					File.WriteAllText(Path.Join("logs", "schema", $"{runId}-invalid-{(isList ? $"{type.GenericTypeArguments[0].Name}[]" : type.Name)}.txt"), sb.ToString());
 				}
@@ -122,6 +129,7 @@ namespace LMUSessionTracker.Core.Json {
 		public SystemTextJsonSchemaValidator(ILogger<SystemTextJsonSchemaValidator> logger, IOptions<SchemaValidatorOptions> options = null) {
 			this.logger = logger;
 			this.options = options?.Value ?? new SchemaValidatorOptions();
+			Directory.CreateDirectory(Path.Join("logs", "schema"));
 		}
 
 		public bool Validate(string json, Type type, string id = null) {
