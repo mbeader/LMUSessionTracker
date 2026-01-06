@@ -8,7 +8,7 @@
           <Exclude></Exclude> 
           <Include>[LMUSessionTracker.Core]LMUSessionTracker.*,[LMUSessionTracker.Core.Tests]LMUSessionTracker.*</Include> 
           <ExcludeByAttribute></ExcludeByAttribute>
-          <ExcludeByFile></ExcludeByFile> 
+          <ExcludeByFile>**/*.g.cs</ExcludeByFile> 
           <IncludeDirectory></IncludeDirectory>
           <SingleHit>false</SingleHit>
           <UseSourceLink>false</UseSourceLink>
