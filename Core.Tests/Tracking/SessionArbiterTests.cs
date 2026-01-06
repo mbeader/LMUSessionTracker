@@ -48,6 +48,15 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public async Task Load_FinishedSession_Closes() {
+			Session session = Session.Create(SessionId(1), new() { gamePhase = (int)GamePhase.Checkered }, baseTimestamp, MultiplayerTeams());
+			managementRepo.Setup(x => x.GetSessions()).ReturnsAsync(new List<Session>() { session });
+			managementRepo.Setup(x => x.GetSession(SessionId(1))).ReturnsAsync(session);
+			await arbiter.Load();
+			managementRepo.Verify(x => x.CloseSession(SessionId(1)), Times.Once);
+		}
+
+		[Fact]
 		public async Task Receive_Null_Rejects() {
 			Assert.Equivalent(Status.Rejected(), await arbiter.Receive(null));
 		}

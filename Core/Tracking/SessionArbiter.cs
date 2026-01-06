@@ -281,6 +281,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			foreach(Session session in await managementRepo.GetSessions()) {
 				if(!session.Finished)
 					activeSessions.Add(session.SessionId, await managementRepo.GetSession(session.SessionId));
+				else if(!session.Closed) {
+					logger.LogInformation($"Closing completed session {session.SessionId}");
+					await managementRepo.CloseSession(session.SessionId);
+				}
 			}
 			logger.LogInformation($"Loaded {activeSessions.Count} sessions");
 			semaphore.Release();

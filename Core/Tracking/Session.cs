@@ -20,6 +20,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public DateTime Timestamp { get; private set; }
 		public DateTime LastUpdate { get; private set; }
 		public bool Finished { get; private set; }
+		public bool Closed { get; private set; }
 
 		private Session(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history) {
 			SessionId = sessionId;
@@ -125,6 +126,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public List<string> Close() {
 			Finished = true;
+			Closed = true;
 			List<string> clients = new List<string>();
 			if(PrimaryClientId != null)
 				clients.Add(PrimaryClientId);
