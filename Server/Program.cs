@@ -65,6 +65,7 @@ namespace LMUSessionTracker.Server {
 				builder.Services.AddSingleton<ProtocolServer, AutoRejectServer>();
 				builder.Services.AddScoped<SessionObserver, DefaultSessionObserver>();
 			} else {
+				builder.Services.AddSingleton<SessionLogger>();
 				builder.Services.AddSingleton<SessionArbiter>();
 				builder.Services.AddSingleton<ProtocolServer, SessionArbiter>(provider => provider.GetRequiredService<SessionArbiter>());
 				builder.Services.AddScoped<SessionObserver, SessionArbiterObserver>();

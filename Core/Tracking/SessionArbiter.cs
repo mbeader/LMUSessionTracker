@@ -14,16 +14,19 @@ namespace LMUSessionTracker.Core.Tracking {
 		private readonly ManagementRespository managementRepo;
 		private readonly DateTimeProvider dateTimeProvider;
 		private readonly UuidVersion7Provider uuidProvider;
+		private readonly SessionLogger sessionLogger;
 		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private readonly SortedDictionary<string, Session> activeSessions = new SortedDictionary<string, Session>();
 		private readonly SortedDictionary<string, Session> inactiveSessions = new SortedDictionary<string, Session>();
 		private readonly Dictionary<string, Client> clients = new Dictionary<string, Client>();
 
-		public SessionArbiter(ILogger<SessionArbiter> logger, ManagementRespository managementRepo, DateTimeProvider dateTimeProvider, UuidVersion7Provider uuidProvider) {
+		public SessionArbiter(ILogger<SessionArbiter> logger, ManagementRespository managementRepo, DateTimeProvider dateTimeProvider, UuidVersion7Provider uuidProvider,
+			SessionLogger sessionLogger) {
 			this.logger = logger;
 			this.managementRepo = managementRepo;
 			this.dateTimeProvider = dateTimeProvider;
 			this.uuidProvider = uuidProvider;
+			this.sessionLogger = sessionLogger;
 		}
 
 		public async Task<ProtocolStatus> Receive(ProtocolMessage data) {
@@ -185,6 +188,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				logger.LogInformation($"Client {client.ClientId} transitioned from session {data.SessionId} to session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
 			int? phase = data.SessionInfo?.gamePhase;
 			logger.LogDebug($"Client {client.ClientId} created new session in phase [{(phase.HasValue ? phase >= 0 && phase <= 9 ? Enum.GetName((LMU.GamePhase)phase.Value) : phase.Value : "")} {data.GameState?.gamePhase}]");
+			await sessionLogger.NewSession(session.SessionId, data);
 			return session;
 		}
 
