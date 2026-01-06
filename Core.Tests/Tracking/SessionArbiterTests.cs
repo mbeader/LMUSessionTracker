@@ -17,6 +17,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		private readonly SessionArbiter arbiter;
 		private string clientId = "t";
 		private string clientI2 = "q";
+		private string clientI3 = "z";
 		private byte sessionCount = 0;
 		private DateTime lastTimestamp = baseTimestamp;
 
@@ -253,6 +254,44 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public async Task Receive_MultiClientSameSessionPrimaryDisappears_PromotesAndDemotes() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedSecondary(1), await arbiter.Receive(new() { ClientId = clientI2, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 0, 11);
+			Assert.Equivalent(Status.Promoted(1), await arbiter.Receive(new() { ClientId = clientI2, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.Demoted(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientI2, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.AcceptedSecondary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
+		public async Task Receive_MultiClientSameSessionPrimaryDisappearsThenSecondary_PromotesAndDemotesTwice() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedSecondary(1), await arbiter.Receive(new() { ClientId = clientI2, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 0, 11);
+			Assert.Equivalent(Status.Promoted(1), await arbiter.Receive(new() { ClientId = clientI2, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.Demoted(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 0, 22);
+			Assert.Equivalent(Status.Promoted(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.Demoted(1), await arbiter.Receive(new() { ClientId = clientI2, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.AcceptedSecondary(1), await arbiter.Receive(new() { ClientId = clientI2, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
+		public async Task Receive_MultiClientSameSessionPrimaryDisappearsThreeClients_PromotesAndDemotes() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedSecondary(1), await arbiter.Receive(new() { ClientId = clientI2, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.ChangedSecondary(1), await arbiter.Receive(new() { ClientId = clientI3, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 0, 11);
+			Assert.Equivalent(Status.Promoted(1), await arbiter.Receive(new() { ClientId = clientI2, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.Demoted(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.AcceptedSecondary(1), await arbiter.Receive(new() { ClientId = clientI3, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientI2, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			Assert.Equivalent(Status.AcceptedSecondary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
 		public async Task Receive_SessionInactiveForLongerThanLimit_Prunes() {
 			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { trackName = "a" }, MultiplayerTeams = MultiplayerTeams() }));
 			Assert.Equivalent(Status.ChangedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { trackName = "b" }, MultiplayerTeams = MultiplayerTeams() }));
@@ -309,7 +348,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
-		public async Task Receive_SessionInactiveForLongerThanLimitWhileStillInPhase_Prunes() {
+		public async Task Receive_SessionInactiveForLongerThanLimitWhileAfterPhase_Prunes() {
 			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { trackName = "a", timeRemainingInGamePhase = 20*60 }, MultiplayerTeams = MultiplayerTeams() }));
 			lastTimestamp = baseTimestamp + new TimeSpan(0, 10, 1);
 			await arbiter.Prune(lastTimestamp);

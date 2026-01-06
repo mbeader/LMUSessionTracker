@@ -92,10 +92,11 @@ namespace LMUSessionTracker.Core.Tracking {
 				logger.LogInformation($"Client {client.ClientId} directly joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
 			}
 
-			if(inactiveSessions.Remove(session.SessionId)) {
+			if(!session.Finished && inactiveSessions.Remove(session.SessionId)) {
 				logger.LogInformation($"Session {session.SessionId} marked as active");
 			}
 
+			session.CheckForPromotion(client.ClientId, now);
 			bool? isPrimaryChange = session.AcknowledgeRole(client.ClientId);
 			if(isPrimaryChange.HasValue) {
 				if(isPrimaryChange.Value)

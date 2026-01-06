@@ -5,6 +5,8 @@ using System.Collections.Generic;
 namespace LMUSessionTracker.Core.Tracking {
 	public class Session {
 		private static readonly double fuzziness = 5;
+		private static readonly TimeSpan primarySwapLimit = new TimeSpan(0, 0, 10);
+		private DateTime lastPromotion;
 
 		public string SessionId { get; private set; }
 		public string PrimaryClientId { get; private set; }
@@ -90,15 +92,27 @@ namespace LMUSessionTracker.Core.Tracking {
 				RoleChanges.Add(clientId, isPrimary);
 		}
 
-		public void SwapPrimary() {
+		private void SwapPrimary(string clientId) {
 			if(SecondaryClientIds.Count == 0)
 				return;
+			int index = SecondaryClientIds.FindIndex(x => x == clientId);
 			string prevPrimary = PrimaryClientId;
-			PrimaryClientId = SecondaryClientIds[0];
-			SecondaryClientIds.RemoveAt(0);
+			PrimaryClientId = SecondaryClientIds[index];
+			SecondaryClientIds.RemoveAt(index);
 			SecondaryClientIds.Add(prevPrimary);
 			ChangeRole(prevPrimary, false);
 			ChangeRole(PrimaryClientId, true);
+		}
+
+		public void CheckForPromotion(string clientId, DateTime timestamp) {
+			bool isPrimary = IsPrimary(clientId);
+			bool isSecondary = !isPrimary && IsSecondary(clientId);
+			if(isPrimary || !isSecondary || RoleChanges.ContainsKey(clientId))
+				return;
+			if(timestamp - LastUpdate > primarySwapLimit && timestamp - lastPromotion > primarySwapLimit) {
+				SwapPrimary(clientId);
+				lastPromotion = timestamp;
+			}
 		}
 
 		public bool? AcknowledgeRole(string clientId) {
