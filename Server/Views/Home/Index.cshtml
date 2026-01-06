@@ -1,7 +1,7 @@
 @model IndexViewModel
 @{
-	ViewData["Title"] = "Sessions";
-	DateTime now = DateTime.UtcNow;
+    ViewData["Title"] = "Sessions";
+    DateTime now = DateTime.UtcNow;
 }
 
 <h3>Sessions</h3>
@@ -26,8 +26,8 @@
                     <td>@(session.Online ? "Online" : "Offline")</td>
                     <td>@session.Track</td>
                     <td>@session.Type</td>
-                    <td>@(session.Active && session.Phase >= 0 ? Format.Phase(session.Phase) : "")</td>
-                    <td>@(session.Active ? Format.Time(session.Remaining) : "Complete")</td>
+                    <td>@((session.Active || !session.Finished) && session.Phase >= 0 ? Format.Phase(session.Phase) : "")</td>
+                    <td>@(session.Active || !session.Finished ? Format.Time(session.Remaining) : "Complete")</td>
                     <td>@session.CarCount</td>
                     <td>@session.LapCount</td>
                     <td title="@Format.RelativeTimestamp(now, session.LastUpdate)">@(session.Active && session.Finished ? "Finished" : session.Active && session.ClientCount > 0 ? "Active" : session.Finished ? "Closed" : "Inactive")</td>
