@@ -297,6 +297,27 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public async Task Receive_SessionInactiveForLongerThanLimitWhileStillInPhase_Accepts() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { trackName = "a", timeRemainingInGamePhase = 30*60 }, MultiplayerTeams = MultiplayerTeams() }));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 10, 1);
+			await arbiter.Prune(lastTimestamp);
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 20, 1);
+			await arbiter.Prune(lastTimestamp);
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { trackName = "a", timeRemainingInGamePhase = 10*60 }, MultiplayerTeams = MultiplayerTeams() }));
+			Assert.NotNull(await arbiter.CloneSession(SessionId(1)));
+		}
+
+		[Fact]
+		public async Task Receive_SessionInactiveForLongerThanLimitWhileStillInPhase_Prunes() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { trackName = "a", timeRemainingInGamePhase = 20*60 }, MultiplayerTeams = MultiplayerTeams() }));
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 10, 1);
+			await arbiter.Prune(lastTimestamp);
+			lastTimestamp = baseTimestamp + new TimeSpan(0, 20, 1);
+			await arbiter.Prune(lastTimestamp);
+			Assert.Null(await arbiter.CloneSession(SessionId(1)));
+		}
+
+		[Fact]
 		public async Task Receive_JoinLoadedSession_Accepts() {
 			Session session = Session.Create(SessionId(1), new(), baseTimestamp, MultiplayerTeams());
 			managementRepo.Setup(x => x.GetSessions()).ReturnsAsync(new List<Session>() { session });

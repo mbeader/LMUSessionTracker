@@ -32,7 +32,6 @@ namespace LMUSessionTracker.Core.Tracking {
 				return Reject();
 			try {
 				await semaphore.WaitAsync();
-				//await Prune(now);
 				Client client;
 				if(!clients.TryGetValue(data.ClientId, out client)) {
 					client = new Client(data.ClientId);
@@ -88,6 +87,10 @@ namespace LMUSessionTracker.Core.Tracking {
 				bool isPrimary = session.RegisterClient(client.ClientId);
 				client.JoinSession(session, isPrimary);
 				logger.LogInformation($"Client {client.ClientId} directly joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
+			}
+
+			if(inactiveSessions.Remove(session.SessionId)) {
+				logger.LogInformation($"Session {session.SessionId} marked as active");
 			}
 
 			bool? isPrimaryChange = session.AcknowledgeRole(client.ClientId);
@@ -219,6 +222,8 @@ namespace LMUSessionTracker.Core.Tracking {
 			foreach(string sessionId in inactiveSessions.Keys) {
 				Session session = inactiveSessions[sessionId];
 				if(now - session.LastUpdate > pruneLimit) {
+					if(session.Online && session.LastInfo != null && now < session.LastUpdate.AddSeconds(session.LastInfo.timeRemainingInGamePhase))
+						continue;
 					if(!session.Finished) {
 						List<string> clientIds = session.Close();
 						foreach(string clientId in clientIds) {
