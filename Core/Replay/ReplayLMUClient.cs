@@ -14,6 +14,7 @@ namespace LMUSessionTracker.Core.Replay {
 	public class ReplayLMUClient : LMUClient {
 		private static readonly Regex filenamePattern = new Regex(@"\d{17}-raw.json", RegexOptions.Compiled);
 		private readonly ILogger<ReplayLMUClient> logger;
+		private readonly DateTimeProvider dateTime;
 		private readonly ReplayOptions options;
 		private readonly SchemaValidator schemaValidator;
 		private readonly ContinueProviderSource continueProviderSource;
@@ -25,8 +26,10 @@ namespace LMUSessionTracker.Core.Replay {
 		public string ContextId { get; private set; }
 		public int Remaining => runQueue.Count;
 
-		public ReplayLMUClient(ILogger<ReplayLMUClient> logger, IOptions<ReplayOptions> options, SchemaValidator schemaValidator = null, ContinueProviderSource continueProviderSource = null) {
+		public ReplayLMUClient(ILogger<ReplayLMUClient> logger, DateTimeProvider dateTime, IOptions<ReplayOptions> options,
+			SchemaValidator schemaValidator = null, ContinueProviderSource continueProviderSource = null) {
 			this.logger = logger;
+			this.dateTime = dateTime;
 			this.options = options.Value ?? new ReplayOptions();
 			this.schemaValidator = schemaValidator;
 			this.continueProviderSource = continueProviderSource;
@@ -78,10 +81,11 @@ namespace LMUSessionTracker.Core.Replay {
 			}
 		}
 
-		public void OpenContext() {
+		public DateTime OpenContext() {
 			if(ContextId == null || context == null) {
 				ResetContext();
 			}
+			DateTime now = dateTime.UtcNow;
 			if(runQueue.TryDequeue(out string filename)) {
 				using(FileStream stream = File.OpenRead(filename)) {
 					context = (Dictionary<string, string>)JsonSerializer.Deserialize(stream, serializerOptions.GetTypeInfo(typeof(Dictionary<string, string>)));
@@ -89,6 +93,7 @@ namespace LMUSessionTracker.Core.Replay {
 				}
 			} else
 				logger.LogWarning("Queue is empty");
+			return now;
 		}
 
 		public void CloseContext() {

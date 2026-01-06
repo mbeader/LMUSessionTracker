@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.LMU {
 	public interface LMUClient {
-		public void OpenContext();
+		public DateTime OpenContext();
 
 		public void CloseContext();
 

@@ -41,9 +41,9 @@ namespace LMUSessionTracker.Core.Services {
 
 		public override async Task<bool> Do() {
 			(ClientState state, ProtocolRole role, string sessionId) last = (handler.State, handler.Role, handler.SessionId);
-			lmuClient.OpenContext();
+			DateTime timestamp = lmuClient.OpenContext();
 			try {
-				await handler.Handle();
+				await handler.Handle(timestamp);
 			} catch(Exception e) {
 				logger.LogWarning(e, "Client run failed");
 				handler.Reset();

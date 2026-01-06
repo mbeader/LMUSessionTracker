@@ -18,6 +18,7 @@ namespace LMUSessionTracker.TestClient {
 		private readonly IConfiguration configuration;
 		private readonly ILoggerFactory loggerFactory;
 		private readonly ILogger<Orchestrator> logger;
+		private readonly DateTimeProvider dateTime;
 		private readonly List<ClientHandler> clients = new List<ClientHandler>();
 		private readonly List<ReplayLMUClient> lmuClients = new List<ReplayLMUClient>();
 		private ReplayLMUClient replayLMUClient;
@@ -27,6 +28,7 @@ namespace LMUSessionTracker.TestClient {
 			this.configuration = configuration;
 			this.loggerFactory = loggerFactory;
 			logger = loggerFactory.CreateLogger<Orchestrator>();
+			dateTime = new DefaultDateTimeProvider();
 		}
 
 		public void Configure() {
@@ -60,15 +62,15 @@ namespace LMUSessionTracker.TestClient {
 					SimpleContinueProvider<Orchestrator> continueProvider = new SimpleContinueProvider<Orchestrator>();
 					this.continueProvider = continueProvider;
 					if(replayLMUClient == null)
-						replayLMUClient = new ReplayLMUClient(loggerFactory.CreateLogger<ReplayLMUClient>(), replayOptions, null, continueProvider);
+						replayLMUClient = new ReplayLMUClient(loggerFactory.CreateLogger<ReplayLMUClient>(), dateTime, replayOptions, null, continueProvider);
 					lmuClient = replayLMUClient;
 				} else {
 					replayOptions.Value.Directory = clientOptions.ReplayDirectories[i];
-					lmuClient = new ReplayLMUClient(loggerFactory.CreateLogger<ReplayLMUClient>(), replayOptions, null, null);
+					lmuClient = new ReplayLMUClient(loggerFactory.CreateLogger<ReplayLMUClient>(), dateTime, replayOptions, null, null);
 					lmuClients.Add((ReplayLMUClient)lmuClient);
 				}
 			} else {
-				lmuClient = new HttpLMUClient(loggerFactory.CreateLogger<HttpLMUClient>(), null, lmuClientOptions);
+				lmuClient = new HttpLMUClient(loggerFactory.CreateLogger<HttpLMUClient>(), dateTime, null, lmuClientOptions);
 			}
 			HttpProtocolClient protocolClient = new HttpProtocolClient(loggerFactory.CreateLogger<HttpProtocolClient>(), signingKey, protocolClientOptions);
 			return new DefaultClientHandler(loggerFactory.CreateLogger<DefaultClientHandler>(), lmuClient, protocolClient, clientInfo);
@@ -88,10 +90,11 @@ namespace LMUSessionTracker.TestClient {
 			clients.ForEach(handler => lasts.Add((handler.State, handler.Role, handler.SessionId)));
 			replayLMUClient?.OpenContext();
 			lmuClients.ForEach(x => x.OpenContext());
+			DateTime now = dateTime.UtcNow;
 			try {
 				List<Task> tasks = new List<Task>();
 				foreach(ClientHandler handler in clients)
-					tasks.Add(Task.Delay(RandomDelay()).ContinueWith(async t => await handler.Handle()));
+					tasks.Add(Task.Delay(RandomDelay()).ContinueWith(async t => await handler.Handle(now)));
 				await Task.WhenAll(tasks);
 			} finally {
 				replayLMUClient?.CloseContext();

@@ -1,5 +1,6 @@
 ﻿using LMUSessionTracker.Core.Json;
 using LMUSessionTracker.Core.LMU;
+using LMUSessionTracker.Core.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -15,6 +16,7 @@ namespace LMUSessionTracker.Core.Http {
 	public class HttpLMUClient : LMUClient {
 		private readonly HttpClient httpClient;
 		private readonly ILogger<HttpLMUClient> logger;
+		private readonly DateTimeProvider dateTime;
 		private readonly SchemaValidator schemaValidator;
 		private readonly LMUClientOptions options;
 		private readonly JsonSerializerOptions serializerOptions;
@@ -23,8 +25,9 @@ namespace LMUSessionTracker.Core.Http {
 		//private readonly ConcurrentDictionary<string, object> objContext = new ConcurrentDictionary<string, object>();
 		private readonly ConcurrentDictionary<string, string> rawContext = new ConcurrentDictionary<string, string>();
 
-		public HttpLMUClient(ILogger<HttpLMUClient> logger, SchemaValidator schemaValidator = null, IOptions<LMUClientOptions> options = null) {
+		public HttpLMUClient(ILogger<HttpLMUClient> logger, DateTimeProvider dateTime, SchemaValidator schemaValidator = null, IOptions<LMUClientOptions> options = null) {
 			this.logger = logger;
+			this.dateTime = dateTime;
 			this.schemaValidator = schemaValidator;
 			this.options = options?.Value ?? new LMUClientOptions();
 			httpClient = new HttpClient() {
@@ -73,7 +76,7 @@ namespace LMUSessionTracker.Core.Http {
 				if(!Directory.Exists(logPath))
 					Directory.CreateDirectory(logPath);
 				string json = JsonSerializer.Serialize(response, serializerOptions.GetTypeInfo(typeof(T)));
-				File.WriteAllText(Path.Join(logPath, $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}{path.Replace("/", "_")}.json"), json);
+				File.WriteAllText(Path.Join(logPath, $"{dateTime.UtcNow.ToString("yyyyMMddHHmmssfff")}{path.Replace("/", "_")}.json"), json);
 			} catch(Exception e) {
 				logger.LogWarning(e, "Failed to write request debug file");
 			}
@@ -92,12 +95,14 @@ namespace LMUSessionTracker.Core.Http {
 			}
 		}
 
-		public void OpenContext() {
+		public DateTime OpenContext() {
 			if(contextId != null) {
 				logger.LogWarning("A leftover context was not logged");
 				ResetContext();
 			}
-			contextId = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
+			DateTime now = dateTime.UtcNow;
+			contextId = now.ToString("yyyyMMddHHmmssfff");
+			return now;
 		}
 
 		public void CloseContext() {

@@ -12,7 +12,7 @@ namespace LMUSessionTracker.Core.Client {
 		public string SessionId { get; }
 		public string ClientId { get; }
 
-		public Task Handle();
+		public Task Handle(DateTime timestamp);
 		public void Reset();
 	}
 
@@ -43,8 +43,8 @@ namespace LMUSessionTracker.Core.Client {
 			this.client = client;
 		}
 
-		public async Task Handle() {
-			ProtocolMessage message = new ProtocolMessage() { ClientId = client.ClientId.Hash, SessionId = sessionId };
+		public async Task Handle(DateTime timestamp) {
+			ProtocolMessage message = new ProtocolMessage() { ClientId = client.ClientId.Hash, SessionId = sessionId, Timestamp = timestamp };
 			await GetMainData(message);
 
 			if(lastMultiplayerJoinState != message.MultiplayerJoinState || lastMultiStintState != message.GameState?.MultiStintState) {
