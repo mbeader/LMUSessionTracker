@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace LMUSessionTracker.Server.Models {
 	public class Session {
@@ -25,11 +26,17 @@ namespace LMUSessionTracker.Server.Models {
 		public double StartEventTime { get; set; }
 		public string TrackName { get; set; }
 
+		[JsonIgnore]
 		public SessionState LastState { get; set; }
+		[JsonIgnore]
 		public ICollection<Car> Cars { get; } = new List<Car>();
+		[JsonIgnore]
 		public ICollection<Lap> Laps { get; } = new List<Lap>();
+		[JsonIgnore]
 		public ICollection<Entry> Entries { get; } = new List<Entry>();
+		[JsonIgnore]
 		public ICollection<Member> Members { get; } = new List<Member>();
+		[JsonIgnore]
 		public ICollection<Chat> Chats { get; } = new List<Chat>();
 
 		public void From(SessionInfo info) {

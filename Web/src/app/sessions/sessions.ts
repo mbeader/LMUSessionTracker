@@ -1,9 +1,10 @@
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ServerApiService } from '../server-api.service';
 
 @Component({
 	selector: 'app-sessions',
-	imports: [],
+	imports: [RouterLink],
 	templateUrl: './sessions.html',
 	styleUrl: './sessions.css',
 })

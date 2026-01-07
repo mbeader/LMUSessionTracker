@@ -14,4 +14,12 @@ export class ServerApiService {
 	getSessions(): Promise<any> {
 		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Index'));
 	}
+
+	getSession(sessionId: string): Promise<any> {
+		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Session?sessionId=' + sessionId));
+	}
+
+	getLaps(sessionId: string, carId: string): Promise<any> {
+		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Laps?sessionId=' + sessionId + '&carId=' + carId));
+	}
 }

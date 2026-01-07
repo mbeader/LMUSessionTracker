@@ -106,8 +106,11 @@ namespace LMUSessionTracker.Server {
 				app.UseHsts();
 				app.UseExceptionHandler("/Home/Error");
 			}
-			app.UseDefaultFiles(new DefaultFilesOptions() { FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "./wwwroot/browser")) });
-			app.UseStaticFiles(new StaticFileOptions() { FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "./wwwroot/browser")) });
+
+			var fileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "./wwwroot/browser"));
+			app.UseDefaultFiles(new DefaultFilesOptions() { FileProvider = fileProvider });
+			app.UseStaticFiles(new StaticFileOptions() { FileProvider = fileProvider });
+			app.MapFallbackToFile("index.html", new StaticFileOptions() { FileProvider = fileProvider });
 
 			app.Use(async (context, next) => {
 				context.Request.EnableBuffering();

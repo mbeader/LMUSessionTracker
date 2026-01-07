@@ -1,0 +1,113 @@
+export class Format {
+	private static timeSecondsFormat: Intl.NumberFormatOptions = { style: 'decimal', minimumFractionDigits: 3, maximumFractionDigits: 3 };
+	private static timeSecondsFullFormat: Intl.NumberFormatOptions = { style: 'decimal', minimumIntegerDigits: 2, minimumFractionDigits: 3, maximumFractionDigits: 3 };
+	private static timePartFormat: Intl.NumberFormatOptions = { style: 'decimal', minimumIntegerDigits: 2, maximumFractionDigits: 0 };
+	private static percentFormat: Intl.NumberFormatOptions = { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 };
+	private static tempFormat: Intl.NumberFormatOptions = { style: 'decimal', minimumFractionDigits: 1, maximumFractionDigits: 1 };
+
+	static diff(laps: number, time: number) {
+		return laps > 0 ? `${laps} L` : time.toLocaleString(undefined, this.timeSecondsFormat);
+	}
+
+	static percent(value: number | null) {
+		return value == null ? '' : value.toLocaleString(undefined, this.percentFormat);
+	}
+
+	static time(time: number | null) {
+		if (time == null)
+			return '';
+		time = Math.round(time);
+		let hours = Math.floor(time / (60 * 60));
+		let minutes = Math.floor((time - hours * 60 * 60) / 60);
+		let seconds = Math.floor(time - hours * 60 * 60 - minutes * 60);
+		return `${hours.toLocaleString(undefined, this.timePartFormat)}:${minutes.toLocaleString(undefined, this.timePartFormat)}:${seconds.toLocaleString(undefined, this.timePartFormat)}`;
+	}
+
+	static lapTime(laptime: number) {
+		if (laptime <= 0.0)
+			return '-';
+		let time = Math.round(laptime);
+		let hours = Math.floor(time / (60 * 60));
+		let minutes = Math.floor((time - hours * 60 * 60) / 60);
+		let seconds = Math.floor(time - hours * 60 * 60 - minutes * 60);
+		let base = `${seconds.toLocaleString(undefined, this.timeSecondsFullFormat)}`
+		if (hours > 0)
+			return `${hours.toLocaleString(undefined, this.timePartFormat)}:${minutes.toLocaleString(undefined, this.timePartFormat)}:${base}`;
+		if (minutes > 0)
+			return `${minutes.toLocaleString(undefined, this.timePartFormat)}:${base}`;
+		return base;
+	}
+
+	static sectorTime(start: number, end: number) {
+		if (start < 0.0 || end <= 0.0)
+			return '-';
+		return this.lapTime(end - start);
+	}
+
+	static temp(c: number | null) {
+		if (!c)
+			return '';
+		let f = c * 9.0 / 5.0 + 32;
+		return `${c.toLocaleString(undefined, this.tempFormat)} °C (${f.toLocaleString(undefined, this.tempFormat)} °F)`;
+	}
+
+	static phase(gamePhase: number | null) {
+		switch (gamePhase) {
+			case 0: return 'Starting';
+			case 1: return 'Reconnaissance laps';
+			case 2: return 'Grid';
+			case 3: return 'Formation lap';
+			case 4: return 'Countdown';
+			case 5: return 'Green';
+			case 6: return 'FCY';
+			case 7: return 'Session stopped';
+			case 8: return 'Checkered';
+			case 9: return 'Paused';
+			default: return `Unknown (${gamePhase})`;
+		}
+	}
+
+	// indicating pit should be done on lap with entering status
+	static status(standing: any) {
+		if (standing.inGarageStall)
+			return 'Gar';
+		else if (standing.pitState == 'NONE')
+			return 'Run';
+		else if (standing.pitState == 'ENTERING')
+			return 'In';
+		else if (standing.pitState == 'EXITING')
+			return 'Out';
+		else if (standing.pitState == 'STOPPED')
+			return 'Pit';
+		else if (standing.pitState == 'REQUEST')
+			return 'Req';
+		else
+			return '???';
+	}
+
+	static relativeTimestamp(now: Date, timestamp: Date) {
+		let diff = now.valueOf() - timestamp.valueOf();
+		let totalSeconds = diff / 1000;
+		if (totalSeconds < 10)
+			return 'now';
+		else {
+			let totalMinutes = totalSeconds / 60;
+			if (totalMinutes < 1)
+				return `${totalSeconds} seconds ago`;
+			else {
+				let totalHours = totalMinutes / 60;
+				if (totalHours < 1)
+					return `${totalMinutes} minutes ago`;
+				else {
+					let totalDays = totalHours / 24;
+					if (totalDays < 1)
+						return `${totalHours} hours ago`;
+					else if (totalDays < 31)
+						return `${totalDays} days ago`;
+					else
+						return 'long ago';
+				}
+			}
+		}
+	}
+}
