@@ -10,7 +10,9 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Server.Controllers {
-	public class HomeController : Controller {
+	[ApiController]
+	[Route("api/[controller]/[action]")]
+	public class HomeController : ControllerBase {
 		private readonly ILogger<HomeController> logger;
 		private readonly SessionRepository sessionRepo;
 		private readonly SessionObserver sessionObserver;
@@ -32,7 +34,7 @@ namespace LMUSessionTracker.Server.Controllers {
 					vm.Sessions[i] = activeSession;
 				}
 			}
-			return View(vm);
+			return Ok(vm);
 		}
 
 		public async Task<IActionResult> Session([Required] string sessionId) {
@@ -64,7 +66,7 @@ namespace LMUSessionTracker.Server.Controllers {
 				Core.Tracking.Session coreSession = vm.Session.To();
 				vm.History = coreSession.History.GetAllHistory();
 			}
-			return View(vm);
+			return Ok(vm);
 		}
 
 		public async Task<IActionResult> Laps([Required] string sessionId, [Required] string carId) {
@@ -77,12 +79,12 @@ namespace LMUSessionTracker.Server.Controllers {
 			vm.Car = vm.Session?.History.GetAllHistory().Find(x => x.Key.Matches(carId));
 			if(vm.Car == null)
 				return NotFound();
-			return View(vm);
+			return Ok(vm);
 		}
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error() {
-			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+			return Ok(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
 	}
 }

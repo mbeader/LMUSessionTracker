@@ -3,6 +3,7 @@ data/
 out/
 reports/
 misc/
+Server/wwwroot
 # default dotnet ignore below
 
 ## Ignore Visual Studio temporary files, build results, and
@@ -489,3 +490,34 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+## Ignores for Angular projects
+
+# Angular specific
+/dist/
+/out-tsc/
+/tmp/
+/coverage/
+/e2e/test-output/
+/.angular/
+.angular/
+
+# Node modules and dependency files
+/node_modules/
+/package-lock.json
+/yarn.lock
+
+# Environment files
+/.env
+
+# Angular CLI and build artefacts
+/.angular-cli.json
+/.ng/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
