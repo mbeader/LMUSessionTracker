@@ -1,6 +1,6 @@
 import { SessionInfo, Standing } from './lmu';
-import { Session } from './models';
-import { SessionSummary, CarHistory, Car, CarKey } from './tracking';
+import { Session, SessionState } from './models';
+import { SessionSummary, CarHistory, Car } from './tracking';
 
 export class IndexViewModel {
 	public sessions: Array<SessionSummary> | null = null;
@@ -15,9 +15,9 @@ export class SessionViewModel {
 	public info: SessionInfo | null = null;
 	public standings: Array<Standing> | null = null;
 	public history: Array<CarHistory> | null = null;
-	public positionInClass: Map<CarKey, number> = new Map();
-	public entries: Map<CarKey, Car> = new Map();
+	public positionInClass: { [key: string]: number } | null = null;
+	public entries: { [key: string]: Car } | null = null;
 
 	public session: Session | null = null;
-	get sessionState() { return this.session?.lastState; }
+	public sessionState: SessionState | null = null;
 }

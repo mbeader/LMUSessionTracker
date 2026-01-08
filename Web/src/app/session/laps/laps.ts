@@ -2,7 +2,7 @@ import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { ServerApiService } from '../../server-api.service';
 import { LapsViewModel } from '../../view-models';
-import { CarKey, Lap } from '../../tracking';
+import { Lap } from '../../tracking';
 import { Format } from '../../format';
 
 @Component({
@@ -16,7 +16,6 @@ export class Laps {
 	private route = inject(ActivatedRoute);
 	private api = inject(ServerApiService);
 	model: LapsViewModel | null = null;
-	carKeyId = (key: CarKey | undefined) => key ? `${key.slotId}-${key.veh}` : null;
 	defaultLap = (number: number) => { return { lapNumber: number, totalTime: -1, sector1: -1, sector2: -1, sector3: -1, isValid: false } as Lap };
 	Format = Format;
 
@@ -27,7 +26,6 @@ export class Laps {
 			return;
 		this.api.getLaps(sessionId, carId).then(result => {
 			this.model = result;
-			console.log(this.model.car?.laps);
 			this.ref.markForCheck();
 		}, error => { console.log(error); })
 	}

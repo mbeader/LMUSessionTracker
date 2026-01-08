@@ -114,10 +114,13 @@ export class Format {
 
 	static date(date: Date | string) {
 		if (typeof (date) === 'string') {
-			date = new Date(date + 'Z');
+			if(!date.endsWith('Z'))
+				date + 'Z';
+			date = new Date(date);
 		}
 		let format = (number: number, digits: number) => Math.floor(number).toString().padStart(digits, '0');
-		return `${format(date.getFullYear(), 4)}-${format(date.getMonth() + 1, 2)}-${format(date.getDate(), 2)} ${format(date.getHours(), 2)}:${format(date.getSeconds(), 2)}`;
+		let res = `${format(date.getFullYear(), 4)}-${format(date.getMonth() + 1, 2)}-${format(date.getDate(), 2)} ${format(date.getHours(), 2)}:${format(date.getMinutes(), 2)}`;
+		return res;
 	}
 
 	static distance(progress: number | null, total: number | null) {

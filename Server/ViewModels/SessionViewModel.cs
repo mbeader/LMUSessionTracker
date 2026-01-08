@@ -1,7 +1,6 @@
 ﻿using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Tracking;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace LMUSessionTracker.Server.ViewModels {
 	public class SessionViewModel {

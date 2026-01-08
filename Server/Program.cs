@@ -32,7 +32,12 @@ namespace LMUSessionTracker.Server {
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
-			builder.Services.AddControllers();
+			builder.Services.AddControllers()
+				.AddJsonOptions(options => {
+					options.JsonSerializerOptions.Converters.Add(new CarKeyConverter());
+					options.JsonSerializerOptions.Converters.Add(new CarKeyDictionaryConverter<int>());
+					options.JsonSerializerOptions.Converters.Add(new CarKeyDictionaryConverter<Core.Tracking.Car>());
+				});
 
 			var clientConfig = builder.Configuration.GetSection("Client");
 			var clientOptions = clientConfig.GetSection("Options").Get<ClientOptions>();

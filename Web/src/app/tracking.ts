@@ -1,32 +1,43 @@
+import { Standing } from "./lmu";
 
 export interface CarHistory {
-	key: CarKey;
+	/** CarKey */
+	key: string;
 	car: Car;
-	laps: Array<Lap>;
+	laps: Array<Lap | null>;
 	lapsCompleted: number;
 }
 
-export interface CarKey {
-	slotId: number;
-	veh: string;
-}
-//export class CarKey {
-//	public slotId: number;
-//	public veh: string;
-
-//	constructor(slotId: number, veh: string) {
-//		this.slotId = slotId;
-//		this.veh = veh;
-//	}
-
-//	matches(s: string) {
-//		return s == this.id;
-//	}
-
-//	get id() {
-//		return `${this.slotId}-${this.veh}`;
-//	}
+//export interface CarKey {
+//	slotId: number;
+//	veh: string;
 //}
+export class CarKey {
+	public slotId: number;
+	public veh: string;
+
+	constructor(slotId: number, veh: string) {
+		this.slotId = slotId;
+		this.veh = veh;
+	}
+
+	matches(s: string) {
+		return s == this.id;
+	}
+
+	get id() {
+		return `${this.slotId}-${this.veh}`;
+	}
+
+	static fromKey(key: string) {
+		let dash = key.indexOf('-');
+		return new CarKey(parseInt(key.substring(0, dash)), key.substring(dash + 1, key.length));
+	}
+
+	static fromStanding(standing: Standing) {
+		return new CarKey(standing.slotID, standing.vehicleFilename);
+	}
+}
 
 export interface Car {
 	slotId: number;

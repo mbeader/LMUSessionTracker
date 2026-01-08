@@ -23,8 +23,8 @@
         </tr>
     </thead>
     <tbody>
-        @for (standing of session.standings; track carKeyId(carKey(standing)); let i = $index) {
-        @let id = carKeyId(carKey(standing));
+        @for (standing of session.standings; track CarKey.fromStanding(standing).id; let i = $index) {
+        @let id = CarKey.fromStanding(standing).id;
         @let car = entries.get(id ?? '');
         @if(car) {
         <tr>

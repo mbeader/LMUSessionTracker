@@ -37,7 +37,7 @@
     <tbody>
         @for(_ of [].constructor(model.car.laps.length); track _; let i = $index) {
         <!--@for(historyLap of model.car.laps; track $index; let i = $index) {-->
-        @let lap = model.car.laps[i]; <!--?? defaultLap(i+1);-->
+        @let lap = model.car.laps[i] ?? defaultLap(i+1);
         <tr>
             <td>{{ lap.lapNumber }}</td>
             <td>{{ lap.driver }}</td>
