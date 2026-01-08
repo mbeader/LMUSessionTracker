@@ -1,10 +1,13 @@
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { ServerApiService } from '../../server-api.service';
+import { LapsViewModel } from '../../view-models';
+import { CarKey, Lap } from '../../tracking';
+import { Format } from '../../format';
 
 @Component({
 	selector: 'app-session-laps',
-	imports: [],
+	imports: [RouterLink],
 	templateUrl: './laps.html',
 	styleUrl: './laps.css',
 })
@@ -12,7 +15,10 @@ export class Laps {
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
 	private api = inject(ServerApiService);
-	carHistory: any = null;
+	model: LapsViewModel | null = null;
+	carKeyId = (key: CarKey | undefined) => key ? `${key.slotId}-${key.veh}` : null;
+	defaultLap = (number: number) => { return { lapNumber: number, totalTime: -1, sector1: -1, sector2: -1, sector3: -1, isValid: false } as Lap };
+	Format = Format;
 
 	constructor() {
 		let sessionId = this.route.snapshot.paramMap.get('sessionId');
@@ -20,7 +26,8 @@ export class Laps {
 		if(!sessionId || !carId)
 			return;
 		this.api.getLaps(sessionId, carId).then(result => {
-			this.carHistory = result;
+			this.model = result;
+			console.log(this.model.car?.laps);
 			this.ref.markForCheck();
 		}, error => { console.log(error); })
 	}

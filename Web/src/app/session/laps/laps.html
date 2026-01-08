@@ -1,1 +1,53 @@
-<p>{{ carHistory?.car.key.veh }}</p>
+@if(model && model.session && model.car) {
+<dl class="row">
+    <dt class="col-lg-1 col-2">Session</dt>
+    <dd class="col-lg-3 col-3"><a [routerLink]="['/', 'Session', model.session.sessionId]">{{ Format.date(model.session.timestamp) }}</a></dd>
+    <dt class="col-lg-1 col-2">Session</dt>
+    <dd class="col-lg-2 col-5">{{ model.session.type }}</dd>
+    <dt class="col-lg-1 col-2">Track</dt>
+    <dd class="col-lg-4 col-10">{{ model.session.track }}</dd>
+    <dt class="col-lg-1 col-2">Slot ID</dt>
+    <dd class="col-lg-1 col-3">{{ model.car.car.slotId }}</dd>
+    <dt class="col-lg-1 col-2">Veh</dt>
+    <dd class="col-lg-4 col-5">{{ model.car.car.veh }}</dd>
+    <dt class="col-lg-1 col-2">Vehicle</dt>
+    <dd class="col-lg-4 col-10">{{ model.car.car.vehicleName }}</dd>
+    <dt class="col-lg-1 col-2">Number</dt>
+    <dd class="col-lg-1 col-3">{{ model.car.car.number }}</dd>
+    <dt class="col-lg-1 col-2">Class</dt>
+    <dd class="col-lg-1 col-5 text-truncate">{{ model.car.car.class }}</dd>
+    <dt class="col-lg-1 col-2">Team</dt>
+    <dd class="col-lg-3 col-10">{{ model.car.car.teamName }}</dd>
+    <dt class="col-lg-1 col-2">ID</dt>
+    <dd class="col-lg-3 col-10 text-truncate">{{ model.car.car.id }}</dd>
+</dl>
+
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Lap</th>
+            <th>Driver</th>
+            <th class="text-end">Time</th>
+            <th class="text-end">S1</th>
+            <th class="text-end">S2</th>
+            <th class="text-end">S3</th>
+            <th class="text-end">Fuel</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(_ of [].constructor(model.car.laps.length); track _; let i = $index) {
+        <!--@for(historyLap of model.car.laps; track $index; let i = $index) {-->
+        @let lap = model.car.laps[i]; <!--?? defaultLap(i+1);-->
+        <tr>
+            <td>{{ lap.lapNumber }}</td>
+            <td>{{ lap.driver }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.totalTime) }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.sector1) }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.sector2) }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.sector3) }}</td>
+            <td class="text-end">{{ Format.percent(lap.fuel) }}</td>
+        </tr>
+        }
+    </tbody>
+</table>
+}

@@ -3,6 +3,7 @@ export class Format {
 	private static timeSecondsFullFormat: Intl.NumberFormatOptions = { style: 'decimal', minimumIntegerDigits: 2, minimumFractionDigits: 3, maximumFractionDigits: 3 };
 	private static timePartFormat: Intl.NumberFormatOptions = { style: 'decimal', minimumIntegerDigits: 2, maximumFractionDigits: 0 };
 	private static percentFormat: Intl.NumberFormatOptions = { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 };
+	private static percentWholeFormat: Intl.NumberFormatOptions = { style: 'percent', minimumFractionDigits: 0, maximumFractionDigits: 0 };
 	private static tempFormat: Intl.NumberFormatOptions = { style: 'decimal', minimumFractionDigits: 1, maximumFractionDigits: 1 };
 
 	static diff(laps: number, time: number) {
@@ -26,10 +27,10 @@ export class Format {
 	static lapTime(laptime: number) {
 		if (laptime <= 0.0)
 			return '-';
-		let time = Math.round(laptime);
+		let time = Math.round(laptime*1000)/1000;
 		let hours = Math.floor(time / (60 * 60));
 		let minutes = Math.floor((time - hours * 60 * 60) / 60);
-		let seconds = Math.floor(time - hours * 60 * 60 - minutes * 60);
+		let seconds = time - hours * 60 * 60 - minutes * 60;
 		let base = `${seconds.toLocaleString(undefined, this.timeSecondsFullFormat)}`
 		if (hours > 0)
 			return `${hours.toLocaleString(undefined, this.timePartFormat)}:${minutes.toLocaleString(undefined, this.timePartFormat)}:${base}`;
@@ -109,5 +110,17 @@ export class Format {
 				}
 			}
 		}
+	}
+
+	static date(date: Date | string) {
+		if (typeof (date) === 'string') {
+			date = new Date(date + 'Z');
+		}
+		let format = (number: number, digits: number) => Math.floor(number).toString().padStart(digits, '0');
+		return `${format(date.getFullYear(), 4)}-${format(date.getMonth() + 1, 2)}-${format(date.getDate(), 2)} ${format(date.getHours(), 2)}:${format(date.getSeconds(), 2)}`;
+	}
+
+	static distance(progress: number | null, total: number | null) {
+		return progress != null && total != null ? (progress/total).toLocaleString(undefined, this.percentWholeFormat) : null;
 	}
 }

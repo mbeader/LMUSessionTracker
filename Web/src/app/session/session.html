@@ -1,5 +1,5 @@
 @if(session != null) {
-@if(session.sessionState != null) {
+@if(session.session != null && session.sessionState != null) {
 <div class="row">
     <div class="col-xxl">
         <h3>Session</h3>
@@ -57,20 +57,19 @@
 </div>
 }
 
-<table class="table table-sm table-striped table-hover">
-    <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">CarId</th>
-        </tr>
-    </thead>
-    <tbody>
-        @for (car of session.history; track $index; let i = $index) {
-        <tr>
-            <th scope="row">{{ i + 1 }}</th>
-            <td><a [routerLink]="['Laps', `${car.key.slotId}-${car.key.veh}`]">{{ car.car.veh }}</a></td>
-        </tr>
-        }
-    </tbody>
-</table>
+@if(hasStandings) {
+<app-session-standings [session]="session" />
+}
+
+@if(session.history != null) {
+@if(hasStandings) {
+<div><a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#history">Show history</a></div>
+<div class="collapse" id="history">
+    <app-session-history [session]="session" />
+</div>
+} @else {
+<app-session-history [session]="session" />
+}
+}
+
 }
