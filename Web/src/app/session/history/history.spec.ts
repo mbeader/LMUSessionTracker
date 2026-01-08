@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { History } from './history';
 
@@ -8,7 +10,11 @@ describe('History', () => {
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [History]
+			imports: [History],
+			providers: [
+				{ provide: ChangeDetectorRef, useValue: {} },
+				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } },
+			]
 		})
 			.compileComponents();
 
