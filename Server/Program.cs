@@ -20,6 +20,7 @@ using Serilog;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 
 namespace LMUSessionTracker.Server {
 	public class Program {
@@ -33,13 +34,15 @@ namespace LMUSessionTracker.Server {
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
+			static void configureJsonSerializer(JsonSerializerOptions options) {
+				options.Converters.Add(new CarKeyConverter());
+				options.Converters.Add(new CarKeyDictionaryConverter<int>());
+				options.Converters.Add(new CarKeyDictionaryConverter<Core.Tracking.Car>());
+			}
 			builder.Services.AddControllers()
-				.AddJsonOptions(options => {
-					options.JsonSerializerOptions.Converters.Add(new CarKeyConverter());
-					options.JsonSerializerOptions.Converters.Add(new CarKeyDictionaryConverter<int>());
-					options.JsonSerializerOptions.Converters.Add(new CarKeyDictionaryConverter<Core.Tracking.Car>());
-				});
-			builder.Services.AddSignalR();
+				.AddJsonOptions(options => configureJsonSerializer(options.JsonSerializerOptions));
+			builder.Services.AddSignalR()
+				.AddJsonProtocol(options => configureJsonSerializer(options.PayloadSerializerOptions));
 
 			var clientConfig = builder.Configuration.GetSection("Client");
 			var clientOptions = clientConfig.GetSection("Options").Get<ClientOptions>();
@@ -130,7 +133,7 @@ namespace LMUSessionTracker.Server {
 			app.UseAuthorization();
 
 			app.MapControllers();
-			app.MapHub<SessionHub>("/api/Live/Session", options => {  });
+			app.MapHub<SessionHub>("/api/Live/Session", options => { });
 
 			app.Run();
 		}

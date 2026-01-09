@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ServerApiService } from '../server-api.service';
 import { ServerLiveService } from '../server-live.service';
@@ -29,9 +29,16 @@ export class Session {
 			this.session = result;
 			this.hasStandings = this.session.standings != null && this.session.standings.length > 0;
 			this.ref.markForCheck();
-			if (this.session?.session?.sessionId)
-				this.live.join(this.session.session.sessionId, 'live');
+			if (this.session?.session?.sessionId && this.hasStandings)
+				this.live.joinLive(this.session.session.sessionId, this.updateSession.bind(this));
 		}, error => { console.log(error); })
+	}
+
+	updateSession(session: SessionViewModel) {
+		if (this.session) {
+			SessionViewModel.merge(this.session, session);
+			this.ref.markForCheck();
+		}
 	}
 
 	ngOnInit() {

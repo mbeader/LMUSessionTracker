@@ -1,6 +1,7 @@
 ﻿using LMUSessionTracker.Core.Services;
 using LMUSessionTracker.Core.Tracking;
 using LMUSessionTracker.Server.Hubs;
+using LMUSessionTracker.Server.ViewModels;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
@@ -13,8 +14,9 @@ namespace LMUSessionTracker.Server.Services {
 		}
 
 		public async Task Session(Session session) {
-			await hubContext.Clients.Group(SessionHub.LiveGroup(session.SessionId))
-				.SendAsync("SessionInfo", session.LastInfo);
+			SessionViewModel vm = new SessionViewModel() { Info = session.LastInfo };
+			vm.SetSession(session);
+			await hubContext.Clients.Group(SessionHub.LiveGroup(session.SessionId)).SendAsync("Live", vm);
 		}
 	}
 }
