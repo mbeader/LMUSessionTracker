@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
-import { SessionViewModel } from './view-models';
+import { JoinRequest, LapsViewModel, SessionViewModel } from './view-models';
 
 declare var signalR: any;
 @Injectable({
@@ -11,55 +11,75 @@ declare var signalR: any;
 export class ServerLiveService {
 	private readonly router = inject(Router);
 	private connection: HubConnection | null = null;
+	private stop: boolean = false;
 
 	constructor() {
 		this.router.events.pipe(
 			filter(e => e instanceof NavigationStart)
 		).subscribe(async (route: NavigationStart) => {
-			if (this.connection) {
-				await this.connection.invoke('Leave');
-				console.log('Left');
-			}
+			await this.reset();
 		});
 	}
 
-	private join(sessionId: string, type: string, configure: (connection: HubConnection) => void) {
+	private async reset() {
+		this.stop = true;
+		if (this.connection) {
+			if (this.connection.state == HubConnectionState.Connected) {
+				await this.connection.invoke('Leave');
+				console.log('Left');
+			}
+			await this.connection.stop();
+		}
+	}
+
+	private async join(req: JoinRequest, configure: (connection: HubConnection) => void) {
+		await this.reset();
+
 		this.connection = new signalR.HubConnectionBuilder()
 			.withUrl('/api/Live/Session')
 			.configureLogging(signalR.LogLevel.Information)
 			.build() as HubConnection;
 
-		this.connection.on('Joined', (sessionId: string, type: string) => {
-			console.log('Joined', sessionId, type);
+		this.connection.on('Joined', (req: JoinRequest) => {
+			console.log('Joined', req.sessionId, req.type, req.key);
 		});
 
 		configure(this.connection);
 
 		this.connection.onclose(async () => {
-			await this.start(sessionId, type);
+			await this.start(req);
 		});
 
-		this.start(sessionId, type);
+		this.stop = false;
+		await this.start(req);
 	}
 
 	joinLive(sessionId: string, callback: (session: SessionViewModel) => void) {
-		this.join(sessionId, 'live', connection => {
+		this.join(new JoinRequest(sessionId, 'live'), connection => {
 			connection.on('Live', (session: SessionViewModel) => {
 				callback(session);
 			});
 		});
 	}
 
-	private async start(sessionId: string, type: string) {
-		if (!this.connection || this.connection.state != HubConnectionState.Disconnected)
+	joinLaps(sessionId: string, carId: string, callback: (laps: LapsViewModel) => void) {
+		this.join(new JoinRequest(sessionId, 'laps', carId), connection => {
+			connection.on('Laps', (laps: LapsViewModel) => {
+				callback(laps);
+			});
+		});
+	}
+
+	private async start(req: JoinRequest) {
+		if (this.stop || !this.connection || this.connection.state != HubConnectionState.Disconnected)
 			return;
 		try {
 			await this.connection.start();
 			console.log('SignalR Connected.');
-			await this.connection.invoke('Join', sessionId, type);
+			await this.connection.invoke('Join', req);
 		} catch (err) {
 			console.log(err);
-			setTimeout(this.start.bind(this, sessionId, type), 5000);
+			setTimeout(this.start.bind(this, req), 5000);
 		}
 	};
 }

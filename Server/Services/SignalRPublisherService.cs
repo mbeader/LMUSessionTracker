@@ -17,6 +17,10 @@ namespace LMUSessionTracker.Server.Services {
 			SessionViewModel vm = new SessionViewModel() { Info = session.LastInfo };
 			vm.SetSession(session);
 			await hubContext.Clients.Group(SessionHub.LiveGroup(session.SessionId)).SendAsync("Live", vm);
+			foreach(CarHistory car in vm.History) {
+				string group = SessionHub.LapsGroup(session.SessionId, car.Key.Id());
+				await hubContext.Clients.Group(group).SendAsync("Laps", new LapsViewModel() { Car = car });
+			}
 		}
 	}
 }
