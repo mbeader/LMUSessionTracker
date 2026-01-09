@@ -45,27 +45,7 @@ namespace LMUSessionTracker.Server.Controllers {
 			if(vm.Session == null)
 				return NotFound();
 			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId);
-			if(session != null) {
-				vm.Standings = session.LastStandings;
-				vm.History = session.History.GetAllHistory();
-				Dictionary<string, List<CarKey>> classes = new Dictionary<string, List<CarKey>>();
-				if(vm.Standings != null) {
-					foreach(Standing standings in vm.Standings) {
-						if(!classes.TryGetValue(standings.carClass, out List<CarKey> cars)) {
-							cars = new List<CarKey>();
-							classes.Add(standings.carClass, cars);
-						}
-						cars.Add(new CarKey() { SlotId = standings.slotID, Veh = standings.vehicleFilename });
-					}
-				}
-				foreach(string classname in classes.Keys)
-					for(int i = 0; i < classes[classname].Count; i++)
-						vm.PositionInClass.Add(classes[classname][i], i + 1);
-				vm.History.ForEach(x => vm.Entries.Add(x.Key, x.Car));
-			} else {
-				Core.Tracking.Session coreSession = vm.Session.To();
-				vm.History = coreSession.History.GetAllHistory();
-			}
+			vm.SetSession(session);
 			return Ok(vm);
 		}
 

@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, NavigationStart, Router, RouterLink, Event, ActivatedRoute, UrlSegment } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, ActivatedRoute, UrlSegment } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 
 @Component({
@@ -85,33 +84,5 @@ export class Header {
 			}
 		}
 		return { navLink: rootLink, navSubLink: subLink };
-	}
-
-	ngOnInit() {
-		let check = document.querySelector('input#autorefresh');
-		if (check instanceof HTMLInputElement) {
-			check.checked = localStorage.getItem(check.id) == "true";
-			if (check.checked)
-				this.reload(check);
-		}
-	}
-
-	reload(check: HTMLInputElement) {
-		setTimeout(function () {
-			if (check.checked)
-				window.location.reload();
-		}, 10000);
-	}
-
-	autorefresh(e: MouseEvent) {
-		if (e.target instanceof HTMLInputElement) {
-			let check = e.target;
-			if (check.checked) {
-				localStorage.setItem(check.id, check.checked.toString());
-				this.reload(check);
-			} else {
-				localStorage.removeItem(check.id);
-			}
-		}
 	}
 }

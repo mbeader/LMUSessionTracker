@@ -30,7 +30,8 @@
 							"src/styles.css"
 						],
 						"scripts": [
-							"node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+							"node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+							"node_modules/@microsoft/signalr/dist/browser/signalr.min.js"
 						],
 						"polyfills": [
 							"@angular/localize/init"
@@ -41,7 +42,7 @@
 							"budgets": [
 								{
 									"type": "initial",
-									"maximumWarning": "600kB",
+									"maximumWarning": "700kB",
 									"maximumError": "1MB"
 								},
 								{
