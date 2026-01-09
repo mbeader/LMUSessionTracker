@@ -20,6 +20,7 @@ export class Session {
 	session: SessionViewModel | null = null;
 	hasStandings: boolean = false;
 	Format = Format;
+	flagClass = SessionViewModel.flagClass;
 
 	constructor() {
 		let sessionId = this.route.snapshot.paramMap.get('sessionId');

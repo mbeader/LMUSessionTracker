@@ -58,6 +58,21 @@ export class SessionViewModel {
 			vm.sessionState = sessionState as SessionState;
 		}
 	}
+
+	static flagClass(sectorFlag: string, even?: boolean) {
+		switch(sectorFlag) {
+			case 'UNKNOWN':
+				return 'pe-3 bg-success';
+			case 'YELLOW':
+				return 'pe-3 bg-warning';
+			case 'RED':
+				return 'pe-3 bg-danger';
+			case 'CHECKERED':
+				return even ? 'pe-3 bg-white' : 'pe-3 bg-black';
+			default:
+				return 'pe-3 bg-secondary';
+		}
+	}
 }
 
 export class JoinRequest {

@@ -14,8 +14,8 @@
             <dd class="col-xxl-3 col-lg-1 col-3">{{ session.sessionState.numberOfPlayers }}</dd>
             <dt class="col-xxl-3 col-lg-2 col-3">Caution</dt>
             <dd class="col-xxl-3 col-lg-2 col-3">{{ session.sessionState.yellowFlagState }}</dd>
-            <dt class="col-xxl-3 col-lg-2 col-3">Sector flags</dt>
-            <dd class="col-xxl-9 col-lg-4 col-9">{{ session.sessionState.sector1Flag }} {{ session.sessionState.sector2Flag }} {{ session.sessionState.sector3Flag }}</dd>
+            <dt class="col-xxl-6 col-lg-3 col-3">Sector flags</dt>
+            <dd class="col-xxl-6 col-lg-3 col-3"><span [class]="flagClass(session.sessionState.sector1Flag)" title="{{ session.sessionState.sector1Flag }}"></span>&nbsp;<span [class]="flagClass(session.sessionState.sector2Flag, true)" title="{{ session.sessionState.sector2Flag }}"></span>&nbsp;<span [class]="flagClass(session.sessionState.sector3Flag)" title="{{ session.sessionState.sector3Flag }}"></span></dd>
         </dl>
     </div>
 
