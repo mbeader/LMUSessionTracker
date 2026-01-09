@@ -15,18 +15,20 @@ namespace LMUSessionTracker.Core.Tracking {
 		private readonly DateTimeProvider dateTimeProvider;
 		private readonly UuidVersion7Provider uuidProvider;
 		private readonly SessionLogger sessionLogger;
+		private readonly PublisherService publisher;
 		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private readonly SortedDictionary<string, Session> activeSessions = new SortedDictionary<string, Session>();
 		private readonly SortedDictionary<string, Session> inactiveSessions = new SortedDictionary<string, Session>();
 		private readonly Dictionary<string, Client> clients = new Dictionary<string, Client>();
 
 		public SessionArbiter(ILogger<SessionArbiter> logger, ManagementRespository managementRepo, DateTimeProvider dateTimeProvider, UuidVersion7Provider uuidProvider,
-			SessionLogger sessionLogger) {
+			SessionLogger sessionLogger, PublisherService publisher) {
 			this.logger = logger;
 			this.managementRepo = managementRepo;
 			this.dateTimeProvider = dateTimeProvider;
 			this.uuidProvider = uuidProvider;
 			this.sessionLogger = sessionLogger;
+			this.publisher = publisher;
 		}
 
 		public async Task<ProtocolStatus> Receive(ProtocolMessage data) {
@@ -113,6 +115,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			await managementRepo.UpdateSession(session.SessionId, data.SessionInfo, now);
 			session.Update(data.SessionInfo, data.Standings, now);
 			await managementRepo.UpdateLaps(session.SessionId, session.History.GetAllHistory());
+			await publisher.Session(session);
 			if(session.Finished && !inactiveSessions.ContainsKey(session.SessionId)) {
 				inactiveSessions.Add(session.SessionId, session);
 				await managementRepo.CloseSession(session.SessionId);

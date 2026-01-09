@@ -3,6 +3,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { Session } from './session';
+import { ServerLiveService } from '../server-live.service';
 
 describe('Session', () => {
 	let component: Session;
@@ -14,6 +15,7 @@ describe('Session', () => {
 			providers: [
 				{ provide: ChangeDetectorRef, useValue: {} },
 				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } },
+				{ provide: ServerLiveService, useValue: { join: vi.fn() } },
 			]
 		}).compileComponents();
 
