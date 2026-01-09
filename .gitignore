@@ -4,6 +4,7 @@ out/
 reports/
 misc/
 Server/wwwroot
+Web/coverage
 # default dotnet ignore below
 
 ## Ignore Visual Studio temporary files, build results, and
