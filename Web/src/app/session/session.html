@@ -1,0 +1,66 @@
+@if(session != null) {
+@if(session.session != null && session.sessionState != null) {
+<div class="row">
+    <div class="col-xxl">
+        <h3>Session</h3>
+        <dl class="row">
+            <dt class="col-xxl-3 col-lg-1 col-3">Track</dt>
+            <dd class="col-xxl-9 col-lg-3 col-9">{{ session.session.trackName }}</dd>
+            <dt class="col-xxl-3 col-lg-2 col-3">Session</dt>
+            <dd class="col-xxl-3 col-lg-2 col-3">{{ session.session.sessionType }}</dd>
+            <dt class="col-xxl-3 col-lg-2 col-3">Phase</dt>
+            <dd class="col-xxl-3 col-lg-2 col-3">{{ Format.phase(session.sessionState.gamePhase) }}</dd>
+            <dt class="col-xxl-3 col-lg-1 col-3">Players</dt>
+            <dd class="col-xxl-3 col-lg-1 col-3">{{ session.sessionState.numberOfPlayers }}</dd>
+            <dt class="col-xxl-3 col-lg-2 col-3">Caution</dt>
+            <dd class="col-xxl-3 col-lg-2 col-3">{{ session.sessionState.yellowFlagState }}</dd>
+            <dt class="col-xxl-3 col-lg-2 col-3">Sector flags</dt>
+            <dd class="col-xxl-9 col-lg-4 col-9">{{ session.sessionState.sector1Flag }} {{ session.sessionState.sector2Flag }} {{ session.sessionState.sector3Flag }}</dd>
+        </dl>
+    </div>
+
+    <div class="col-lg">
+        <h3>Timing</h3>
+        <dl class="row">
+            <dt class="col-3">Elapsed</dt>
+            <dd class="col-3">{{ Format.time(session.sessionState.currentEventTime) }}</dd>
+            <dt class="col-3">Remaining</dt>
+            <dd class="col-3">{{ Format.time(session.sessionState.timeRemainingInGamePhase) }}</dd>
+            <dt class="col-3">Start time</dt>
+            <dd class="col-3">{{ Format.time(session.session.startEventTime) }}</dd>
+            <dt class="col-3">End time</dt>
+            <dd class="col-3">{{ Format.time(session.session.endEventTime) }}</dd>
+            <dt class="col-3">Completion</dt>
+            <dd class="col-3">{{ Format.percent(session.sessionState.raceCompletion) }}</dd>
+            <dt class="col-3">Max time</dt>
+            <dd class="col-3">{{ Format.time(session.session.maxTime) }}</dd>
+        </dl>
+    </div>
+
+    <div class="col-lg">
+        <h3>Conditions</h3>
+        <dl class="row">
+            <dt class="col-lg-2 col-3 order-1">Ambient</dt>
+            <dd class="col-lg-4 col-3 order-1">{{ Format.temp(session.sessionState.ambientTemp) }}</dd>
+            <dt class="col-lg-2 col-3 order-2">Track</dt>
+            <dd class="col-lg-4 col-3 order-2">{{ Format.temp(session.sessionState.trackTemp) }}</dd>
+            <dt class="col-lg-2 col-3 order-3">Raining</dt>
+            <dd class="col-lg-4 col-3 order-3">{{ Format.percent(session.sessionState.raining) }}</dd>
+            <dt class="col-lg-4 col-3 order-1">Wetness (min)</dt>
+            <dd class="col-lg-2 col-3 order-1">{{ Format.percent(session.sessionState.minPathWetness) }}</dd>
+            <dt class="col-lg-4 col-3 order-2">Wetness (avg)</dt>
+            <dd class="col-lg-2 col-3 order-2">{{ Format.percent(session.sessionState.averagePathWetness) }}</dd>
+            <dt class="col-lg-4 col-3 order-3">Wetness (max)</dt>
+            <dd class="col-lg-2 col-3 order-3">{{ Format.percent(session.sessionState.maxPathWetness) }}</dd>
+        </dl>
+    </div>
+</div>
+}
+
+@if(hasStandings) {
+<app-session-standings [session]="session" />
+} @else {
+<p class="text-center">This session is not live. View the <a [routerLink]="['History']">history</a> instead.</p>
+}
+
+}

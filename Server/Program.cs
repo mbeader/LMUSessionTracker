@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -31,7 +32,12 @@ namespace LMUSessionTracker.Server {
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
-			builder.Services.AddControllersWithViews();
+			builder.Services.AddControllers()
+				.AddJsonOptions(options => {
+					options.JsonSerializerOptions.Converters.Add(new CarKeyConverter());
+					options.JsonSerializerOptions.Converters.Add(new CarKeyDictionaryConverter<int>());
+					options.JsonSerializerOptions.Converters.Add(new CarKeyDictionaryConverter<Core.Tracking.Car>());
+				});
 
 			var clientConfig = builder.Configuration.GetSection("Client");
 			var clientOptions = clientConfig.GetSection("Options").Get<ClientOptions>();
@@ -105,7 +111,11 @@ namespace LMUSessionTracker.Server {
 				app.UseHsts();
 				app.UseExceptionHandler("/Home/Error");
 			}
-			app.UseStaticFiles();
+
+			var fileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "./wwwroot/browser"));
+			app.UseDefaultFiles(new DefaultFilesOptions() { FileProvider = fileProvider });
+			app.UseStaticFiles(new StaticFileOptions() { FileProvider = fileProvider });
+			app.MapFallbackToFile("index.html", new StaticFileOptions() { FileProvider = fileProvider });
 
 			app.Use(async (context, next) => {
 				context.Request.EnableBuffering();
@@ -116,7 +126,7 @@ namespace LMUSessionTracker.Server {
 
 			app.UseAuthorization();
 
-			app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+			app.MapControllers();
 
 			app.Run();
 		}

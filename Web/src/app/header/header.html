@@ -1,0 +1,47 @@
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" [routerLink]="['']">LMUSessionTracker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    @if(navLink == 'home') {
+                    <li class="nav-item">
+                        <a class="nav-link active" [routerLink]="['']">Home</a>
+                    </li>
+                    } @else {
+                    <li class="nav-item">
+                        <a class="nav-link" [routerLink]="['']">Home</a>
+                    </li>
+                    }
+                    @if(sessionId) {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Session</a>
+                        <ul class="dropdown-menu">
+                            @if(navLink == 'session' && navSubLink == 'live') {
+                            <li><a class="dropdown-item active" [routerLink]="['Session', sessionId]">Live</a></li>
+                            } @else {
+                            <li><a class="dropdown-item" [routerLink]="['Session', sessionId]">Live</a></li>
+                            }
+                            @if(navLink == 'session' && navSubLink == 'history') {
+                            <li><a class="dropdown-item active" [routerLink]="['Session', sessionId, 'History']">History</a></li>
+                            } @else {
+                            <li><a class="dropdown-item" [routerLink]="['Session', sessionId, 'History']">History</a></li>
+                            }
+                        </ul>
+                    </li>
+                    }
+                </ul>
+            </div>
+            <div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="autorefresh" (click)="autorefresh($event)">
+                    <label class="form-check-label" for="autorefresh">Auto-refresh</label>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>

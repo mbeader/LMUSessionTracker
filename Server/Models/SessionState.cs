@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace LMUSessionTracker.Server.Models {
 	public class SessionState {
@@ -36,7 +37,8 @@ namespace LMUSessionTracker.Server.Models {
 		public double? WindY { get; set; }
 		public double? WindZ { get; set; }
 		public string YellowFlagState { get; set; }
-
+		
+		[JsonIgnore]
 		public Session Session { get; set; }
 
 		public void From(SessionInfo info) {

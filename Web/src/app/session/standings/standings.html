@@ -1,0 +1,53 @@
+@if(session && session.session && session.standings) {
+<h3>Standings</h3>
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Pos</th>
+            <th scope="col">PIC</th>
+            <th scope="col">Class</th>
+            <th scope="col">Number</th>
+            <th scope="col" class="team-col">Team</th>
+            <th scope="col" class="driver-col">Driver</th>
+            <th scope="col" class="text-end">Laps</th>
+            <th scope="col" class="text-end">Behind</th>
+            <th scope="col" class="text-end">Int</th>
+            <th scope="col" class="text-end">Best</th>
+            <th scope="col" class="text-end">Last</th>
+            <th scope="col" class="text-end">S1</th>
+            <th scope="col" class="text-end">S2</th>
+            <th scope="col" class="text-end">S3</th>
+            <th scope="col" class="text-end">Fuel</th>
+            <th scope="col" class="text-end">Lap%</th>
+            <th scope="col" class="text-center">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (standing of session.standings; track CarKey.fromStanding(standing).id; let i = $index) {
+        @let id = CarKey.fromStanding(standing).id;
+        @let car = entries.get(id ?? '');
+        @if(car) {
+        <tr>
+            <td><a [routerLink]="['Laps', `${id}`]">{{ standing.position }}</a></td>
+            <td>{{ positionInClass.get(id ?? '') }}</td>
+            <td>{{ car?.class ? car.class : standing.carClass }}</td>
+            <td>{{ car?.number ? car.number : standing.carNumber }}</td>
+            <td class="team-col text-truncate">{{ car?.teamName ? car.teamName : (!standing.fullTeamName ? standing.vehicleName : standing.fullTeamName) }}</td>
+            <td class="driver-col text-truncate">{{ standing.driverName }}</td>
+            <td class="text-end">{{ standing.lapsCompleted }}</td>
+            <td class="text-end">{{ Format.diff(standing.lapsBehindLeader, standing.timeBehindLeader) }}</td>
+            <td class="text-end">{{ Format.diff(standing.lapsBehindNext, standing.timeBehindNext) }}</td>
+            <td class="text-end">{{ Format.lapTime(standing.bestLapTime) }}</td>
+            <td class="text-end">{{ Format.lapTime(standing.lastLapTime) }}</td>
+            <td class="text-end">{{ Format.sectorTime(0.0, standing.lastSectorTime1) }}</td>
+            <td class="text-end">{{ standing.sector == "SECTOR2" ? "" : Format.sectorTime(standing.lastSectorTime1, standing.lastSectorTime2) }}</td>
+            <td class="text-end">{{ standing.sector != "SECTOR1" ? "" : Format.sectorTime(standing.lastSectorTime2, standing.lastLapTime) }}</td>
+            <td class="text-end">{{ Format.percent(standing.fuelFraction) }}</td>
+            <td class="text-end">{{ Format.distance(standing.lapDistance, session.session.lapDistance) }}</td>
+            <td class="text-center">{{ Format.status(standing) }}</td>
+        </tr>
+        }
+        }
+    </tbody>
+</table>
+}
