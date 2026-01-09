@@ -53,6 +53,7 @@ export class SessionViewModel {
 			sessionState.timeRemainingInGamePhase = other.info.timeRemainingInGamePhase;
 			sessionState.trackTemp = other.info.trackTemp;
 			sessionState.yellowFlagState = other.info.yellowFlagState;
+			session.lapDistance = vm.session?.lapDistance;
 			vm.session = session as Session;
 			vm.sessionState = sessionState as SessionState;
 		}
