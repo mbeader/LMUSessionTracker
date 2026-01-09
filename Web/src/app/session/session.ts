@@ -29,10 +29,12 @@ export class Session {
 			this.session = result;
 			this.hasStandings = this.session.standings != null && this.session.standings.length > 0;
 			this.ref.markForCheck();
+			if (this.session?.session?.sessionId)
+				this.live.join(this.session.session.sessionId, 'live');
 		}, error => { console.log(error); })
 	}
 
 	ngOnInit() {
-		this.live.join();
+
 	}
 }

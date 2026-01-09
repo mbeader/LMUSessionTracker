@@ -13,7 +13,8 @@ namespace LMUSessionTracker.Server.Services {
 		}
 
 		public async Task Session(Session session) {
-			await hubContext.Clients.All.SendAsync("ReceiveMessage", "u", $"{session.SessionId} {session.LastInfo.timeRemainingInGamePhase}");
+			await hubContext.Clients.Group(SessionHub.LiveGroup(session.SessionId))
+				.SendAsync("SessionInfo", session.LastInfo);
 		}
 	}
 }
