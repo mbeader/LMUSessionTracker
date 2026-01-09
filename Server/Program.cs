@@ -77,6 +77,7 @@ namespace LMUSessionTracker.Server {
 				builder.Services.AddScoped<SessionObserver, DefaultSessionObserver>();
 			} else {
 				builder.Services.AddSingleton<PublisherService, SignalRPublisherService>();
+				builder.Services.AddSingleton<SignalRGroupCollection>();
 				builder.Services.AddSingleton<SessionLogger>();
 				builder.Services.AddSingleton<SessionArbiter>();
 				builder.Services.AddSingleton<ProtocolServer, SessionArbiter>(provider => provider.GetRequiredService<SessionArbiter>());

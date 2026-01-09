@@ -249,6 +249,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				activeSessions.Remove(sessionId);
 				inactiveSessions.Remove(sessionId);
 			}
+			await publisher.Prune(now, activeSessions.Keys);
 
 			pendingSessionIds.Clear();
 			foreach(string sessionId in activeSessions.Keys) {

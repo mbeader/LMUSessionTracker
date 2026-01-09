@@ -1,11 +1,17 @@
-﻿using LMUSessionTracker.Server.ViewModels;
+﻿using LMUSessionTracker.Core.Services;
+using LMUSessionTracker.Server.Services;
+using LMUSessionTracker.Server.ViewModels;
 using Microsoft.AspNetCore.SignalR;
-using System.Collections.Concurrent;
+using System;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Server.Hubs {
 	public class SessionHub : Hub {
-		private static readonly ConcurrentDictionary<string, bool> groups = new ConcurrentDictionary<string, bool>();
+		private readonly SignalRGroupCollection groupCollection;
+
+		public SessionHub(SignalRGroupCollection groupCollection) {
+			this.groupCollection = groupCollection;
+		}
 
 		public async Task Join(JoinRequest request) {
 			if(string.IsNullOrEmpty(request.SessionId))
@@ -18,14 +24,14 @@ namespace LMUSessionTracker.Server.Hubs {
 					return;
 			}
 			string group = Group(request);
-			groups.TryAdd(group, true);
+			groupCollection.Groups.TryAdd(group, DateTime.UnixEpoch);
 			await Groups.AddToGroupAsync(Context.ConnectionId, group);
 			await Clients.Caller.SendAsync("Joined", request);
 		}
 
 		public async Task Leave() {
 			// TODO: work around microsoft's garbage
-			foreach(string group in groups.Keys)
+			foreach(string group in groupCollection.Groups.Keys)
 				await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
 		}
 

@@ -44,6 +44,11 @@ export class ServerLiveService {
 			console.log('Joined', req.sessionId, req.type, req.key);
 		});
 
+		this.connection.on('Kicked', async () => {
+			console.log('Kicked');
+			await this.reset();
+		});
+
 		configure(this.connection);
 
 		this.connection.onclose(async () => {
