@@ -9,7 +9,7 @@ namespace LMUSessionTracker.Core.Tests.Json {
 
 		public TeamStrategyConverterTests() {
 			options = new JsonSerializerOptions();
-			options.PropertyNameCaseInsensitive = true;
+			options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 			options.Converters.Add(new TeamStrategyConverter());
 		}
 
@@ -59,7 +59,7 @@ namespace LMUSessionTracker.Core.Tests.Json {
 		[Fact]
 		public void WriteJson_Sample_CanBeSerialized() {
 			List<TeamStrategy> ex = JsonSerializer.Deserialize<List<TeamStrategy>>(json, options);
-			string serialized = JsonSerializer.Serialize(ex);
+			string serialized = JsonSerializer.Serialize(ex, options);
 			List<TeamStrategy> ac = JsonSerializer.Deserialize<List<TeamStrategy>>(json, options);
 			Assert.Equivalent(ex, ac);
 		}

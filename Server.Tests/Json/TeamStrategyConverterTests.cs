@@ -5,9 +5,15 @@ using System.Collections.Generic;
 
 namespace LMUSessionTracker.Server.Tests.Json {
 	public class TeamStrategyConverterTests {
+		private readonly JsonSerializerSettings settings;
+
+		public TeamStrategyConverterTests() {
+			settings = new JsonSerializerSettings();
+			settings.Converters.Add(new TeamStrategyNewtonsoftConverter());
+		}
 		[Fact]
 		public void ReadJson_Sample_CanBeDeserialized() {
-			List<TeamStrategy> ac = JsonConvert.DeserializeObject<List<TeamStrategy>>(json, new TeamStrategyNewtonsoftConverter());
+			List<TeamStrategy> ac = JsonConvert.DeserializeObject<List<TeamStrategy>>(json, settings);
 			TeamStrategy ex = new TeamStrategy() {
 				Name = "DKR Engineering",
 				Strategy = new List<Strategy>() {
@@ -50,9 +56,9 @@ namespace LMUSessionTracker.Server.Tests.Json {
 
 		[Fact]
 		public void WriteJson_Sample_CanBeSerialized() {
-			List<TeamStrategy> ex = JsonConvert.DeserializeObject<List<TeamStrategy>>(json, new TeamStrategyNewtonsoftConverter());
-			string serialized = JsonConvert.SerializeObject(ex);
-			List<TeamStrategy> ac = JsonConvert.DeserializeObject<List<TeamStrategy>>(json, new TeamStrategyNewtonsoftConverter());
+			List<TeamStrategy> ex = JsonConvert.DeserializeObject<List<TeamStrategy>>(json, settings);
+			string serialized = JsonConvert.SerializeObject(ex, settings);
+			List<TeamStrategy> ac = JsonConvert.DeserializeObject<List<TeamStrategy>>(json, settings);
 			Assert.Equivalent(ex, ac);
 		}
 

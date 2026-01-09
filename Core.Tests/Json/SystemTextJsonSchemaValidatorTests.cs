@@ -3,12 +3,10 @@ using LMUSessionTracker.Core.LMU;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
-using System.Text.Json;
 
 namespace LMUSessionTracker.Core.Tests.Json {
 	public class SystemTextJsonSchemaValidatorTests {
 		private readonly ILogger<SystemTextJsonSchemaValidator> logger;
-		private readonly JsonSerializerOptions options;
 
 		static SystemTextJsonSchemaValidatorTests() {
 			string dir = Path.Join("logs", "schema");
@@ -20,9 +18,6 @@ namespace LMUSessionTracker.Core.Tests.Json {
 
 		public SystemTextJsonSchemaValidatorTests(LoggingFixture loggingFixture) {
 			logger = loggingFixture.LoggerFactory.CreateLogger<SystemTextJsonSchemaValidator>();
-			options = new JsonSerializerOptions();
-			options.PropertyNameCaseInsensitive = true;
-			options.Converters.Add(new TeamStrategyConverter());
 		}
 
 		[Fact]

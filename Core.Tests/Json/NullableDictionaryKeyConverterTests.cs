@@ -1,5 +1,4 @@
 using LMUSessionTracker.Core.Json;
-using LMUSessionTracker.Core.LMU;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -9,7 +8,7 @@ namespace LMUSessionTracker.Core.Tests.Json {
 
 		public NullableDictionaryKeyConverter() {
 			options = new JsonSerializerOptions();
-			options.PropertyNameCaseInsensitive = true;
+			options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 			options.Converters.Add(new NullableDictionaryKeyConverter<int, int>());
 		}
 
@@ -23,7 +22,7 @@ namespace LMUSessionTracker.Core.Tests.Json {
 		[Fact]
 		public void WriteJson_Sample_CanBeSerialized() {
 			Dictionary<int, int> ex = JsonSerializer.Deserialize<Dictionary<int, int>>("{\"1\":2,\"3\":4}", options);
-			string serialized = JsonSerializer.Serialize(ex);
+			string serialized = JsonSerializer.Serialize(ex, options);
 			Dictionary<int, int> ac = JsonSerializer.Deserialize<Dictionary<int, int>>("{\"1\":2,\"3\":4}", options);
 			Assert.Equivalent(ex, ac);
 		}

@@ -1,15 +1,12 @@
-using LMUSessionTracker.Core.Json;
 using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Server.Json;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
-using System.Text.Json;
 
 namespace LMUSessionTracker.Server.Tests.Json {
 	public class NewtonsoftSchemaValidatorTests {
 		private readonly ILogger<NewtonsoftSchemaValidator> logger;
-		private readonly JsonSerializerOptions options;
 
 		static NewtonsoftSchemaValidatorTests() {
 			string dir = Path.Join("logs", "schema");
@@ -21,9 +18,6 @@ namespace LMUSessionTracker.Server.Tests.Json {
 
 		public NewtonsoftSchemaValidatorTests(LoggingFixture loggingFixture) {
 			logger = loggingFixture.LoggerFactory.CreateLogger<NewtonsoftSchemaValidator>();
-			options = new JsonSerializerOptions();
-			options.PropertyNameCaseInsensitive = true;
-			options.Converters.Add(new TeamStrategyConverter());
 		}
 
 		[Fact]

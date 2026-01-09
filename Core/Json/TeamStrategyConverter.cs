@@ -32,9 +32,7 @@ namespace LMUSessionTracker.Core.Json {
 		public override void Write(Utf8JsonWriter writer, TeamStrategy value, JsonSerializerOptions options) {
 			writer.WriteStartArray();
 			writer.WriteStringValue(value.Name);
-			writer.WriteStartArray();
-			JsonSerializer.Serialize(writer, value, options.GetTypeInfo(typeof(TeamStrategy)));
-			writer.WriteEndArray();
+			JsonSerializer.Serialize(writer, value.Strategy, options.GetTypeInfo(typeof(List<Strategy>)));
 			writer.WriteEndArray();
 		}
 	}
