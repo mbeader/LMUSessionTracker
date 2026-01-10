@@ -3,10 +3,11 @@ import { RouterLink } from '@angular/router';
 import { SessionViewModel } from '../../view-models';
 import { Car, CarKey } from '../../tracking';
 import { Format } from '../../format';
+import { ClassBadge } from '../class-badge/class-badge';
 
 @Component({
 	selector: 'app-session-standings',
-	imports: [RouterLink],
+	imports: [RouterLink, ClassBadge],
 	templateUrl: './standings.html',
 	styleUrl: './standings.css',
 })

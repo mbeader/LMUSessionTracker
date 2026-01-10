@@ -2,10 +2,11 @@ import { ChangeDetectorRef, Component, inject, Input } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ServerApiService } from '../../server-api.service';
 import { SessionViewModel } from '../../view-models';
+import { ClassBadge } from '../class-badge/class-badge';
 
 @Component({
 	selector: 'app-session-history',
-	imports: [RouterLink],
+	imports: [RouterLink, ClassBadge],
 	templateUrl: './history.html',
 	styleUrl: './history.css',
 })

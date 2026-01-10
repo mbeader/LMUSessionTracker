@@ -1,0 +1,47 @@
+:host {
+	--lmu-hy: #db2122;
+	--lmu-p2: #4a74a1;
+	--lmu-p3: #6d2c76;
+	--lmu-gte: #fc5000;
+	--lmu-gt3: #149e4a;
+}
+
+.class-badge {
+	border-radius: 3px;
+	border-style: solid;
+	border-width: 2px;
+	background-color: white;
+	padding: 0px 3px;
+	font-weight: bold;
+	width: 3rem;
+}
+
+.class-badge-hy {
+	border-color: var(--lmu-hy);
+	color: var(--lmu-hy);
+}
+
+.class-badge-p2 {
+	border-color: var(--lmu-p2);
+	color: var(--lmu-p2);
+}
+
+.class-badge-p2e {
+	border-color: var(--lmu-gte);
+	color: var(--lmu-p2);
+}
+
+.class-badge-p3 {
+	border-color: var(--lmu-p3);
+	color: var(--lmu-p3);
+}
+
+.class-badge-gte {
+	border-color: var(--lmu-gte);
+	color: var(--lmu-gte);
+}
+
+.class-badge-gt3 {
+	border-color: var(--lmu-gt3);
+	color: var(--lmu-gt3);
+}

@@ -15,7 +15,7 @@
     <dt class="col-lg-1 col-2">Number</dt>
     <dd class="col-lg-1 col-3">{{ model.car.car.number }}</dd>
     <dt class="col-lg-1 col-2">Class</dt>
-    <dd class="col-lg-1 col-5 text-truncate">{{ model.car.car.class }}</dd>
+    <dd class="col-lg-1 col-5"><app-session-class-badge [carClass]="model.car.car.class" /></dd>
     <dt class="col-lg-1 col-2">Team</dt>
     <dd class="col-lg-3 col-10">{{ model.car.car.teamName }}</dd>
     <dt class="col-lg-1 col-2">ID</dt>

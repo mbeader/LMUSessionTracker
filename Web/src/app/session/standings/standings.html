@@ -26,11 +26,12 @@
         @for (standing of session.standings; track CarKey.fromStanding(standing).id; let i = $index) {
         @let id = CarKey.fromStanding(standing).id;
         @let car = entries.get(id ?? '');
+        @let carClass = (car && car.class ? car.class : standing.carClass) ?? '';
         @if(car) {
         <tr>
             <td><a [routerLink]="['Laps', `${id}`]">{{ standing.position }}</a></td>
             <td>{{ positionInClass.get(id ?? '') }}</td>
-            <td>{{ car?.class ? car.class : standing.carClass }}</td>
+            <td><app-session-class-badge [carClass]="carClass" /></td>
             <td>{{ car?.number ? car.number : standing.carNumber }}</td>
             <td class="team-col text-truncate">{{ car?.teamName ? car.teamName : (!standing.fullTeamName ? standing.vehicleName : standing.fullTeamName) }}</td>
             <td class="driver-col text-truncate">{{ standing.driverName }}</td>

@@ -5,10 +5,11 @@ import { ServerLiveService } from '../../server-live.service';
 import { LapsViewModel } from '../../view-models';
 import { Lap } from '../../tracking';
 import { Format } from '../../format';
+import { ClassBadge } from '../class-badge/class-badge';
 
 @Component({
 	selector: 'app-session-laps',
-	imports: [RouterLink],
+	imports: [RouterLink, ClassBadge],
 	templateUrl: './laps.html',
 	styleUrl: './laps.css',
 })

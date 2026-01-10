@@ -13,7 +13,7 @@
     <tbody>
         @for (car of session.history; track car.key; let i = $index) {
         <tr>
-            <td>{{ car.car.class }}</td>
+            <td><app-session-class-badge [carClass]="car.car.class" /></td>
             <td>{{ car.car.number }}</td>
             <td>{{ car.car.teamName }}</td>
             <td>{{ join(drivers.get(car.key)) }}</td>

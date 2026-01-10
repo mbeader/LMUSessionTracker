@@ -1,0 +1,15 @@
+@if(carClass == 'Hyper') {
+<span class="class-badge class-badge-hy" title="{{ carClass }}">HY</span>
+} @else if(carClass == 'LMP2') {
+<span class="class-badge class-badge-p2" title="{{ carClass }}">P2</span>
+} @else if(carClass == 'LMP2_ELMS') {
+<span class="class-badge class-badge-p2e" title="{{ carClass }}">P2</span>
+} @else if(carClass == 'LMP3') {
+<span class="class-badge class-badge-p3" title="{{ carClass }}">P3</span>
+} @else if(carClass == 'GTE') {
+<span class="class-badge class-badge-gte" title="{{ carClass }}">GTE</span>
+} @else if(carClass == 'GT3') {
+<span class="class-badge class-badge-gt3" title="{{ carClass }}">GT3</span>
+} @else {
+{{ carClass }}
+}
