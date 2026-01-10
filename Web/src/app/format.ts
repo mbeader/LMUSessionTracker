@@ -115,7 +115,7 @@ export class Format {
 	static date(date: Date | string) {
 		if (typeof (date) === 'string') {
 			if(!date.endsWith('Z'))
-				date + 'Z';
+				date += 'Z';
 			date = new Date(date);
 		}
 		let format = (number: number, digits: number) => Math.floor(number).toString().padStart(digits, '0');
