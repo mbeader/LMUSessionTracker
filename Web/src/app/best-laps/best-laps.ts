@@ -111,6 +111,8 @@ export class BestLaps {
 				network.checked = true;
 		}
 		let classes = queryParamMap.getAll('classes');
+		if (classes.length == 0)
+			classes = this.classes.map(x => x.value);
 		for (let carClass of form.querySelectorAll<HTMLInputElement>('#classset input')) {
 			let checked = classes.includes(carClass.value);
 			carClass.checked = checked;
