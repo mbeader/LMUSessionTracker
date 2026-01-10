@@ -17,6 +17,15 @@
                         <a class="nav-link" [routerLink]="['']">Home</a>
                     </li>
                     }
+                    @if(navLink == 'best-laps') {
+                    <li class="nav-item">
+                        <a class="nav-link active" [routerLink]="['BestLaps']">Laps</a>
+                    </li>
+                    } @else {
+                    <li class="nav-item">
+                        <a class="nav-link" [routerLink]="['BestLaps']">Laps</a>
+                    </li>
+                    }
                     @if(sessionId) {
                     <li class="nav-item dropdown">
                         <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Session</a>

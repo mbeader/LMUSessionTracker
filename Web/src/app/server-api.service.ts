@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { IndexViewModel, SessionViewModel, LapsViewModel } from './view-models';
+import { Lap } from './models';
 
 @Injectable({
 	providedIn: 'root',
@@ -22,5 +23,14 @@ export class ServerApiService {
 
 	getLaps(sessionId: string, carId: string): Promise<LapsViewModel> {
 		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Laps?sessionId=' + sessionId + '&carId=' + carId)) as Promise<LapsViewModel>;
+	}
+
+	getTracks(): Promise<string[]> {
+		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Tracks')) as Promise<string[]>;
+	}
+
+	getBestLaps(track: string, network: string, classes: string[]): Promise<Lap[]> {
+		let params = new HttpParams().appendAll({ track: track, network: network, classes: classes });
+		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/BestLaps', { params })) as Promise<Lap[]>;
 	}
 }

@@ -62,6 +62,18 @@ namespace LMUSessionTracker.Server.Controllers {
 			return Ok(vm);
 		}
 
+		public async Task<IActionResult> Tracks() {
+			return Ok(await sessionRepo.GetTracks());
+		}
+
+		public async Task<IActionResult> BestLaps([FromQuery, Required] string track, [FromQuery] string network, [FromQuery] List<string> classes) {
+			if(!ModelState.IsValid)
+				return BadRequest();
+			bool? onlineOnly = network == "online" ? true : network == "offline" ? false : null;
+			classes ??= new List<string>();
+			return Ok(await sessionRepo.GetLaps(track, onlineOnly, classes));
+		}
+
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error() {
 			return Ok(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });

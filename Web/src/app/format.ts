@@ -112,9 +112,11 @@ export class Format {
 		}
 	}
 
-	static date(date: Date | string) {
+	static date(date: Date | string | null) {
+		if (date == null)
+			return;
 		if (typeof (date) === 'string') {
-			if(!date.endsWith('Z'))
+			if (!date.endsWith('Z'))
 				date += 'Z';
 			date = new Date(date);
 		}

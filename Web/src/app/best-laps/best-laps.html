@@ -1,0 +1,89 @@
+<h3>Best laps</h3>
+
+@if(tracks) {
+<form class="d-flex flex-row align-items-center flex-wrap">
+    <label class="me-3" for="bestLapsTrack">Track</label>
+    <select class="form-select w-auto" id="bestLapsTrack" [(ngModel)]="track" (change)="onChange($event)">
+        @for(track of tracks; track track) {
+        <option>{{ track }}</option>
+        }
+    </select>
+    <span class="flex-grow-1"></span>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">Filters</button>
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="filterModalLabel">Filters</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <fieldset class="mb-3" id="classset">
+                        <legend class="form-label fs-6">Classes</legend>
+                        @for(c of classes; track c;) {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="class-{{c.value}}" value="{{ c.value }}" checked>
+                            <label class="form-check-label" for="class-{{c.value}}"><app-session-class-badge [carClass]="c.value" /></label>
+                        </div>
+                        }
+                    </fieldset>
+                    <fieldset class="mb-3">
+                        <legend class="form-label fs-6">Network</legend>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="network-both" name="network" value="" checked>
+                            <label class="form-check-label" for="network-both">Online and offline</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="network-online" name="network" value="online">
+                            <label class="form-check-label" for="network-online">Online only</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="network-offline" name="network" value="offline">
+                            <label class="form-check-label" for="network-offline">Offline only</label>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="applyFilters($event)">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+}
+
+@if(laps != null) {
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Rank</th>
+            <th scope="col">Class</th>
+            <th scope="col">Driver</th>
+            <th scope="col">Vehicle</th>
+            <th class="text-end">Time</th>
+            <th class="text-end">S1</th>
+            <th class="text-end">S2</th>
+            <th class="text-end">S3</th>
+            <th class="text-end">Fuel</th>
+            <th class="text-end">Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (lap of laps; track lap.lapId; let i = $index) {
+        <tr>
+            <th scope="row">{{ i + 1 }}</th>
+            <td><app-session-class-badge [carClass]="lap.car.class" /></td>
+            <td>{{ lap.driver }}</td>
+            <td>{{ lap.car.vehicleName ? lap.car.vehicleName : lap.car.veh }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.totalTime) }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.sector1) }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.sector2) }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.sector3) }}</td>
+            <td class="text-end">{{ Format.percent(lap.fuel) }}</td>
+            <td class="text-end"><a [routerLink]="['/', 'Session', lap.sessionId]">{{ Format.date(lap.timestamp) }}</a></td>
+        </tr>
+        }
+    </tbody>
+</table>
+}

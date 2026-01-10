@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace LMUSessionTracker.Server.Models {
 	public class Car {
@@ -24,6 +25,7 @@ namespace LMUSessionTracker.Server.Models {
 
 		public Entry Entry { get; set; }
 		public Session Session { get; set; }
+		[JsonIgnore]
 		public ICollection<Lap> Laps { get; } = new List<Lap>();
 
 		public void From(Core.Tracking.Car car) {

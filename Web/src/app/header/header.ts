@@ -27,6 +27,10 @@ export class Header {
 					path: [(x: string) => x == 'Session', null, (x: string) => x == 'History']
 				}
 			]
+		},
+		{
+			id: 'best-laps',
+			path: [(x: string) => x == 'BestLaps']
 		}
 	];
 	private readonly ref = inject(ChangeDetectorRef);

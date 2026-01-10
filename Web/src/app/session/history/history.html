@@ -17,7 +17,7 @@
             <td>{{ car.car.number }}</td>
             <td>{{ car.car.teamName }}</td>
             <td>{{ join(drivers.get(car.key)) }}</td>
-            <td>{{ car.car.vehicleName }}</td>
+            <td>{{ car.car.vehicleName ? car.car.vehicleName : car.car.veh }}</td>
             <td class="text-end"><a [routerLink]="['Laps', `${car.key}`]">{{ car.laps && car.laps.length > 0 ? (car.laps[car.laps.length - 1]?.lapNumber ?? car.laps.length) : 0 }}</a></td>
         </tr>
         }

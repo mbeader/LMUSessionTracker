@@ -10,6 +10,8 @@ namespace LMUSessionTracker.Server.Models {
 		public Task<Session> GetSession(string sessionId);
 		public Task<List<Core.Tracking.SessionSummary>> GetSessions();
 		public Task<SessionState> GetSessionState(string sessionId);
+		public Task<List<string>> GetTracks();
+		public Task<List<Lap>> GetLaps(string track, bool? network, List<string> classes);
 	}
 
 	public class SqliteSessionRepository : SessionRepository {
@@ -61,6 +63,37 @@ namespace LMUSessionTracker.Server.Models {
 
 		public async Task<SessionState> GetSessionState(string sessionId) {
 			return await context.SessionStates.SingleOrDefaultAsync(x => x.SessionId == sessionId);
+		}
+
+		public async Task<List<string>> GetTracks() {
+			return await context.Sessions.GroupBy(x => x.TrackName).Select(x => x.Key).OrderBy(x => x).ToListAsync();
+		}
+
+		public async Task<List<Lap>> GetLaps(string track, bool? network, List<string> classes) {
+			bool hasUnknown = classes.Contains("Unknown");
+			return await context.Sessions
+				.Where(x => x.TrackName == track && (!network.HasValue || x.IsOnline == network.Value))
+				.Join(context.Laps.Include(x => x.Car), x => x.SessionId, x => x.SessionId, (x, y) => y)
+				.Where(x => x.TotalTime > 0 && x.IsValid && (
+					(
+						(x.Car.Class == "Hyper" || x.Car.Class == "LMP2" || x.Car.Class == "LMP2_ELMS" || x.Car.Class == "LMP3" || x.Car.Class == "GTE" || x.Car.Class == "GT3") &&
+						classes.Contains(x.Car.Class)
+					) ||
+					(
+						!(x.Car.Class == "Hyper" || x.Car.Class == "LMP2" || x.Car.Class == "LMP2_ELMS" || x.Car.Class == "LMP3" || x.Car.Class == "GTE" || x.Car.Class == "GT3") &&
+						hasUnknown
+					)
+				))
+				.OrderBy(x => x.TotalTime)
+				.GroupBy(x => new { x.Driver, x.Car.Veh })
+				.Select(x => new { x.Key.Driver, x.Key.Veh, TotalTime = x.Select(x => x.TotalTime).Min() })
+				.Join(context.Laps.Include(x => x.Car), x => new { x.Driver, x.Veh, x.TotalTime }, x => new { x.Driver, x.Car.Veh, x.TotalTime }, (x, y) => y)
+				.GroupBy(x => new { x.Driver, x.Car.Veh, x.TotalTime })
+				.Select(x => new { x.Key.Driver, x.Key.Veh, x.Key.TotalTime, LapId = x.Select(x => x.LapId).Min() })
+				.Join(context.Laps.Include(x => x.Car), x => x.LapId, x => x.LapId, (x, y) => y)
+				.OrderBy(x => x.TotalTime)
+				.Take(100)
+				.ToListAsync();
 		}
 	}
 }
