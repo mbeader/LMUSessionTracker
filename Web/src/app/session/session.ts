@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef, signal } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ServerApiService } from '../server-api.service';
 import { ServerLiveService } from '../server-live.service';
@@ -17,6 +17,7 @@ export class Session {
 	private route = inject(ActivatedRoute);
 	private api = inject(ServerApiService);
 	private live = inject(ServerLiveService);
+	private standings = viewChild(Standings);
 	session: SessionViewModel | null = null;
 	hasStandings: boolean = false;
 	Format = Format;
@@ -38,6 +39,7 @@ export class Session {
 	updateSession(session: SessionViewModel) {
 		if (this.session) {
 			SessionViewModel.merge(this.session, session);
+			this.standings()?.ngOnChanges();
 			this.ref.markForCheck();
 		}
 	}
