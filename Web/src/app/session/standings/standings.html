@@ -18,7 +18,7 @@
             <th scope="col" class="text-end">S2</th>
             <th scope="col" class="text-end">S3</th>
             <th scope="col" class="text-end">Fuel</th>
-            <th scope="col" class="text-end">Lap%</th>
+            <th scope="col" class="text-center">Lap%</th>
             <th scope="col" class="text-center">Status</th>
         </tr>
     </thead>
@@ -43,9 +43,12 @@
             <td class="text-end">{{ Format.sectorTime(0.0, standing.lastSectorTime1) }}</td>
             <td class="text-end">{{ standing.sector == "SECTOR2" ? "" : Format.sectorTime(standing.lastSectorTime1, standing.lastSectorTime2) }}</td>
             <td class="text-end">{{ standing.sector != "SECTOR1" ? "" : Format.sectorTime(standing.lastSectorTime2, standing.lastLapTime) }}</td>
-            <td class="text-end">{{ Format.percent(standing.fuelFraction) }}</td>
-            <td class="text-end">{{ Format.distance(standing.lapDistance, session.session.lapDistance) }}</td>
-            <td class="text-center">{{ Format.status(standing) }}</td>
+            @let fuelClass = standing.fuelFraction > .1 ? '' : standing.fuelFraction > .05 ? 'text-warning' : 'text-danger';
+            <td class="text-end {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</td>
+            <td class="text-center"><span class="border bg-secondary-subtle" title="{{ Format.distance(standing.lapDistance, session.session.lapDistance) }}"><span class="lap-prog-{{ Format.lapProgress(standing.lapDistance, session.session.lapDistance) }}"></span></span></td>
+            @let status = Format.status(standing);
+            @let statusClass = status == 'Run' ? 'text-success' : status == 'Req' ? 'text-info' : status == 'Out' ? 'text-warning' : status == 'In' || status == 'Pit' ? 'text-danger' : 'text-secondary';
+            <td class="text-center {{ statusClass }}">{{ status }}</td>
         </tr>
         }
         }

@@ -27,7 +27,7 @@ export class Format {
 	static lapTime(laptime: number) {
 		if (laptime <= 0.0)
 			return '-';
-		let time = Math.round(laptime*1000)/1000;
+		let time = Math.round(laptime * 1000) / 1000;
 		let hours = Math.floor(time / (60 * 60));
 		let minutes = Math.floor((time - hours * 60 * 60) / 60);
 		let seconds = time - hours * 60 * 60 - minutes * 60;
@@ -70,20 +70,32 @@ export class Format {
 
 	// indicating pit should be done on lap with entering status
 	static status(standing: any) {
+		switch (standing.finishStatus) {
+			case 'FSTAT_FINISHED':
+				return 'Fin';
+			case 'FSTAT_CHECKERED':
+				return 'Chk';
+			case 'FSTAT_DNF':
+				return 'DNF';
+			case 'FSTAT_DQ':
+				return 'DQ';
+		}
 		if (standing.inGarageStall)
 			return 'Gar';
-		else if (standing.pitState == 'NONE')
-			return 'Run';
-		else if (standing.pitState == 'ENTERING')
-			return 'In';
-		else if (standing.pitState == 'EXITING')
-			return 'Out';
-		else if (standing.pitState == 'STOPPED')
-			return 'Pit';
-		else if (standing.pitState == 'REQUEST')
-			return 'Req';
-		else
-			return '???';
+		switch (standing.pitState) {
+			case 'NONE':
+				return 'Run';
+			case 'ENTERING':
+				return 'In';
+			case 'EXITING':
+				return 'Out';
+			case 'STOPPED':
+				return 'Pit';
+			case 'REQUEST':
+				return 'Req';
+			default:
+				return '???';
+		}
 	}
 
 	static relativeTimestamp(now: Date, timestamp: Date) {
@@ -126,6 +138,18 @@ export class Format {
 	}
 
 	static distance(progress: number | null, total: number | null) {
-		return progress != null && total != null ? (progress/total).toLocaleString(undefined, this.percentWholeFormat) : null;
+		return progress != null && total != null ? (progress / total).toLocaleString(undefined, this.percentWholeFormat) : null;
+	}
+
+	static lapProgress(progress: number | null, total: number | null) {
+		if (progress != null && total != null) {
+			let value = (progress / total * 10);
+			if (value > 10)
+				value = 10;
+			else if (value < -10)
+				value = -10
+			return value.toString().split('.')[0];
+		}
+		return '0';
 	}
 }
