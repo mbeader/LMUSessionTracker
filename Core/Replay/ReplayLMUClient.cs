@@ -22,6 +22,7 @@ namespace LMUSessionTracker.Core.Replay {
 		private readonly string path;
 		private readonly Queue<string> runQueue;
 		private Dictionary<string, string> context;
+		private Task<Dictionary<string, string>> nextContext;
 
 		public string ContextId { get; private set; }
 		public int Remaining => runQueue.Count;
@@ -44,6 +45,7 @@ namespace LMUSessionTracker.Core.Replay {
 			};
 			serializerOptions.Converters.Add(new TeamStrategyConverter());
 			logger.LogInformation($"Found {runQueue.Count} runs to replay");
+			nextContext = Task.Run(ReadNextContext);
 		}
 
 		private Queue<string> LoadDirectory(string path) {
@@ -81,16 +83,24 @@ namespace LMUSessionTracker.Core.Replay {
 			}
 		}
 
+		private async Task<Dictionary<string, string>> ReadNextContext() {
+			if(runQueue.TryPeek(out string nextFilename)) {
+				using(FileStream stream = File.OpenRead(nextFilename)) {
+					return (Dictionary<string, string>)await JsonSerializer.DeserializeAsync(stream, serializerOptions.GetTypeInfo(typeof(Dictionary<string, string>)));
+				}
+			} else
+				return null;
+		}
+
 		public DateTime OpenContext() {
 			if(ContextId == null || context == null) {
 				ResetContext();
 			}
 			DateTime now = dateTime.UtcNow;
 			if(runQueue.TryDequeue(out string filename)) {
-				using(FileStream stream = File.OpenRead(filename)) {
-					context = (Dictionary<string, string>)JsonSerializer.Deserialize(stream, serializerOptions.GetTypeInfo(typeof(Dictionary<string, string>)));
-					ContextId = filename;
-				}
+				context = nextContext.Result;
+				nextContext = Task.Run(ReadNextContext);
+				ContextId = filename;
 			} else
 				logger.LogWarning("Queue is empty");
 			return now;

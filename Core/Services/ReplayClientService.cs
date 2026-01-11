@@ -16,7 +16,9 @@ namespace LMUSessionTracker.Core.Services {
 		private readonly JsonSerializerOptions serializerOptions;
 		private ReplayLMUClient lmuClient;
 		private int completed = 0;
+		private DateTime start;
 		private DateTime last;
+		private int lastCompleted = 0;
 
 		public ReplayClientService(ILogger<ResponseLoggerService> logger, IServiceProvider serviceProvider, DateTimeProvider dateTime, IOptions<ReplayOptions> options) : base(logger, serviceProvider, dateTime) {
 			this.options = options.Value ?? new ReplayOptions();
@@ -29,7 +31,8 @@ namespace LMUSessionTracker.Core.Services {
 			serializerOptions.Converters.Add(new NullableDictionaryKeyConverter<uint, int>());
 			serializerOptions.Converters.Add(new NullableDictionaryKeyConverter<long, int>());
 			serializerOptions.Converters.Add(new NullableDictionaryKeyConverter<bool, int>());
-			last = DateTime.UtcNow;
+			start = dateTime.UtcNow;
+			last = start;
 		}
 
 		public override int GetInterval() {
@@ -51,9 +54,12 @@ namespace LMUSessionTracker.Core.Services {
 				lmuClient.CloseContext();
 			}
 			DateTime now = dateTime.UtcNow;
-			if((now - last).TotalSeconds >= 10.0) {
+			TimeSpan diff = now - last;
+			if(diff.TotalSeconds >= 10.0) {
+				int change = completed - lastCompleted;
 				last = now;
-				logger.LogDebug($"Completed {completed} ({completed / ((double)completed + lmuClient.Remaining):P0})");
+				lastCompleted = completed;
+				logger.LogDebug($"Completed {completed} ({completed / ((double)completed + lmuClient.Remaining):P0}) ({change / diff.TotalSeconds:N1} runs/s)");
 			}
 			return lmuClient.Remaining > 0;
 		}
@@ -75,7 +81,9 @@ namespace LMUSessionTracker.Core.Services {
 		}
 
 		public override Task End() {
-			logger.LogInformation($"Replay finished with {completed} completed runs");
+			DateTime now = dateTime.UtcNow;
+			TimeSpan diff = now - start;
+			logger.LogInformation($"Replay finished with {completed} completed runs ({completed / diff.TotalSeconds:N1} runs/s)");
 			string dir = Path.Join("logs", "replay");
 			Directory.CreateDirectory(dir);
 			SortedDictionary<string, object> result = collection.Build();
