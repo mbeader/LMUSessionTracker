@@ -49,6 +49,15 @@ export interface Car {
 	id: string;
 }
 
+export interface Entry {
+	slotId: number;
+	id: string;
+	number: string;
+	name: string;
+	vehicle: string;
+	members: Member[];
+}
+
 export interface Lap {
 	lapNumber: number;
 	totalTime: number;
@@ -67,6 +76,15 @@ export interface Lap {
 	rRTire: number;
 	finishStatus: string;
 	timestamp: Date | null;
+}
+
+export interface Member {
+	name: string;
+	badge: string;
+	nationality: string;
+	isDriver: boolean;
+	isEngineer: boolean;
+	isAdmin: boolean;
 }
 
 export interface SessionSummary {

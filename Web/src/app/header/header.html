@@ -40,6 +40,11 @@
                             } @else {
                             <li><a class="dropdown-item" [routerLink]="['Session', sessionId, 'History']">History</a></li>
                             }
+                            @if(navLink == 'session' && navSubLink == 'entry-list') {
+                            <li><a class="dropdown-item active" [routerLink]="['Session', sessionId, 'EntryList']">Entry list</a></li>
+                            } @else {
+                            <li><a class="dropdown-item" [routerLink]="['Session', sessionId, 'EntryList']">Entry list</a></li>
+                            }
                         </ul>
                     </li>
                     }

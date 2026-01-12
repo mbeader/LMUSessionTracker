@@ -1,0 +1,34 @@
+@if(entries != null) {
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Slot</th>
+            <th scope="col">Class</th>
+            <th scope="col">Number</th>
+            <th scope="col">Team</th>
+            <th scope="col">Drivers</th>
+            <th scope="col">Vehicle</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (entry of entries; track $index) {
+        <tr>
+            <td>{{ entry.slotId }}</td>
+            <td><app-session-class-badge [carClass]="''" /></td>
+            <td>{{ entry.number }}</td>
+            <td>{{ entry.name }}</td>
+            <td>
+                @for (member of entry.members; track $index) {
+                <span>{{ member.badge }}</span>&ngsp;
+                <span>{{ member.nationality }}</span>&ngsp;
+                <span>{{ member.name }}</span>&ngsp;
+                <span>{{ member.isDriver && member.isEngineer ? 'Driver/Engineer' : member.isDriver ? 'Driver' : member.isEngineer ? 'Engineer' : '' }}</span>
+                <br />
+                }
+            </td>
+            <td>{{ entry.vehicle }}</td>
+        </tr>
+        }
+    </tbody>
+</table>
+}

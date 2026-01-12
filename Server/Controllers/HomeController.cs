@@ -62,6 +62,20 @@ namespace LMUSessionTracker.Server.Controllers {
 			return Ok(vm);
 		}
 
+		public async Task<IActionResult> EntryList([Required] string sessionId) {
+			if(!ModelState.IsValid)
+				return BadRequest();
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
+			if(session == null)
+				return NotFound();
+			List<Core.Tracking.Entry> entries = new List<Core.Tracking.Entry>();
+			foreach(int slotId in session.Entries.Slots.Keys)
+				entries.Add(session.Entries.Slots[slotId]);
+			foreach((_, Core.Tracking.Entry entry) in session.Entries.Replaced)
+				entries.Add(entry);
+			return Ok(entries);
+		}
+
 		public async Task<IActionResult> Tracks() {
 			return Ok(await sessionRepo.GetTracks());
 		}
