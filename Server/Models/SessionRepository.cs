@@ -86,7 +86,9 @@ namespace LMUSessionTracker.Server.Models {
 				.Join(context.Laps.Include(x => x.Car), x => x.SessionId, x => x.SessionId, (x, y) => y)
 				.Where(x =>
 					x.TotalTime > 0 &&
-					x.IsValid && (
+					x.IsValid &&
+					(!filters.Since.HasValue || (x.Timestamp.HasValue && filters.Since.Value <= x.Timestamp.Value)) &&
+					 (
 						(
 							(x.Car.Class == "Hyper" || x.Car.Class == "LMP2" || x.Car.Class == "LMP2_ELMS" || x.Car.Class == "LMP3" || x.Car.Class == "GTE" || x.Car.Class == "GT3") &&
 							filters.Classes.Contains(x.Car.Class)

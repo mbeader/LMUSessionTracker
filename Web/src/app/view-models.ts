@@ -4,6 +4,7 @@ import { SessionSummary, CarHistory, Car } from './tracking';
 
 export class BestLapsFilters {
 	public track: string | null = null;
+	public since: string | null = null;
 	public network: string | null = null;
 	public classes: string[] | null = null;
 	public sessions: string[] | null = null;

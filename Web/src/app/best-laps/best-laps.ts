@@ -38,6 +38,9 @@ export class BestLaps {
 		{ value: 'Race', checked: true }
 	];
 	network: string = '';
+	since: string = new Date(Date.now() - 2592000000).toISOString().split('T')[0];
+	sinceMax: string = new Date().toISOString().split('T')[0];
+	anytime: boolean = true;
 	Format = Format;
 
 	constructor() {
@@ -79,6 +82,7 @@ export class BestLaps {
 		if (this.track) {
 			let filters = new BestLapsFilters();
 			filters.track = this.track;
+			filters.since = this.anytime ? null : new Date(this.since).toISOString();
 			filters.network = this.network;
 			filters.classes = this.classes.filter(x => x.checked).map(x => x.value);
 			filters.sessions = this.sessions.filter(x => x.checked).map(x => x.value);
@@ -102,6 +106,8 @@ export class BestLaps {
 	}
 
 	readFilters(form: Element) {
+		this.anytime = form.querySelector<HTMLInputElement>('input#any-date')?.checked ?? false;
+		this.since = form.querySelector<HTMLInputElement>('input#since-date')?.value ?? '';
 		this.network = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="network"]')).find(x => x.checked)?.value ?? '';
 		let classes = Array.from(form.querySelectorAll<HTMLInputElement>('#classset input')).map(x => { return { value: x.value, checked: x.checked }; });
 		for (let carClass of this.classes) {
@@ -121,11 +127,29 @@ export class BestLaps {
 			return;
 		}
 
+		let date = queryParamMap.get('since');
+		if (date) {
+			this.since = date;
+			this.anytime = false;
+		} else
+			this.anytime = true;
+		let anyCheck = form.querySelector<HTMLInputElement>('input#any-date');
+		if (anyCheck)
+			anyCheck.checked = this.anytime;
+		let sinceInput = form.querySelector<HTMLInputElement>('input#since-date');
+		if (sinceInput) {
+			if (this.anytime)
+				sinceInput.setAttribute('disabled', '');
+			else
+				sinceInput.removeAttribute('disabled');
+		}
+
 		this.network = queryParamMap.get('network') ?? '';
 		for (let network of form.querySelectorAll<HTMLInputElement>('input[name="network"]')) {
 			if (network.value == this.network)
 				network.checked = true;
 		}
+
 		let classes = queryParamMap.getAll('classes');
 		if (classes.length == 0)
 			classes = this.classes.map(x => x.value);
@@ -136,6 +160,7 @@ export class BestLaps {
 			if (carClassObj)
 				carClassObj.checked = checked;
 		}
+
 		let sessions = queryParamMap.getAll('sessions');
 		if (sessions.length == 0)
 			sessions = this.sessions.map(x => x.value);
@@ -154,6 +179,7 @@ export class BestLaps {
 				relativeTo: this.route,
 				queryParams: {
 					track: this.track,
+					since: this.anytime ? null : this.since,
 					classes: this.classes.filter(x => x.checked).map(x => x.value),
 					sessions: this.sessions.filter(x => x.checked).map(x => x.value),
 					network: this.network
@@ -161,5 +187,18 @@ export class BestLaps {
 				queryParamsHandling: 'replace',
 				replaceUrl: replaceUrl
 			});
+	}
+
+	onChangeDate(e: Event) {
+		if (e && e.target && e.target instanceof HTMLInputElement) {
+			let checked = e.target.checked;
+			let sinceInput = e.target.closest('fieldset')?.querySelector('input[type=date]');
+			if (sinceInput) {
+				if (checked)
+					sinceInput.setAttribute('disabled', '');
+				else
+					sinceInput.removeAttribute('disabled');
+			}
+		}
 	}
 }

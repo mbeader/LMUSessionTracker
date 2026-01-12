@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace LMUSessionTracker.Server.ViewModels {
@@ -9,6 +10,7 @@ namespace LMUSessionTracker.Server.ViewModels {
 
 		[Required]
 		public string Track { get; set; }
+		public DateTime? Since { get; set; }
 		public string Network { get; set; }
 		public List<string> Classes { get; set; }
 		public List<string> Sessions { get; set; }

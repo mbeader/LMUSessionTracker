@@ -18,6 +18,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <fieldset class="mb-3" id="dateset">
+                        <legend class="form-label fs-6">Date range</legend>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="any-date" value="" checked (change)="onChangeDate($event)">
+                            <label class="form-check-label" for="any-date">Anytime</label>
+                        </div>
+                        <div>
+                            <label for="since-date" class="form-label">Since</label>
+                            <input type="date" class="form-control" id="since-date" value="{{ since }}" max="{{ sinceMax }}" disabled>
+                        </div>
+                    </fieldset>
                     <fieldset class="mb-3" id="classset">
                         <legend class="form-label fs-6">Classes</legend>
                         <div class="row">
