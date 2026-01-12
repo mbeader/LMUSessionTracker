@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace LMUSessionTracker.Server.Models {
 	public class Entry {
@@ -43,6 +44,18 @@ namespace LMUSessionTracker.Server.Models {
 			foreach(Member member in Members)
 				entry.Members.Add(member.To());
 			return entry;
+		}
+
+		public bool IsSameEntry(Entry otherEntry) {
+			return SlotId == otherEntry.SlotId &&
+				Id == otherEntry.Id &&
+				Number == otherEntry.Number &&
+				Name == otherEntry.Name &&
+				Vehicle == otherEntry.Vehicle &&
+				Members.All(member => {
+					Member otherMember = otherEntry.Members.First(otherMember => member.Name == otherMember.Name);
+					return otherMember != null && member.IsSameMember(otherMember);
+				});
 		}
 	}
 }

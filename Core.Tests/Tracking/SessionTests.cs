@@ -105,7 +105,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		public void IsSameSession_OfflineValidPhaseTransition_ReturnsTrue(string prev, string inter, string next) {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }, baseTimestamp);
 			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }).Difference);
-			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, baseTimestamp);
+			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, null, baseTimestamp);
 			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }).Difference);
 		}
 
@@ -116,7 +116,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		public void IsSameSession_OfflineInvalidPhaseTransition_ReturnsFalse(string prev, string inter, string next) {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }, baseTimestamp);
 			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }).Difference);
-			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, baseTimestamp);
+			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, null, baseTimestamp);
 			Assert.Equal(SessionDifference.PhaseTransition, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }).Difference);
 		}
 

@@ -109,6 +109,21 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public void Construct_FromEntriesTwoEntries() {
+			EntryList entries = new EntryList(new List<Entry>() { One(), Two() });
+			Assert.Equivalent(new Dictionary<int, Entry>() { { 0, One() }, { 1, Two() } }, entries.Slots);
+		}
+
+		[Fact]
+		public void Construct_FromEntriesOneChangedEntry() {
+			Entry changed = One();
+			changed.Name = "teama";
+			EntryList entries = new EntryList(new List<Entry>() { One(), changed });
+			Assert.Equivalent(new Dictionary<int, Entry>() { { 0, changed } }, entries.Slots);
+			Assert.Equivalent(new List<(CarKey, Entry)>() { (new CarKey(0, "veh1"), One()) }, entries.Replaced);
+		}
+
+		[Fact]
 		public void CalculateChange_ZeroToOne_ReturnsAdded() {
 			Assert.Equal((0, 0, 0, 1), new EntryList().CalculateChange(OneEntry()));
 		}
@@ -143,6 +158,48 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[Fact]
 		public void CalculateChange_TwoToOne_ReturnsSameAndRemoved() {
 			Assert.Equal((1, 1, 0, 0), TwoEntries().CalculateChange(OneEntry()));
+		}
+
+		[Fact]
+		public void Merge_OneNoChanges_ReturnsFalse() {
+			Assert.False(OneEntry().Merge(OneEntry()));
+		}
+
+		[Fact]
+		public void Merge_TwoNoChanges_ReturnsFalse() {
+			Assert.False(TwoEntries().Merge(TwoEntries()));
+		}
+
+		[Fact]
+		public void Merge_OneToZero_ReturnsFalse() {
+			Assert.False(TwoEntries().Merge(new EntryList()));
+		}
+
+		[Fact]
+		public void Merge_ZeroToOne_ReturnsTrue() {
+			Assert.True(new EntryList().Merge(OneEntry()));
+		}
+
+		[Fact]
+		public void Merge_OneToDifferentOne_ReturnsTrue() {
+			Assert.True(OneEntry().Merge(OneEntryTwo()));
+		}
+
+		[Fact]
+		public void Merge_OneChanged_ReturnsTrue() {
+			EntryList changed = OneEntry();
+			changed.Slots.First().Value.Name = "teama";
+			Assert.True(OneEntry().Merge(changed));
+		}
+
+		[Fact]
+		public void Merge_OneToTwo_ReturnsTrue() {
+			Assert.True(OneEntry().Merge(TwoEntries()));
+		}
+
+		[Fact]
+		public void Merge_TwoToOne_ReturnsFalse() {
+			Assert.False(TwoEntries().Merge(OneEntry()));
 		}
 	}
 }

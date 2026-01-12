@@ -5,18 +5,26 @@ using System.Collections.Generic;
 namespace LMUSessionTracker.Core.Tracking {
 	public class EntryList {
 		public Dictionary<int, Entry> Slots { get; private set; }
+		public List<(CarKey, Entry)> Replaced { get; private set; }
 
 		public EntryList(MultiplayerTeams teams = null) {
 			Slots = new Dictionary<int, Entry>();
+			Replaced = new List<(CarKey, Entry)>();
 			if(teams != null)
 				Populate(teams);
 		}
 
 		public EntryList(List<Entry> entries) {
 			Slots = new Dictionary<int, Entry>();
+			Replaced = new List<(CarKey, Entry)>();
 			if(entries != null)
-				foreach(Entry entry in entries)
-					Slots.Add(entry.SlotId, entry);
+				foreach(Entry entry in entries) {
+					if(Slots.TryGetValue(entry.SlotId, out Entry existingEntry)) {
+						Replaced.Add((new CarKey(existingEntry.SlotId, existingEntry.Vehicle), existingEntry));
+						Slots[entry.SlotId] = entry;
+					} else
+						Slots.Add(entry.SlotId, entry);
+				}
 		}
 
 		private void Populate(MultiplayerTeams teams) {
@@ -85,6 +93,26 @@ namespace LMUSessionTracker.Core.Tracking {
 		public bool HasAnyMatch(EntryList other) {
 			(int same, int removed, int changed, int added) = CalculateChange(other);
 			return same != 0 || (same + removed + changed + added == 0);
+		}
+
+		/// <summary>
+		/// Returns whether the content of Slots changed
+		/// </summary>
+		public bool Merge(EntryList other) {
+			bool changed = false;
+			foreach(int slotId in other.Slots.Keys) {
+				if(Slots.TryGetValue(slotId, out Entry existingEntry)) {
+					if(!existingEntry.IsSameEntry(other.Slots[slotId])) {
+						Replaced.Add((new CarKey(slotId, existingEntry.Vehicle), existingEntry));
+						Slots[slotId] = other.Slots[slotId];
+						changed = true;
+					}
+				} else {
+					Slots.Add(slotId, other.Slots[slotId]);
+					changed = true;
+				}
+			}
+			return changed;
 		}
 	}
 }

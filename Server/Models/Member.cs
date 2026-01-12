@@ -39,5 +39,14 @@ namespace LMUSessionTracker.Server.Models {
 				IsAdmin = IsAdmin,
 			};
 		}
+
+		public bool IsSameMember(Member otherMember) {
+			return Name == otherMember.Name &&
+				Badge == otherMember.Badge &&
+				Nationality == otherMember.Nationality &&
+				IsAdmin == otherMember.IsAdmin &&
+				IsDriver == otherMember.IsDriver &&
+				IsEngineer == otherMember.IsEngineer;
+		}
 	}
 }

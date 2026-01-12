@@ -127,7 +127,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public bool IsSecondary(string clientId) => SecondaryClientIds.Contains(clientId);
 
-		public void Update(SessionInfo info, List<Standing> standings, DateTime timestamp) {
+		public bool Update(SessionInfo info, List<Standing> standings, MultiplayerTeams teams, DateTime timestamp) {
 			LastInfo = info ?? LastInfo;
 			LastStandings = standings ?? LastStandings;
 			if(standings != null) {
@@ -136,6 +136,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
+			if(teams != null) {
+				return Entries.Merge(new EntryList(teams));
+			}
+			return false;
 		}
 
 		public List<string> Close() {
@@ -231,7 +235,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public Session Clone() {
 			Session session = Create(SessionId, LastInfo, Timestamp, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()));
-			session.Update(LastInfo, LastStandings, LastUpdate);
+			session.Update(LastInfo, LastStandings, null, LastUpdate);
 			return session;
 		}
 

@@ -95,14 +95,28 @@ namespace LMUSessionTracker.Server.Models {
 		public async Task UpdateEntries(string sessionId, EntryList entries) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			using(var transaction = await context.Database.BeginTransactionAsync()) {
+				Dictionary<int, List<Entry>> existingEntries = new Dictionary<int, List<Entry>>();
+				foreach(Entry entry in await context.Entries.Include(x => x.Members).Where(x => x.SessionId == sessionId).OrderBy(x => x.EntryId).ToListAsync()) {
+					if(!existingEntries.TryGetValue(entry.SlotId, out List<Entry> slotEntries)) {
+						slotEntries = new List<Entry>();
+						existingEntries.Add(entry.SlotId, slotEntries);
+					}
+					slotEntries.Add(entry);
+				}
 				foreach(int slotId in entries.Slots.Keys) {
 					Entry entry = new Entry() { SessionId = sessionId };
 					entry.From(entries.Slots[slotId]);
-					context.Entries.Add(entry);
 					foreach(Core.Tracking.Member coreMember in entries.Slots[slotId].Members) {
 						Member member = new Member() { SessionId = sessionId };
 						member.From(coreMember);
-						entry.Members.Add(member);
+					}
+					if(!(existingEntries.TryGetValue(slotId, out List<Entry> slotEntries) && slotEntries.Exists(x => x.IsSameEntry(entry)))) {
+						if(slotEntries != null) {
+							logger.LogDebug($"Session {sessionId} slot {slotId} replaced");
+						}
+						context.Entries.Add(entry);
+						foreach(Member member in entry.Members)
+							entry.Members.Add(member);
 					}
 				}
 				await context.SaveChangesAsync();
