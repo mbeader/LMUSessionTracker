@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace LMUSessionTracker.Server.Models {
 	public class Entry {
@@ -20,8 +21,10 @@ namespace LMUSessionTracker.Server.Models {
 		public string Name { get; set; }
 		[Required]
 		public string Vehicle { get; set; }
-
+		
+		[JsonIgnore]
 		public Session Session { get; set; }
+		[JsonIgnore]
 		public Car Car { get; set; }
 		public ICollection<Member> Members { get; } = new List<Member>();
 

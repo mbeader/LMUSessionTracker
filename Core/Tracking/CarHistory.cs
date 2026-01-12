@@ -42,7 +42,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			//}
 			if(standing.lapsCompleted > 0)
 				AddLap(new Lap(standing), timestamp);
-			else
+			if(!Car.HasAllFields)
 				Car.Merge(new Car(standing));
 		}
 

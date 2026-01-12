@@ -25,5 +25,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		public string Id() => $"{SlotId}-{Veh}";
+
+		public override string ToString() => Id();
 	}
 }

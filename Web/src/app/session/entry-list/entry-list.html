@@ -1,7 +1,8 @@
-@if(entries != null) {
+@if(cars != null) {
 <table class="table table-sm table-striped table-hover">
     <thead>
         <tr>
+            <th scope="col">#</th>
             <th scope="col">Slot</th>
             <th scope="col">Class</th>
             <th scope="col">Number</th>
@@ -11,22 +12,27 @@
         </tr>
     </thead>
     <tbody>
-        @for (entry of entries; track $index) {
+        @for (car of cars; track $index; let i = $index) {
         <tr>
-            <td>{{ entry.slotId }}</td>
-            <td><app-session-class-badge [carClass]="''" /></td>
-            <td>{{ entry.number }}</td>
-            <td>{{ entry.name }}</td>
+            <th scope="row">{{ i + 1 }}</th>
+            <td>{{ car.slotId }}</td>
+            <td><app-session-class-badge [carClass]="car.class" /></td>
+            <td>{{ car.number }}</td>
+            <td>{{ car.teamName }}</td>
             <td>
-                @for (member of entry.members; track $index) {
-                <span>{{ member.badge }}</span>&ngsp;
-                <span>{{ member.nationality }}</span>&ngsp;
+                @if (car.entry) {
+                @for (member of car.entry.members; track $index) {
+                <small>
+                    [<span class="text-body-secondary">{{ member.badge }}</span>&ngsp;
+                    <span class="text-body-secondary">{{ member.nationality }}</span>]
+                </small>&ngsp;
                 <span>{{ member.name }}</span>&ngsp;
-                <span>{{ member.isDriver && member.isEngineer ? 'Driver/Engineer' : member.isDriver ? 'Driver' : member.isEngineer ? 'Engineer' : '' }}</span>
+                <span class="text-body-secondary">{{ member.isDriver && member.isEngineer ? 'Driver/Engineer' : member.isDriver ? 'Driver' : member.isEngineer ? 'Engineer' : '' }}</span>
                 <br />
                 }
+                }
             </td>
-            <td>{{ entry.vehicle }}</td>
+            <td>{{ car.vehicleName ? car.vehicleName : car.veh }}</td>
         </tr>
         }
     </tbody>

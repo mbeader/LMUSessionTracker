@@ -114,9 +114,9 @@ namespace LMUSessionTracker.Core.Tracking {
 
 			await managementRepo.UpdateSession(session.SessionId, data.SessionInfo, now);
 			bool entriesChanged = session.Update(data.SessionInfo, data.Standings, data.MultiplayerTeams, now);
-			await managementRepo.UpdateLaps(session.SessionId, session.History.GetAllHistory());
 			if(entriesChanged)
 				await managementRepo.UpdateEntries(session.SessionId, session.Entries);
+			await managementRepo.UpdateLaps(session.SessionId, session.History.GetAllHistory());
 			await publisher.Session(session);
 			if(session.Finished && !inactiveSessions.ContainsKey(session.SessionId)) {
 				inactiveSessions.Add(session.SessionId, session);

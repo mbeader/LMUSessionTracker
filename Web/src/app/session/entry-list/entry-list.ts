@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Entry } from '../../tracking';
+import { Car } from '../../models';
 import { ServerApiService } from '../../server-api.service';
 import { ClassBadge } from '../class-badge/class-badge';
 
@@ -14,7 +14,7 @@ export class EntryList {
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
 	private api = inject(ServerApiService);
-	entries: Entry[] | null = null;
+	cars: Car[] | null = null;
 
 	constructor() {
 		let snapshot = this.route.snapshot;
@@ -22,7 +22,7 @@ export class EntryList {
 		if (!sessionId)
 			return;
 		this.api.getEntryList(sessionId).then(result => {
-			this.entries = result;
+			this.cars = result;
 			this.ref.markForCheck();
 		}, error => { console.log(error); })
 	}

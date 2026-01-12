@@ -10,6 +10,7 @@ namespace LMUSessionTracker.Server.Models {
 		public Task<Session> GetSession(string sessionId);
 		public Task<List<Core.Tracking.SessionSummary>> GetSessions();
 		public Task<SessionState> GetSessionState(string sessionId);
+		public Task<List<Car>> GetEntries(string sessionId);
 		public Task<List<string>> GetTracks();
 		public Task<List<Lap>> GetLaps(string track, bool? network, List<string> classes);
 	}
@@ -63,6 +64,10 @@ namespace LMUSessionTracker.Server.Models {
 
 		public async Task<SessionState> GetSessionState(string sessionId) {
 			return await context.SessionStates.SingleOrDefaultAsync(x => x.SessionId == sessionId);
+		}
+
+		public async Task<List<Car>> GetEntries(string sessionId) {
+			return await context.Cars.Include(x => x.Entry).Include(x => x.Entry.Members).Where(x => x.SessionId == sessionId).OrderBy(x => x.CarId).ToListAsync();
 		}
 
 		public async Task<List<string>> GetTracks() {

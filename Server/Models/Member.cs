@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace LMUSessionTracker.Server.Models {
 	public class Member {
@@ -16,8 +17,10 @@ namespace LMUSessionTracker.Server.Models {
 		public bool IsDriver { get; set; }
 		public bool IsEngineer { get; set; }
 		public bool IsAdmin { get; set; }
-
+		
+		[JsonIgnore]
 		public Entry Entry { get; set; }
+		[JsonIgnore]
 		public Session Session { get; set; }
 
 		public void From(Core.Tracking.Member member) {

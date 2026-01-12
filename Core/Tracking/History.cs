@@ -11,7 +11,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public History(List<CarHistory> history = null, EntryList entries = null) {
 			if(history != null)
 				foreach(CarHistory car in history)
-					cars.Add(new CarKey() { SlotId = car.Car.SlotId, Veh = car.Car.Veh ?? "" }, car);
+					cars[new CarKey() { SlotId = car.Car.SlotId, Veh = car.Car.Veh ?? "" }] = car;
 			if(entries != null)
 				LoadEntryList(entries);
 		}
@@ -50,6 +50,22 @@ namespace LMUSessionTracker.Core.Tracking {
 				cars.Add(key, car);
 			}
 			car.Update(standing, timestamp);
+		}
+
+		public void UpdateCars(EntryList entries) {
+			foreach(int slotId in entries.Slots.Keys) {
+				Entry entry = entries.Slots[slotId];
+				CarKey key = new CarKey() { SlotId = slotId, Veh = entry.Vehicle };
+				if(cars.TryGetValue(key, out CarHistory carHistory) && !carHistory.Car.HasAllFields) {
+					carHistory.Car.Merge(new Car() {
+						VehicleName = carHistory.Car.VehicleName,
+						TeamName = entry.Name,
+						Class = carHistory.Car.Class,
+						Number = entry.Number,
+						Id = entry.Id
+					});
+				}
+			}
 		}
 
 		public List<CarHistory> GetAllHistory() {

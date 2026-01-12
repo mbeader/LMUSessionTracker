@@ -65,10 +65,12 @@ namespace LMUSessionTracker.Server.Models {
 					foreach(Lap dbLap in dbCar.Laps)
 						dbLaps.Add(dbLap.LapNumber, dbLap);
 				}
+				int c = 0;
 				foreach(CarHistory car in cars) {
 					if(!dbCars.TryGetValue(car.Key, out Car dbCar)) {
 						dbCar = new Car() { SessionId = sessionId };
 						context.Cars.Add(dbCar);
+						c++;
 					}
 					dbCar.From(car.Car);
 					if(!allDbLaps.TryGetValue(car.Key, out Dictionary<int, Lap> dbLaps)) {
@@ -87,6 +89,8 @@ namespace LMUSessionTracker.Server.Models {
 						dbLap.From(lap);
 					}
 				}
+				if(c > 0)
+					logger.LogDebug($"Added {c} cars");
 				await context.SaveChangesAsync();
 				await transaction.CommitAsync();
 			}
@@ -95,30 +99,43 @@ namespace LMUSessionTracker.Server.Models {
 		public async Task UpdateEntries(string sessionId, EntryList entries) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			using(var transaction = await context.Database.BeginTransactionAsync()) {
+				Dictionary<CarKey, Car> dbCars = new Dictionary<CarKey, Car>();
 				Dictionary<int, List<Entry>> existingEntries = new Dictionary<int, List<Entry>>();
-				foreach(Entry entry in await context.Entries.Include(x => x.Members).Where(x => x.SessionId == sessionId).OrderBy(x => x.EntryId).ToListAsync()) {
-					if(!existingEntries.TryGetValue(entry.SlotId, out List<Entry> slotEntries)) {
-						slotEntries = new List<Entry>();
-						existingEntries.Add(entry.SlotId, slotEntries);
+				foreach(Car dbCar in await context.Cars.Include(x => x.Entry).Include(x => x.Entry.Members).Where(x => x.SessionId == sessionId).OrderBy(x => x.CarId).ToListAsync()) {
+					CarKey key = new CarKey() { SlotId = dbCar.SlotId, Veh = dbCar.Veh };
+					dbCars.Add(key, dbCar);
+					if(dbCar.Entry != null) {
+						if(!existingEntries.TryGetValue(dbCar.Entry.SlotId, out List<Entry> slotEntries)) {
+							slotEntries = new List<Entry>();
+							existingEntries.Add(dbCar.Entry.SlotId, slotEntries);
+						}
+						slotEntries.Add(dbCar.Entry);
 					}
-					slotEntries.Add(entry);
 				}
-				foreach(int slotId in entries.Slots.Keys) {
+				List<int> slots = new List<int>(entries.Slots.Keys);
+				slots.Sort();
+				int c = 0;
+				foreach(int slotId in slots) {
 					Entry entry = new Entry() { SessionId = sessionId };
 					entry.From(entries.Slots[slotId]);
 					foreach(Core.Tracking.Member coreMember in entries.Slots[slotId].Members) {
 						Member member = new Member() { SessionId = sessionId };
 						member.From(coreMember);
+						entry.Members.Add(member);
 					}
 					if(!(existingEntries.TryGetValue(slotId, out List<Entry> slotEntries) && slotEntries.Exists(x => x.IsSameEntry(entry)))) {
 						if(slotEntries != null) {
 							logger.LogDebug($"Session {sessionId} slot {slotId} replaced");
 						}
-						context.Entries.Add(entry);
-						foreach(Member member in entry.Members)
-							entry.Members.Add(member);
+						if(dbCars.TryGetValue(new CarKey(entry.SlotId, entry.Vehicle), out Car car) && car.Entry == null)
+							car.Entry = entry;
+						else
+							context.Cars.Add(new Car() { SessionId = sessionId, SlotId = entry.SlotId, Veh = entry.Vehicle, Entry = entry });
+						c++;
 					}
 				}
+				if(c > 0)
+					logger.LogDebug($"Added {c} cars");
 				await context.SaveChangesAsync();
 				await transaction.CommitAsync();
 			}

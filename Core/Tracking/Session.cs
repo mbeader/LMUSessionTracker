@@ -137,7 +137,9 @@ namespace LMUSessionTracker.Core.Tracking {
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
 			if(teams != null) {
-				return Entries.Merge(new EntryList(teams));
+				EntryList entries = new EntryList(teams);
+				History.UpdateCars(entries);
+				return Entries.Merge(entries);
 			}
 			return false;
 		}

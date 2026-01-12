@@ -22,8 +22,9 @@ namespace LMUSessionTracker.Server.Models {
 		public string Class { get; set; }
 		public string Number { get; set; }
 		public string Id { get; set; }
-
+		
 		public Entry Entry { get; set; }
+		[JsonIgnore]
 		public Session Session { get; set; }
 		[JsonIgnore]
 		public ICollection<Lap> Laps { get; } = new List<Lap>();
