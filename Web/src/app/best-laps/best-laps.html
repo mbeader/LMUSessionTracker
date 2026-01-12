@@ -20,12 +20,29 @@
                 <div class="modal-body">
                     <fieldset class="mb-3" id="classset">
                         <legend class="form-label fs-6">Classes</legend>
-                        @for(c of classes; track c;) {
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="class-{{c.value}}" value="{{ c.value }}" checked>
-                            <label class="form-check-label" for="class-{{c.value}}"><app-session-class-badge [carClass]="c.value" /></label>
+                        <div class="row">
+                            @for(c of classes; track c;) {
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="class-{{c.value}}" value="{{ c.value }}" checked>
+                                    <label class="form-check-label" for="class-{{c.value}}"><app-session-class-badge [carClass]="c.value" /></label>
+                                </div>
+                            </div>
+                            }
                         </div>
-                        }
+                    </fieldset>
+                    <fieldset class="mb-3" id="sessionsset">
+                        <legend class="form-label fs-6">Sessions</legend>
+                        <div class="row">
+                            @for(s of sessions; track s;) {
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="session-{{s.value}}" value="{{ s.value }}" checked>
+                                    <label class="form-check-label" for="session-{{s.value}}">{{ s.value }}</label>
+                                </div>
+                            </div>
+                            }
+                        </div>
                     </fieldset>
                     <fieldset class="mb-3">
                         <legend class="form-label fs-6">Network</legend>

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ServerApiService } from '../server-api.service';
 import { Lap } from '../models';
 import { Format } from '../format';
+import { BestLapsFilters } from '../view-models';
 import { ClassBadge } from '../session/class-badge/class-badge';
 
 declare var bootstrap: any;
@@ -30,6 +31,11 @@ export class BestLaps {
 		{ value: 'GTE', checked: true },
 		{ value: 'GT3', checked: true },
 		{ value: 'Unknown', checked: true }
+	];
+	sessions: { value: string, checked: boolean }[] = [
+		{ value: 'Practice', checked: true },
+		{ value: 'Qualifying', checked: true },
+		{ value: 'Race', checked: true }
 	];
 	network: string = '';
 	Format = Format;
@@ -70,11 +76,17 @@ export class BestLaps {
 
 	changeTrack(nagivate: boolean, replaceUrl: boolean) {
 		this.query(nagivate, replaceUrl);
-		if (this.track)
-			this.api.getBestLaps(this.track, this.network, this.classes.filter(x => x.checked).map(x => x.value)).then(result => {
+		if (this.track) {
+			let filters = new BestLapsFilters();
+			filters.track = this.track;
+			filters.network = this.network;
+			filters.classes = this.classes.filter(x => x.checked).map(x => x.value);
+			filters.sessions = this.sessions.filter(x => x.checked).map(x => x.value);
+			this.api.getBestLaps(filters).then(result => {
 				this.laps = result ?? [];
 				this.ref.markForCheck();
 			}, error => { console.log(error); });
+		}
 	}
 
 	applyFilters(e: Event) {
@@ -94,6 +106,10 @@ export class BestLaps {
 		let classes = Array.from(form.querySelectorAll<HTMLInputElement>('#classset input')).map(x => { return { value: x.value, checked: x.checked }; });
 		for (let carClass of this.classes) {
 			carClass.checked = classes.find(x => x.value == carClass.value)?.checked ?? false;
+		}
+		let sessions = Array.from(form.querySelectorAll<HTMLInputElement>('#sessionsset input')).map(x => { return { value: x.value, checked: x.checked }; });
+		for (let session of this.sessions) {
+			session.checked = sessions.find(x => x.value == session.value)?.checked ?? false;
 		}
 	}
 
@@ -120,6 +136,16 @@ export class BestLaps {
 			if (carClassObj)
 				carClassObj.checked = checked;
 		}
+		let sessions = queryParamMap.getAll('sessions');
+		if (sessions.length == 0)
+			sessions = this.sessions.map(x => x.value);
+		for (let session of form.querySelectorAll<HTMLInputElement>('#sessionsset input')) {
+			let checked = sessions.includes(session.value);
+			session.checked = checked;
+			let sessionObj = this.sessions.find(x => x.value == session.value);
+			if (sessionObj)
+				sessionObj.checked = checked;
+		}
 	}
 
 	query(nagivate: boolean, replaceUrl: boolean) {
@@ -129,6 +155,7 @@ export class BestLaps {
 				queryParams: {
 					track: this.track,
 					classes: this.classes.filter(x => x.checked).map(x => x.value),
+					sessions: this.sessions.filter(x => x.checked).map(x => x.value),
 					network: this.network
 				},
 				queryParamsHandling: 'replace',

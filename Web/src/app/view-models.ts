@@ -2,6 +2,13 @@ import { SessionInfo, Standing } from './lmu';
 import { Session, SessionState } from './models';
 import { SessionSummary, CarHistory, Car } from './tracking';
 
+export class BestLapsFilters {
+	public track: string | null = null;
+	public network: string | null = null;
+	public classes: string[] | null = null;
+	public sessions: string[] | null = null;
+}
+
 export class IndexViewModel {
 	public sessions: Array<SessionSummary> | null = null;
 }

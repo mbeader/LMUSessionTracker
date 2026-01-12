@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LMUSessionTracker.Server.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace LMUSessionTracker.Server.Models {
 		public Task<SessionState> GetSessionState(string sessionId);
 		public Task<List<Car>> GetEntries(string sessionId);
 		public Task<List<string>> GetTracks();
-		public Task<List<Lap>> GetLaps(string track, bool? network, List<string> classes);
+		public Task<List<Lap>> GetLaps(BestLapsFilters filters);
 	}
 
 	public class SqliteSessionRepository : SessionRepository {
@@ -74,21 +75,28 @@ namespace LMUSessionTracker.Server.Models {
 			return await context.Sessions.GroupBy(x => x.TrackName).Select(x => x.Key).OrderBy(x => x).ToListAsync();
 		}
 
-		public async Task<List<Lap>> GetLaps(string track, bool? network, List<string> classes) {
-			bool hasUnknown = classes.Contains("Unknown");
+		public async Task<List<Lap>> GetLaps(BestLapsFilters filters) {
+			bool hasUnknown = filters.Classes.Contains("Unknown");
 			return await context.Sessions
-				.Where(x => x.TrackName == track && (!network.HasValue || x.IsOnline == network.Value))
+				.Where(x =>
+					x.TrackName == filters.Track &&
+					(!filters.OnlineOnly.HasValue || x.IsOnline == filters.OnlineOnly.Value) &&
+					filters.SessionTypes.Contains(x.SessionType)
+				)
 				.Join(context.Laps.Include(x => x.Car), x => x.SessionId, x => x.SessionId, (x, y) => y)
-				.Where(x => x.TotalTime > 0 && x.IsValid && (
-					(
-						(x.Car.Class == "Hyper" || x.Car.Class == "LMP2" || x.Car.Class == "LMP2_ELMS" || x.Car.Class == "LMP3" || x.Car.Class == "GTE" || x.Car.Class == "GT3") &&
-						classes.Contains(x.Car.Class)
-					) ||
-					(
-						!(x.Car.Class == "Hyper" || x.Car.Class == "LMP2" || x.Car.Class == "LMP2_ELMS" || x.Car.Class == "LMP3" || x.Car.Class == "GTE" || x.Car.Class == "GT3") &&
-						hasUnknown
+				.Where(x =>
+					x.TotalTime > 0 &&
+					x.IsValid && (
+						(
+							(x.Car.Class == "Hyper" || x.Car.Class == "LMP2" || x.Car.Class == "LMP2_ELMS" || x.Car.Class == "LMP3" || x.Car.Class == "GTE" || x.Car.Class == "GT3") &&
+							filters.Classes.Contains(x.Car.Class)
+						) ||
+						(
+							!(x.Car.Class == "Hyper" || x.Car.Class == "LMP2" || x.Car.Class == "LMP2_ELMS" || x.Car.Class == "LMP3" || x.Car.Class == "GTE" || x.Car.Class == "GT3") &&
+							hasUnknown
+						)
 					)
-				))
+				)
 				.OrderBy(x => x.TotalTime)
 				.GroupBy(x => new { x.Driver, x.Car.Veh })
 				.Select(x => new { x.Key.Driver, x.Key.Veh, TotalTime = x.Select(x => x.TotalTime).Min() })
