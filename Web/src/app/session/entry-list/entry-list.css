@@ -1,0 +1,53 @@
+.fi.fi-none {
+	background-image: url(../../../../public/restricted-country.svg);
+}
+
+.sr {
+	background-size: contain;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	position: relative;
+	display: inline-block;
+	width: 1em;
+	line-height: 1em;
+}
+
+.sr:before {
+	content: " ";
+}
+
+.sr.content-creator {
+	background-image: url(../../../../public/content-creator.svg);
+}
+
+.sr.content-creator {
+	background-image: url(../../../../public/irl-driver.svg);
+}
+
+.sr.sr-clean {
+	background-image: url(../../../../public/sr-clean.svg);
+}
+
+.sr.sr-danger {
+	background-image: url(../../../../public/sr-danger.svg);
+}
+
+.sr.sr-noob {
+	background-image: url(../../../../public/sr-noob.svg);
+}
+
+.sr.sr-probation {
+	background-image: url(../../../../public/sr-probation.svg);
+}
+
+.sr.sr-rookie {
+	background-image: url(../../../../public/sr-rookie.svg);
+}
+
+.sr.sr-saint {
+	background-image: url(../../../../public/sr-saint.svg);
+}
+
+.sr.sr-warning {
+	background-image: url(../../../../public/sr-warning.svg);
+}
