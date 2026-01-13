@@ -11,84 +11,10 @@
 </div>
 <div class="tab-content" id="sessions-tabs-content">
     <div class="tab-pane fade show active" id="live-tab-pane" role="tabpanel" aria-labelledby="live-tab" tabindex="0">
-        <table class="table table-sm table-striped table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">Start time</th>
-                    <th scope="col">Network</th>
-                    <th scope="col">Track</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Phase</th>
-                    <th scope="col">Remaining</th>
-                    <th scope="col">Cars</th>
-                    <th scope="col">Laps</th>
-                    <th scope="col">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (session of liveSessions | async; track session.sessionId; let i = $index) {
-                <tr>
-                    <td><a [routerLink]="['Session', session.sessionId]">{{ Format.date(session.timestamp) }}</a></td>
-                    <td>{{ session.online ? "Online" : "Offline" }}</td>
-                    <td>{{ session.track }}</td>
-                    <td>{{ session.type }}</td>
-                    <td>{{ (session.active || !session.finished) && session.phase >= 0 ? Format.phase(session.phase) : "" }}</td>
-                    <td>{{ session.active || !session.finished ? Format.time(session.remaining) : "Complete" }}</td>
-                    <td>{{ session.carCount }}</td>
-                    <td>{{ session.lapCount }}</td>
-                    <td title="{{ Format.relativeTimestamp(now, session.lastUpdate) }}">{{ session.active && session.finished ? "Finished" : session.active && session.clientCount > 0 ? "Active" : session.finished ? "Closed" : "Inactive" }}</td>
-                </tr>
-                } @empty {
-                <tr>
-                    @if(init) {
-                    <td colspan="9" class="text-center">Loading live sessions...</td>
-                    } @else {
-                    <td colspan="9" class="text-center">No live sessions found</td>
-                    }
-                </tr>
-                }
-            </tbody>
-        </table>
+        <app-sessions-sessions-table [sessions]="liveSessions" [init]="init" />
     </div>
     <div class="tab-pane fade" id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab" tabindex="0">
-        <table class="table table-sm table-striped table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">Start time</th>
-                    <th scope="col">Network</th>
-                    <th scope="col">Track</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Phase</th>
-                    <th scope="col">Remaining</th>
-                    <th scope="col">Cars</th>
-                    <th scope="col">Laps</th>
-                    <th scope="col">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (session of sessions | async; track session.sessionId; let i = $index) {
-                <tr>
-                    <td><a [routerLink]="['Session', session.sessionId]">{{ Format.date(session.timestamp) }}</a></td>
-                    <td>{{ session.online ? "Online" : "Offline" }}</td>
-                    <td>{{ session.track }}</td>
-                    <td>{{ session.type }}</td>
-                    <td>{{ (session.active || !session.finished) && session.phase >= 0 ? Format.phase(session.phase) : "" }}</td>
-                    <td>{{ session.active || !session.finished ? Format.time(session.remaining) : "Complete" }}</td>
-                    <td>{{ session.carCount }}</td>
-                    <td>{{ session.lapCount }}</td>
-                    <td title="{{ Format.relativeTimestamp(now, session.lastUpdate) }}">{{ session.active && session.finished ? "Finished" : session.active && session.clientCount > 0 ? "Active" : session.finished ? "Closed" : "Inactive" }}</td>
-                </tr>
-                } @empty {
-                <tr>
-                    @if(init) {
-                    <td colspan="9" class="text-center">Loading sessions...</td>
-                    } @else {
-                    <td colspan="9" class="text-center">No sessions found</td>
-                    }
-                </tr>
-                }
-            </tbody>
-        </table>
+        <app-sessions-sessions-table [sessions]="sessions" [init]="init" />
 
         <div class="d-flex justify-content-between">
             <ngb-pagination [collectionSize]="(total | async)!" [(page)]="service.page" [pageSize]="service.pageSize">

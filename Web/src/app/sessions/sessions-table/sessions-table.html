@@ -1,0 +1,38 @@
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Start time</th>
+            <th scope="col">Network</th>
+            <th scope="col">Track</th>
+            <th scope="col">Type</th>
+            <th scope="col">Phase</th>
+            <th scope="col">Remaining</th>
+            <th scope="col">Cars</th>
+            <th scope="col">Laps</th>
+            <th scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (session of sessions | async; track session.sessionId; let i = $index) {
+        <tr>
+            <td><a [routerLink]="['Session', session.sessionId]">{{ Format.date(session.timestamp) }}</a></td>
+            <td>{{ session.online ? "Online" : "Offline" }}</td>
+            <td>{{ session.track }}</td>
+            <td>{{ session.type }}</td>
+            <td>{{ (session.active || !session.finished) && session.phase >= 0 ? Format.phase(session.phase) : "" }}</td>
+            <td>{{ session.active || !session.finished ? Format.time(session.remaining) : "Complete" }}</td>
+            <td>{{ session.carCount }}</td>
+            <td>{{ session.lapCount }}</td>
+            <td title="{{ Format.relativeTimestamp(now, session.lastUpdate) }}">{{ session.active && session.finished ? "Finished" : session.active && session.clientCount > 0 ? "Active" : session.finished ? "Closed" : "Inactive" }}</td>
+        </tr>
+        } @empty {
+        <tr>
+            @if(init) {
+            <td colspan="9" class="text-center">Loading sessions...</td>
+            } @else {
+            <td colspan="9" class="text-center">No sessions found</td>
+            }
+        </tr>
+        }
+    </tbody>
+</table>

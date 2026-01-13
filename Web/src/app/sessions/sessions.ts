@@ -1,17 +1,16 @@
 import { Component, inject, Injectable } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap/pagination';
 import { BehaviorSubject, debounceTime, delay, Observable, Subject, switchMap, tap } from 'rxjs';
 import { ServerApiService } from '../server-api.service';
 import { ServerLiveService } from '../server-live.service';
-import { Format } from '../format';
 import { SessionSummary } from '../tracking';
 import { IndexViewModel } from '../view-models';
+import { SessionsTable } from './sessions-table/sessions-table';
 
 @Component({
 	selector: 'app-sessions',
-	imports: [RouterLink, NgbPagination, AsyncPipe],
+	imports: [NgbPagination, AsyncPipe, SessionsTable],
 	templateUrl: './sessions.html',
 	styleUrl: './sessions.css',
 })
@@ -24,9 +23,7 @@ export class Sessions {
 	liveSessions: Observable<SessionSummary[]>;
 	sessions: Observable<SessionSummary[]>;
 	total: Observable<number>;
-	now: Date = new Date();
 	init: boolean = true;
-	Format = Format;
 
 	constructor() {
 		this.liveSessions = this._liveSessions.asObservable();
