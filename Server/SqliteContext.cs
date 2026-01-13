@@ -13,12 +13,15 @@ namespace LMUSessionTracker.Server {
 		public DbSet<Entry> Entries { get; set; }
 		public DbSet<Member> Members { get; set; }
 		public DbSet<Chat> Chats { get; set; }
+		public DbSet<KnownDriver> KnownDrivers { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder) {
 			modelBuilder.Entity<Entry>()
 				.HasAlternateKey(x => new { x.SessionId, x.EntryId });
 			modelBuilder.Entity<Car>()
 				.HasAlternateKey(x => new { x.SessionId, x.CarId });
+			modelBuilder.Entity<KnownDriver>()
+				.HasAlternateKey(x => x.Name);
 
 			modelBuilder.Entity<Member>()
 				.HasOne(x => x.Entry)

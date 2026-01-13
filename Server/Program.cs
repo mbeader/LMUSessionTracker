@@ -50,6 +50,7 @@ namespace LMUSessionTracker.Server {
 			var serverConfig = builder.Configuration.GetSection("Server");
 			var serverOptions = serverConfig.Get<ServerOptions>();
 			builder.Services.Configure<ServerOptions>(serverConfig);
+			builder.Services.Configure<KnownDriversOptions>(builder.Configuration.GetSection("KnownDrivers"));
 			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
 
 			builder.Services.AddDbContextFactory<SqliteContext>(options => options.UseSqlite(builder.Configuration["ConnectionStrings:Sqlite"]));
@@ -84,6 +85,7 @@ namespace LMUSessionTracker.Server {
 				builder.Services.AddScoped<SessionObserver, SessionArbiterObserver>();
 			}
 			builder.Services.AddScoped<SessionRepository, SqliteSessionRepository>();
+			builder.Services.AddScoped<SqliteKnownDriversRepository>();
 			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
 			builder.Services.AddSingleton<ProtocolAuthenticator, DefaultProtocolAuthenticator>();
 			builder.Services.AddHostedService<SessionLoaderService>();
@@ -105,6 +107,8 @@ namespace LMUSessionTracker.Server {
 					context.Database.EnsureDeleted();
 				}
 				context.Database.Migrate();
+				var knownDriversRepo = serviceScope.ServiceProvider.GetRequiredService<SqliteKnownDriversRepository>();
+				knownDriversRepo.Apply().Wait();
 			}
 
 			// Configure the HTTP request pipeline.

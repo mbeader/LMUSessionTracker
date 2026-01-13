@@ -8,6 +8,7 @@ export class BestLapsFilters {
 	public network: string | null = null;
 	public classes: string[] | null = null;
 	public sessions: string[] | null = null;
+	public knownDriversOnly: boolean = false;
 }
 
 export class IndexViewModel {

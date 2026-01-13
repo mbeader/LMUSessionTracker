@@ -14,6 +14,7 @@ namespace LMUSessionTracker.Server.ViewModels {
 		public string Network { get; set; }
 		public List<string> Classes { get; set; }
 		public List<string> Sessions { get; set; }
+		public bool KnownDriversOnly { get; set; }
 
 		public bool? OnlineOnly => Network == "online" ? true : Network == "offline" ? false : null;
 		public List<string> SessionTypes => GetSessionType();

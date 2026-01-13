@@ -68,6 +68,8 @@ export interface Lap {
 
 	session: Session;
 	car: Car;
+
+	known: boolean;
 }
 
 export interface Member {

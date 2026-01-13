@@ -86,7 +86,8 @@ namespace LMUSessionTracker.Server.Models {
 
 		public async Task<List<Lap>> GetLaps(BestLapsFilters filters) {
 			bool hasUnknown = filters.Classes.Contains("Unknown");
-			return await context.Sessions
+			HashSet<string> knownDrivers = context.KnownDrivers.Select(x => x.Name).ToHashSet();
+			List<Lap> laps = await context.Sessions
 				.Where(x =>
 					x.TrackName == filters.Track &&
 					(!filters.OnlineOnly.HasValue || x.IsOnline == filters.OnlineOnly.Value) &&
@@ -106,7 +107,8 @@ namespace LMUSessionTracker.Server.Models {
 							!(x.Car.Class == "Hyper" || x.Car.Class == "LMP2" || x.Car.Class == "LMP2_ELMS" || x.Car.Class == "LMP3" || x.Car.Class == "GTE" || x.Car.Class == "GT3") &&
 							hasUnknown
 						)
-					)
+					) &&
+					(!filters.KnownDriversOnly || knownDrivers.Contains(x.Driver))
 				)
 				.OrderBy(x => x.TotalTime)
 				.GroupBy(x => new { x.Driver, x.Car.Veh })
@@ -118,6 +120,9 @@ namespace LMUSessionTracker.Server.Models {
 				.OrderBy(x => x.TotalTime)
 				.Take(100)
 				.ToListAsync();
+			foreach(Lap lap in laps)
+				lap.Known = knownDrivers.Contains(lap.Driver);
+			return laps;
 		}
 	}
 }

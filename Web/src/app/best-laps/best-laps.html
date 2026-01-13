@@ -56,6 +56,17 @@
                         </div>
                     </fieldset>
                     <fieldset class="mb-3">
+                        <legend class="form-label fs-6">Drivers</legend>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="knownDrivers-all" name="knownDrivers" value="false" checked>
+                            <label class="form-check-label" for="knownDrivers-all">All drivers</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="knownDrivers-only" name="knownDrivers" value="true">
+                            <label class="form-check-label" for="knownDrivers-only">Known drivers only</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="mb-3">
                         <legend class="form-label fs-6">Network</legend>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" id="network-both" name="network" value="" checked>
@@ -87,6 +98,7 @@
         <tr>
             <th scope="col">Rank</th>
             <th scope="col">Class</th>
+            <th scope="col" title="Known driver">&#x2605;</th>
             <th scope="col">Driver</th>
             <th scope="col">Vehicle</th>
             <th class="text-end">Time</th>
@@ -102,6 +114,11 @@
         <tr>
             <th scope="row">{{ i + 1 }}</th>
             <td><app-session-class-badge [carClass]="lap.car.class" /></td>
+            @if(lap.known) {
+            <td class="text-warning" title="Known driver">&#x2605;</td>
+            } @else {
+            <td></td>
+            }
             <td>{{ lap.driver }}</td>
             <td>{{ lap.car.vehicleName ? lap.car.vehicleName : lap.car.veh }}</td>
             <td class="text-end">{{ Format.lapTime(lap.totalTime) }}</td>

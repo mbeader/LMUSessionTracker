@@ -34,6 +34,9 @@ namespace LMUSessionTracker.Server.Models {
 		public Session Session { get; set; }
 		public Car Car { get; set; }
 
+		[NotMapped]
+		public bool Known { get; set; }
+
 		public void From(Core.Tracking.Lap lap) {
 			if(LapNumber > 0 && LapNumber != lap.LapNumber)
 				throw new InvalidOperationException($"Cannot change lap from L{LapNumber} to L{lap.LapNumber}");

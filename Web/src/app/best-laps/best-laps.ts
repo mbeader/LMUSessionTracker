@@ -41,6 +41,7 @@ export class BestLaps {
 	since: string = new Date(Date.now() - 2592000000).toISOString().split('T')[0];
 	sinceMax: string = new Date().toISOString().split('T')[0];
 	anytime: boolean = true;
+	knownDriversOnly: boolean = false;
 	Format = Format;
 
 	constructor() {
@@ -86,6 +87,7 @@ export class BestLaps {
 			filters.network = this.network;
 			filters.classes = this.classes.filter(x => x.checked).map(x => x.value);
 			filters.sessions = this.sessions.filter(x => x.checked).map(x => x.value);
+			filters.knownDriversOnly = this.knownDriversOnly;
 			this.api.getBestLaps(filters).then(result => {
 				this.laps = result ?? [];
 				this.ref.markForCheck();
@@ -117,6 +119,7 @@ export class BestLaps {
 		for (let session of this.sessions) {
 			session.checked = sessions.find(x => x.value == session.value)?.checked ?? false;
 		}
+		this.knownDriversOnly = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="knownDrivers"]')).find(x => x.checked)?.value == 'true';
 	}
 
 	setFilters(queryParamMap: ParamMap) {
@@ -171,6 +174,12 @@ export class BestLaps {
 			if (sessionObj)
 				sessionObj.checked = checked;
 		}
+
+		this.knownDriversOnly = queryParamMap.get('knownDriversOnly') == 'true';
+		for (let knownDrivers of form.querySelectorAll<HTMLInputElement>('input[name="knownDrivers"]')) {
+			if ((knownDrivers.value == 'true') == this.knownDriversOnly)
+				knownDrivers.checked = true;
+		}
 	}
 
 	query(nagivate: boolean, replaceUrl: boolean) {
@@ -182,7 +191,8 @@ export class BestLaps {
 					since: this.anytime ? null : this.since,
 					classes: this.classes.filter(x => x.checked).map(x => x.value),
 					sessions: this.sessions.filter(x => x.checked).map(x => x.value),
-					network: this.network
+					network: this.network,
+					knownDriversOnly: this.knownDriversOnly
 				},
 				queryParamsHandling: 'replace',
 				replaceUrl: replaceUrl
