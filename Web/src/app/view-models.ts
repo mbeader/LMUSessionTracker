@@ -11,7 +11,8 @@ export class BestLapsFilters {
 }
 
 export class IndexViewModel {
-	public sessions: Array<SessionSummary> | null = null;
+	public sessions: SessionSummary[] | null = null;
+	public total: number = 0;
 }
 
 export class LapsViewModel {
@@ -68,7 +69,7 @@ export class SessionViewModel {
 	}
 
 	static flagClass(sectorFlag: string, even?: boolean) {
-		switch(sectorFlag) {
+		switch (sectorFlag) {
 			case 'UNKNOWN':
 				return 'pe-3 bg-success';
 			case 'YELLOW':

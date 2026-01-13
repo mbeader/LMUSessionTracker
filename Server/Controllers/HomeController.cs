@@ -1,4 +1,3 @@
-using LMUSessionTracker.Core.LMU;
 using LMUSessionTracker.Core.Tracking;
 using LMUSessionTracker.Server.Models;
 using LMUSessionTracker.Server.ViewModels;
@@ -23,9 +22,11 @@ namespace LMUSessionTracker.Server.Controllers {
 			this.sessionObserver = sessionObserver;
 		}
 
-		public async Task<IActionResult> Index() {
+		public async Task<IActionResult> Index([FromQuery, Range(1, int.MaxValue)] int page, [FromQuery, Range(1, 20)] int pageSize) {
+			if(!ModelState.IsValid)
+				return BadRequest();
 			IndexViewModel vm = new IndexViewModel();
-			vm.Sessions = await sessionRepo.GetSessions();
+			vm.Sessions = await sessionRepo.GetSessions(page, pageSize);
 			List<SessionSummary> activeSessions = await sessionObserver.GetSessions();
 			for(int i = 0; i < vm.Sessions.Count; i++) {
 				SessionSummary activeSession = activeSessions.Find(x => x.SessionId == vm.Sessions[i].SessionId);
@@ -34,6 +35,7 @@ namespace LMUSessionTracker.Server.Controllers {
 					vm.Sessions[i] = activeSession;
 				}
 			}
+			vm.Total = await sessionRepo.GetSessionCount();
 			return Ok(vm);
 		}
 

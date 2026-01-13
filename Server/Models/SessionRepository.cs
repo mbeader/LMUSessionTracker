@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Server.Models {
 	public interface SessionRepository {
 		public Task<Session> GetSession(string sessionId);
-		public Task<List<Core.Tracking.SessionSummary>> GetSessions();
+		public Task<int> GetSessionCount();
+		public Task<List<Core.Tracking.SessionSummary>> GetSessions(int page, int pageSize);
 		public Task<SessionState> GetSessionState(string sessionId);
 		public Task<List<Car>> GetEntries(string sessionId);
 		public Task<List<string>> GetTracks();
@@ -36,8 +37,16 @@ namespace LMUSessionTracker.Server.Models {
 				.SingleOrDefaultAsync(x => x.SessionId == sessionId);
 		}
 
-		public async Task<List<Core.Tracking.SessionSummary>> GetSessions() {
-			List<Session> sessions = await context.Sessions.Include(x => x.LastState).OrderByDescending(x => x.Timestamp).ToListAsync();
+		public async Task<int> GetSessionCount() {
+			return await context.Sessions.CountAsync();
+		}
+
+		public async Task<List<Core.Tracking.SessionSummary>> GetSessions(int page, int pageSize) {
+			List<Session> sessions = await context.Sessions.Include(x => x.LastState)
+				.OrderByDescending(x => x.Timestamp)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToListAsync();
 			// TODO improve this
 			var cars = await context.Cars.GroupBy(x => new { x.SessionId }).Select(x => new { x.Key.SessionId, Count = x.Count() }).ToListAsync();
 			var entries = await context.Entries.GroupBy(x => new { x.SessionId }).Select(x => new { x.Key.SessionId, Count = x.Count() }).ToListAsync();

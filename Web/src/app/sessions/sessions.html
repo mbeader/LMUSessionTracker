@@ -15,7 +15,7 @@
         </tr>
     </thead>
     <tbody>
-        @for (session of sessions; track session.sessionId; let i = $index) {
+        @for (session of sessions | async; track session.sessionId; let i = $index) {
         <tr>
             <td><a [routerLink]="['Session', session.sessionId]">{{ Format.date(session.timestamp) }}</a></td>
             <td>{{ session.online ? "Online" : "Offline" }}</td>
@@ -27,6 +27,22 @@
             <td>{{ session.lapCount }}</td>
             <td title="{{ Format.relativeTimestamp(now, session.lastUpdate) }}">{{ session.active && session.finished ? "Finished" : session.active && session.clientCount > 0 ? "Active" : session.finished ? "Closed" : "Inactive" }}</td>
         </tr>
+        } @empty {
+        <tr>
+            @if(init) {
+            <td colspan="9" class="text-center">Loading sessions...</td>
+            } @else {
+            <td colspan="9" class="text-center">No sessions found</td>
+            }
+        </tr>
         }
     </tbody>
 </table>
+
+<div class="d-flex justify-content-between">
+    <ngb-pagination [collectionSize]="(total | async)!" [(page)]="service.page" [pageSize]="service.pageSize">
+    </ngb-pagination>
+    @if (service.loading | async) {
+    <div class="text-body-secondary">Loading...</div>
+    }
+</div>

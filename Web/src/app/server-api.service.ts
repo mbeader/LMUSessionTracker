@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom, Observable } from 'rxjs';
 import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters } from './view-models';
 import { Lap, Car } from './models';
 
@@ -13,8 +13,8 @@ export class ServerApiService {
 
 	constructor() { }
 
-	getSessions(): Promise<IndexViewModel> {
-		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Index')) as Promise<IndexViewModel>;
+	getSessions(page: number, pageSize: number): Observable<IndexViewModel> {
+		return this.httpClient.get<IndexViewModel>(this.baseUrl + '/Home/Index', { params: { page: page, pageSize: pageSize } });
 	}
 
 	getSession(sessionId: string): Promise<SessionViewModel> {
