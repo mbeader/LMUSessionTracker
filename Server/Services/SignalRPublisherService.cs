@@ -32,9 +32,15 @@ namespace LMUSessionTracker.Server.Services {
 			}
 		}
 
+		public async Task Sessions(List<SessionSummary> sessions) {
+			await hubContext.Clients.Group(SessionHub.SessionsGroup()).SendAsync("Sessions", sessions);
+		}
+
 		public async Task Prune(DateTime now, ICollection<string> sessionIds) {
 			HashSet<string> set = new HashSet<string>(sessionIds);
 			foreach(var group in groupCollection.Groups) {
+				if(group.Key == SessionHub.SessionsGroup())
+					continue;
 				string sessionId = group.Key[0..group.Key.IndexOf('-')];
 				if(!set.Contains(sessionId)) {
 					await hubContext.Clients.Group(group.Key).SendAsync("Kicked");

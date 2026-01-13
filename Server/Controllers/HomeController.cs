@@ -39,6 +39,12 @@ namespace LMUSessionTracker.Server.Controllers {
 			return Ok(vm);
 		}
 
+		public async Task<IActionResult> LiveSessions() {
+			IndexViewModel vm = new IndexViewModel();
+			vm.Sessions = await sessionObserver.GetSessions();
+			return Ok(vm);
+		}
+
 		public async Task<IActionResult> Session([Required] string sessionId) {
 			if(!ModelState.IsValid)
 				return BadRequest();

@@ -17,6 +17,10 @@ export class ServerApiService {
 		return this.httpClient.get<IndexViewModel>(this.baseUrl + '/Home/Index', { params: { page: page, pageSize: pageSize } });
 	}
 
+	getLiveSessions(): Observable<IndexViewModel> {
+		return this.httpClient.get<IndexViewModel>(this.baseUrl + '/Home/LiveSessions');
+	}
+
 	getSession(sessionId: string): Promise<SessionViewModel> {
 		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Session?sessionId=' + sessionId)) as Promise<SessionViewModel>;
 	}

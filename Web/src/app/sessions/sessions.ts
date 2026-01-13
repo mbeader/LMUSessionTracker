@@ -1,9 +1,10 @@
-import { Component, inject, ChangeDetectorRef, Injectable } from '@angular/core';
+import { Component, inject, Injectable } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap/pagination';
 import { BehaviorSubject, debounceTime, delay, Observable, Subject, switchMap, tap } from 'rxjs';
 import { ServerApiService } from '../server-api.service';
+import { ServerLiveService } from '../server-live.service';
 import { Format } from '../format';
 import { SessionSummary } from '../tracking';
 import { IndexViewModel } from '../view-models';
@@ -15,9 +16,12 @@ import { IndexViewModel } from '../view-models';
 	styleUrl: './sessions.css',
 })
 export class Sessions {
-	//private ref = inject(ChangeDetectorRef);
-	//private api = inject(ServerApiService);
+	private initCount: number = 0;
+	private _liveSessions = new BehaviorSubject<SessionSummary[]>([]);
+	private api = inject(ServerApiService);
+	private live = inject(ServerLiveService);
 	service = inject(SessionsService);
+	liveSessions: Observable<SessionSummary[]>;
 	sessions: Observable<SessionSummary[]>;
 	total: Observable<number>;
 	now: Date = new Date();
@@ -25,12 +29,34 @@ export class Sessions {
 	Format = Format;
 
 	constructor() {
+		this.liveSessions = this._liveSessions.asObservable();
+		this.api.getLiveSessions().subscribe((result) => {
+			this._liveSessions.next(result.sessions ?? []);
+			this.live.joinSessions(liveSessions => this._liveSessions.next(liveSessions));
+		});
 		this.sessions = this.service.sessions;
 		this.total = this.service.total;
-		let count = 0;
-		console.log('new', this.init);
-		this.service.reset();
-		this.sessions.subscribe(() => { if(this.init && count++ > 0) this.init = false; });
+		this.sessions.subscribe(() => { if (this.init && this.initCount++ > 0) this.init = false; });
+		this.whenExists('#all-tab', tab => {
+			tab.addEventListener('shown.bs.tab', event => {
+				this.init = true;
+				this.initCount = 0;
+				this.service.reset();
+			});
+		});
+	}
+
+	private whenExists<T extends Element>(selector: string, callback: (el: T) => void) {
+		new Promise<T>((resolve) => {
+			let fn = (fn: any) => {
+				let el = document.querySelector<T>(selector);
+				if (!el)
+					setTimeout(fn, 100);
+				else
+					resolve(el);
+			}
+			fn(fn);
+		}).then(callback);
 	}
 }
 

@@ -195,6 +195,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			int? phase = data.SessionInfo?.gamePhase;
 			logger.LogDebug($"Client {client.ClientId} created new session in phase [{(phase.HasValue ? phase >= 0 && phase <= 9 ? Enum.GetName((LMU.GamePhase)phase.Value) : phase.Value : "")} {data.GameState?.gamePhase}]");
 			await sessionLogger.NewSession(session.SessionId, data);
+			await publisher.Sessions(SummarizeSessionsNoLock());
 			return session;
 		}
 
@@ -261,6 +262,7 @@ namespace LMUSessionTracker.Core.Tracking {
 					inactiveSessions.Add(sessionId, session);
 				}
 			}
+			await publisher.Sessions(SummarizeSessionsNoLock());
 			semaphore.Release();
 		}
 
@@ -276,12 +278,18 @@ namespace LMUSessionTracker.Core.Tracking {
 			return clonedSession;
 		}
 
-		public async Task<List<SessionSummary>> SummarizeSessions() {
-			await semaphore.WaitAsync();
+		private List<SessionSummary> SummarizeSessionsNoLock() {
 			List<SessionSummary> summaries = new List<SessionSummary>();
 			foreach(string sessionId in activeSessions.Keys) {
 				summaries.Add(activeSessions[sessionId].Summarize(!inactiveSessions.ContainsKey(sessionId)));
 			}
+			summaries.Sort((a, b) =>  b.Timestamp.CompareTo(a.Timestamp));
+			return summaries;
+		}
+
+		public async Task<List<SessionSummary>> SummarizeSessions() {
+			await semaphore.WaitAsync();
+			List<SessionSummary> summaries = SummarizeSessionsNoLock();
 			semaphore.Release();
 			return summaries;
 		}

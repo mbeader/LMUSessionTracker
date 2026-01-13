@@ -28,3 +28,15 @@ body {
 .driver-col {
 	max-width: 8rem;
 }
+
+:root {
+	/*from --bs-nav-link-padding-y*/
+	--tab-header-pb: .5rem;
+	/*from --bs-nav-tabs-border-width*/
+	--tab-header-mb: 1px;
+}
+
+.inline-tab-header {
+	padding-bottom: calc(var(--tab-header-pb) - var(--tab-header-mb));
+	margin-bottom: calc(-1 * var(--tab-header-mb));
+}

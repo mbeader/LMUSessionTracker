@@ -3,6 +3,7 @@ import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
 import { JoinRequest, LapsViewModel, SessionViewModel } from './view-models';
+import { SessionSummary } from './tracking';
 
 declare var signalR: any;
 @Injectable({
@@ -41,7 +42,7 @@ export class ServerLiveService {
 			.build() as HubConnection;
 
 		this.connection.on('Joined', (req: JoinRequest) => {
-			console.log('Joined', req.sessionId, req.type, req.key);
+			console.log('Joined', req.type, req.sessionId, req.key);
 		});
 
 		this.connection.on('Kicked', async () => {
@@ -59,8 +60,16 @@ export class ServerLiveService {
 		await this.start(req);
 	}
 
+	joinSessions(callback: (sessions: SessionSummary[]) => void) {
+		this.join(new JoinRequest('sessions'), connection => {
+			connection.on('Sessions', (sessions: SessionSummary[]) => {
+				callback(sessions);
+			});
+		});
+	}
+
 	joinLive(sessionId: string, callback: (session: SessionViewModel) => void) {
-		this.join(new JoinRequest(sessionId, 'live'), connection => {
+		this.join(new JoinRequest('live', sessionId), connection => {
 			connection.on('Live', (session: SessionViewModel) => {
 				callback(session);
 			});
@@ -68,7 +77,7 @@ export class ServerLiveService {
 	}
 
 	joinLaps(sessionId: string, carId: string, callback: (laps: LapsViewModel) => void) {
-		this.join(new JoinRequest(sessionId, 'laps', carId), connection => {
+		this.join(new JoinRequest('laps', sessionId, carId), connection => {
 			connection.on('Laps', (laps: LapsViewModel) => {
 				callback(laps);
 			});

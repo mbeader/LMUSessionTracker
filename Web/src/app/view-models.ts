@@ -85,13 +85,13 @@ export class SessionViewModel {
 }
 
 export class JoinRequest {
-	public readonly sessionId: string;
 	public readonly type: string;
+	public readonly sessionId: string | null;
 	public readonly key: string | null;
 
-	constructor(sessionId: string, type: string, key?: string) {
-		this.sessionId = sessionId;
+	constructor(type: string, sessionId?: string, key?: string) {
 		this.type = type;
+		this.sessionId = sessionId ?? null;
 		this.key = key ?? null;
 	}
 };

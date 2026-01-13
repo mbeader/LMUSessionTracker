@@ -14,16 +14,25 @@ namespace LMUSessionTracker.Server.Hubs {
 		}
 
 		public async Task Join(JoinRequest request) {
-			if(string.IsNullOrEmpty(request.SessionId))
-				return;
-			switch(request.Type) {
-				case "live":
-				case "laps":
-					break;
-				default:
-					return;
+			string group;
+			if(string.IsNullOrEmpty(request.SessionId)) {
+				switch(request.Type) {
+					case "sessions":
+						group = SessionsGroup();
+						break;
+					default:
+						return;
+				}
+			} else {
+				switch(request.Type) {
+					case "live":
+					case "laps":
+						break;
+					default:
+						return;
+				}
+				group = Group(request);
 			}
-			string group = Group(request);
 			groupCollection.Groups.TryAdd(group, DateTime.UnixEpoch);
 			await Groups.AddToGroupAsync(Context.ConnectionId, group);
 			await Clients.Caller.SendAsync("Joined", request);
@@ -35,6 +44,7 @@ namespace LMUSessionTracker.Server.Hubs {
 				await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
 		}
 
+		public static string SessionsGroup() => "sessions";
 		public static string LiveGroup(string sessionId) => Group(sessionId, "live");
 		public static string LapsGroup(string sessionId, string carId) => Group(sessionId, "laps", carId);
 		private static string Group(JoinRequest request) => Group(request.SessionId, request.Type, request.Key);
