@@ -14,6 +14,9 @@ namespace LMUSessionTracker.Server {
 		public DbSet<Member> Members { get; set; }
 		public DbSet<Chat> Chats { get; set; }
 		public DbSet<KnownDriver> KnownDrivers { get; set; }
+		public DbSet<Vehicle> Vehicles { get; set; }
+		public DbSet<VehicleModel> VehicleModels { get; set; }
+		public DbSet<VehicleDriver> VehicleDrivers { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder) {
 			modelBuilder.Entity<Entry>()
@@ -39,6 +42,14 @@ namespace LMUSessionTracker.Server {
 				.WithMany(x => x.Laps)
 				.HasForeignKey(x => new { x.SessionId, x.CarId })
 				.HasPrincipalKey(x => new { x.SessionId, x.CarId });
+
+			var vehicleData = VehicleSeedData.GetData();
+			modelBuilder.Entity<VehicleModel>()
+				.HasData(vehicleData.models);
+			modelBuilder.Entity<Vehicle>()
+				.HasData(vehicleData.vehicles);
+			modelBuilder.Entity<VehicleDriver>()
+				.HasData(vehicleData.drivers);
 		}
 	}
 }
