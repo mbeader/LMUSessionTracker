@@ -1,9 +1,10 @@
 :host {
-	--lmu-hy: #db2122;
-	--lmu-p2: #4a74a1;
-	--lmu-p3: #6d2c76;
-	--lmu-gte: #fc5000;
-	--lmu-gt3: #149e4a;
+	--lmu-hy: #e21e19;
+	--lmu-p2: #005096;
+	--lmu-p2e: #e95b0c;
+	--lmu-p3: #411c52;
+	--lmu-gte: #f08c00;
+	--lmu-gt3: #009639;
 }
 
 .class-badge {
@@ -27,7 +28,7 @@
 }
 
 .class-badge-p2e {
-	border-color: var(--lmu-gte);
+	border-color: var(--lmu-p2e);
 	color: var(--lmu-p2);
 }
 
