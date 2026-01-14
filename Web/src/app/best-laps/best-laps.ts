@@ -42,6 +42,7 @@ export class BestLaps {
 	sinceMax: string = new Date().toISOString().split('T')[0];
 	anytime: boolean = true;
 	knownDriversOnly: boolean = false;
+	init: boolean = true;
 	Format = Format;
 
 	constructor() {
@@ -65,10 +66,12 @@ export class BestLaps {
 					}
 					fn(fn);
 				}).then(() => {
+					this.init = false;
 					this.setFilters(snapshot.queryParamMap);
 					this.changeTrack(true, true);
 				});
-			}
+			} else
+				this.init = false;
 		}, error => { console.log(error); });
 	}
 

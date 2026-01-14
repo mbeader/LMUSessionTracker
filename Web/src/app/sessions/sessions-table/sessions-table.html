@@ -28,9 +28,9 @@
         } @empty {
         <tr>
             @if(init) {
-            <td colspan="9" class="text-center">Loading sessions...</td>
+            <td colspan="9" class="text-center">{{ loadingContent }}</td>
             } @else {
-            <td colspan="9" class="text-center">No sessions found</td>
+            <td colspan="9" class="text-center">{{ noSessionsContent }}</td>
             }
         </tr>
         }

@@ -11,7 +11,7 @@
 </div>
 <div class="tab-content" id="sessions-tabs-content">
     <div class="tab-pane fade show active" id="live-tab-pane" role="tabpanel" aria-labelledby="live-tab" tabindex="0">
-        <app-sessions-sessions-table [sessions]="liveSessions" [init]="init" />
+        <app-sessions-sessions-table [sessions]="liveSessions" [init]="init" [loadingContent]="'Loading live sessions...'" [noSessionsContent]="'There are no live sessions'" />
     </div>
     <div class="tab-pane fade" id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab" tabindex="0">
         <app-sessions-sessions-table [sessions]="sessions" [init]="init" />

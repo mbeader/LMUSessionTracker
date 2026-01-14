@@ -14,6 +14,8 @@ import { Format } from '../../format';
 export class SessionsTable {
 	@Input() sessions: Observable<SessionSummary[]> = new Observable();
 	@Input() init: boolean = true;
+	@Input() noSessionsContent: string = 'No sessions found';
+	@Input() loadingContent: string = 'Loading sessions...';
 	now: Date = new Date();
 	Format = Format;
 }

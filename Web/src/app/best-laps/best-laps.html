@@ -1,10 +1,9 @@
 <h3>Best laps</h3>
 
-@if(tracks) {
 <form class="d-flex flex-row align-items-center flex-wrap">
     <label class="me-3" for="bestLapsTrack">Track</label>
-    <select class="form-select w-auto" id="bestLapsTrack" [(ngModel)]="track" (change)="onChange($event)">
-        @for(track of tracks; track track) {
+    <select class="form-select w-auto" id="bestLapsTrack" name="track" [(ngModel)]="track" (change)="onChange($event)">
+        @for(track of tracks ?? []; track track) {
         <option>{{ track }}</option>
         }
     </select>
@@ -90,9 +89,7 @@
         </div>
     </div>
 </form>
-}
 
-@if(laps != null) {
 <table class="table table-sm table-striped table-hover">
     <thead>
         <tr>
@@ -110,7 +107,7 @@
         </tr>
     </thead>
     <tbody>
-        @for (lap of laps; track lap.lapId; let i = $index) {
+        @for (lap of laps ?? []; track lap.lapId; let i = $index) {
         <tr>
             <th scope="row">{{ i + 1 }}</th>
             <td><app-session-class-badge [carClass]="lap.car.class" /></td>
@@ -128,7 +125,14 @@
             <td class="text-end">{{ Format.percent(lap.fuel) }}</td>
             <td class="text-end"><a [routerLink]="['/', 'Session', lap.sessionId]">{{ Format.date(lap.timestamp) }}</a></td>
         </tr>
+        } @empty {
+        <tr>
+            @if(init) {
+            <td colspan="11" class="text-center">Loading laps...</td>
+            } @else {
+            <td colspan="11" class="text-center">No laps found</td>
+            }
+        </tr>
         }
     </tbody>
 </table>
-}
