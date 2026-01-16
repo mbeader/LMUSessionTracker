@@ -3,10 +3,11 @@
 <table class="table table-sm table-striped table-hover">
     <thead>
         <tr>
-            <th scope="col">Pos</th>
-            <th scope="col">PIC</th>
-            <th scope="col">Class</th>
-            <th scope="col">Number</th>
+            <th scope="col" class="text-center">Status</th>
+            <th scope="col" class="text-center">Pos</th>
+            <th scope="col" class="text-center">PIC</th>
+            <th scope="col" class="text-center">Class</th>
+            <th scope="col" class="text-center">#</th>
             <th scope="col" class="team-col">Team</th>
             <th scope="col" class="driver-col">Driver</th>
             <th scope="col" class="text-end">Laps</th>
@@ -23,7 +24,6 @@
             <th scope="col" class="text-end">S3</th>
             <th scope="col" class="text-end">Fuel</th>
             <th scope="col" class="text-center">Lap%</th>
-            <th scope="col" class="text-center">Status</th>
         </tr>
     </thead>
     <tbody>
@@ -33,10 +33,14 @@
         @let carClass = (car && car.class ? car.class : standing.carClass) ?? '';
         @if(car) {
         <tr>
-            <td><a [routerLink]="['Laps', `${id}`]">{{ standing.position }}</a></td>
-            <td>{{ positionInClass.get(id ?? '') }}</td>
-            <td><app-session-class-badge [carClass]="carClass" /></td>
-            <td>{{ car?.number ? car.number : standing.carNumber }}</td>
+            @let status = Format.status(standing);
+            @let statusClass = status == 'Run' ? 'link-success' : status == 'Req' ? 'link-info' : status == 'Out' ? 'link-warning' : status == 'In' || status == 'Pit' ? 'link-danger' : 'link-secondary';
+            <td class="text-center"><a class="{{ statusClass }}" [routerLink]="['Laps', `${id}`]">{{ status }}</a></td>
+            <td class="text-center">{{ standing.position }}</td>
+            @let classId = carClass == 'Hyper' ? 'hy' : carClass == 'LMP2_ELMS' ? 'p2e' : carClass == 'LMP2' ? 'p2' : carClass == 'LMP3' ? 'p3' : carClass == 'GTE' ? 'gte' : carClass == 'GT3' ? 'gt3' : '';
+            <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
+            <td class="text-center"><app-session-class-badge [carClass]="carClass" /></td>
+            <td class="text-center">{{ car?.number ? car.number : standing.carNumber }}</td>
             <td class="team-col text-truncate">{{ car?.teamName ? car.teamName : (!standing.fullTeamName ? standing.vehicleName : standing.fullTeamName) }}</td>
             <td class="driver-col text-truncate">{{ standing.driverName }}</td>
             <td class="text-end">{{ standing.lapsCompleted }}</td>
@@ -50,9 +54,6 @@
             @let fuelClass = standing.fuelFraction > .1 ? '' : standing.fuelFraction > .05 ? 'text-warning' : 'text-danger';
             <td class="text-end {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</td>
             <td class="text-center"><span class="border bg-secondary-subtle" title="{{ Format.distance(standing.lapDistance, session.session.lapDistance) }}"><span class="lap-prog-{{ Format.lapProgress(standing.lapDistance, session.session.lapDistance) }}"></span></span></td>
-            @let status = Format.status(standing);
-            @let statusClass = status == 'Run' ? 'text-success' : status == 'Req' ? 'text-info' : status == 'Out' ? 'text-warning' : status == 'In' || status == 'Pit' ? 'text-danger' : 'text-secondary';
-            <td class="text-center {{ statusClass }}">{{ status }}</td>
         </tr>
         }
         }
