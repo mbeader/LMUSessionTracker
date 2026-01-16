@@ -51,9 +51,11 @@ export class BestLaps {
 
 	constructor() {
 		this.route.queryParamMap.subscribe(queryParamMap => {
-			this.setFilters(queryParamMap);
-			this.ref.markForCheck();
-			this.changeTrack(false, true);
+			if (!this.init) {
+				this.setFilters(queryParamMap);
+				this.ref.markForCheck();
+				this.changeTrack(false, true);
+			}
 		});
 		this.api.getTracks().then(result => {
 			this.tracks = result ?? [];
@@ -82,11 +84,11 @@ export class BestLaps {
 
 	onChange(e: Event) {
 		if (e && e.target && e.target instanceof HTMLSelectElement) {
-			this.changeTrack(true, false);
+			this.changeTrack(true, false, true);
 		}
 	}
 
-	changeTrack(nagivate: boolean, replaceUrl: boolean) {
+	changeTrack(nagivate: boolean, replaceUrl: boolean, skip?: boolean) {
 		this.query(nagivate, replaceUrl);
 		if (this.track) {
 			let filters = new BestLapsFilters();
@@ -96,11 +98,12 @@ export class BestLaps {
 			filters.classes = this.classes.filter(x => x.checked).map(x => x.value);
 			filters.sessions = this.sessions.filter(x => x.checked).map(x => x.value);
 			filters.knownDriversOnly = this.knownDriversOnly;
-			this.api.getBestLaps(filters).then(result => {
-				this.laps = result.laps ?? [];
-				this.bests = result.classBests ?? {};
-				this.ref.markForCheck();
-			}, error => { console.log(error); });
+			if (!skip)
+				this.api.getBestLaps(filters).then(result => {
+					this.laps = result.laps ?? [];
+					this.bests = result.classBests ?? {};
+					this.ref.markForCheck();
+				}, error => { console.log(error); });
 		}
 	}
 
