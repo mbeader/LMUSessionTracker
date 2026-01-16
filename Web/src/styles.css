@@ -40,3 +40,40 @@ body {
 	padding-bottom: calc(var(--tab-header-pb) - var(--tab-header-mb));
 	margin-bottom: calc(-1 * var(--tab-header-mb));
 }
+
+.best-class {
+	color: #c29ffa !important;
+}
+
+.best-car {
+	color: #6ea8fe !important;
+}
+
+.best-driver {
+	color: #79dfc1 !important;
+}
+
+.btn-icon {
+	display: block;
+	padding: .25em;
+	line-height: 1;
+	color: #dee2e6;
+	background: none;
+	border: 0;
+	border-radius: .25rem;
+}
+
+.btn-icon:hover {
+	color: #8bb9fe;
+}
+
+button.btn-icon.dropdown-toggle::after {
+	content: none !important;
+}
+
+.bi {
+	width: 1em;
+	height: 1em;
+	vertical-align: -.125em;
+	fill: currentcolor;
+}

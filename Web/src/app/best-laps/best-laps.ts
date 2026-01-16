@@ -1,16 +1,17 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ServerApiService } from '../server-api.service';
-import { Lap } from '../models';
+import { BestLap, ClassBest, Lap as LapModel } from '../models';
 import { Format } from '../format';
 import { BestLapsFilters } from '../view-models';
 import { ClassBadge } from '../session/class-badge/class-badge';
+import { Lap } from './lap/lap';
 
 declare var bootstrap: any;
 @Component({
 	selector: 'app-best-laps',
-	imports: [FormsModule, RouterLink, ClassBadge],
+	imports: [FormsModule, ClassBadge, Lap],
 	templateUrl: './best-laps.html',
 	styleUrl: './best-laps.css',
 })
@@ -21,7 +22,8 @@ export class BestLaps {
 	private api = inject(ServerApiService);
 	private filterModal: any;
 	tracks: string[] | null = null;
-	laps: Lap[] | null = null;
+	laps: BestLap[] | null = null;
+	bests: { [key: string]: ClassBest } | null = null;
 	track: string = '';
 	classes: { value: string, checked: boolean }[] = [
 		{ value: 'Hyper', checked: true },
@@ -43,6 +45,8 @@ export class BestLaps {
 	anytime: boolean = true;
 	knownDriversOnly: boolean = false;
 	init: boolean = true;
+	selectedLap: LapModel | null = null;
+	selectedLapType: number = 0;
 	Format = Format;
 
 	constructor() {
@@ -69,6 +73,7 @@ export class BestLaps {
 					this.init = false;
 					this.setFilters(snapshot.queryParamMap);
 					this.changeTrack(true, true);
+					document.querySelector('#lapModal')?.addEventListener('show.bs.modal', this.updateLapModal.bind(this));
 				});
 			} else
 				this.init = false;
@@ -92,7 +97,8 @@ export class BestLaps {
 			filters.sessions = this.sessions.filter(x => x.checked).map(x => x.value);
 			filters.knownDriversOnly = this.knownDriversOnly;
 			this.api.getBestLaps(filters).then(result => {
-				this.laps = result ?? [];
+				this.laps = result.laps ?? [];
+				this.bests = result.classBests ?? {};
 				this.ref.markForCheck();
 			}, error => { console.log(error); });
 		}
@@ -211,6 +217,21 @@ export class BestLaps {
 					sinceInput.setAttribute('disabled', '');
 				else
 					sinceInput.removeAttribute('disabled');
+			}
+		}
+	}
+
+	updateLapModal(e: any) {
+		if (e && e.relatedTarget && e.relatedTarget instanceof HTMLButtonElement) {
+			let button: HTMLButtonElement = e.relatedTarget;
+			if (button.getAttribute('data-bs-target') != '#lapModal')
+				return;
+			let th = button.closest('tr')?.querySelector('th');
+			if (th) {
+				let i = parseInt(th.textContent) - 1;
+				this.selectedLap = this.laps ? this.laps[i]?.lap : null;
+				this.selectedLapType = Array.from(button.parentElement?.children ?? []).indexOf(button);
+				this.ref.markForCheck();
 			}
 		}
 	}

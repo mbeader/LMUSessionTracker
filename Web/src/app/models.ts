@@ -1,3 +1,9 @@
+export interface BestLap {
+	lap: Lap;
+	sector1: Lap | null;
+	sector2: Lap | null;
+	sector3: Lap | null;
+}
 
 export interface Car {
 	carId: BigInt;
@@ -25,6 +31,13 @@ export interface Chat {
 	timestamp: Date;
 
 	session: Session;
+}
+
+export interface ClassBest {
+	totalTime: number;
+	sector1: number;
+	sector2: number;
+	sector3: number;
 }
 
 export interface Entry {

@@ -1,0 +1,31 @@
+@if(lap) {
+<dl class="row">
+    <dt class="col-12">Timestamp</dt>
+    <dd class="col-12"><a [routerLink]="['/', 'Session', lap.sessionId]">{{ Format.date(lap.timestamp) }}</a></dd>
+    <dt class="col-12">Class</dt>
+    <dd class="col-12"><app-session-class-badge [carClass]="lap.car.class" /></dd>
+    <dt class="col-12">Driver</dt>
+    <dd class="col-12">
+        @if(lap.known) {
+        <span class="text-warning" title="Known driver">&#x2605;</span>
+        }
+        {{ lap.driver }}
+    </dd>
+    <dt class="col-12">Team</dt>
+    <dd class="col-12">{{ lap.car.teamName ? lap.car.teamName : '&nbsp;' }}</dd>
+    <dt class="col-12">Vehicle</dt>
+    <dd class="col-12">{{ lap.car.vehicleName ? lap.car.vehicleName : '&nbsp;' }}</dd>
+    <dt class="col-12">Veh</dt>
+    <dd class="col-12">{{ lap.car.veh ? lap.car.veh : '&nbsp;' }}</dd>
+    <dt class="col-12">Time</dt>
+    <dd class="col-12">{{ Format.lapTime(lap.totalTime) }}</dd>
+    <dt class="col-4 order-1">S1</dt>
+    <dd class="col-4 order-2">{{ Format.lapTime(lap.sector1) }}</dd>
+    <dt class="col-4 order-1">S2</dt>
+    <dd class="col-4 order-2">{{ Format.lapTime(lap.sector2) }}</dd>
+    <dt class="col-4 order-1">S3</dt>
+    <dd class="col-4 order-2">{{ Format.lapTime(lap.sector3) }}</dd>
+    <dt class="col-12 order-3">Fuel</dt>
+    <dd class="col-12 order-3">{{ Format.percent(lap.fuel) }}</dd>
+</dl>
+}

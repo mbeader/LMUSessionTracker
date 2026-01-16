@@ -102,12 +102,27 @@
             <th class="text-end">S1</th>
             <th class="text-end">S2</th>
             <th class="text-end">S3</th>
-            <th class="text-end">Fuel</th>
-            <th class="text-end">Timestamp</th>
+            <th class="text-end">Possible</th>
+            <th class="text-end">BS1</th>
+            <th class="text-end">BS2</th>
+            <th class="text-end">BS3</th>
+            <th class="text-end"></th>
         </tr>
     </thead>
     <tbody>
-        @for (lap of laps ?? []; track lap.lapId; let i = $index) {
+        @for (bestlap of laps ?? []; track bestlap.lap.lapId; let i = $index) {
+        @let lap = bestlap.lap;
+        @let tt = bests ? bests[lap.car.class]?.totalTime == lap.totalTime : false;
+        @let s1 = bests ? bests[lap.car.class]?.sector1 == lap.sector1 : false;
+        @let s2 = bests ? bests[lap.car.class]?.sector2 == lap.sector2 : false;
+        @let s3 = bests ? bests[lap.car.class]?.sector3 == lap.sector3 : false;
+        @let bs1 = bests ? bests[lap.car.class]?.sector1 == bestlap.sector1?.sector1 : false;
+        @let bs2 = bests ? bests[lap.car.class]?.sector2 == bestlap.sector2?.sector2 : false;
+        @let bs3 = bests ? bests[lap.car.class]?.sector3 == bestlap.sector3?.sector3 : false;
+        @let dbs1 = lap.sector1 == bestlap.sector1?.sector1;
+        @let dbs2 = lap.sector2 == bestlap.sector2?.sector2;
+        @let dbs3 = lap.sector3 == bestlap.sector3?.sector3;
+        @let possible = bestlap.sector1 && bestlap.sector2 && bestlap.sector3 ? bestlap.sector1.sector1 + bestlap.sector2.sector2 + bestlap.sector3.sector3 : -1;
         <tr>
             <th scope="row">{{ i + 1 }}</th>
             <td><app-session-class-badge [carClass]="lap.car.class" /></td>
@@ -118,21 +133,55 @@
             }
             <td>{{ lap.driver }}</td>
             <td>{{ lap.car.vehicleName ? lap.car.vehicleName : lap.car.veh }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.totalTime) }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.sector1) }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.sector2) }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.sector3) }}</td>
-            <td class="text-end">{{ Format.percent(lap.fuel) }}</td>
-            <td class="text-end"><a [routerLink]="['/', 'Session', lap.sessionId]">{{ Format.date(lap.timestamp) }}</a></td>
+            <td class="text-end {{ tt ? 'best-class' : null }}">{{ Format.lapTime(lap.totalTime) }}</td>
+            <td class="text-end {{ s1 ? 'best-class' : dbs1 ? 'best-driver' : null }}">{{ Format.lapTime(lap.sector1) }}</td>
+            <td class="text-end {{ s2 ? 'best-class' : dbs2 ? 'best-driver' : null }}">{{ Format.lapTime(lap.sector2) }}</td>
+            <td class="text-end {{ s3 ? 'best-class' : dbs3 ? 'best-driver' : null }}">{{ Format.lapTime(lap.sector3) }}</td>
+            <td class="text-end">{{ Format.lapTime(possible) }}</td>
+            <td class="text-end {{ bs1 ? 'best-class' : null }}">{{ Format.lapTime(bestlap.sector1?.sector1) }}</td>
+            <td class="text-end {{ bs2 ? 'best-class' : null }}">{{ Format.lapTime(bestlap.sector2?.sector2) }}</td>
+            <td class="text-end {{ bs3 ? 'best-class' : null }}">{{ Format.lapTime(bestlap.sector3?.sector3) }}</td>
+            <td class="">
+                <div class="dropdown">
+                    <button class="btn-icon ms-auto dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                        </svg>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#lapModal">View best lap</button></li>
+                        <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#lapModal">View best sector 1 lap</button></li>
+                        <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#lapModal">View best sector 2 lap</button></li>
+                        <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#lapModal">View best sector 3 lap</button></li>
+                    </ul>
+                </div>
+            </td>
         </tr>
         } @empty {
         <tr>
             @if(init) {
-            <td colspan="11" class="text-center">Loading laps...</td>
+            <td colspan="14" class="text-center">Loading laps...</td>
             } @else {
-            <td colspan="11" class="text-center">No laps found</td>
+            <td colspan="14" class="text-center">No laps found</td>
             }
         </tr>
         }
     </tbody>
 </table>
+
+<div class="modal fade" id="lapModal" tabindex="-1" aria-labelledby="lapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="lapModalLabel">{{ selectedLapType >= 1 && selectedLapType <= 3 ? `Best sector ${selectedLapType} lap` : 'Best lap' }}</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <app-best-laps-lap [lap]="selectedLap" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

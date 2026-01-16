@@ -87,7 +87,10 @@ namespace LMUSessionTracker.Server.Controllers {
 			if(!ModelState.IsValid)
 				return BadRequest();
 			filters.Classes ??= new List<string>();
-			return Ok(await sessionRepo.GetLaps(filters));
+			BestLapsViewModel vm = new BestLapsViewModel();
+			vm.Laps = await sessionRepo.GetLaps(filters);
+			vm.ClassBests = await sessionRepo.GetClassBests(filters);
+			return Ok(vm);
 		}
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

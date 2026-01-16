@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LMUSessionTracker.Server.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -29,5 +30,10 @@ namespace LMUSessionTracker.Server.ViewModels {
 				sessions.AddRange(raceSessions);
 			return sessions;
 		}
+	}
+
+	public class BestLapsViewModel {
+		public List<BestLap> Laps { get; set; }
+		public Dictionary<string, ClassBest> ClassBests { get; set; }
 	}
 }

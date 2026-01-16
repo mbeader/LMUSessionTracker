@@ -14,7 +14,8 @@ namespace LMUSessionTracker.Server.Models {
 		public Task<SessionState> GetSessionState(string sessionId);
 		public Task<List<Car>> GetEntries(string sessionId);
 		public Task<List<string>> GetTracks();
-		public Task<List<Lap>> GetLaps(BestLapsFilters filters);
+		public Task<List<BestLap>> GetLaps(BestLapsFilters filters);
+		public Task<Dictionary<string, ClassBest>> GetClassBests(BestLapsFilters filters);
 	}
 
 	public class SqliteSessionRepository : SessionRepository {
@@ -84,10 +85,67 @@ namespace LMUSessionTracker.Server.Models {
 			return await context.Sessions.GroupBy(x => x.TrackName).Select(x => x.Key).OrderBy(x => x).ToListAsync();
 		}
 
-		public async Task<List<Lap>> GetLaps(BestLapsFilters filters) {
-			bool hasUnknown = filters.Classes.Contains("Unknown");
+		public async Task<List<BestLap>> GetLaps(BestLapsFilters filters) {
 			HashSet<string> knownDrivers = context.KnownDrivers.Select(x => x.Name).ToHashSet();
-			List<Lap> laps = await context.Sessions
+
+			// queries for best lap and each best sector are all the same, only the field is different
+			// however, I do not understand how to successfully parameterize by a field selector expression
+			var bs1Query = LapQuery(filters, knownDrivers)
+				.Where(x => x.Sector1 > 0)
+				.GroupBy(x => new { x.Driver, x.Car.Veh })
+				.Select(x => new { x.Key.Driver, x.Key.Veh, Time = x.Min(x => x.Sector1) })
+				.Join(context.Laps.Include(x => x.Car), x => new { x.Driver, x.Veh, x.Time }, x => new { x.Driver, x.Car.Veh, Time = x.Sector1 }, (x, y) => y)
+				.GroupBy(x => new { x.Driver, x.Car.Veh, x.Sector1 })
+				.Select(x => new { x.Key.Driver, x.Key.Veh, x.Key.Sector1, LapId = x.Select(x => x.LapId).Min() })
+				.Join(context.Laps.Include(x => x.Car), x => x.LapId, x => x.LapId, (x, y) => y)
+				.OrderBy(x => x.Sector1);
+			var bs2Query = LapQuery(filters, knownDrivers)
+				.Where(x => x.Sector2 > 0)
+				.GroupBy(x => new { x.Driver, x.Car.Veh })
+				.Select(x => new { x.Key.Driver, x.Key.Veh, Time = x.Min(x => x.Sector2) })
+				.Join(context.Laps.Include(x => x.Car), x => new { x.Driver, x.Veh, x.Time }, x => new { x.Driver, x.Car.Veh, Time = x.Sector2 }, (x, y) => y)
+				.GroupBy(x => new { x.Driver, x.Car.Veh, x.Sector2 })
+				.Select(x => new { x.Key.Driver, x.Key.Veh, x.Key.Sector2, LapId = x.Select(x => x.LapId).Min() })
+				.Join(context.Laps.Include(x => x.Car), x => x.LapId, x => x.LapId, (x, y) => y)
+				.OrderBy(x => x.Sector2);
+			var bs3Query = LapQuery(filters, knownDrivers)
+				.Where(x => x.Sector3 > 0)
+				.GroupBy(x => new { x.Driver, x.Car.Veh })
+				.Select(x => new { x.Key.Driver, x.Key.Veh, Time = x.Min(x => x.Sector3) })
+				.Join(context.Laps.Include(x => x.Car), x => new { x.Driver, x.Veh, x.Time }, x => new { x.Driver, x.Car.Veh, Time = x.Sector3 }, (x, y) => y)
+				.GroupBy(x => new { x.Driver, x.Car.Veh, x.Sector3 })
+				.Select(x => new { x.Key.Driver, x.Key.Veh, x.Key.Sector3, LapId = x.Select(x => x.LapId).Min() })
+				.Join(context.Laps.Include(x => x.Car), x => x.LapId, x => x.LapId, (x, y) => y)
+				.OrderBy(x => x.Sector3);
+			var laps = await LapQuery(filters, knownDrivers)
+				.GroupBy(x => new { x.Driver, x.Car.Veh })
+				.Select(x => new { x.Key.Driver, x.Key.Veh, Time = x.Min(x => x.TotalTime) })
+				.Join(context.Laps.Include(x => x.Car), x => new { x.Driver, x.Veh, x.Time }, x => new { x.Driver, x.Car.Veh, Time = x.TotalTime }, (x, y) => y)
+				.GroupBy(x => new { x.Driver, x.Car.Veh, x.TotalTime })
+				.Select(x => new { x.Key.Driver, x.Key.Veh, x.Key.TotalTime, LapId = x.Select(x => x.LapId).Min() })
+				.Join(context.Laps.Include(x => x.Car), x => x.LapId, x => x.LapId, (x, y) => y)
+				.LeftJoin(bs1Query, x => new { x.Driver, x.Car.Veh }, x => new { x.Driver, x.Car.Veh }, (x, y) => new { Lap = x, S1 = y })
+				.LeftJoin(bs2Query, x => new { x.Lap.Driver, x.Lap.Car.Veh }, x => new { x.Driver, x.Car.Veh }, (x, y) => new { x.Lap, x.S1, S2 = y })
+				.LeftJoin(bs3Query, x => new { x.Lap.Driver, x.Lap.Car.Veh }, x => new { x.Driver, x.Car.Veh }, (x, y) => new { x.Lap, x.S1, x.S2, S3 = y })
+				.OrderBy(x => x.Lap.TotalTime)
+				.Take(1000)
+				.ToListAsync();
+
+			List<BestLap> res = new List<BestLap>();
+			foreach(var lap in laps) {
+				BestLap best = new BestLap() { Lap = lap.Lap, Sector1 = lap.S1, Sector2 = lap.S2, Sector3 = lap.S3 };
+				res.Add(best);
+				best.Lap.Known = knownDrivers.Contains(best.Lap.Driver);
+			}
+			return res;
+		}
+
+		/// <summary>
+		/// Query that returns all laps matching the given filters
+		/// </summary>
+		private IQueryable<Lap> LapQuery(BestLapsFilters filters, HashSet<string> knownDrivers) {
+			bool hasUnknown = filters.Classes.Contains("Unknown");
+			return context.Sessions
 				.Where(x =>
 					x.TrackName == filters.Track &&
 					(!filters.OnlineOnly.HasValue || x.IsOnline == filters.OnlineOnly.Value) &&
@@ -110,19 +168,24 @@ namespace LMUSessionTracker.Server.Models {
 					) &&
 					(!filters.KnownDriversOnly || knownDrivers.Contains(x.Driver))
 				)
-				.OrderBy(x => x.TotalTime)
-				.GroupBy(x => new { x.Driver, x.Car.Veh })
-				.Select(x => new { x.Key.Driver, x.Key.Veh, TotalTime = x.Select(x => x.TotalTime).Min() })
-				.Join(context.Laps.Include(x => x.Car), x => new { x.Driver, x.Veh, x.TotalTime }, x => new { x.Driver, x.Car.Veh, x.TotalTime }, (x, y) => y)
-				.GroupBy(x => new { x.Driver, x.Car.Veh, x.TotalTime })
-				.Select(x => new { x.Key.Driver, x.Key.Veh, x.Key.TotalTime, LapId = x.Select(x => x.LapId).Min() })
-				.Join(context.Laps.Include(x => x.Car), x => x.LapId, x => x.LapId, (x, y) => y)
-				.OrderBy(x => x.TotalTime)
-				.Take(100)
-				.ToListAsync();
-			foreach(Lap lap in laps)
-				lap.Known = knownDrivers.Contains(lap.Driver);
-			return laps;
+				.OrderBy(x => x.TotalTime);
+		}
+
+		public async Task<Dictionary<string, ClassBest>> GetClassBests(BestLapsFilters filters) {
+			HashSet<string> knownDrivers = context.KnownDrivers.Select(x => x.Name).ToHashSet();
+			var bests = await LapQuery(filters, knownDrivers)
+				.GroupBy(x => new { x.Car.Class })
+				.Select(x => new {
+					x.Key,
+					Bests = new ClassBest() {
+						TotalTime = x.Min(x => x.TotalTime),
+						Sector1 = ((double?)x.Select(x => x.Sector1).Where(x => x > 0).Min()) ?? -3,
+						Sector2 = ((double?)x.Select(x => x.Sector2).Where(x => x > 0).Min()) ?? -3,
+						Sector3 = ((double?)x.Select(x => x.Sector3).Where(x => x > 0).Min()) ?? -3
+					}
+				})
+				.ToDictionaryAsync(x => x.Key.Class, x => x.Bests);
+			return bests;
 		}
 	}
 }

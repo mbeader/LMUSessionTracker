@@ -24,8 +24,8 @@ export class Format {
 		return `${hours.toLocaleString(undefined, this.timePartFormat)}:${minutes.toLocaleString(undefined, this.timePartFormat)}:${seconds.toLocaleString(undefined, this.timePartFormat)}`;
 	}
 
-	static lapTime(laptime: number) {
-		if (laptime <= 0.0)
+	static lapTime(laptime?: number) {
+		if (typeof laptime != 'number' || laptime <= 0.0)
 			return '-';
 		let time = Math.round(laptime * 1000) / 1000;
 		let hours = Math.floor(time / (60 * 60));
