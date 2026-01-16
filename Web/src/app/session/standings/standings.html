@@ -12,7 +12,11 @@
             <th scope="col" class="text-end">Laps</th>
             <th scope="col" class="text-end">Behind</th>
             <th scope="col" class="text-end">Int</th>
+            @if(isRace) {
             <th scope="col" class="text-end">Best</th>
+            } @else {
+            <th scope="col" class="text-end">Time</th>
+            }
             <th scope="col" class="text-end">Last</th>
             <th scope="col" class="text-end">S1</th>
             <th scope="col" class="text-end">S2</th>
@@ -36,8 +40,8 @@
             <td class="team-col text-truncate">{{ car?.teamName ? car.teamName : (!standing.fullTeamName ? standing.vehicleName : standing.fullTeamName) }}</td>
             <td class="driver-col text-truncate">{{ standing.driverName }}</td>
             <td class="text-end">{{ standing.lapsCompleted }}</td>
-            <td class="text-end">{{ Format.diff(standing.lapsBehindLeader, standing.timeBehindLeader) }}</td>
-            <td class="text-end">{{ Format.diff(standing.lapsBehindNext, standing.timeBehindNext) }}</td>
+            <td class="text-end">{{ !isRace && standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindLeader, standing.timeBehindLeader) }}</td>
+            <td class="text-end">{{ !isRace && standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindNext, standing.timeBehindNext) }}</td>
             <td class="text-end">{{ Format.lapTime(standing.bestLapTime) }}</td>
             <td class="text-end">{{ Format.lapTime(standing.lastLapTime) }}</td>
             <td class="text-end">{{ Format.sectorTime(0.0, standing.lastSectorTime1) }}</td>
