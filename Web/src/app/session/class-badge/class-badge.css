@@ -5,6 +5,14 @@
 	--lmu-p3: #411c52;
 	--lmu-gte: #f08c00;
 	--lmu-gt3: #009639;
+	--class-badge-width-hy: 21.969;
+	--class-badge-width-p2: 19.031;
+	--class-badge-width-p2e: 19.031;
+	--class-badge-width-p3: 19.031;
+	--class-badge-width-gte: 28.953;
+	--class-badge-width-gt3: 29.641;
+	--class-badge-width: 17;
+	--class-badge-height: .9;
 }
 
 .class-badge {
@@ -12,9 +20,13 @@
 	border-style: solid;
 	border-width: 2px;
 	background-color: white;
-	padding: 0px 3px;
+	padding: 0px 2px;
 	font-weight: bold;
 	width: 3rem;
+}
+
+.class-badge > span {
+	transform-origin: 0;
 }
 
 .class-badge-hy {
@@ -45,4 +57,34 @@
 .class-badge-gt3 {
 	border-color: var(--lmu-gt3);
 	color: var(--lmu-gt3);
+}
+
+.class-badge-hy > span {
+	transform: scale(calc(var(--class-badge-width) / var(--class-badge-width-hy)), var(--class-badge-height));
+	margin-right: calc(-1px * (var(--class-badge-width-hy) - var(--class-badge-width)));
+}
+
+.class-badge-p2 > span {
+	transform: scale(calc(var(--class-badge-width) / var(--class-badge-width-p2)), var(--class-badge-height));
+	margin-right: calc(-1px * (var(--class-badge-width-p2) - var(--class-badge-width)));
+}
+
+.class-badge-p2e > span {
+	transform: scale(calc(var(--class-badge-width) / var(--class-badge-width-p2e)), var(--class-badge-height));
+	margin-right: calc(-1px * (var(--class-badge-width-p2e) - var(--class-badge-width)));
+}
+
+.class-badge-p3 > span {
+	transform: scale(calc(var(--class-badge-width) / var(--class-badge-width-p3)), var(--class-badge-height));
+	margin-right: calc(-1px * (var(--class-badge-width-p3) - var(--class-badge-width)));
+}
+
+.class-badge-gte > span {
+	transform: scale(calc(var(--class-badge-width) / var(--class-badge-width-gte)), var(--class-badge-height));
+	margin-right: calc(-1px * (var(--class-badge-width-gte) - var(--class-badge-width)));
+}
+
+.class-badge-gt3 > span {
+	transform: scale(calc(var(--class-badge-width) / var(--class-badge-width-gt3)), var(--class-badge-height));
+	margin-right: calc(-1px * (var(--class-badge-width-gt3) - var(--class-badge-width)));
 }
