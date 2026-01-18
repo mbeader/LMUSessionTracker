@@ -54,6 +54,9 @@ namespace LMUSessionTracker.Server.Controllers {
 				return NotFound();
 			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId);
 			vm.SetSession(session);
+			if(vm.Standings == null) {
+				vm.Results = vm.Session.SessionType.StartsWith("RACE") ? await sessionRepo.GetResults(sessionId) : await sessionRepo.GetTimedResults(sessionId);
+			}
 			return Ok(vm);
 		}
 
@@ -77,15 +80,6 @@ namespace LMUSessionTracker.Server.Controllers {
 			if(session == null)
 				return NotFound();
 			return Ok(await sessionRepo.GetEntries(sessionId));
-		}
-
-		public async Task<IActionResult> Results([Required] string sessionId) {
-			if(!ModelState.IsValid)
-				return BadRequest();
-			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
-			if(session == null)
-				return NotFound();
-			return Ok(await sessionRepo.GetResults(sessionId));
 		}
 
 		public async Task<IActionResult> Tracks() {

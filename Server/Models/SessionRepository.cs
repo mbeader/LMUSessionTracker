@@ -14,6 +14,7 @@ namespace LMUSessionTracker.Server.Models {
 		public Task<SessionState> GetSessionState(string sessionId);
 		public Task<List<Car>> GetEntries(string sessionId);
 		public Task<List<Lap>> GetResults(string sessionId);
+		public Task<List<Lap>> GetTimedResults(string sessionId);
 		public Task<List<string>> GetTracks();
 		public Task<List<BestLap>> GetLaps(BestLapsFilters filters);
 		public Task<Dictionary<string, ClassBest>> GetClassBests(BestLapsFilters filters);
@@ -93,6 +94,25 @@ namespace LMUSessionTracker.Server.Models {
 					x => new { x.CarId, x.LapNumber }, x => x, (x, y) => x)
 				.OrderByDescending(x => x.FinishStatus != "FSTAT_DQ").ThenByDescending(x => x.LapNumber).ThenBy(x => x.Position)
 				.ToListAsync();
+		}
+
+		public async Task<List<Lap>> GetTimedResults(string sessionId) {
+			var laps = await context.Laps.Include(x => x.Car).Include(x => x.Car.Entry)
+				.Where(x => x.SessionId == sessionId)
+				.Join(
+					context.Laps
+						.Where(x => x.SessionId == sessionId && x.TotalTime > 0 && x.IsValid)
+						.GroupBy(x => x.CarId)
+						.Select(x => new { CarId = x.Key, TotalTime = x.Min(x => x.TotalTime), TotalLaps = x.Max(x => x.LapNumber) }),
+					x => new { x.CarId, x.TotalTime }, x => new { x.CarId, x.TotalTime }, (x, y) => new { Lap = x, y.TotalLaps })
+				.OrderBy(x => x.Lap.TotalTime)
+				.ToListAsync();
+			List<Lap> res = new List<Lap>();
+			foreach(var lap in laps) {
+				lap.Lap.LapNumber = lap.TotalLaps;
+				res.Add(lap.Lap);
+			}
+			return res;
 		}
 
 		public async Task<List<string>> GetTracks() {

@@ -1,5 +1,5 @@
 import { SessionInfo, Standing } from './lmu';
-import { BestLap, ClassBest, Session, SessionState } from './models';
+import { BestLap, ClassBest, Lap, Session, SessionState } from './models';
 import { SessionSummary, CarHistory, Car } from './tracking';
 
 export class BestLapsFilters {
@@ -36,6 +36,7 @@ export class SessionViewModel {
 	public history: Array<CarHistory> | null = null;
 	public positionInClass: { [key: string]: number } | null = null;
 	public entries: { [key: string]: Car } | null = null;
+	public results: Lap[] | null = null;
 
 	public session: Session | null = null;
 	public sessionState: SessionState | null = null;

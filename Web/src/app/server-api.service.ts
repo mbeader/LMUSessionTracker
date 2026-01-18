@@ -33,10 +33,6 @@ export class ServerApiService {
 		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/EntryList?sessionId=' + sessionId)) as Promise<Car[]>;
 	}
 
-	getResults(sessionId: string): Promise<Lap[]> {
-		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Results?sessionId=' + sessionId)) as Promise<Lap[]>;
-	}
-
 	getTracks(): Promise<string[]> {
 		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Tracks')) as Promise<string[]>;
 	}

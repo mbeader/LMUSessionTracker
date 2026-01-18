@@ -9,6 +9,7 @@ namespace LMUSessionTracker.Server.ViewModels {
 		public List<CarHistory> History { get; set; }
 		public Dictionary<CarKey, int> PositionInClass { get; } = new Dictionary<CarKey, int>();
 		public Dictionary<CarKey, Car> Entries { get; } = new Dictionary<CarKey, Car>();
+		public List<Models.Lap> Results { get; set; }
 
 		public Models.Session Session { get; set; }
 		public Models.SessionState SessionState => Session?.LastState;

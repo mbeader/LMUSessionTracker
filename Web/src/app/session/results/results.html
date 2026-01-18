@@ -1,6 +1,10 @@
-@if(session && session.session && isRace) {
+@if(session && session.session) {
 <h3 class="mb-0">Results</h3>
+@if(isRace) {
 <div class="mb-2"><small class="fst-italic">Only accurate to last completed lap</small></div>
+} @else {
+<div class="mb-2"><small class="fst-italic">Fastest recorded laps</small></div>
+}
 <table class="table table-sm table-striped table-hover">
     <thead>
         <tr>
@@ -12,7 +16,13 @@
             <th scope="col" class="team-col">Team</th>
             <th scope="col" class="driver-col">Driver</th>
             <th scope="col" class="text-end">Laps</th>
+            @if(isRace) {
             <th scope="col" class="text-end">Last</th>
+            } @else {
+            <th scope="col" class="text-end">Behind</th>
+            <th scope="col" class="text-end">Int</th>
+            <th scope="col" class="text-end">Time</th>
+            }
             <th scope="col" class="text-end">S1</th>
             <th scope="col" class="text-end">S2</th>
             <th scope="col" class="text-end">S3</th>
@@ -37,6 +47,10 @@
             <td class="team-col text-truncate">{{ car?.teamName ? car.teamName : '' }}</td>
             <td class="driver-col text-truncate">{{ lap.driver }}</td>
             <td class="text-end">{{ lap.lapNumber }}</td>
+            @if(!isRace) {
+            <td class="text-end">{{ gaps[i].behind <= 0 ? '-' : Format.diff(0, gaps[i].behind) }}</td>
+            <td class="text-end">{{ gaps[i].interval <= 0 ? '-' : Format.diff(0, gaps[i].interval) }}</td>
+            }
             <td class="text-end">{{ Format.lapTime(lap.totalTime) }}</td>
             <td class="text-end">{{ Format.lapTime(lap.sector1) }}</td>
             <td class="text-end">{{ Format.lapTime(lap.sector2) }}</td>
