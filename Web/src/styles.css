@@ -29,6 +29,10 @@ body {
 	max-width: 8rem;
 }
 
+.time-col {
+	min-width: 4.25rem;
+}
+
 :root {
 	/*from --bs-nav-link-padding-y*/
 	--tab-header-pb: .5rem;

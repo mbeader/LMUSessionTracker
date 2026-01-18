@@ -17,16 +17,16 @@
             <th scope="col" class="driver-col">Driver</th>
             <th scope="col" class="text-end">Laps</th>
             @if(isRace) {
-            <th scope="col" class="text-end">Last</th>
+            <th scope="col" class="text-end time-col">Last</th>
             } @else {
-            <th scope="col" class="text-end">Behind</th>
-            <th scope="col" class="text-end">Int</th>
-            <th scope="col" class="text-end">Time</th>
+            <th scope="col" class="text-end time-col">Behind</th>
+            <th scope="col" class="text-end time-col">Int</th>
+            <th scope="col" class="text-end time-col">Time</th>
             }
-            <th scope="col" class="text-end">S1</th>
-            <th scope="col" class="text-end">S2</th>
-            <th scope="col" class="text-end">S3</th>
-            <th scope="col" class="text-end">Fuel</th>
+            <th scope="col" class="text-end time-col">S1</th>
+            <th scope="col" class="text-end time-col">S2</th>
+            <th scope="col" class="text-end time-col">S3</th>
+            <th scope="col" class="text-end time-col">Fuel</th>
         </tr>
     </thead>
     <tbody>
@@ -44,19 +44,19 @@
             <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
             <td class="text-center"><app-session-class-badge [carClass]="carClass" /></td>
             <td class="text-center">{{ car?.number ? car.number : '' }}</td>
-            <td class="team-col text-truncate">{{ car?.teamName ? car.teamName : '' }}</td>
-            <td class="driver-col text-truncate">{{ lap.driver }}</td>
+            <td class="team-col text-truncate" title="{{ car?.teamName }}">{{ car?.teamName ? car.teamName : '' }}</td>
+            <td class="driver-col text-truncate" title="{{ lap.driver }}">{{ lap.driver }}</td>
             <td class="text-end">{{ lap.lapNumber }}</td>
             @if(!isRace) {
-            <td class="text-end">{{ gaps[i].behind <= 0 ? '-' : Format.diff(0, gaps[i].behind) }}</td>
-            <td class="text-end">{{ gaps[i].interval <= 0 ? '-' : Format.diff(0, gaps[i].interval) }}</td>
+            <td class="text-end time-col">{{ gaps[i].behind <= 0 ? '-' : Format.diff(0, gaps[i].behind) }}</td>
+            <td class="text-end time-col">{{ gaps[i].interval <= 0 ? '-' : Format.diff(0, gaps[i].interval) }}</td>
             }
-            <td class="text-end">{{ Format.lapTime(lap.totalTime) }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.sector1) }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.sector2) }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.sector2) }}</td>
+            <td class="text-end time-col">{{ Format.lapTime(lap.totalTime) }}</td>
+            <td class="text-end time-col">{{ Format.lapTime(lap.sector1) }}</td>
+            <td class="text-end time-col">{{ Format.lapTime(lap.sector2) }}</td>
+            <td class="text-end time-col">{{ Format.lapTime(lap.sector2) }}</td>
             @let fuelClass = lap.fuel > .1 ? '' : lap.fuel > .05 ? 'text-warning' : 'text-danger';
-            <td class="text-end {{ fuelClass }}">{{ Format.percent(lap.fuel) }}</td>
+            <td class="text-end time-col {{ fuelClass }}">{{ Format.percent(lap.fuel) }}</td>
         </tr>
         }
         }
