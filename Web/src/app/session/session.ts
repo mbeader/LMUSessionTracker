@@ -1,14 +1,15 @@
 import { Component, inject, ChangeDetectorRef, viewChild } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ServerApiService } from '../server-api.service';
 import { ServerLiveService } from '../server-live.service';
 import { Format } from '../format';
 import { SessionViewModel } from '../view-models';
 import { Standings } from './standings/standings';
+import { Results } from './results/results';
 
 @Component({
 	selector: 'app-session',
-	imports: [RouterLink, Standings],
+	imports: [Standings, Results],
 	templateUrl: './session.html',
 	styleUrl: './session.css',
 })

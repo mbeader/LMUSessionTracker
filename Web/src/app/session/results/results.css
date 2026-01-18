@@ -1,0 +1,32 @@
+:host {
+	--lmu-hy: #e21e19;
+	--lmu-p2: #005096;
+	--lmu-p2e: #e95b0c;
+	--lmu-p3: #411c52;
+	--lmu-gte: #f08c00;
+	--lmu-gt3: #009639;
+}
+
+.pic-hy {
+	background-color: var(--lmu-hy);
+}
+
+.pic-p2 {
+	background-color: var(--lmu-p2);
+}
+
+.pic-p2e {
+	background-color: var(--lmu-p2e);
+}
+
+.pic-p3 {
+	background-color: var(--lmu-p3);
+}
+
+.pic-gte {
+	background-color: var(--lmu-gte);
+}
+
+.pic-gt3 {
+	background-color: var(--lmu-gt3);
+}

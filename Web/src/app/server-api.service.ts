@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, Observable } from 'rxjs';
 import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel } from './view-models';
-import { Car } from './models';
+import { Car, Lap } from './models';
 
 @Injectable({
 	providedIn: 'root',
@@ -31,6 +31,10 @@ export class ServerApiService {
 
 	getEntryList(sessionId: string): Promise<Car[]> {
 		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/EntryList?sessionId=' + sessionId)) as Promise<Car[]>;
+	}
+
+	getResults(sessionId: string): Promise<Lap[]> {
+		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Results?sessionId=' + sessionId)) as Promise<Lap[]>;
 	}
 
 	getTracks(): Promise<string[]> {

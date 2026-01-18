@@ -1,0 +1,53 @@
+@if(session && session.session && isRace) {
+<h3 class="mb-0">Results</h3>
+<div class="mb-2"><small class="fst-italic">Only accurate to last completed lap</small></div>
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col" class="text-center">Status</th>
+            <th scope="col" class="text-center">Pos</th>
+            <th scope="col" class="text-center">PIC</th>
+            <th scope="col" class="text-center">Class</th>
+            <th scope="col" class="text-center">#</th>
+            <th scope="col" class="team-col">Team</th>
+            <th scope="col" class="driver-col">Driver</th>
+            <th scope="col" class="text-end">Laps</th>
+            <th scope="col" class="text-end">Last</th>
+            <th scope="col" class="text-end">S1</th>
+            <th scope="col" class="text-end">S2</th>
+            <th scope="col" class="text-end">S3</th>
+            <th scope="col" class="text-end">Fuel</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (lap of results; track CarKey.fromCar(lap.car).id; let i = $index) {
+        @let id = CarKey.fromCar(lap.car).id;
+        @let car = lap.car;
+        @let carClass = (car && car.class ? car.class : '') ?? '';
+        @if(car) {
+        <tr>
+            @let status = Format.status(lap);
+            @let statusClass = status == 'Run' ? 'link-success' : status == 'Req' ? 'link-info' : status == 'Out' ? 'link-warning' : status == 'In' || status == 'Pit' ? 'link-danger' : 'link-secondary';
+            <td class="text-center"><a class="{{ statusClass }}" [routerLink]="['Laps', `${id}`]">{{ status }}</a></td>
+            <td class="text-center">{{ i + 1 }}</td>
+            @let classId = carClass == 'Hyper' ? 'hy' : carClass == 'LMP2_ELMS' ? 'p2e' : carClass == 'LMP2' ? 'p2' : carClass == 'LMP3' ? 'p3' : carClass == 'GTE' ? 'gte' : carClass == 'GT3' ? 'gt3' : '';
+            <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
+            <td class="text-center"><app-session-class-badge [carClass]="carClass" /></td>
+            <td class="text-center">{{ car?.number ? car.number : '' }}</td>
+            <td class="team-col text-truncate">{{ car?.teamName ? car.teamName : '' }}</td>
+            <td class="driver-col text-truncate">{{ lap.driver }}</td>
+            <td class="text-end">{{ lap.lapNumber }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.totalTime) }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.sector1) }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.sector2) }}</td>
+            <td class="text-end">{{ Format.lapTime(lap.sector2) }}</td>
+            @let fuelClass = lap.fuel > .1 ? '' : lap.fuel > .05 ? 'text-warning' : 'text-danger';
+            <td class="text-end {{ fuelClass }}">{{ Format.percent(lap.fuel) }}</td>
+        </tr>
+        }
+        }
+    </tbody>
+</table>
+} @else {
+<p class="text-center">This session is not live. View the <a [routerLink]="['History']">history</a> instead.</p>
+}

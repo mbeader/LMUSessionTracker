@@ -93,9 +93,8 @@ export class Format {
 				return 'Pit';
 			case 'REQUEST':
 				return 'Req';
-			default:
-				return '???';
 		}
+		return typeof(standing.pitState) === 'undefined' && standing.finishStatus == 'FSTAT_NONE' ? 'Run' : '???';
 	}
 
 	static relativeTimestamp(now: Date, timestamp: Date) {

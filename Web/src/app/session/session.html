@@ -60,7 +60,7 @@
 @if(hasStandings) {
 <app-session-standings [session]="session" />
 } @else {
-<p class="text-center">This session is not live. View the <a [routerLink]="['History']">history</a> instead.</p>
+<app-session-results [session]="session" />
 }
 
 }

@@ -1,4 +1,5 @@
 import { Standing } from "./lmu";
+import { Car as CarModel } from "./models";
 
 export interface CarHistory {
 	/** CarKey */
@@ -36,6 +37,10 @@ export class CarKey {
 
 	static fromStanding(standing: Standing) {
 		return new CarKey(standing.slotID, standing.vehicleFilename);
+	}
+
+	static fromCar(car: CarModel) {
+		return new CarKey(car.slotId, car.veh);
 	}
 }
 

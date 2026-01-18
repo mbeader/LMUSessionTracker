@@ -13,6 +13,7 @@ namespace LMUSessionTracker.Server.Models {
 		public Task<List<Core.Tracking.SessionSummary>> GetSessions(int page, int pageSize);
 		public Task<SessionState> GetSessionState(string sessionId);
 		public Task<List<Car>> GetEntries(string sessionId);
+		public Task<List<Lap>> GetResults(string sessionId);
 		public Task<List<string>> GetTracks();
 		public Task<List<BestLap>> GetLaps(BestLapsFilters filters);
 		public Task<Dictionary<string, ClassBest>> GetClassBests(BestLapsFilters filters);
@@ -79,6 +80,19 @@ namespace LMUSessionTracker.Server.Models {
 
 		public async Task<List<Car>> GetEntries(string sessionId) {
 			return await context.Cars.Include(x => x.Entry).Include(x => x.Entry.Members).Where(x => x.SessionId == sessionId).OrderBy(x => x.CarId).ToListAsync();
+		}
+
+		public async Task<List<Lap>> GetResults(string sessionId) {
+			return await context.Laps.Include(x => x.Car).Include(x => x.Car.Entry)
+				.Where(x => x.SessionId == sessionId)
+				.Join(
+					context.Laps
+						.Where(x => x.SessionId == sessionId)
+						.GroupBy(x => x.CarId)
+						.Select(x => new { CarId = x.Key, LapNumber = x.Max(x => x.LapNumber) }),
+					x => new { x.CarId, x.LapNumber }, x => x, (x, y) => x)
+				.OrderByDescending(x => x.FinishStatus != "FSTAT_DQ").ThenByDescending(x => x.LapNumber).ThenBy(x => x.Position)
+				.ToListAsync();
 		}
 
 		public async Task<List<string>> GetTracks() {
