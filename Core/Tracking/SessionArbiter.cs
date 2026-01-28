@@ -112,6 +112,12 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(session.IsSecondary(client.ClientId))
 				return Accept(data.SessionId, false);
 
+
+			if(session.FirstUpdate && session.Online && data.MultiplayerTeams != null && data.Standings != null && data.MultiplayerTeams.teams.Count == data.Standings.Count) {
+				if(Session.IsHosted(data.MultiplayerTeams, data.Standings))
+					logger.LogDebug($"Session {session.SessionId} detected as hosted session with {data.MultiplayerTeams.teams.Count} entries");
+			}
+
 			await managementRepo.UpdateSession(session.SessionId, data.SessionInfo, now);
 			bool entriesChanged = session.Update(data.SessionInfo, data.Standings, data.MultiplayerTeams, now);
 			if(entriesChanged)

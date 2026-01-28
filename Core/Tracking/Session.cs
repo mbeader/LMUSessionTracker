@@ -21,6 +21,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public History History { get; private set; }
 		public DateTime Timestamp { get; private set; }
 		public DateTime LastUpdate { get; private set; }
+		public bool FirstUpdate { get; private set; } = true;
 		public bool Finished { get; private set; }
 		public bool Closed { get; private set; }
 
@@ -132,10 +133,21 @@ namespace LMUSessionTracker.Core.Tracking {
 			LastStandings = standings ?? LastStandings;
 			if(standings != null) {
 				standings.Sort((a, b) => a.position.CompareTo(b.position));
+				if(Online && teams != null && teams.teams.Count == standings.Count && Entries.Slots.Count == standings.Count && IsHosted(Entries, standings)) {
+					// for entry list hosted sessions, assume invariant content
+					int minSlot = int.MaxValue;
+					foreach(int slotId in Entries.Slots.Keys)
+						if(slotId < minSlot)
+							minSlot = slotId;
+					// shift slots to match entry list
+					foreach(Standing standing in standings)
+						standing.slotID += minSlot;
+				}
 				History.Update(standings, timestamp);
 			}
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
+			FirstUpdate = false;
 			if(teams != null) {
 				EntryList entries = new EntryList(teams);
 				History.UpdateCars(entries);
@@ -263,6 +275,30 @@ namespace LMUSessionTracker.Core.Tracking {
 				Remaining = LastInfo?.timeRemainingInGamePhase ?? 0,
 				Phase = LastInfo?.gamePhase ?? -1,
 			};
+		}
+
+		public static bool IsHosted(MultiplayerTeams teams, List<Standing> standings) {
+			EntryList entries = new EntryList(teams);
+			return IsHosted(entries, standings);
+		}
+
+		private static bool IsHosted(EntryList entries, List<Standing> standings) {
+			if(entries.Slots.Count == 0 || entries.Slots.Count != standings.Count)
+				return false;
+			int minSlot = int.MaxValue;
+			foreach(int slotId in entries.Slots.Keys)
+				if(slotId < minSlot)
+					minSlot = slotId;
+			if(minSlot == 0)
+				return false;
+			foreach(Standing standing in standings) {
+				if(entries.Slots.TryGetValue(standing.slotID + minSlot, out Entry entry)) {
+					if(entry.Vehicle != standing.vehicleFilename || !entry.Members.Exists(x => x.Name == standing.driverName))
+						return false;
+				} else
+					return false;
+			}
+			return true;
 		}
 	}
 }

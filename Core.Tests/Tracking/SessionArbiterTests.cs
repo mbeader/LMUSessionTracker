@@ -121,10 +121,10 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			Assert.Equivalent(Status.ChangedPrimary(2), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new SessionInfo() }));
 		}
 
-		private MultiplayerTeams MultiplayerTeams() {
+		private MultiplayerTeams MultiplayerTeams(int? id = null) {
 			return new() {
 				teams = new() {
-					{ "utid0", new() {
+					{ $"utid{id ?? 0}", new() {
 						name = "team1",
 						vehicle = "someveh",
 						drivers = new() {
@@ -152,6 +152,14 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		public async Task Receive_SuccessiveSameSessionPausedOnlineData_Accepts() {
 			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
 			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { gamePhase = 9 }, MultiplayerTeams = MultiplayerTeams() }));
+		}
+
+		[Fact]
+		public async Task Receive_SuccessiveSameSessionHostedOnlineData_Accepts() {
+			MultiplayerTeams teams = MultiplayerTeams(56);
+			List<Standing> standings = new List<Standing>() { new() { slotID = 0, vehicleFilename = "someveh", driverName ="driver1" } };
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = teams }));
+			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = teams, Standings = standings }));
 		}
 
 		[Fact]

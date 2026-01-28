@@ -317,5 +317,47 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			Assert.Equivalent(s1, s2);
 			Assert.Equivalent(s1.History.GetAllHistory(), s1.History.GetAllHistory());
 		}
+
+		[Fact]
+		public void IsHosted_NoEntries_ReturnsFalse() {
+			Assert.False(Session.IsHosted(new() { teams = new() }, new()));
+		}
+
+		[Fact]
+		public void IsHosted_MismatchedCounts_ReturnsFalse() {
+			Assert.False(Session.IsHosted(FullMultiplayerTeams(), new() { new Standing() }));
+		}
+
+		[Fact]
+		public void IsHosted_MismatchedEntries_ReturnsFalse() {
+			Assert.False(Session.IsHosted(
+				new() { teams = new() { { "utid56", new() { vehicle = "veh1", drivers = new() { { "driver1", new() } } } } } },
+				new() { new Standing() { slotID = 0, vehicleFilename = "veh2", driverName = "driver2" } }
+			));
+		}
+
+		[Fact]
+		public void IsHosted_MismatchedEntrySlot_ReturnsFalse() {
+			Assert.False(Session.IsHosted(
+				new() { teams = new() { { "utid56", new() { vehicle = "veh1", drivers = new() { { "driver1", new() } } } }, { "utid57", new() { vehicle = "veh2", drivers = new() { { "driver2", new() } } } } } },
+				new() { new Standing() { slotID = 0, vehicleFilename = "veh1", driverName = "driver1" }, new Standing() { slotID = 2, vehicleFilename = "veh2", driverName = "driver2" } }
+			));
+		}
+
+		[Fact]
+		public void IsHosted_Nonhosted_ReturnsFalse() {
+			Assert.False(Session.IsHosted(
+				new() { teams = new() { { "utid0", new() { vehicle = "veh1", drivers = new() { { "driver1", new() } } } }, { "utid1", new() { vehicle = "veh2", drivers = new() { { "driver2", new() } } } } } },
+				new() { new Standing() { slotID = 0, vehicleFilename = "veh1", driverName = "driver1" }, new Standing() { slotID = 1, vehicleFilename = "veh2", driverName = "driver2" } }
+			));
+		}
+
+		[Fact]
+		public void IsHosted_Matched_ReturnsTrue() {
+			Assert.True(Session.IsHosted(
+				new() { teams = new() { { "utid56", new() { vehicle = "veh1", drivers = new() { { "driver1", new() } } } }, { "utid57", new() { vehicle = "veh2", drivers = new() { { "driver2", new() } } } } } },
+				new() { new Standing() { slotID = 0, vehicleFilename = "veh1", driverName = "driver1" }, new Standing() { slotID = 1, vehicleFilename = "veh2", driverName = "driver2" } }
+			));
+		}
 	}
 }
