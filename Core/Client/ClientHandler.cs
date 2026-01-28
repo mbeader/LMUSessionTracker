@@ -127,6 +127,10 @@ namespace LMUSessionTracker.Core.Client {
 				logger.LogDebug("Missing multiplayer teams");
 				return;
 			}
+			if(message.Standings == null || message.Standings.Count == 0) {
+				logger.LogDebug("Missing standings");
+				return;
+			}
 			switch(state) {
 				case ClientState.Idle:
 				case ClientState.Connected:

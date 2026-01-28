@@ -4,6 +4,7 @@ using LMUSessionTracker.Core.Protocol;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Core.Tests.Client {
@@ -27,6 +28,7 @@ namespace LMUSessionTracker.Core.Tests.Client {
 			ClientInfo clientInfo = new ClientInfo() { ClientId = clientId };
 			lmuClient = new Mock<LMUClient>();
 			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_IDLE");
+			lmuClient.Setup(x => x.GetStandings()).ReturnsAsync(new List<Standing>() { new() { } });
 			protocolClient = new Mock<ProtocolClient>();
 			handler = new DefaultClientHandler(loggingFixture.LoggerFactory.CreateLogger<DefaultClientHandler>(), lmuClient.Object, protocolClient.Object, clientInfo);
 		}
@@ -242,6 +244,19 @@ namespace LMUSessionTracker.Core.Tests.Client {
 			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
 			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
 			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync((MultiplayerTeams)null);
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
+			AssertState(TestState.Idle());
+			await handler.Handle(baseTimestamp);
+			AssertState(TestState.Idle());
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionNewNoStandings_IsIdle() {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
+			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
+			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
+			lmuClient.Setup(x => x.GetStandings()).ReturnsAsync((List<Standing>)null);
 			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
 			AssertState(TestState.Idle());
 			await handler.Handle(baseTimestamp);
