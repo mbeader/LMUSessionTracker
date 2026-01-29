@@ -264,6 +264,19 @@ namespace LMUSessionTracker.Core.Tests.Client {
 		}
 
 		[Fact]
+		public async Task Handle_OnlineSessionNewPhaseStartingWithFinishedCars_IsIdle() {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo() { gamePhase = (int)GamePhase.Starting });
+			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU", gamePhase = "GPHASE_BEFORE" });
+			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
+			lmuClient.Setup(x => x.GetStandings()).ReturnsAsync(new List<Standing>() { new() { finishStatus = "FSTAT_FINISHED" } });
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
+			AssertState(TestState.Idle());
+			await handler.Handle(baseTimestamp);
+			AssertState(TestState.Idle());
+		}
+
+		[Fact]
 		public async Task Handle_OnlineSession_IsWorking() {
 			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
 			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");

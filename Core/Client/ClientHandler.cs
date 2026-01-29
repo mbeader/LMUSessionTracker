@@ -131,6 +131,11 @@ namespace LMUSessionTracker.Core.Client {
 				logger.LogDebug("Missing standings");
 				return;
 			}
+			if(message.GameState.gamePhase == "GPHASE_BEFORE" && message.SessionInfo.gamePhase == (int)GamePhase.Starting && message.Standings.Exists(x => x.finishStatus != "FSTAT_NONE")) {
+				// may be problematic for disconnects/DQs before green?
+				logger.LogDebug("Session starting but cars finished");
+				return;
+			}
 			switch(state) {
 				case ClientState.Idle:
 				case ClientState.Connected:
