@@ -46,6 +46,7 @@ namespace LMUSessionTracker.Server.Models {
 
 		public async Task<List<Core.Tracking.SessionSummary>> GetSessions(int page, int pageSize) {
 			List<Session> sessions = await context.Sessions.Include(x => x.LastState)
+				.Join(context.Cars.GroupBy(x => x.SessionId).Select(x => x.Key), x => new { x.SessionId }, x => new { SessionId = x }, (x, y) => x)
 				.OrderByDescending(x => x.Timestamp)
 				.Skip((page - 1) * pageSize)
 				.Take(pageSize)
