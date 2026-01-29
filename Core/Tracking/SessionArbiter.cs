@@ -73,6 +73,11 @@ namespace LMUSessionTracker.Core.Tracking {
 				session.UnregisterClient(data.ClientId);
 				client.LeaveSession();
 				logger.LogInformation($"Client {client.ClientId} left session {session.SessionId}");
+				if(!session.Online && !session.HasClient()) {
+					session.Close();
+					await managementRepo.CloseSession(session.SessionId);
+					logger.LogInformation($"Closing session {session.SessionId} (offline client left)");
+				}
 				return Reject();
 			}
 
@@ -289,7 +294,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			foreach(string sessionId in activeSessions.Keys) {
 				summaries.Add(activeSessions[sessionId].Summarize(!inactiveSessions.ContainsKey(sessionId)));
 			}
-			summaries.Sort((a, b) =>  b.Timestamp.CompareTo(a.Timestamp));
+			summaries.Sort((a, b) => b.Timestamp.CompareTo(a.Timestamp));
 			return summaries;
 		}
 

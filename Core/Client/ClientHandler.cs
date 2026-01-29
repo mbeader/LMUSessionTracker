@@ -136,6 +136,10 @@ namespace LMUSessionTracker.Core.Client {
 				logger.LogDebug("Session starting but cars finished");
 				return;
 			}
+			if(message.GameState.gamePhase == "GPHASE_BEFORE" && message.SessionInfo.gamePhase == (int)GamePhase.Paused) {
+				logger.LogDebug("In replay/skipped session transition");
+				return;
+			}
 			switch(state) {
 				case ClientState.Idle:
 				case ClientState.Connected:

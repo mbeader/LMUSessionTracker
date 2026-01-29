@@ -94,6 +94,16 @@ namespace LMUSessionTracker.Core.Tests.Client {
 		}
 
 		[Fact]
+		public async Task Handle_OfflineSessionNewSuspectedReplay_IsIdle() {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo() { gamePhase = (int)GamePhase.Paused });
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU", gamePhase = "GPHASE_BEFORE" });
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
+			AssertState(TestState.Idle());
+			await handler.Handle(baseTimestamp);
+			AssertState(TestState.Idle());
+		}
+
+		[Fact]
 		public async Task Handle_OfflineSession_IsWorking() {
 			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
 			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });

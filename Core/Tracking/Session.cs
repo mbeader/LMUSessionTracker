@@ -193,7 +193,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(diff.Difference == SessionDifference.None) {
 				if(Online != (teams != null)) {
 					diff.Set(SessionDifference.Network, Online ? "online" : "offline", teams != null ? "online" : "offline");
-				} else if(!Entries.HasAnyMatch(new EntryList(teams))) {
+				} else if(Entries == null || !Entries.HasAnyMatch(new EntryList(teams))) {
 					diff.Difference = SessionDifference.EntryList;
 					diff.MessageFormat = "Entrylist has no match";
 				}
