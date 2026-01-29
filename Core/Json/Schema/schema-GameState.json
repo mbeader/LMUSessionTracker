@@ -1,5 +1,5 @@
 {
-	"$id": "GameState",
+	"$id": "/LMUSessionTracker/Schema/GameState",
 	"type": "object",
 	"properties": {
 		"MultiStintState": {
@@ -14,7 +14,7 @@
 			"type": "string"
 		},
 		"closeestWeatherNode": {
-			"$ref": "schema-WeatherNode.json"
+			"$ref": "/LMUSessionTracker/Schema/WeatherNode"
 		},
 		"gamePhase": {
 			"enum": [ "GPHASE_BEFORE", "GPHASE_FORMATION", "GPHASE_GREEN", "GPHASE_CHECKERED" ]

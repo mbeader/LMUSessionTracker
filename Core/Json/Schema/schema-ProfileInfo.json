@@ -1,5 +1,5 @@
 {
-	"$id": "ProfileInfo",
+	"$id": "/LMUSessionTracker/Schema/ProfileInfo",
 	"type": "object",
 	"properties": {
 		"language": {

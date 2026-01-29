@@ -1,11 +1,11 @@
 {
-	"$id": "MultiplayerTeam",
+	"$id": "/LMUSessionTracker/Schema/MultiplayerTeam",
 	"type": "object",
 	"properties": {
 		"Id": {
 			"description": "Team uuid in online events. Integer in online practices.",
 			"type": "string",
-			"pattern": "^(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(?:[0-9]{22})$"
+			"pattern": "^(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(?:[0-9]{1,22})$"
 		},
 		"carNumber": {
 			"type": "string",
@@ -15,7 +15,7 @@
 			"type": "object",
 			"patternProperties": {
 				"^.+$": {
-					"$ref": "schema-MultiplayerTeamMember.json"
+					"$ref": "/LMUSessionTracker/Schema/MultiplayerTeamMember"
 				}
 			},
 			"additionalProperties": false

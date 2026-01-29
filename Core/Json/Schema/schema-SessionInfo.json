@@ -1,11 +1,11 @@
 {
-	"$id": "SessionInfo",
+	"$id": "/LMUSessionTracker/Schema/SessionInfo",
 	"$defs": {
 		"Completion": {
-			"$ref": "schema-Completion.json"
+			"$ref": "/LMUSessionTracker/Schema/Completion"
 		},
 		"Velocity": {
-			"$ref": "schema-Velocity.json"
+			"$ref": "/LMUSessionTracker/Schema/Velocity"
 		}
 	},
 	"type": "object",

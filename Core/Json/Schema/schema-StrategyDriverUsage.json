@@ -1,5 +1,5 @@
 {
-	"$id": "StrategyDriverUsage",
+	"$id": "/LMUSessionTracker/Schema/StrategyDriverUsage",
 	"type": "object",
 	"properties": {
 		"fuel": {

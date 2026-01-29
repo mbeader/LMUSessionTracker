@@ -1,7 +1,7 @@
 {
-	"$id": "TeamStrategy[]",
+	"$id": "/LMUSessionTracker/Schema/TeamStrategy[]",
 	"type": "array",
 	"items": {
-		"$ref": "schema-TeamStrategy.json"
+		"$ref": "/LMUSessionTracker/Schema/TeamStrategy"
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"$id": "StrategyTire",
+	"$id": "/LMUSessionTracker/Schema/StrategyTire",
 	"type": "object",
 	"properties": {
 		"changed": {

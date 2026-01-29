@@ -1,5 +1,5 @@
 {
-	"$id": "TeamStrategy",
+	"$id": "/LMUSessionTracker/Schema/TeamStrategy",
 	"type": "array",
 	"prefixItems": [
 		{
@@ -8,7 +8,7 @@
 		{
 			"type": "array",
 			"items": {
-				"$ref": "schema-Strategy.json"
+				"$ref": "/LMUSessionTracker/Schema/Strategy"
 			}
 		}
 	],

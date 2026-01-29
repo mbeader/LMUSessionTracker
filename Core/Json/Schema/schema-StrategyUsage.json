@@ -1,11 +1,11 @@
 {
-	"$id": "StrategyUsage",
+	"$id": "/LMUSessionTracker/Schema/StrategyUsage",
 	"type": "object",
 	"patternProperties": {
 		"^.+$": {
 			"type": [ "array", "null" ],
 			"items": {
-				"$ref": "schema-StrategyDriverUsage.json"
+				"$ref": "/LMUSessionTracker/Schema/StrategyDriverUsage"
 			}
 		}
 	},

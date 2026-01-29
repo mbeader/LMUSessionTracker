@@ -1,5 +1,5 @@
 {
-	"$id": "TrackMapPoint",
+	"$id": "/LMUSessionTracker/Schema/TrackMapPoint",
 	"type": "object",
 	"properties": {
 		"x": {

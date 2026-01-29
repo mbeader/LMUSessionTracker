@@ -1,5 +1,5 @@
 {
-	"$id": "Velocity",
+	"$id": "/LMUSessionTracker/Schema/Velocity",
 	"type": "object",
 	"properties": {
 		"velocity": {

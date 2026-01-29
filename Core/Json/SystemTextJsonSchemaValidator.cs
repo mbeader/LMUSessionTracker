@@ -5,12 +5,16 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
 namespace LMUSessionTracker.Core.Json {
 	public class SystemTextJsonSchemaValidator : SchemaValidator {
-		private static readonly string filenameformat = "schema-{0}.json";
+		//private static readonly string filenameformat = "schema-{0}.json";
+		private static readonly string baseresname = "LMUSessionTracker.Core.Json.Schema.";
+		private static readonly Uri baseuri = new Uri("https://mbeader.github.io/");
+		private static readonly Uri baseuripath = new Uri(baseuri, "LMUSessionTracker/Schema/");
 		private static readonly List<Type> types = new List<Type>() {
 			typeof(Standing[]),
 			typeof(AttackMode),
@@ -56,13 +60,17 @@ namespace LMUSessionTracker.Core.Json {
 		public static void LoadJsonSchemas() {
 			if(loaded)
 				throw new Exception("Schemas already loaded");
-			foreach(string filename in Directory.GetFiles(Path.Join(AppContext.BaseDirectory, "Json", "Schema"))) {
-				JsonSchema schema = JsonSchema.FromFile(filename, baseUri: new Uri(Path.GetFullPath(filename)));
-				SchemaRegistry.Global.Register(new Uri(Path.GetFullPath(filename)), schema);
+			var assembly = Assembly.GetExecutingAssembly();
+			foreach(string resname in assembly.GetManifestResourceNames()) {
+				if(!resname.StartsWith(baseresname))
+					continue;
+				string filename = resname.Substring(baseresname.Length);
+				using Stream stream = assembly.GetManifestResourceStream(resname);
+				using StreamReader reader = new StreamReader(stream);
+				JsonSchema schema = JsonSchema.FromText(reader.ReadToEnd(), baseUri: baseuri);
 			}
 			foreach(Type type in types) {
-				string filename = Path.Join(AppContext.BaseDirectory, "Json", "Schema", string.Format(filenameformat, type.Name));
-				var basedoc = SchemaRegistry.Global.Get(new Uri(Path.GetFullPath(Path.Join(AppContext.BaseDirectory, "Json", "Schema", type.Name))));
+				var basedoc = SchemaRegistry.Global.Get(new Uri(baseuripath, type.Name));
 				if(basedoc is JsonSchema schema) {
 					schemas.Add(type.FullName, schema);
 					if(type.BaseType == typeof(Array)) {

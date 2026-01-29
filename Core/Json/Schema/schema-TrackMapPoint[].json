@@ -1,7 +1,7 @@
 {
-	"$id": "TrackMapPoint[]",
+	"$id": "/LMUSessionTracker/Schema/TrackMapPoint[]",
 	"type": "array",
 	"items": {
-		"$ref": "schema-TrackMapPoint.json"
+		"$ref": "/LMUSessionTracker/Schema/TrackMapPoint"
 	}
 }

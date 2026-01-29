@@ -1,5 +1,5 @@
 {
-	"$id": "ScheduledSession",
+	"$id": "/LMUSessionTracker/Schema/ScheduledSession",
 	"type": "object",
 	"properties": {
 		"airTemp": {

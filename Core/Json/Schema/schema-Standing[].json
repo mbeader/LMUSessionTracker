@@ -1,8 +1,8 @@
 {
-	"$id": "Standing[]",
+	"$id": "/LMUSessionTracker/Schema/Standing[]",
 	"$defs": {
 		"Standing": {
-			"$ref": "schema-Standing.json"
+			"$ref": "/LMUSessionTracker/Schema/Standing"
 		}
 	},
 	"type": "array",

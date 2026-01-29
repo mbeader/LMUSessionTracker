@@ -1,5 +1,5 @@
 {
-	"$id": "StandingsHistoryLap",
+	"$id": "/LMUSessionTracker/Schema/StandingsHistoryLap",
 	"type": "object",
 	"properties": {
 		"carClass": {

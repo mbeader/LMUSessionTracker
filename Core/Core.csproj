@@ -22,9 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include=".\Json\Schema\*.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>  
+    <EmbeddedResource Include=".\Json\Schema\*.json" />
   </ItemGroup>
 
   <ItemGroup>

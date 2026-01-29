@@ -1,14 +1,14 @@
 {
-	"$id": "Standing",
+	"$id": "/LMUSessionTracker/Schema/Standing",
 	"$defs": {
 		"AttackMode": {
-			"$ref": "schema-AttackMode.json"
+			"$ref": "/LMUSessionTracker/Schema/AttackMode"
 		},
 		"Position": {
-			"$ref": "schema-Position.json"
+			"$ref": "/LMUSessionTracker/Schema/Position"
 		},
 		"Velocity": {
-			"$ref": "schema-Velocity.json"
+			"$ref": "/LMUSessionTracker/Schema/Velocity"
 		}
 	},
 	"type": "object",

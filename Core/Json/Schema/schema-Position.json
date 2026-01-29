@@ -1,5 +1,5 @@
 {
-	"$id": "Position",
+	"$id": "/LMUSessionTracker/Schema/Position",
 	"type": "object",
 	"properties": {
 		"type": {

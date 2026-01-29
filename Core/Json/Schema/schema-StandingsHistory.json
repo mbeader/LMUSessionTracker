@@ -1,11 +1,11 @@
 {
-	"$id": "StandingsHistory",
+	"$id": "/LMUSessionTracker/Schema/StandingsHistory",
 	"type": "object",
 	"patternProperties": {
 		"^[0-9]+$": {
 			"type": "array",
 			"items": {
-				"$ref": "schema-StandingsHistoryLap.json"
+				"$ref": "/LMUSessionTracker/Schema/StandingsHistoryLap"
 			}
 		}
 	},

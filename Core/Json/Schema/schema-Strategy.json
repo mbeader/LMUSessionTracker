@@ -1,5 +1,5 @@
 {
-	"$id": "Strategy",
+	"$id": "/LMUSessionTracker/Schema/Strategy",
 	"type": "object",
 	"properties": {
 		"driver": {
@@ -30,7 +30,7 @@
 			"minimum": 0
 		},
 		"tyres": {
-			"$ref": "schema-StrategyTires.json"
+			"$ref": "/LMUSessionTracker/Schema/StrategyTires"
 		},
 		"ve": {
 			"type": "number",

@@ -1,5 +1,5 @@
 {
-	"$id": "WeatherNode",
+	"$id": "/LMUSessionTracker/Schema/WeatherNode",
 	"type": "object",
 	"properties": {
 		"Duration": {

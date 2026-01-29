@@ -1,12 +1,12 @@
 {
-	"$id": "SessionsInfoForEvent",
+	"$id": "/LMUSessionTracker/Schema/SessionsInfoForEvent",
 	"type": "object",
 	"properties": {
 		"scheduledSessions": {
-			"$id": "ScheduledSession[]",
+			"$id": "/LMUSessionTracker/Schema/ScheduledSession[]",
 			"type": [ "array", "null" ],
 			"items": {
-				"$ref": "schema-ScheduledSession.json"
+				"$ref": "/LMUSessionTracker/Schema/ScheduledSession"
 			}
 		}
 	},

@@ -1,5 +1,5 @@
 {
-	"$id": "Completion",
+	"$id": "/LMUSessionTracker/Schema/Completion",
 	"type": "object",
 	"properties": {
 		"timeCompletion": {

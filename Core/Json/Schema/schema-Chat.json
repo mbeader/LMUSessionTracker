@@ -1,5 +1,5 @@
 {
-	"$id": "Chat",
+	"$id": "/LMUSessionTracker/Schema/Chat",
 	"type": "object",
 	"properties": {
 		"message": {

@@ -1,18 +1,18 @@
 {
-	"$id": "StrategyTires",
+	"$id": "/LMUSessionTracker/Schema/StrategyTires",
 	"type": "object",
 	"properties": {
 		"fl": {
-			"$ref": "schema-StrategyTire.json"
+			"$ref": "/LMUSessionTracker/Schema/StrategyTire"
 		},
 		"fr": {
-			"$ref": "schema-StrategyTire.json"
+			"$ref": "/LMUSessionTracker/Schema/StrategyTire"
 		},
 		"rl": {
-			"$ref": "schema-StrategyTire.json"
+			"$ref": "/LMUSessionTracker/Schema/StrategyTire"
 		},
 		"rr": {
-			"$ref": "schema-StrategyTire.json"
+			"$ref": "/LMUSessionTracker/Schema/StrategyTire"
 		}
 	},
 	"additionalProperties": false,

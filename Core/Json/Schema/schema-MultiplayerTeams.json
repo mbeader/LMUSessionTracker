@@ -1,11 +1,11 @@
 {
-	"$id": "MultiplayerTeams",
+	"$id": "/LMUSessionTracker/Schema/MultiplayerTeams",
 	"$defs": {
 		"MultiplayerDriver": {
-			"$ref": "schema-MultiplayerDriver.json"
+			"$ref": "/LMUSessionTracker/Schema/MultiplayerDriver"
 		},
 		"MultiplayerTeam": {
-			"$ref": "schema-MultiplayerTeam.json"
+			"$ref": "/LMUSessionTracker/Schema/MultiplayerTeam"
 		}
 	},
 	"type": "object",

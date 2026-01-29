@@ -1,5 +1,5 @@
 {
-	"$id": "AttackMode",
+	"$id": "/LMUSessionTracker/Schema/AttackMode",
 	"type": "object",
 	"properties": {
 		"remainingCount": {

@@ -1,7 +1,7 @@
 {
-	"$id": "Chat[]",
+	"$id": "/LMUSessionTracker/Schema/Chat[]",
 	"type": "array",
 	"items": {
-		"$ref": "schema-Chat.json"
+		"$ref": "/LMUSessionTracker/Schema/Chat"
 	}
 }
