@@ -25,7 +25,17 @@
                 <span class="sr {{ member.badge }}" title="{{ member.badge }}"></span>&ngsp;
                 <span class="fi fi-{{ getFlag(member.nationality) }}" title="{{ member.nationality }}"></span>&ngsp;
                 <span>{{ member.name }}</span>&ngsp;
-                <span class="text-body-secondary">{{ member.isDriver && member.isEngineer ? 'Driver/Engineer' : member.isDriver ? 'Driver' : member.isEngineer ? 'Engineer' : '' }}</span>
+                <span class="text-body-secondary">
+                    @if(member.isDriver) {
+                    <span class="tr tr-driver" title="Driver"></span>
+                    }
+                    @if(member.isDriver && member.isEngineer) {
+                    &ngsp;
+                    }
+                    @if(member.isEngineer) {
+                    <span class="tr tr-engineer" title="Engineer"></span>
+                    }
+                </span>
                 <br />
                 }
                 }

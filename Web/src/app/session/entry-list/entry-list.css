@@ -2,7 +2,7 @@
 	background-image: url(../../../../public/restricted-country.svg);
 }
 
-.sr {
+.sr, .tr {
 	background-size: contain;
 	background-position: 50%;
 	background-repeat: no-repeat;
@@ -12,7 +12,7 @@
 	line-height: 1em;
 }
 
-.sr:before {
+.sr:before, .tr:before {
 	content: " ";
 }
 
@@ -50,4 +50,20 @@
 
 .sr.sr-warning {
 	background-image: url(../../../../public/sr-warning.svg);
+}
+
+.tr.tr-driver {
+	background-image: url(../../../../public/tr-driver.svg);
+}
+
+.tr.tr-engineer {
+	background-image: url(../../../../public/tr-engineer.svg);
+}
+
+.tr.tr-manager {
+	background-image: url(../../../../public/tr-manager.svg);
+}
+
+.tr.tr-owner {
+	background-image: url(../../../../public/tr-owner.svg);
 }
