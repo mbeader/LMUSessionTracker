@@ -15,9 +15,9 @@ namespace LMUSessionTracker.Core.Services {
 			return 60000;
 		}
 
-		public override Task Start(IServiceScope scope) {
+		public override async Task Start(IServiceScope scope) {
 			arbiter = scope.ServiceProvider.GetRequiredService<SessionArbiter>();
-			return Task.CompletedTask;
+			await arbiter.Prune(dateTime.UtcNow);
 		}
 
 		public override async Task<bool> Do() {
