@@ -109,6 +109,8 @@ See [HOSTING.md](HOSTING.md) for more information.
 
 ## Notes
 
+Contains assets created by Studio 397.
+
 ### Event support
 
 * Online
