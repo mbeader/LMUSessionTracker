@@ -22,11 +22,9 @@ as long as one exists, data will continue to be collected uninterrupted.
 
 ## Features
 
-<video autoplay="true" loop="true" src="https://raw.githubusercontent.com/mbeader/LMUSessionTracker/refs/heads/master/standings.webm"></video>
-
 * Unified view of active sessions
 	* Live session conditions (data provided using websockets)
-	* Live standings (data provided using websockets)
+	* [Live standings](standings.webm) (data provided using websockets)
 		* Including standard timing information, fuel, lap progess, and car status
 	* Live lap time tracking (data provided using websockets)
 	* Entry list with flags, badges, and roles for humans
