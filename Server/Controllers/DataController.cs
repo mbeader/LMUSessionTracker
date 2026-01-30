@@ -30,6 +30,7 @@ namespace LMUSessionTracker.Server.Controllers {
 				return StatusCode(403);
 		}
 
+		[Produces("application/json")]
 		[HttpPost("{action}")]
 		public async Task<IActionResult> Authenticate([FromBody] ProtocolCredential credential) {
 			if(!ModelState.IsValid)

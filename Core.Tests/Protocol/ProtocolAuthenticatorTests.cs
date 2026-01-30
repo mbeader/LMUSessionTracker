@@ -42,78 +42,108 @@ namespace LMUSessionTracker.Core.Tests.Protocol {
 			return Convert.ToBase64String(Encoding.UTF8.GetBytes(content));
 		}
 
-		private async Task<bool> Authenticate(string publicKey, string signature) {
-			ProtocolCredential credential = new ProtocolCredential() { EncodedPublicKey = publicKey, Version = new Version(0, 1, 0).ToString() };
+		private async Task<string> Authenticate(string publicKey, string signature) {
+			ProtocolCredential credential = new ProtocolCredential() { EncodedPublicKey = publicKey, Version = DefaultProtocolAuthenticator.MinVersion.ToString() };
 			return await protocolAuthenticator.Authenticate(Request(credential, signature), credential);
 		}
 
-		private async Task<bool> Authenticate(PublicKey publicKey, string signature) {
-			ProtocolCredential credential = new ProtocolCredential(publicKey, new Version(0, 1, 0));
+		private async Task<string> Authenticate(PublicKey publicKey, string signature) {
+			ProtocolCredential credential = new ProtocolCredential(publicKey, DefaultProtocolAuthenticator.MinVersion);
 			return await Authenticate(credential, signature);
 		}
 
-		private async Task<bool> Authenticate(ProtocolCredential credential, string signature) {
+		private async Task<string> Authenticate(ProtocolCredential credential, string signature) {
 			return await protocolAuthenticator.Authenticate(Request(credential, signature), credential);
 		}
 
 		[Fact]
-		public async Task Authenticate_NullClientId_ReturnsFalse() {
-			Assert.False(await Authenticate((string)null, null));
+		public async Task Authenticate_NullClientId_ReturnsNotNull() {
+			Assert.NotNull(await Authenticate((string)null, null));
 		}
 
 		[Fact]
-		public async Task Authenticate_EmptyClientId_ReturnsFalse() {
-			Assert.False(await Authenticate("", null));
+		public async Task Authenticate_EmptyClientId_ReturnsNotNull() {
+			Assert.NotNull(await Authenticate("", null));
 		}
 
 		[Fact]
-		public async Task Authenticate_InvalidClientIdEncoding_ReturnsFalse() {
-			Assert.False(await Authenticate("notakey", null));
+		public async Task Authenticate_InvalidClientIdEncoding_ReturnsNotNull() {
+			Assert.NotNull(await Authenticate("notakey", null));
 		}
 
 		[Fact]
-		public async Task Authenticate_InvalidClientId_ReturnsFalse() {
-			Assert.False(await Authenticate(Base64("notakey"), null));
+		public async Task Authenticate_InvalidClientId_ReturnsNotNull() {
+			Assert.NotNull(await Authenticate(Base64("notakey"), null));
 		}
 
 		[Fact]
-		public async Task Authenticate_NullSignature_ReturnsFalse() {
-			Assert.False(await Authenticate(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), null));
+		public async Task Authenticate_NullSignature_ReturnsNotNull() {
+			Assert.NotNull(await Authenticate(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), null));
 		}
 
 		[Fact]
-		public async Task Authenticate_EmptySignature_ReturnsFalse() {
-			Assert.False(await Authenticate(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), ""));
+		public async Task Authenticate_EmptySignature_ReturnsNotNull() {
+			Assert.NotNull(await Authenticate(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), ""));
 		}
 
 		[Fact]
-		public async Task Authenticate_InvalidSignatureEncoding_ReturnsFalse() {
-			Assert.False(await Authenticate(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), "notasig"));
+		public async Task Authenticate_InvalidSignatureEncoding_ReturnsNotNull() {
+			Assert.NotNull(await Authenticate(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), "notasig"));
 		}
 
 		[Fact]
-		public async Task Authenticate_InvalidSignature_ReturnsFalse() {
-			Assert.False(await Authenticate(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), Base64("notasig")));
+		public async Task Authenticate_InvalidSignature_ReturnsNotNull() {
+			Assert.NotNull(await Authenticate(Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText)), Base64("notasig")));
 		}
 
 		[Fact]
-		public async Task Authenticate_MismatchSignature_ReturnsFalse() {
+		public async Task Authenticate_MismatchSignature_ReturnsNotNull() {
 			Key otherKey = Key.Create(algorithm, new KeyCreationParameters() { ExportPolicy = KeyExportPolicies.AllowPlaintextExport });
-			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, new Version(0, 1, 0));
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, DefaultProtocolAuthenticator.MinVersion);
 			byte[] sig = algorithm.Sign(otherKey, Body(credential));
-			Assert.False(await Authenticate(credential, Convert.ToBase64String(sig)));
+			Assert.NotNull(await Authenticate(credential, Convert.ToBase64String(sig)));
 		}
 
 		[Fact]
-		public async Task Authenticate_ValidSignature_ReturnsTrue() {
-			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, new Version(0, 1, 0));
+		public async Task Authenticate_VersionInvalid_ReturnsNotNull() {
+			ProtocolCredential credential = new ProtocolCredential() { Version = "foo" };
+			credential.Encode(privateKey.PublicKey);
 			byte[] sig = algorithm.Sign(privateKey, Body(credential));
-			Assert.True(await Authenticate(credential, Convert.ToBase64String(sig)));
+			Assert.NotNull(await Authenticate(credential, Convert.ToBase64String(sig)));
+		}
+
+		[Fact]
+		public async Task Authenticate_VersionTooLow_ReturnsNotNull() {
+			Version min = DefaultProtocolAuthenticator.MinVersion;
+			Version ver;
+			if(min.Major > 0)
+				ver = new Version(min.Major - 1, 0, 0);
+			else if(min.Minor > 0)
+				ver = new Version(0, min.Minor - 1, 0);
+			else
+				ver = new Version(0, 0, min.Build - 1);
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, ver);
+			byte[] sig = algorithm.Sign(privateKey, Body(credential));
+			Assert.NotNull(await Authenticate(credential, Convert.ToBase64String(sig)));
+		}
+
+		[Fact]
+		public async Task Authenticate_VersionTooHigh_ReturnsNotNull() {
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, DefaultProtocolAuthenticator.MaxVersion);
+			byte[] sig = algorithm.Sign(privateKey, Body(credential));
+			Assert.NotNull(await Authenticate(credential, Convert.ToBase64String(sig)));
+		}
+
+		[Fact]
+		public async Task Authenticate_ValidSignature_ReturnsNull() {
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, DefaultProtocolAuthenticator.MinVersion);
+			byte[] sig = algorithm.Sign(privateKey, Body(credential));
+			Assert.Null(await Authenticate(credential, Convert.ToBase64String(sig)));
 		}
 
 		private async Task<bool?> Verify(ProtocolMessage data, string signature, bool preAuthenticate = true) {
 			data ??= new() { ClientId = Convert.ToBase64String(HashAlgorithm.Sha256.Hash(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText))) };
-			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, new Version(0, 1, 0));
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, DefaultProtocolAuthenticator.MinVersion);
 			await Authenticate(credential, Convert.ToBase64String(algorithm.Sign(privateKey, Body(credential))));
 			return await protocolAuthenticator.Verify(Request(data, signature), data);
 		}

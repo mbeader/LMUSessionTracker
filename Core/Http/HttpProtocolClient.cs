@@ -47,9 +47,9 @@ namespace LMUSessionTracker.Core.Http {
 				HttpResponseMessage res = await httpClient.SendAsync(req);
 				if(res.StatusCode == HttpStatusCode.Unauthorized && allowAuth) {
 					// authenticate and reattempt
-					bool authed = await Authenticate();
-					if(!authed) {
-						logger.LogWarning("Authentication failed");
+					string authResult = await Authenticate();
+					if(authResult != null) {
+						logger.LogWarning($"Authentication failed: {authResult}");
 						return default;
 					}
 					HttpRequestMessage req2 = new HttpRequestMessage(HttpMethod.Post, path);
@@ -76,8 +76,8 @@ namespace LMUSessionTracker.Core.Http {
 			}
 		}
 
-		private async Task<bool> Authenticate() {
-			return await Post<bool, ProtocolCredential>("api/Data/Authenticate", new ProtocolCredential(signingKey.Key.PublicKey, version), false);
+		private async Task<string> Authenticate() {
+			return await Post<string, ProtocolCredential>("api/Data/Authenticate", new ProtocolCredential(signingKey.Key.PublicKey, version), false);
 		}
 
 		public async Task<ProtocolStatus> Send(ProtocolMessage data) {

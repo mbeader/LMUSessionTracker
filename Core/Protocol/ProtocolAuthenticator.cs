@@ -9,13 +9,18 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Core.Protocol {
 	public interface ProtocolAuthenticator {
 		public Task<bool?> Verify(HttpRequest request, ProtocolMessage data);
-		public Task<bool> Authenticate(HttpRequest request, ProtocolCredential credential);
+		public Task<string> Authenticate(HttpRequest request, ProtocolCredential credential);
 	}
 
 	public class DefaultProtocolAuthenticator : ProtocolAuthenticator {
+		private static readonly Version minVersion = new Version(0, 7, 0);
+		private static readonly Version maxVersion = new Version(1, 0, 0);
 		private static readonly SignatureAlgorithm algorithm = SignatureAlgorithm.Ed25519;
 		private readonly ConcurrentDictionary<string, PublicKey> clientKeys = new ConcurrentDictionary<string, PublicKey>();
 		private readonly ILogger<DefaultProtocolAuthenticator> logger;
+
+		public static Version MinVersion => minVersion;
+		public static Version MaxVersion => maxVersion;
 
 		public DefaultProtocolAuthenticator(ILogger<DefaultProtocolAuthenticator> logger) {
 			this.logger = logger;
@@ -34,22 +39,24 @@ namespace LMUSessionTracker.Core.Protocol {
 			}
 		}
 
-		public async Task<bool> Authenticate(HttpRequest request, ProtocolCredential credential) {
+		public async Task<string> Authenticate(HttpRequest request, ProtocolCredential credential) {
 			try {
 				string signatureHeader = request.Headers["X-Signature"];
 				(byte[] publicKeyBytes, PublicKey publicKey) = credential.Decode(algorithm);
 				byte[] body = await CopyBody(request);
 				if(algorithm.Verify(publicKey, body, Convert.FromBase64String(signatureHeader))) {
+					string versionMessage = CheckVersion(credential.Version);
+					if(versionMessage != null)
+						return versionMessage;
 					string hash = Convert.ToBase64String(HashAlgorithm.Sha256.Hash(publicKeyBytes));
 					clientKeys.TryAdd(hash, publicKey);
 					logger.LogInformation($"Authentication successful for client {hash} version {credential.Version}");
-					return true;
-				} else
-					return false;
+					return null;
+				}
 			} catch(Exception e) {
 				logger.LogError(e, $"Authentication failed for {credential.EncodedPublicKey}");
-				return false;
 			}
+			return "Invalid credentials";
 		}
 
 		private async Task<byte[]> CopyBody(HttpRequest request) {
@@ -59,6 +66,16 @@ namespace LMUSessionTracker.Core.Protocol {
 			await request.Body.CopyToAsync(stream);
 			request.Body.Position = 0;
 			return body;
+		}
+
+		private string CheckVersion(string versionString) {
+			if(!Version.TryParse(versionString, out Version version))
+				return "Invalid version";
+			if(version < minVersion)
+				return $"Does not meet minimum required version {minVersion}";
+			if(version >= maxVersion)
+				return $"Does not meet maximum required version {maxVersion}";
+			return null;
 		}
 	}
 }
