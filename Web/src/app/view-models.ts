@@ -2,6 +2,20 @@ import { SessionInfo, Standing } from './lmu';
 import { BestLap, ClassBest, Lap, Session, SessionState } from './models';
 import { SessionSummary, CarHistory, Car } from './tracking';
 
+export class AboutOptions {
+	public repoUrl: string | null = null;
+	public releasesUrl: string | null = null;
+	public binaryUrl: string | null = null;
+
+	static hasUrl(url: string | null) {
+		return url && url.trim() ? true : false;
+	}
+
+	static hasAnyUrl(options: AboutOptions) {
+		return this.hasUrl(options.repoUrl) || this.hasUrl(options.releasesUrl) || this.hasUrl(options.binaryUrl);
+	}
+}
+
 export class BestLapsFilters {
 	public track: string | null = null;
 	public since: string | null = null;

@@ -2,3 +2,43 @@
 <p class="lead">Harvesting your Le Mans Ultimate sessions as long as you remember to run the client.</p>
 
 <p>Contains assets created by Studio 397. Supports only <a href="https://lemansultimate.com">Le Mans Ultimate</a>.</p>
+
+@let options = aboutOptions | async;
+@if(options && AboutOptions.hasAnyUrl(options)) {
+
+@if(AboutOptions.hasUrl(options.repoUrl)) {
+<p>The LMUSessionTracker source code can be found <a href="{{ options.repoUrl }}">here</a>.</p>
+}
+
+@if(AboutOptions.hasUrl(options.releasesUrl) || AboutOptions.hasUrl(options.binaryUrl)) {
+<hr />
+<h3>Want to contribute data to this instance?</h3>
+@if(AboutOptions.hasUrl(options.binaryUrl)) {
+<p>
+    Download the latest <a href="{{ options.binaryUrl }}">preconfigured client release</a>.
+    Extract anywhere.
+</p>
+} @else {
+<p>
+    Download the latest compatible <a href="{{ options.releasesUrl }}">client release</a>.
+    Extract anywhere.
+    Create a file named <code>appsettings.Production.json</code> containing the content below.
+</p>
+<div class="card bg-dark-subtle mb-3">
+    <div class="card-header">appsettings.Production.json</div>
+    <div class="card-body">
+        <pre class="card-text"><code>{{ '{' }}
+  "Client": {{ '{' }}
+    "Protocol": {{ '{' }}
+      "BaseUri": "{{ url }}"
+    {{ '}' }}
+  {{ '}' }}
+{{ '}' }}
+</code></pre>
+    </div>
+</div>
+}
+<p>Simply run <code>LMUSessionTracker.Client.exe</code> any time you want to collect data, regardless of whether the game is already running or in a session.</p>
+}
+
+}

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { About } from './about';
+import { ServerApiService } from '../server-api.service';
 
 describe('About', () => {
 	let component: About;
@@ -8,7 +9,10 @@ describe('About', () => {
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [About]
+			imports: [About],
+			providers: [
+				{ provide: ServerApiService, useValue: { getAbout: vi.fn().mockReturnValueOnce({ subscribe: vi.fn() }) } },
+			]
 		})
 			.compileComponents();
 
