@@ -25,17 +25,19 @@ as long as one exists, data will continue to be collected uninterrupted.
 	* Live standings (data provided using websockets)
 		* Including standard timing information, fuel, lap progess, and car status
 	* Live lap time tracking (data provided using websockets)
-	* Entry list with flags and badges for humans
+	* Entry list with flags, badges, and roles for humans
 	* Multiplayer event resilience
 		* Identification of clients connected to the same session
 			* Whether as drivers or race engineers on the same team or competing teams
 		* Continuous data collection when a client leaves a session where other clients were present
 * Historical view of old sessions
 	* Last known conditions
+	* Final standings based on recorded lap data (not equivalent to game results)
 	* Lap times for each car
 * Live active sessions list (data provided using websockets)
 * Best laps per driver per car per track
 	* Prominent display of drivers marked as "known"
+	* Highlighting of best sector times
 	* Filters
 		* Track
 		* Date cutoff
@@ -112,7 +114,7 @@ See [HOSTING.md](HOSTING.md) for more information.
 * Online
 	* Daily/Weekly/Special Events: supported
 	* Practice sessions: supported
-	* Hosted: untested
+	* Hosted: supported
 	* Championships: untested
 * Offline
 	* Race Weekend: supported
