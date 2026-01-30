@@ -5,6 +5,7 @@ import { History } from './session/history/history';
 import { Laps } from './session/laps/laps';
 import { EntryList } from './session/entry-list/entry-list';
 import { BestLaps } from './best-laps/best-laps';
+import { NotFound } from './not-found/not-found';
 
 export const routes: Routes = [
 	{
@@ -34,5 +35,9 @@ export const routes: Routes = [
 	{
 		path: 'BestLaps',
 		component: BestLaps,
+	},
+	{
+		path: '**',
+		component: NotFound,
 	},
 ];
