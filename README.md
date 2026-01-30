@@ -11,6 +11,8 @@ This repo contains a [client](#client) and a [server](#server).
 > [!WARNING]
 > This project is under active development and may change significantly between `0.x` releases
 
+![Live sessions](sessions.png)
+
 ### Goal
 
 The objective of this project is to achieve a unified and consistent view of live team endurance races.
@@ -19,6 +21,8 @@ Regardless of any members role or whether they are currently connected to the se
 as long as one exists, data will continue to be collected uninterrupted.
 
 ## Features
+
+<video autoplay="true" loop="true" src="https://raw.githubusercontent.com/mbeader/LMUSessionTracker/refs/heads/master/standings.webm"></video>
 
 * Unified view of active sessions
 	* Live session conditions (data provided using websockets)
@@ -45,6 +49,8 @@ as long as one exists, data will continue to be collected uninterrupted.
 		* Session type
 		* Known drivers only
 		* Online/offline
+
+![Best laps](bestlaps.png)
 
 ### Planned features
 
