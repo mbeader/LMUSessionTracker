@@ -24,7 +24,7 @@
 			"additionalProperties": false
 		},
 		"teams": {
-			"description": "Number is slot, starting from 0.",
+			"description": "Number is slot, starting from 0. Hosted starts at some arbitrary value.",
 			"type": "object",
 			"patternProperties": {
 				"^utid[0-9]+$": {

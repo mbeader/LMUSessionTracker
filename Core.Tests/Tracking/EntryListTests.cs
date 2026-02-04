@@ -91,6 +91,13 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public void Construct_FromMultiplayerTeamsOneEntryWithVehExtension() {
+			MultiplayerTeams teams = MultiplayerTeamsOneEntry();
+			teams.teams["utid0"].vehicle += ".VEH";
+			Assert.Equivalent(OneEntry(), new EntryList(teams));
+		}
+
+		[Fact]
 		public void Construct_FromMultiplayerTeamsOneEntryNullRoles() {
 			EntryList ex = OneEntry();
 			ex.Slots[0].Members[0].IsDriver = false;

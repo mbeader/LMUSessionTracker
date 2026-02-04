@@ -3,7 +3,7 @@
 	"type": "object",
 	"properties": {
 		"Id": {
-			"description": "Team uuid in online events. Integer in online practices.",
+			"description": "Team uuid in online events. Integer in online practices. Hosted either team uuid for those with liveries or integer.",
 			"type": "string",
 			"pattern": "^(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(?:[0-9]{1,22})$"
 		},
@@ -21,11 +21,11 @@
 			"additionalProperties": false
 		},
 		"name": {
-			"description": "Limited to 25 characters in online practices.",
+			"description": "Limited to 25 characters in online practices. Player name in hosted.",
 			"type": "string"
 		},
 		"vehicle": {
-			"description": "veh file.",
+			"description": "veh file. Sometimes includes .veh extension.",
 			"type": "string"
 		}
 	},

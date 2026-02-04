@@ -31,6 +31,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			foreach(string team in teams.teams.Keys) {
 				if(!team.StartsWith("utid"))
 					throw new Exception("Unique team ID does not start with utid");
+				// sometimes veh actually includes the extension
+				string veh = teams.teams[team].vehicle;
+				if(veh != null && veh.EndsWith(".veh", StringComparison.OrdinalIgnoreCase))
+					teams.teams[team].vehicle = veh[..^4];
 				int slotId = int.Parse(team.Substring(4));
 				Entry entry = new Entry(slotId, teams.teams[team]);
 				Slots.Add(slotId, entry);
