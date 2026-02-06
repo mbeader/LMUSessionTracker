@@ -4,6 +4,7 @@ import { Session } from './session/session';
 import { History } from './session/history/history';
 import { Laps } from './session/laps/laps';
 import { EntryList } from './session/entry-list/entry-list';
+import { TrackMap } from './session/track-map/track-map';
 import { BestLaps } from './best-laps/best-laps';
 import { About } from './about/about';
 import { NotFound } from './not-found/not-found';
@@ -32,6 +33,10 @@ export const routes: Routes = [
 	{
 		path: 'Session/:sessionId/EntryList',
 		component: EntryList,
+	},
+	{
+		path: 'Session/:sessionId/TrackMap',
+		component: TrackMap,
 	},
 	{
 		path: 'BestLaps',

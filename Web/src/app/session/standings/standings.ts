@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { SessionViewModel } from '../../view-models';
 import { Car, CarKey } from '../../tracking';
 import { Format } from '../../format';
+import { classId } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
 
 @Component({
@@ -18,6 +19,7 @@ export class Standings {
 	classBests: Map<string, number> = new Map();
 	isRace: boolean = false;
 	Format = Format;
+	Utils = { classId };
 	CarKey = CarKey;
 
 	ngOnChanges() {

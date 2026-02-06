@@ -4,6 +4,7 @@ import { NgbPagination } from '@ng-bootstrap/ng-bootstrap/pagination';
 import { BehaviorSubject, debounceTime, delay, Observable, Subject, switchMap, tap } from 'rxjs';
 import { ServerApiService } from '../server-api.service';
 import { ServerLiveService } from '../server-live.service';
+import { whenExists } from '../utils';
 import { SessionSummary } from '../tracking';
 import { IndexViewModel } from '../view-models';
 import { SessionsTable } from './sessions-table/sessions-table';
@@ -34,26 +35,13 @@ export class Sessions {
 		this.sessions = this.service.sessions;
 		this.total = this.service.total;
 		this.sessions.subscribe(() => { if (this.init && this.initCount++ > 0) this.init = false; });
-		this.whenExists('#all-tab', tab => {
+		whenExists('#all-tab', tab => {
 			tab.addEventListener('shown.bs.tab', event => {
 				this.init = true;
 				this.initCount = 0;
 				this.service.reset();
 			});
 		});
-	}
-
-	private whenExists<T extends Element>(selector: string, callback: (el: T) => void) {
-		new Promise<T>((resolve) => {
-			let fn = (fn: any) => {
-				let el = document.querySelector<T>(selector);
-				if (!el)
-					setTimeout(fn, 100);
-				else
-					resolve(el);
-			}
-			fn(fn);
-		}).then(callback);
 	}
 }
 

@@ -29,6 +29,10 @@ export class Header {
 				{
 					id: 'entry-list',
 					path: [(x: string) => x == 'Session', null, (x: string) => x == 'EntryList']
+				},
+				{
+					id: 'track-map',
+					path: [(x: string) => x == 'Session', null, (x: string) => x == 'TrackMap']
 				}
 			]
 		},

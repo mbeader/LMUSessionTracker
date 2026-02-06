@@ -45,6 +45,11 @@
                             } @else {
                             <li><a class="dropdown-item" [routerLink]="['Session', sessionId, 'EntryList']">Entry list</a></li>
                             }
+                            @if(navLink == 'session' && navSubLink == 'track-map') {
+                            <li><a class="dropdown-item active" [routerLink]="['Session', sessionId, 'TrackMap']">Track map</a></li>
+                            } @else {
+                            <li><a class="dropdown-item" [routerLink]="['Session', sessionId, 'TrackMap']">Track map</a></li>
+                            }
                         </ul>
                     </li>
                     }

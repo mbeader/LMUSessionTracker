@@ -1,5 +1,6 @@
 using LMUSessionTracker.Core.Tracking;
 using LMUSessionTracker.Server.Models;
+using LMUSessionTracker.Server.Services;
 using LMUSessionTracker.Server.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,11 +16,13 @@ namespace LMUSessionTracker.Server.Controllers {
 		private readonly ILogger<HomeController> logger;
 		private readonly SessionRepository sessionRepo;
 		private readonly SessionObserver sessionObserver;
+		private readonly TrackMapService trackMapService;
 
-		public HomeController(ILogger<HomeController> logger, SessionRepository sessionRepo, SessionObserver sessionObserver) {
+		public HomeController(ILogger<HomeController> logger, SessionRepository sessionRepo, SessionObserver sessionObserver, TrackMapService trackMapService) {
 			this.logger = logger;
 			this.sessionRepo = sessionRepo;
 			this.sessionObserver = sessionObserver;
+			this.trackMapService = trackMapService;
 		}
 
 		public async Task<IActionResult> Index([FromQuery, Range(1, int.MaxValue)] int page, [FromQuery, Range(1, 20)] int pageSize) {
@@ -80,6 +83,15 @@ namespace LMUSessionTracker.Server.Controllers {
 			if(session == null)
 				return NotFound();
 			return Ok(await sessionRepo.GetEntries(sessionId));
+		}
+
+		public async Task<IActionResult> TrackMap([Required] string sessionId) {
+			if(!ModelState.IsValid)
+				return BadRequest();
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
+			if(session == null)
+				return NotFound();
+			return Ok(trackMapService.GetTrack(session.Track));
 		}
 
 		public async Task<IActionResult> Tracks() {

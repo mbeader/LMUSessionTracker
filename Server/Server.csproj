@@ -58,6 +58,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove=".\Tracks\*.json" />
+    <EmbeddedResource Include=".\Tracks\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 

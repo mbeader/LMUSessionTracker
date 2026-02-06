@@ -264,16 +264,16 @@ export interface TeamStrategy {
 }
 
 export interface TrackMapPoint {
-	X: number;
-	Y: number; // up
-	Z: number;
+	x: number;
+	y: number; // up
+	z: number;
 	/// <summary>
 	/// 0 - track
 	/// 1 - pit/paddock (including entry+exit)
 	/// >=3 - grid (pair of points)
 	/// >=107 - pit (pair of points)
 	/// </summary>
-	Type: number;
+	type: number;
 }
 
 export interface Velocity {

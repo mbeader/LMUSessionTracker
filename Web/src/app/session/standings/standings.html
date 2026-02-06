@@ -36,7 +36,7 @@
             @let status = Format.status(standing);
             @let statusClass = status == 'Run' ? 'link-success' : status == 'Req' ? 'link-info' : status == 'Out' ? 'link-warning' : status == 'In' || status == 'Pit' ? 'link-danger' : 'link-secondary';
             <td class="text-center"><a class="{{ statusClass }}" [routerLink]="['Laps', `${id}`]">{{ status }}</a></td>
-            @let classId = carClass == 'Hyper' ? 'hy' : carClass == 'LMP2_ELMS' ? 'p2e' : carClass == 'LMP2' ? 'p2' : carClass == 'LMP3' ? 'p3' : carClass == 'GTE' ? 'gte' : carClass == 'GT3' ? 'gt3' : '';
+            @let classId = Utils.classId(carClass);
             <td class="text-center {{ positionInClass.get(id ?? '') == 1 ? `pic-${classId}` : null }}">{{ standing.position }}</td>
             <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
             <td class="text-center"><app-session-class-badge [carClass]="carClass" /></td>

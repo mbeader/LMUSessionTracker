@@ -86,6 +86,7 @@ namespace LMUSessionTracker.Server {
 			builder.Services.AddScoped<SessionRepository, SqliteSessionRepository>();
 			builder.Services.AddScoped<SqliteKnownDriversRepository>();
 			builder.Services.AddScoped<SqliteVehicleRepository>();
+			builder.Services.AddScoped<TrackMapService>();
 			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
 			builder.Services.AddSingleton<ProtocolAuthenticator, DefaultProtocolAuthenticator>();
 			builder.Services.AddHostedService<SessionLoaderService>();
