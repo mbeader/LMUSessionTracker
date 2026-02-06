@@ -13,4 +13,8 @@ import { ClassBadge } from '../../session/class-badge/class-badge';
 export class Lap {
 	@Input() lap: LapModel | null = null;
 	Format = Format;
+
+	removeBackdrop() {
+		document.querySelector('.modal-backdrop')?.remove();
+	}
 }
