@@ -7,6 +7,7 @@ import { classId, whenExists } from '../../utils';
 import { Format } from '../../format';
 import { SessionViewModel } from '../../view-models';
 import { TrackMapPoint } from '../../lmu';
+import { Car, CarKey } from '../../tracking';
 
 @Component({
 	selector: 'app-session-track-map',
@@ -20,6 +21,7 @@ export class TrackMap {
 	private api = inject(ServerApiService);
 	private live = inject(ServerLiveService);
 	private resize = new Subject();
+	private mousemove = new Subject<MousePosition>();
 	private map: TrackMapService | null = null
 	private trackMapPoints: TrackMapPoint[] = [];
 	session: SessionViewModel | null = null;
@@ -42,7 +44,7 @@ export class TrackMap {
 	}
 
 	initMap(wrapper: HTMLDivElement) {
-		this.map = new TrackMapService(wrapper, this.resize);
+		this.map = new TrackMapService(wrapper, this.resize, this.mousemove);
 		this.map.map(this.trackMapPoints);
 		if (this.hasStandings && this.session?.session?.sessionId) {
 			this.map.veh(Veh.from(this.session));
@@ -65,23 +67,53 @@ export class TrackMap {
 		if (target instanceof Window)
 			this.resize.next({ width: target.innerWidth, height: target.innerHeight });
 	}
+
+	@HostListener('window:mousemove', ['$event'])
+	public onMousemove(e: MouseEvent) {
+		this.mousemove.next({ x: e.clientX, y: e.clientY });
+	}
+}
+
+type MousePosition = {
+	x: number;
+	y: number;
 }
 
 class Veh {
 	x: number;
 	y: number;
 	c: string;
+	pic: number;
+	driver: string;
+	car?: Car;
 
-	constructor(x: number, y: number, c: string) {
+	constructor(x: number, y: number, c: string, pic: number, driver: string, car?: Car) {
 		this.x = x;
 		this.y = y;
 		this.c = c;
+		this.driver = driver;
+		this.pic = pic;
+		this.car = car;
 	}
 
 	static from(session: SessionViewModel) {
+		let entries: Map<string, Car> = new Map();
+		let positionInClass: Map<string, number> = new Map();
+		if (session && session.entries) {
+			for (let car in session.entries) {
+				entries.set(car ?? '', session.entries[car]);
+			}
+		}
+		if (session && session.positionInClass) {
+			for (let car in session.positionInClass) {
+				positionInClass.set(car ?? '', session.positionInClass[car]);
+			}
+		}
 		let vehs: Veh[] = [];
 		for (let standing of session.standings ?? []) {
-			vehs.push(new Veh(standing.carPosition.x, standing.carPosition.z, classId(standing.carClass)));
+			let id = CarKey.fromStanding(standing).id;
+			let car = entries.get(id);
+			vehs.push(new Veh(standing.carPosition.x, standing.carPosition.z, classId(standing.carClass), positionInClass.get(id) ?? 0, standing.driverName, car));
 		}
 		return vehs;
 	}
@@ -144,8 +176,10 @@ class TrackMapService {
 	};
 	private edges = { maxx: Number.MIN_SAFE_INTEGER, minx: Number.MAX_SAFE_INTEGER, maxy: Number.MIN_SAFE_INTEGER, miny: Number.MAX_SAFE_INTEGER };
 	private staticcanvas: { canvas: HTMLCanvasElement, context: CanvasRenderingContext2D };
+	private mouse: MousePosition = { x: 0, y: 0 };
+	private lastVehs: Veh[] = [];
 
-	constructor(wrapper: HTMLDivElement, resize: Subject<unknown>) {
+	constructor(wrapper: HTMLDivElement, resize: Subject<unknown>, mousemove: Subject<MousePosition>) {
 		let canvas = wrapper.querySelector<HTMLCanvasElement>('canvas');
 		if (!canvas)
 			throw new Error('Missing map canvas');
@@ -177,6 +211,7 @@ class TrackMapService {
 
 		this.resizeMapMap();
 		resize.pipe(debounceTime(500)).subscribe(this.resizeMapMap.bind(this));
+		mousemove.subscribe(pos => { this.mouse = pos; this.veh(this.lastVehs); });
 	}
 
 	veh(vehs: Veh[]) {
@@ -185,7 +220,12 @@ class TrackMapService {
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.context.drawImage(this.staticcanvas.canvas, 0, 0);
 
+		let bounds = this.canvas.getBoundingClientRect();
+		let mouseX = this.mouse.x - bounds.left;
+		let mouseY = this.mouse.y - bounds.top;
+
 		let changed = false;
+		let hoverIndex = -1;
 		for (let i = vehs.length - 1; i >= 0; i--) {
 			let veh = vehs[i];
 			let colors = this.classcolors[veh.c] ?? this.classcolors['default'];
@@ -217,6 +257,8 @@ class TrackMapService {
 			this.context.font = '12px serif';
 			this.context.textAlign = 'center';
 			this.context.fillText((i + 1).toString(), x, y + 4);
+			if (this.context.isPointInPath(mouseX, mouseY))
+				hoverIndex = i;
 		};
 		if (changed) {
 			this.dx = this.edges.maxx - this.edges.minx;
@@ -225,6 +267,12 @@ class TrackMapService {
 			this.cy = (this.edges.maxy + this.edges.miny) / 2;
 			this.calcScaleFactor(this.dx, this.dy);
 		}
+		if (hoverIndex >= 0) {
+			let veh = vehs[hoverIndex];
+			this.context.textAlign = 'left';
+			this.context.fillText(`${hoverIndex + 1} (${veh.pic}) ${veh.driver} - ${veh.car?.class} #${veh.car?.number} ${veh.car?.teamName}`, 0, 10);
+		}
+		this.lastVehs = vehs;
 	}
 
 	map(map: TrackMapPoint[]) {
