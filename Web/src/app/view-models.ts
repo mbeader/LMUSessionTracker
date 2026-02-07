@@ -116,3 +116,49 @@ export class JoinRequest {
 		this.key = key ?? null;
 	}
 };
+
+export class Point2D {
+	x: number = 0;
+	y: number = 0;
+}
+
+export class TrackMap {
+	points: Point2D[] = [];
+	pits: Point2D[] = [];
+	s1: Point2D[] = [];
+	s2: Point2D[] = [];
+	s3: Point2D[] = [];
+	maxX: number = 0;
+	maxY: number = 0;
+	minX: number = 0;
+	minY: number = 0;
+
+	constructor(map?: TrackMap) {
+		if(map) {
+			this.points = map.points ?? this.points;
+			this.pits = map.pits ?? this.pits;
+			this.s1 = map.s1 ?? this.s1;
+			this.s2 = map.s2 ?? this.s2;
+			this.s3 = map.s3 ?? this.s3;
+			this.maxX = map.maxX;
+			this.maxY = map.maxY;
+			this.minX = map.minX;
+			this.minY = map.minY;
+		}
+	}
+
+	get maxx() { return this.maxX; }
+	get maxy() { return this.maxY; }
+	get minx() { return this.minX; }
+	get miny() { return this.minY; }
+
+	set maxx(v: number) { this.maxX = v; }
+	set maxy(v: number) { this.maxY = v; }
+	set minx(v: number) { this.minX = v; }
+	set miny(v: number) { this.minY = v; }
+
+	hasSectors() {
+		return this.s1.length > 0 && this.s2.length > 0 && this.s3.length > 0;
+	}
+}
+

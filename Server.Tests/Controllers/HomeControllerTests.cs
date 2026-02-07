@@ -15,7 +15,7 @@ namespace LMUSessionTracker.Server.Tests.Controllers {
 		public HomeControllerTests(LoggingFixture loggingFixture) {
 			sessionRepo = new Mock<SessionRepository>();
 			sessionObserver = new Mock<SessionObserver>();
-			trackMapService = new Mock<TrackMapService>();
+			trackMapService = new Mock<TrackMapService>(Mock.Of<ILogger<TrackMapService>>());
 			controller = new HomeController(loggingFixture.LoggerFactory.CreateLogger<HomeController>(), sessionRepo.Object, sessionObserver.Object, trackMapService.Object);
 		}
 

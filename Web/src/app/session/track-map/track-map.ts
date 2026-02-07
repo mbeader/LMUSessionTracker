@@ -5,8 +5,7 @@ import { ServerApiService } from '../../server-api.service';
 import { ServerLiveService } from '../../server-live.service';
 import { classId, whenExists } from '../../utils';
 import { Format } from '../../format';
-import { SessionViewModel } from '../../view-models';
-import { TrackMapPoint } from '../../lmu';
+import { Point2D, SessionViewModel, TrackMap as Track } from '../../view-models';
 import { Car, CarKey } from '../../tracking';
 
 @Component({
@@ -23,7 +22,7 @@ export class TrackMap {
 	private resize = new Subject();
 	private mousemove = new Subject<MousePosition>();
 	private map: TrackMapService | null = null
-	private trackMapPoints: TrackMapPoint[] = [];
+	private trackMap: Track = new Track();
 	session: SessionViewModel | null = null;
 	hasStandings: boolean = false;
 	Format = Format;
@@ -33,7 +32,7 @@ export class TrackMap {
 		if (!sessionId)
 			return;
 		this.api.getTrackMap(sessionId).then(result => {
-			this.trackMapPoints = result ?? [];
+			this.trackMap = result ?? new Track();
 			this.api.getSession(sessionId).then(result => {
 				this.session = result;
 				this.hasStandings = this.session.standings != null && this.session.standings.length > 0;
@@ -45,7 +44,7 @@ export class TrackMap {
 
 	initMap(wrapper: HTMLDivElement) {
 		this.map = new TrackMapService(wrapper, this.resize, this.mousemove);
-		this.map.map(this.trackMapPoints);
+		this.map.map(this.trackMap);
 		if (this.hasStandings && this.session?.session?.sessionId) {
 			this.map.veh(Veh.from(this.session));
 			this.live.joinLive(this.session.session.sessionId, this.updateSession.bind(this));
@@ -116,40 +115,6 @@ class Veh {
 			vehs.push(new Veh(standing.carPosition.x, standing.carPosition.z, classId(standing.carClass), positionInClass.get(id) ?? 0, standing.driverName, car));
 		}
 		return vehs;
-	}
-}
-
-class Point {
-	private point: TrackMapPoint;
-
-	constructor(point: TrackMapPoint) {
-		this.point = point;
-	}
-
-	get x() { return this.point.x; }
-	get y() { return this.point.z; }
-	get z() { return this.point.y; }
-	get type() { return this.point.type; }
-
-	set x(v) { this.point.x = v; }
-	set y(v) { this.point.z = v; }
-	set z(v) { this.point.y = v; }
-	set type(v) { this.point.type = v; }
-}
-
-class Track {
-	points: Point[] = [];
-	pit: Point[] = [];
-	s1: Point[] = [];
-	s2: Point[] = [];
-	s3: Point[] = [];
-	maxx: number = 0;
-	maxy: number = 0;
-	minx: number = 0;
-	miny: number = 0;
-
-	hasSectors() {
-		return this.s1.length > 0 && this.s2.length > 0 && this.s3.length > 0;
 	}
 }
 
@@ -275,37 +240,16 @@ class TrackMapService {
 		this.lastVehs = vehs;
 	}
 
-	map(map: TrackMapPoint[]) {
-		this.track = new Track();
-		for (let point of map) {
-			let arr = point.type == 0 ? this.track.points : point.type == 1 ? this.track.pit : null;
-			if (arr)
-				arr.push(new Point(point));
-		}
-		if (this.track.points.length > 0) {
-			this.track.maxx = this.track.points[0].x;
-			this.track.maxy = this.track.points[0].y;
-			this.track.minx = this.track.points[0].x;
-			this.track.miny = this.track.points[0].y;
-		}
-		for (let p of this.track.points) {
-			if (p.x > this.track.maxx)
-				this.track.maxx = p.x;
-			else if (p.x < this.track.minx)
-				this.track.minx = p.x;
-			if (p.y > this.track.maxy)
-				this.track.maxy = p.y;
-			else if (p.y < this.track.miny)
-				this.track.miny = p.y;
-		}
+	map(map: Track) {
+		this.track = new Track(map);
 		this.dx = this.track.maxx - this.track.minx;
 		this.dy = this.track.maxy - this.track.miny;
 		this.cx = (this.track.maxx + this.track.minx) / 2;
 		this.cy = (this.track.maxy + this.track.miny) / 2;
 		if (this.track.points.length > 0)
 			this.processTrack(this.track);
-		if (this.track.pit.length > 0)
-			this.processPoints(this.track.pit);
+		if (this.track.pits.length > 0)
+			this.processPoints(this.track.pits);
 		this.calcScaleFactor(this.dx, this.dy);
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.drawTrack();
@@ -330,18 +274,18 @@ class TrackMapService {
 		}
 	}
 
-	private processPoints(sector: Point[]) {
+	private processPoints(sector: Point2D[]) {
 		for (let i = 0; i < sector.length; i++)
 			this.processPoint(sector[i]);
 	}
 
-	private processPoint(point: Point) {
+	private processPoint(point: Point2D) {
 		point.x -= this.cx;
 		point.y *= -1;
 		point.y += this.cy;
 	}
 
-	private recalcSectorLimits(track: Track, sector: Point[]) {
+	private recalcSectorLimits(track: Track, sector: Point2D[]) {
 		for (let i = 0; i < sector.length; i++) {
 			if (sector[i].x > track.maxx)
 				track.maxx = sector[i].x;
@@ -400,15 +344,15 @@ class TrackMapService {
 				this.drawSectorMarker(this.track.s1[this.track.s1.length - 1], this.track.s2[0], this.track.s2[1], 'gray');
 				this.drawSectorMarker(this.track.s2[this.track.s2.length - 1], this.track.s3[0], this.track.s3[1], 'gray');
 			} else {
-				if (this.track.pit.length > 0)
-					this.drawSector(this.track.pit, this.track.pit[this.track.pit.length - 1], '#343a40');
+				if (this.track.pits.length > 0)
+					this.drawSector(this.track.pits, this.track.pits[this.track.pits.length - 1], '#343a40');
 				this.drawSector(this.track.points, this.track.points[0], '#6c757d');
 			}
 		}
 		this.context.drawImage(this.staticcanvas.canvas, 0, 0);
 	}
 
-	private drawSector(sector: Point[], end: Point, color: string) {
+	private drawSector(sector: Point2D[], end: Point2D, color: string) {
 		this.staticcanvas.context.strokeStyle = color;
 		this.staticcanvas.context.beginPath();
 		for (let i = 0; i < sector.length; i++)
@@ -417,13 +361,13 @@ class TrackMapService {
 		this.staticcanvas.context.stroke();
 	}
 
-	private drawChevrons(prev: Point, center: Point, next: Point) {
+	private drawChevrons(prev: Point2D, center: Point2D, next: Point2D) {
 		this.staticcanvas.context.fillStyle = 'rgba(191, 191, 191, 0.7)';
 		this.drawChevron(prev, center, next, 10);
 		this.drawChevron(prev, center, next, -10);
 	}
 
-	private drawChevron(prev: Point, center: Point, next: Point, offset: number) {
+	private drawChevron(prev: Point2D, center: Point2D, next: Point2D, offset: number) {
 		let width = 10, height = 10;
 		let baseangle = Math.atan2(next.y - prev.y, next.x - prev.x);
 		let angle = baseangle + Math.PI / 2;
@@ -445,7 +389,7 @@ class TrackMapService {
 		this.staticcanvas.context.restore();
 	}
 
-	private drawSectorMarker(prev: Point, center: Point, next: Point, primary: string, secondary?: string) {
+	private drawSectorMarker(prev: Point2D, center: Point2D, next: Point2D, primary: string, secondary?: string) {
 		let angle = Math.atan2(next.y - prev.y, next.x - prev.x);
 		let point = { x: this.calcX(center.x), y: this.calcY(center.y) };
 		let length = 30, width = 6;
