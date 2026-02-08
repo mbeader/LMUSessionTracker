@@ -78,6 +78,7 @@ namespace LMUSessionTracker.Server {
 			} else {
 				builder.Services.AddSingleton<PublisherService, SignalRPublisherService>();
 				builder.Services.AddSingleton<SignalRGroupCollection>();
+				builder.Services.AddSingleton<TrackMapBuilder, Tracking.TrackMapBuilder>();
 				builder.Services.AddSingleton<SessionLogger>();
 				builder.Services.AddSingleton<SessionArbiter>();
 				builder.Services.AddSingleton<ProtocolServer, SessionArbiter>(provider => provider.GetRequiredService<SessionArbiter>());
@@ -86,7 +87,7 @@ namespace LMUSessionTracker.Server {
 			builder.Services.AddScoped<SessionRepository, SqliteSessionRepository>();
 			builder.Services.AddScoped<SqliteKnownDriversRepository>();
 			builder.Services.AddScoped<SqliteVehicleRepository>();
-			builder.Services.AddScoped<TrackMapService>();
+			builder.Services.AddSingleton<TrackMapService>();
 			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
 			builder.Services.AddSingleton<ProtocolAuthenticator, DefaultProtocolAuthenticator>();
 			builder.Services.AddHostedService<SessionLoaderService>();

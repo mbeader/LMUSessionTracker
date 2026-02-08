@@ -134,7 +134,7 @@ export class TrackMap {
 	minY: number = 0;
 
 	constructor(map?: TrackMap) {
-		if(map) {
+		if (map) {
 			this.points = map.points ?? this.points;
 			this.pits = map.pits ?? this.pits;
 			this.s1 = map.s1 ?? this.s1;
@@ -145,6 +145,10 @@ export class TrackMap {
 			this.minX = map.minX;
 			this.minY = map.minY;
 		}
+	}
+
+	get length() {
+		return this.hasSectors() ? this.s1.length + this.s2.length + this.s3.length : this.points.length;
 	}
 
 	get maxx() { return this.maxX; }

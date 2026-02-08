@@ -194,7 +194,7 @@ class TrackMapService {
 		for (let i = vehs.length - 1; i >= 0; i--) {
 			let veh = vehs[i];
 			let colors = this.classcolors[veh.c] ?? this.classcolors['default'];
-			if ((this.track?.points.length ?? 0) == 0) {
+			if ((this.track?.length ?? 0) == 0) {
 				if (this.edges.maxx < veh.x) {
 					this.edges.maxx = veh.x;
 					changed = true;
@@ -246,7 +246,7 @@ class TrackMapService {
 		this.dy = this.track.maxy - this.track.miny;
 		this.cx = (this.track.maxx + this.track.minx) / 2;
 		this.cy = (this.track.maxy + this.track.miny) / 2;
-		if (this.track.points.length > 0)
+		if (this.track.length > 0)
 			this.processTrack(this.track);
 		if (this.track.pits.length > 0)
 			this.processPoints(this.track.pits);
@@ -323,7 +323,7 @@ class TrackMapService {
 		this.staticcanvas.canvas.width = this.canvas.width;
 		this.staticcanvas.canvas.height = this.canvas.height;
 		this.dim = this.canvas.height / 2;
-		if ((this.track?.points.length ?? 0) > 0) {
+		if ((this.track?.length ?? 0) > 0) {
 			this.calcScaleFactor(this.dx, this.dy);
 			this.drawTrack();
 		}
@@ -331,21 +331,21 @@ class TrackMapService {
 
 	private drawTrack() {
 		this.staticcanvas.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-		if (this.track && (this.track.points.length ?? 0) > 0) {
+		if (this.track && (this.track.length ?? 0) > 0) {
 			this.staticcanvas.context.lineWidth = 15;
+			if (this.track.pits.length > 0)
+				this.drawSector(this.track.pits, this.track.pits[this.track.pits.length - 1], '#343a40');
 			if (this.track.hasSectors()) {
-				this.drawSector(this.track.s1, this.track.s2[0], 'navy');
-				this.drawSector(this.track.s2, this.track.s3[0], 'green');
-				this.drawSector(this.track.s3, this.track.s1[0], 'maroon');
+				this.drawSector(this.track.s1, this.track.s2[0], '#084298');
+				this.drawSector(this.track.s2, this.track.s3[0], '#0f5132');
+				this.drawSector(this.track.s3, this.track.s1[0], '#842029');
 
 				this.drawChevrons(this.track.s3[this.track.s3.length - 1], this.track.s1[0], this.track.s1[1]);
 
 				this.drawSectorMarker(this.track.s3[this.track.s3.length - 1], this.track.s1[0], this.track.s1[1], 'white', 'black');
-				this.drawSectorMarker(this.track.s1[this.track.s1.length - 1], this.track.s2[0], this.track.s2[1], 'gray');
-				this.drawSectorMarker(this.track.s2[this.track.s2.length - 1], this.track.s3[0], this.track.s3[1], 'gray');
+				this.drawSectorMarker(this.track.s1[this.track.s1.length - 1], this.track.s2[0], this.track.s2[1], '#6c757d');
+				this.drawSectorMarker(this.track.s2[this.track.s2.length - 1], this.track.s3[0], this.track.s3[1], '#6c757d');
 			} else {
-				if (this.track.pits.length > 0)
-					this.drawSector(this.track.pits, this.track.pits[this.track.pits.length - 1], '#343a40');
 				this.drawSector(this.track.points, this.track.points[0], '#6c757d');
 			}
 		}
