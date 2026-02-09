@@ -148,12 +148,6 @@ namespace LMUSessionTracker.Server.Tracking {
 			return minIndex;
 		}
 
-		private class TrackMapMetadata {
-			public int S1Index { get; set; }
-			public int S2Index { get; set; }
-			public int S3Index { get; set; }
-		}
-
 		private class SectorMarkers {
 			public Point2D S1 { get; set; }
 			public Point2D S2 { get; set; }
