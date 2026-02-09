@@ -27,6 +27,7 @@ as long as one exists, data will continue to be collected uninterrupted.
 	* [Live standings](standings.webm) (data provided using websockets)
 		* Including standard timing information, fuel, lap progess, and car status
 	* Live lap time tracking (data provided using websockets)
+	* Live track map (data provided using websockets)
 	* Entry list with flags, badges, and roles for humans
 	* Multiplayer event resilience
 		* Identification of clients connected to the same session
@@ -61,7 +62,6 @@ as long as one exists, data will continue to be collected uninterrupted.
 		* Tires/fuel/VE from history
 * Front-end
 	* Page for full live timing
-	* Track map
 * Accept data from rF2 plugin
 
 ## Client
