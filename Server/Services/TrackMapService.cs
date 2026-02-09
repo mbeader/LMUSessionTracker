@@ -14,11 +14,29 @@ namespace LMUSessionTracker.Server.Services {
 		private static readonly string baseresname = "LMUSessionTracker.Server.Tracks.";
 		private static readonly ConcurrentDictionary<string, TrackMap> tracks = new ConcurrentDictionary<string, TrackMap>();
 		private static readonly Dictionary<string, TrackMapMetadata> trackMetadata = new Dictionary<string, TrackMapMetadata>() {
-			{ "Algarve International Circuit", new(77, 266, 588) },
-			{ "Autodromo Nazionale Monza", new(302, 705, 1061) },
-			{ "Paul Ricard - ELMS", new(1131, 293, 682) },
-			{ "Sebring International Raceway", new(10, 433, 734) },
-			{ "Sebring School Circuit", new(273, 485, 589) },
+			{ "Algarve International Circuit", new(64, 260, 583) },
+			{ "Autodromo Enzo e Dino Ferrari", new(970, 309, 634) },
+			{ "Autodromo Nazionale Monza", new(296, 695, 1055) },
+			{ "Autódromo José Carlos Pace", new(1, 261, 637) },
+			{ "Bahrain Endurance Circuit", new(36, 478, 691) },
+			{ "Bahrain International Circuit", new(1075, 340, 792) },
+			{ "Bahrain Outer Circuit", new(17, 357, 492) },
+			{ "Bahrain Paddock Circuit", new(9, 256, 490) },
+			{ "COTA National Circuit", new(16, 277, 428) },
+			{ "Circuit de Spa-Francorchamps Endurance", new(170, 603, 1156) },
+			{ "Circuit de Spa-Francorchamps", new(170, 603, 1157) },
+			{ "Circuit de la Sarthe Mulsanne", new(207, 586, 1751) },
+			{ "Circuit de la Sarthe", new(206, 586, 1751) },
+			{ "Circuit of the Americas", new(5, 337, 774) },
+			{ "Fuji Speedway Classic", new(122, 495, 712) },
+			{ "Fuji Speedway", new(123, 496, 721) },
+			{ "Lusail International Circuit", new(1029, 252, 659) },
+			{ "Lusail Short Circuit", new(1, 274, 551) },
+			{ "Monza Curva Grande Circuit", new(296, 695, 1056) },
+			{ "Paul Ricard - ELMS", new(1127, 285, 666) },
+			{ "Sebring International Raceway", new(2, 431, 728) },
+			{ "Sebring School Circuit", new(269, 476, 584) },
+			{ "Silverstone Grand Prix Circuit - ELMS", new(1149, 290, 632) },
 		};
 		private readonly ILogger<TrackMapService> logger;
 
