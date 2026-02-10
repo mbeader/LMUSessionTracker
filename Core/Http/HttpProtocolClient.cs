@@ -49,7 +49,8 @@ namespace LMUSessionTracker.Core.Http {
 					// authenticate and reattempt
 					string authResult = await Authenticate();
 					if(authResult != null) {
-						logger.LogWarning($"Authentication failed: {authResult}");
+						logger.LogCritical($"Authentication failed: {authResult}");
+						Environment.Exit(-1);
 						return default;
 					}
 					HttpRequestMessage req2 = new HttpRequestMessage(HttpMethod.Post, path);
