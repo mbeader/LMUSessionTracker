@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using System;
 using System.Collections.Concurrent;
@@ -13,17 +14,21 @@ namespace LMUSessionTracker.Core.Protocol {
 	}
 
 	public class DefaultProtocolAuthenticator : ProtocolAuthenticator {
+		private static readonly string ed25519prefix = "MCowBQYDK2VwAyEA";
 		private static readonly Version minVersion = new Version(0, 7, 0);
 		private static readonly Version maxVersion = new Version(1, 0, 0);
 		private static readonly SignatureAlgorithm algorithm = SignatureAlgorithm.Ed25519;
 		private readonly ConcurrentDictionary<string, PublicKey> clientKeys = new ConcurrentDictionary<string, PublicKey>();
 		private readonly ILogger<DefaultProtocolAuthenticator> logger;
+		private readonly AuthenticationOptions options;
 
 		public static Version MinVersion => minVersion;
 		public static Version MaxVersion => maxVersion;
 
-		public DefaultProtocolAuthenticator(ILogger<DefaultProtocolAuthenticator> logger) {
+		public DefaultProtocolAuthenticator(ILogger<DefaultProtocolAuthenticator> logger, IOptions<AuthenticationOptions> options) {
 			this.logger = logger;
+			this.options = options?.Value ??  new AuthenticationOptions();
+			this.options.ClientWhitelist?.RemoveAll(string.IsNullOrEmpty);
 		}
 
 		public async Task<bool?> Verify(HttpRequest request, ProtocolMessage data) {
@@ -49,9 +54,12 @@ namespace LMUSessionTracker.Core.Protocol {
 					if(versionMessage != null)
 						return versionMessage;
 					string hash = Convert.ToBase64String(HashAlgorithm.Sha256.Hash(publicKeyBytes));
-					clientKeys.TryAdd(hash, publicKey);
-					logger.LogInformation($"Authentication successful for client {hash} version {credential.Version}");
-					return null;
+					if(!options.UseWhitelist || IsWhitelisted(publicKey.Export(KeyBlobFormat.RawPublicKey), hash)) {
+						clientKeys.TryAdd(hash, publicKey);
+						logger.LogInformation($"Authentication successful for client {hash} version {credential.Version}");
+						return null;
+					} else
+						logger.LogWarning($"Authentication failed for unwhitelisted client: {credential.EncodedPublicKey}");
 				}
 			} catch(Exception e) {
 				logger.LogError(e, $"Authentication failed for {credential.EncodedPublicKey}");
@@ -76,6 +84,17 @@ namespace LMUSessionTracker.Core.Protocol {
 			if(version >= maxVersion)
 				return $"Does not meet maximum required version {maxVersion}";
 			return null;
+		}
+
+		private bool IsWhitelisted(byte[] publicKey, string hash) {
+			if(options.ClientWhitelist == null)
+				return false;
+			string publicKeyString = ed25519prefix + Convert.ToBase64String(publicKey);
+			foreach(string client in options.ClientWhitelist) {
+				if((client.StartsWith(ed25519prefix) && client == publicKeyString) || client == hash)
+					return true;
+			}
+			return false;
 		}
 	}
 }

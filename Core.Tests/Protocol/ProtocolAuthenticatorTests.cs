@@ -1,6 +1,7 @@
 using LMUSessionTracker.Core.Protocol;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Newtonsoft.Json;
@@ -16,9 +17,13 @@ namespace LMUSessionTracker.Core.Tests.Protocol {
 		private static readonly SignatureAlgorithm algorithm = SignatureAlgorithm.Ed25519;
 		private readonly DefaultProtocolAuthenticator protocolAuthenticator;
 		private readonly Key privateKey;
+		private readonly AuthenticationOptions options;
 
 		public ProtocolAuthenticatorTests(LoggingFixture loggingFixture) {
-			protocolAuthenticator = new DefaultProtocolAuthenticator(loggingFixture.LoggerFactory.CreateLogger<DefaultProtocolAuthenticator>());
+			options = new AuthenticationOptions();
+			Mock<IOptions<AuthenticationOptions>> mockOptions = new Mock<IOptions<AuthenticationOptions>>();
+			mockOptions.Setup(x => x.Value).Returns(() => options);
+			protocolAuthenticator = new DefaultProtocolAuthenticator(loggingFixture.LoggerFactory.CreateLogger<DefaultProtocolAuthenticator>(), mockOptions.Object);
 			privateKey = Key.Create(algorithm, new KeyCreationParameters() { ExportPolicy = KeyExportPolicies.AllowPlaintextExport });
 		}
 
@@ -135,7 +140,34 @@ namespace LMUSessionTracker.Core.Tests.Protocol {
 		}
 
 		[Fact]
+		public async Task Authenticate_NotWhitelisted_ReturnsNotNull() {
+			options.UseWhitelist = true;
+			options.ClientWhitelist = new List<string>() { "foo" };
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, DefaultProtocolAuthenticator.MinVersion);
+			byte[] sig = algorithm.Sign(privateKey, Body(credential));
+			Assert.NotNull(await Authenticate(credential, Convert.ToBase64String(sig)));
+		}
+
+		[Fact]
 		public async Task Authenticate_ValidSignature_ReturnsNull() {
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, DefaultProtocolAuthenticator.MinVersion);
+			byte[] sig = algorithm.Sign(privateKey, Body(credential));
+			Assert.Null(await Authenticate(credential, Convert.ToBase64String(sig)));
+		}
+
+		[Fact]
+		public async Task Authenticate_ValidSignatureWhitlistedHash_ReturnsNull() {
+			options.UseWhitelist = true;
+			options.ClientWhitelist = new List<string>() { Convert.ToBase64String(HashAlgorithm.Sha256.Hash(privateKey.PublicKey.Export(KeyBlobFormat.PkixPublicKeyText))) };
+			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, DefaultProtocolAuthenticator.MinVersion);
+			byte[] sig = algorithm.Sign(privateKey, Body(credential));
+			Assert.Null(await Authenticate(credential, Convert.ToBase64String(sig)));
+		}
+
+		[Fact]
+		public async Task Authenticate_ValidSignatureWhitlistedPublicKey_ReturnsNull() {
+			options.UseWhitelist = true;
+			options.ClientWhitelist = new List<string>() { "MCowBQYDK2VwAyEA" + Convert.ToBase64String(privateKey.PublicKey.Export(KeyBlobFormat.RawPublicKey)) };
 			ProtocolCredential credential = new ProtocolCredential(privateKey.PublicKey, DefaultProtocolAuthenticator.MinVersion);
 			byte[] sig = algorithm.Sign(privateKey, Body(credential));
 			Assert.Null(await Authenticate(credential, Convert.ToBase64String(sig)));
