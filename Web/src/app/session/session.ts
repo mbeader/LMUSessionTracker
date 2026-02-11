@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectorRef, viewChild } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ServerApiService } from '../server-api.service';
 import { ServerLiveService } from '../server-live.service';
 import { Anonymizer } from '../anonymizer.service';
@@ -19,6 +19,7 @@ export class Session {
 	private shouldAnonymize = false;
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
+	private router = inject(Router);
 	private api = inject(ServerApiService);
 	private live = inject(ServerLiveService);
 	private anonymizer = inject(Anonymizer);
@@ -69,6 +70,11 @@ export class Session {
 
 	transitionSession(session: SessionTransitionViewModel) {
 		if (this.session && !this.session.nextSession && session.sessionId && session.info?.session) {
+			let autotransition = localStorage.getItem('autotransition')?.toLowerCase() == 'true';
+			if (autotransition) {
+				this.router.navigate(['/', 'Session', session.sessionId]);
+				return;
+			}
 			this.session.nextSession = new Object() as SessionModel;
 			this.session.nextSession.sessionId = session.sessionId;
 			this.session.nextSession.sessionType = session.info?.session;

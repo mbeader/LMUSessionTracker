@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, HostListener, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subject, debounceTime } from 'rxjs';
 import { ServerApiService } from '../../server-api.service';
 import { ServerLiveService } from '../../server-live.service';
@@ -18,6 +18,7 @@ import { Session as SessionModel } from '../../models';
 export class TrackMap {
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
+	private router = inject(Router);
 	private api = inject(ServerApiService);
 	private live = inject(ServerLiveService);
 	private resize = new Subject();
@@ -79,6 +80,11 @@ export class TrackMap {
 
 	transitionSession(session: SessionTransitionViewModel) {
 		if (this.session && !this.session.nextSession && session.sessionId && session.info?.session) {
+			let autotransition = localStorage.getItem('autotransition')?.toLowerCase() == 'true';
+			if (autotransition) {
+				this.router.navigate(['/', 'Session', session.sessionId, 'TrackMap']);
+				return;
+			}
 			this.session.nextSession = new Object() as SessionModel;
 			this.session.nextSession.sessionId = session.sessionId;
 			this.session.nextSession.sessionType = session.info?.session;
