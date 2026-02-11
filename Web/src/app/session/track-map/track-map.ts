@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subject, debounceTime } from 'rxjs';
 import { ServerApiService } from '../../server-api.service';
 import { ServerLiveService } from '../../server-live.service';
+import { SettingsService } from '../../settings.service';
 import { classId, whenExists } from '../../utils';
 import { Format } from '../../format';
 import { Point2D, SessionTransitionViewModel, SessionViewModel, TrackMap as Track } from '../../view-models';
@@ -21,6 +22,7 @@ export class TrackMap {
 	private router = inject(Router);
 	private api = inject(ServerApiService);
 	private live = inject(ServerLiveService);
+	private settings = inject(SettingsService);
 	private resize = new Subject();
 	private mousemove = new Subject<MousePosition>();
 	private map: TrackMapService | null = null
@@ -80,8 +82,7 @@ export class TrackMap {
 
 	transitionSession(session: SessionTransitionViewModel) {
 		if (this.session && !this.session.nextSession && session.sessionId && session.info?.session) {
-			let autotransition = localStorage.getItem('autotransition')?.toLowerCase() == 'true';
-			if (autotransition) {
+			if (this.settings.get().autotransition) {
 				this.router.navigate(['/', 'Session', session.sessionId, 'TrackMap']);
 				return;
 			}

@@ -2,6 +2,7 @@ import { Component, inject, ChangeDetectorRef, viewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ServerApiService } from '../server-api.service';
 import { ServerLiveService } from '../server-live.service';
+import { SettingsService } from '../settings.service';
 import { Anonymizer } from '../anonymizer.service';
 import { Format } from '../format';
 import { SessionTransitionViewModel, SessionViewModel } from '../view-models';
@@ -22,6 +23,7 @@ export class Session {
 	private router = inject(Router);
 	private api = inject(ServerApiService);
 	private live = inject(ServerLiveService);
+	private settings = inject(SettingsService);
 	private anonymizer = inject(Anonymizer);
 	private standings = viewChild(Standings);
 	private sessionId?: string;
@@ -70,8 +72,7 @@ export class Session {
 
 	transitionSession(session: SessionTransitionViewModel) {
 		if (this.session && !this.session.nextSession && session.sessionId && session.info?.session) {
-			let autotransition = localStorage.getItem('autotransition')?.toLowerCase() == 'true';
-			if (autotransition) {
+			if (this.settings.get().autotransition) {
 				this.router.navigate(['/', 'Session', session.sessionId]);
 				return;
 			}

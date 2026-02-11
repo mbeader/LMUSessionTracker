@@ -6,6 +6,7 @@ import { Laps } from './session/laps/laps';
 import { EntryList } from './session/entry-list/entry-list';
 import { TrackMap } from './session/track-map/track-map';
 import { BestLaps } from './best-laps/best-laps';
+import { Settings } from './settings/settings';
 import { About } from './about/about';
 import { NotFound } from './not-found/not-found';
 
@@ -41,6 +42,10 @@ export const routes: Routes = [
 	{
 		path: 'BestLaps',
 		component: BestLaps,
+	},
+	{
+		path: 'Settings',
+		component: Settings,
 	},
 	{
 		path: 'About',
