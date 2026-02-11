@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
-import { JoinRequest, LapsViewModel, SessionViewModel } from './view-models';
+import { JoinRequest, LapsViewModel, SessionTransitionViewModel, SessionViewModel } from './view-models';
 import { SessionSummary } from './tracking';
 
 declare var signalR: any;
@@ -68,10 +68,13 @@ export class ServerLiveService {
 		});
 	}
 
-	joinLive(sessionId: string, callback: (session: SessionViewModel) => void) {
+	joinLive(sessionId: string, callback: (session: SessionViewModel) => void, transitionCallback: (session: SessionTransitionViewModel) => void) {
 		this.join(new JoinRequest('live', sessionId), connection => {
 			connection.on('Live', (session: SessionViewModel) => {
 				callback(session);
+			});
+			connection.on('Transition', (session: SessionTransitionViewModel) => {
+				transitionCallback(session);
 			});
 		});
 	}
@@ -82,6 +85,10 @@ export class ServerLiveService {
 				callback(laps);
 			});
 		});
+	}
+
+	leave() {
+		this.reset();
 	}
 
 	private async start(req: JoinRequest) {

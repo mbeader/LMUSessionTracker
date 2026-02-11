@@ -13,6 +13,7 @@ namespace LMUSessionTracker.Server.ViewModels {
 
 		public Models.Session Session { get; set; }
 		public Models.SessionState SessionState => Session?.LastState;
+		public Models.Session NextSession { get; set; }
 
 		public void SetSession(Session session) {
 			if(session != null) {

@@ -168,8 +168,11 @@ namespace LMUSessionTracker.Core.Tracking {
 				}
 				if(data.SessionId == null)
 					logger.LogInformation($"Client {client.ClientId} joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
-				else
+				else {
 					logger.LogInformation($"Client {client.ClientId} transitioned from session {data.SessionId} to session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
+					await managementRepo.TransitionSession(data.SessionId, session.SessionId);
+					await publisher.Transition(session, data.SessionId);
+				}
 			}
 			return Change(session.SessionId, session.IsPrimary(client.ClientId));
 		}
@@ -204,8 +207,11 @@ namespace LMUSessionTracker.Core.Tracking {
 			logger.LogInformation($"New session created: {session.SessionId}");
 			if(data.SessionId == null)
 				logger.LogInformation($"Client {client.ClientId} joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
-			else
+			else {
 				logger.LogInformation($"Client {client.ClientId} transitioned from session {data.SessionId} to session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");
+				await managementRepo.TransitionSession(data.SessionId, session.SessionId);
+				await publisher.Transition(session, data.SessionId);
+			}
 			int? phase = data.SessionInfo?.gamePhase;
 			logger.LogDebug($"Client {client.ClientId} created new session in phase [{(phase.HasValue ? phase >= 0 && phase <= 9 ? Enum.GetName((LMU.GamePhase)phase.Value) : phase.Value : "")} {data.GameState?.gamePhase}]");
 			await sessionLogger.NewSession(session.SessionId, data);

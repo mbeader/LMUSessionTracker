@@ -17,6 +17,7 @@ namespace LMUSessionTracker.Server {
 		public DbSet<Vehicle> Vehicles { get; set; }
 		public DbSet<VehicleModel> VehicleModels { get; set; }
 		public DbSet<VehicleDriver> VehicleDrivers { get; set; }
+		public DbSet<SessionTransition> SessionTransitions { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder) {
 			modelBuilder.Entity<Entry>()
@@ -25,6 +26,8 @@ namespace LMUSessionTracker.Server {
 				.HasAlternateKey(x => new { x.SessionId, x.CarId });
 			modelBuilder.Entity<KnownDriver>()
 				.HasAlternateKey(x => x.Name);
+			modelBuilder.Entity<SessionTransition>()
+				.HasAlternateKey(x => new { x.FromSessionId, x.ToSessionId });
 
 			modelBuilder.Entity<Member>()
 				.HasOne(x => x.Entry)

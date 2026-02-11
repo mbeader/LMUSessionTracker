@@ -1,16 +1,17 @@
 import { ChangeDetectorRef, Component, HostListener, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subject, debounceTime } from 'rxjs';
 import { ServerApiService } from '../../server-api.service';
 import { ServerLiveService } from '../../server-live.service';
 import { classId, whenExists } from '../../utils';
 import { Format } from '../../format';
-import { Point2D, SessionViewModel, TrackMap as Track } from '../../view-models';
+import { Point2D, SessionTransitionViewModel, SessionViewModel, TrackMap as Track } from '../../view-models';
 import { Car, CarKey } from '../../tracking';
+import { Session as SessionModel } from '../../models';
 
 @Component({
 	selector: 'app-session-track-map',
-	imports: [],
+	imports: [RouterLink],
 	templateUrl: './track-map.html',
 	styleUrl: './track-map.css',
 })
@@ -23,6 +24,7 @@ export class TrackMap {
 	private mousemove = new Subject<MousePosition>();
 	private map: TrackMapService | null = null
 	private trackMap: Track = new Track();
+	private sessionId?: string;
 	session: SessionViewModel | null = null;
 	hasStandings: boolean = false;
 	Format = Format;
@@ -31,6 +33,19 @@ export class TrackMap {
 		let sessionId = this.route.snapshot.paramMap.get('sessionId');
 		if (!sessionId)
 			return;
+		this.route.paramMap.subscribe(paramMap => {
+			let newSessionId = paramMap.get('sessionId');
+			if (!newSessionId)
+				return;
+			if (this.sessionId != newSessionId) {
+				if (this.sessionId)
+					this.live.leave();
+				this.getTrackMap(newSessionId);
+			}
+		});
+	}
+
+	getTrackMap(sessionId: string) {
 		this.api.getTrackMap(sessionId).then(result => {
 			this.trackMap = result ?? new Track();
 			this.api.getSession(sessionId).then(result => {
@@ -45,9 +60,10 @@ export class TrackMap {
 	initMap(wrapper: HTMLDivElement) {
 		this.map = new TrackMapService(wrapper, this.resize, this.mousemove);
 		this.map.map(this.trackMap);
+		this.resize.next({ width: window.innerWidth, height: window.innerHeight });
 		if (this.hasStandings && this.session?.session?.sessionId) {
 			this.map.veh(Veh.from(this.session));
-			this.live.joinLive(this.session.session.sessionId, this.updateSession.bind(this));
+			this.live.joinLive(this.session.session.sessionId, this.updateSession.bind(this), this.transitionSession.bind(this));
 		}
 	}
 
@@ -57,6 +73,15 @@ export class TrackMap {
 			if (this.map) {
 				this.map.veh(Veh.from(session));
 			}
+			this.ref.markForCheck();
+		}
+	}
+
+	transitionSession(session: SessionTransitionViewModel) {
+		if (this.session && !this.session.nextSession && session.sessionId && session.info?.session) {
+			this.session.nextSession = new Object() as SessionModel;
+			this.session.nextSession.sessionId = session.sessionId;
+			this.session.nextSession.sessionType = session.info?.session;
 			this.ref.markForCheck();
 		}
 	}

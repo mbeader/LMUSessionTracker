@@ -32,6 +32,12 @@ namespace LMUSessionTracker.Server.Services {
 			}
 		}
 
+		public async Task Transition(Session session, string prevSessionId) {
+			SessionTransitionViewModel vm = new SessionTransitionViewModel() { SessionId = session.SessionId, Info = session.LastInfo };
+			string liveGroup = SessionHub.LiveGroup(prevSessionId);
+			await hubContext.Clients.Group(liveGroup).SendAsync("Transition", vm);
+		}
+
 		public async Task Sessions(List<SessionSummary> sessions) {
 			await hubContext.Clients.Group(SessionHub.SessionsGroup()).SendAsync("Sessions", sessions);
 		}

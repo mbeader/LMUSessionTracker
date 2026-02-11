@@ -29,6 +29,10 @@ namespace LMUSessionTracker.Server.Models {
 		[JsonIgnore]
 		public SessionState LastState { get; set; }
 		[JsonIgnore]
+		public ICollection<SessionTransition> PastSessions { get; } = new List<SessionTransition>();
+		[JsonIgnore]
+		public ICollection<SessionTransition> FutureSessions { get; } = new List<SessionTransition>();
+		[JsonIgnore]
 		public ICollection<Car> Cars { get; } = new List<Car>();
 		[JsonIgnore]
 		public ICollection<Lap> Laps { get; } = new List<Lap>();

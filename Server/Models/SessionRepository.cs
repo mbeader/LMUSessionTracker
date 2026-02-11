@@ -32,6 +32,8 @@ namespace LMUSessionTracker.Server.Models {
 		public async Task<Session> GetSession(string sessionId) {
 			return await context.Sessions
 				.Include(x => x.LastState)
+				.Include(x => x.PastSessions)
+				.Include(x => x.FutureSessions)
 				.Include(x => x.Cars)
 				.ThenInclude(x => x.Laps)
 				.Include(x => x.Entries)

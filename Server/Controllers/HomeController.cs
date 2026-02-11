@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.Server.Controllers {
@@ -60,6 +61,8 @@ namespace LMUSessionTracker.Server.Controllers {
 			if(vm.Standings == null) {
 				vm.Results = vm.Session.SessionType.StartsWith("RACE") ? await sessionRepo.GetResults(sessionId) : await sessionRepo.GetTimedResults(sessionId);
 			}
+			if(vm.Session.FutureSessions.Count > 0)
+				vm.NextSession = await sessionRepo.GetSession(vm.Session.FutureSessions.First().ToSessionId);
 			return Ok(vm);
 		}
 

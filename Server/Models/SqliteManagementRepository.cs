@@ -141,6 +141,16 @@ namespace LMUSessionTracker.Server.Models {
 			}
 		}
 
+		public async Task TransitionSession(string fromSessionId, string toSessionId) {
+			using SqliteContext context = await contextFactory.CreateDbContextAsync();
+			using(var transaction = await context.Database.BeginTransactionAsync()) {
+				if(!await context.SessionTransitions.AnyAsync(x => x.FromSessionId == fromSessionId && x.ToSessionId == toSessionId))
+					context.SessionTransitions.Add(new SessionTransition() { FromSessionId = fromSessionId, ToSessionId = toSessionId });
+				await context.SaveChangesAsync();
+				await transaction.CommitAsync();
+			}
+		}
+
 		public async Task<List<Core.Tracking.Session>> GetSessions() {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			List<Core.Tracking.Session> sessions = new List<Core.Tracking.Session>();

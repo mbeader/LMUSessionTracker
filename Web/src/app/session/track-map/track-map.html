@@ -1,6 +1,13 @@
-@if(!hasStandings) {
-<div class="alert alert-info text-center" role="alert">
+@if(session != null && (!hasStandings || session.nextSession)) {
+<div class="alert alert-info alert-dismissible fade show text-center" role="alert">
+    @if(session.sessionState?.gamePhase == 8 && session.nextSession) {
+    <span>This session is complete and transitioned to <a [routerLink]="['/', 'Session', session.nextSession.sessionId, 'TrackMap']">{{ session.nextSession.sessionType }}</a></span>
+    } @else if(session.nextSession) {
+    <span>This session is not live and transitioned to <a [routerLink]="['/', 'Session', session.nextSession.sessionId, 'TrackMap']">{{ session.nextSession.sessionType }}</a></span>
+    } @else {
     <span>This session is not live</span>
+    }
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 }
 <div id="map-wrapper" class="text-center">

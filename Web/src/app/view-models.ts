@@ -54,6 +54,7 @@ export class SessionViewModel {
 
 	public session: Session | null = null;
 	public sessionState: SessionState | null = null;
+	public nextSession: Session | null = null;
 
 	static merge(vm: SessionViewModel, other: SessionViewModel) {
 		vm.info = other.info;
@@ -86,6 +87,7 @@ export class SessionViewModel {
 			session.lapDistance = vm.session?.lapDistance;
 			vm.session = session as Session;
 			vm.sessionState = sessionState as SessionState;
+			vm.nextSession = other.nextSession;
 		}
 	}
 
@@ -166,3 +168,7 @@ export class TrackMap {
 	}
 }
 
+export class SessionTransitionViewModel {
+	public sessionId: string | null = null;
+	public info: SessionInfo | null = null;
+}
