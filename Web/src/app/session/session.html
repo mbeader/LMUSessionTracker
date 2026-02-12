@@ -17,15 +17,15 @@
         <h3>Session</h3>
         <dl class="row">
             <dt class="col-xxl-3 col-lg-1 col-3">Track</dt>
-            <dd class="col-xxl-9 col-lg-3 col-9">{{ session.session.trackName }}</dd>
+            <dd class="col-xxl-9 col-lg-3 col-9 text-truncate" title="{{ session.session.trackName }}">{{ session.session.trackName }}</dd>
             <dt class="col-xxl-3 col-lg-2 col-3">Session</dt>
-            <dd class="col-xxl-3 col-lg-2 col-3">{{ session.session.sessionType }}</dd>
+            <dd class="col-xxl-3 col-lg-2 col-3 text-truncate" title="{{ session.session.sessionType }}">{{ session.session.sessionType }}</dd>
             <dt class="col-xxl-3 col-lg-2 col-3">Phase</dt>
-            <dd class="col-xxl-3 col-lg-2 col-3">{{ Format.phase(session.sessionState.gamePhase) }}</dd>
+            <dd class="col-xxl-3 col-lg-2 col-3 text-truncate" title="{{ Format.phase(session.sessionState.gamePhase) }}">{{ Format.phase(session.sessionState.gamePhase) }}</dd>
             <dt class="col-xxl-3 col-lg-1 col-3">Players</dt>
             <dd class="col-xxl-3 col-lg-1 col-3">{{ session.sessionState.numberOfPlayers }}</dd>
             <dt class="col-xxl-3 col-lg-2 col-3">Caution</dt>
-            <dd class="col-xxl-3 col-lg-2 col-3">{{ session.sessionState.yellowFlagState }}</dd>
+            <dd class="col-xxl-3 col-lg-2 col-3 text-truncate" title="{{ session.sessionState.yellowFlagState }}">{{ session.sessionState.yellowFlagState }}</dd>
             <dt class="col-xxl-6 col-lg-3 col-3">Sector flags</dt>
             <dd class="col-xxl-6 col-lg-3 col-3"><span [class]="flagClass(session.sessionState.sector1Flag)" title="{{ session.sessionState.sector1Flag }}"></span>&nbsp;<span [class]="flagClass(session.sessionState.sector2Flag, true)" title="{{ session.sessionState.sector2Flag }}"></span>&nbsp;<span [class]="flagClass(session.sessionState.sector3Flag)" title="{{ session.sessionState.sector3Flag }}"></span></dd>
         </dl>
