@@ -35,16 +35,28 @@ export class SettingsService {
 
 interface Settings {
 	autotransition: boolean;
+	fahrenheit: string;
 }
 
 class SettingsInternal implements Settings {
 	autotransition: boolean = true;
+	fahrenheit: string = 'true';
+
+	constructor() {
+		this.fahrenheit = navigator.language === 'en-US' ? 'true' : 'false';
+	}
 
 	load(settings: Settings) {
 		this.autotransition = this.loadBoolean(settings, 'autotransition');
+		this.fahrenheit = this.loadBooleanString(settings, 'fahrenheit');
 	}
 
 	private loadBoolean(settings: Settings, prop: string): boolean {
 		return typeof (settings as any)[prop] === 'boolean' ? (settings as any)[prop] === true : (this as any)[prop];
+	}
+
+	private loadBooleanString(settings: Settings, prop: string): 'true' | 'false' {
+		let value = (settings as any)[prop];
+		return value === 'true' ? 'true' : value === 'false' ? 'false' : (this as any)[prop];
 	}
 }

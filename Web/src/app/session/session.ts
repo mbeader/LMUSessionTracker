@@ -29,6 +29,7 @@ export class Session {
 	private sessionId?: string;
 	session: SessionViewModel | null = null;
 	hasStandings: boolean = false;
+	fahrenheit: boolean = true;
 	Format = Format;
 	flagClass = SessionViewModel.flagClass;
 
@@ -36,6 +37,7 @@ export class Session {
 		let sessionId = this.route.snapshot.paramMap.get('sessionId');
 		if (!sessionId)
 			return;
+		this.fahrenheit = this.settings.get().fahrenheit === 'true';
 		this.route.paramMap.subscribe(paramMap => {
 			let newSessionId = paramMap.get('sessionId');
 			if (!newSessionId)

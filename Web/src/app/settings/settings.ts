@@ -25,7 +25,10 @@ export class Settings {
 	private readForm(form: HTMLFormElement) {
 		let settings: { [key: string]: any } = new Object();
 		for (let check of form.querySelectorAll<HTMLInputElement>('input[type=checkbox]'))
-			settings[check.id] = check.checked;
+			settings[check.name] = check.checked;
+		for (let radio of form.querySelectorAll<HTMLInputElement>('input[type=radio]'))
+			if (radio.checked)
+				settings[radio.name] = radio.value;
 		return settings;
 	}
 }

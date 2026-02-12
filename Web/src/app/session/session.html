@@ -52,12 +52,12 @@
     <div class="col-lg">
         <h3>Conditions</h3>
         <dl class="row">
-            <dt class="col-lg-2 col-3 order-1">Ambient</dt>
-            <dd class="col-lg-4 col-3 order-1">{{ Format.temp(session.sessionState.ambientTemp) }}</dd>
-            <dt class="col-lg-2 col-3 order-2">Track</dt>
-            <dd class="col-lg-4 col-3 order-2">{{ Format.temp(session.sessionState.trackTemp) }}</dd>
-            <dt class="col-lg-2 col-3 order-3">Raining</dt>
-            <dd class="col-lg-4 col-3 order-3">{{ Format.percent(session.sessionState.raining) }}</dd>
+            <dt class="col-3 order-1">Ambient</dt>
+            <dd class="col-3 order-1" title="{{ Format.temp(session.sessionState.ambientTemp, fahrenheit, true) }}">{{ Format.temp(session.sessionState.ambientTemp, fahrenheit) }}</dd>
+            <dt class="col-3 order-2">Track</dt>
+            <dd class="col-3 order-2" title="{{ Format.temp(session.sessionState.trackTemp, fahrenheit, true) }}">{{ Format.temp(session.sessionState.trackTemp, fahrenheit) }}</dd>
+            <dt class="col-3 order-3">Raining</dt>
+            <dd class="col-3 order-3">{{ Format.percent(session.sessionState.raining) }}</dd>
             <dt class="col-lg-4 col-3 order-1">Wetness (min)</dt>
             <dd class="col-lg-2 col-3 order-1">{{ Format.percent(session.sessionState.minPathWetness) }}</dd>
             <dt class="col-lg-4 col-3 order-2">Wetness (avg)</dt>

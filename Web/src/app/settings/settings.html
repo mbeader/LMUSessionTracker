@@ -1,7 +1,18 @@
 <h3 class="mb-3">Settings</h3>
 <form id="settings">
-    <div class="form-check">
+    <div class="form-check mb-3">
         <input class="form-check-input" type="checkbox" id="autotransition" name="autotransition" value="" [(ngModel)]="settings.autotransition" (ngModelChange)="onChange()" />
         <label class="form-check-label" for="autotransition">Automatically follow live session transitions</label>
     </div>
+    <fieldset class="mb-3">
+        <legend class="form-label fs-6">Temperature unit</legend>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="tempUnit-c" name="fahrenheit" value="false" [(ngModel)]="settings.fahrenheit" (ngModelChange)="onChange()">
+            <label class="form-check-label" for="tempUnit-c">&deg;C</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="tempUnit-f" name="fahrenheit" value="true" [(ngModel)]="settings.fahrenheit" (ngModelChange)="onChange()">
+            <label class="form-check-label" for="tempUnit-f">&deg;F</label>
+        </div>
+    </fieldset>
 </form>

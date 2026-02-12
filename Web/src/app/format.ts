@@ -46,11 +46,21 @@ export class Format {
 		return this.lapTime(end - start);
 	}
 
-	static temp(c: number | null) {
+	static temp(c: number | null, fahrenheit: boolean = false, long: boolean = false) {
 		if (!c)
 			return '';
-		let f = c * 9.0 / 5.0 + 32;
-		return `${c.toLocaleString(undefined, this.tempFormat)} °C (${f.toLocaleString(undefined, this.tempFormat)} °F)`;
+		let mainTemp = fahrenheit ? this.f(c) : c;
+		let mainUnit = fahrenheit ? 'F' : 'C';
+		let s = `${mainTemp.toLocaleString(undefined, this.tempFormat)} °${mainUnit}`;
+		if(!long)
+			return s;
+		let otherTemp = fahrenheit ? c : this.f(c);
+		let otherUnit = fahrenheit ? 'C' : 'F'
+		return `${s} (${otherTemp.toLocaleString(undefined, this.tempFormat)} °${otherUnit})`;
+	}
+
+	private static f(c: number) {
+		return c * 9.0 / 5.0 + 32
 	}
 
 	static phase(gamePhase: number | null) {
