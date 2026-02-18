@@ -93,6 +93,7 @@ export interface Lap {
 	lRTire: number;
 	rRTire: number;
 	finishStatus: string;
+	startTime: number;
 	timestamp: Date | null;
 }
 

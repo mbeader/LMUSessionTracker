@@ -41,23 +41,23 @@ namespace LMUSessionTracker.Core.Tracking {
 		/// <summary>
 		/// Returns the laps completed during this update
 		/// </summary>
-		public List<CarLap> Update(List<Standing> standings, DateTime timestamp) {
+		public List<CarLap> Update(CarStateMonitor carStates, List<Standing> standings, DateTime timestamp) {
 			List<CarLap> laps = new List<CarLap>();
 			foreach(Standing standing in standings) {
-				CarLap lap = Update(standing, timestamp);
+				CarLap lap = Update(carStates, standing, timestamp);
 				if(lap != null)
 					laps.Add(lap);
 			}
 			return laps;
 		}
 
-		private CarLap Update(Standing standing, DateTime timestamp) {
+		private CarLap Update(CarStateMonitor carStates, Standing standing, DateTime timestamp) {
 			CarKey key = new CarKey() { SlotId = standing.slotID, Veh = standing.vehicleFilename };
 			if(!cars.TryGetValue(key, out CarHistory car)) {
 				car = new CarHistory(key, new Car(standing));
 				cars.Add(key, car);
 			}
-			Lap lap = car.Update(standing, timestamp);
+			Lap lap = car.Update(carStates.GetState(key), standing, timestamp);
 			if(lap != null)
 				return new CarLap() { Car = car.Car, Lap = lap };
 			return null;

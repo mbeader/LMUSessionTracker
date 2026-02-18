@@ -19,11 +19,12 @@ namespace LMUSessionTracker.Core.Tracking {
 		public double LRTire { get; set; }
 		public double RRTire { get; set; }
 		public string FinishStatus { get; set; }
+		public double StartTime { get; set; }
 		public DateTime? Timestamp { get; set; }
 
 		public Lap() { }
 
-		public Lap(Standing standing) {
+		public Lap(Standing standing, CarState state = null) {
 			LapNumber = standing.lapsCompleted;
 			TotalTime = standing.lastLapTime;
 			Sector1 = standing.lastSectorTime1;
@@ -33,9 +34,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			Position = standing.position;
 			Fuel = standing.fuelFraction;
 			FinishStatus = standing.finishStatus;
+			StartTime = state?.LapStartET ?? -1;
 		}
 		public static Lap Default(int lap) {
-			return new Lap() { LapNumber = lap, TotalTime = -1.0, Sector1 = -1.0, Sector2 = -1.0, Sector3 = -1.0 };
+			return new Lap() { LapNumber = lap, TotalTime = -1.0, Sector1 = -1.0, Sector2 = -1.0, Sector3 = -1.0, StartTime = -1.0 };
 		}
 
 		public bool IsDefault() {

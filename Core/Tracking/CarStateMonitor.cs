@@ -29,5 +29,11 @@ namespace LMUSessionTracker.Core.Tracking {
 			else
 				return $"Car {key.Id()} changed state: ({string.Join(", ", changes)})";
 		}
+
+		public CarState GetState(CarKey key) {
+			if(states.TryGetValue(key, out CarState state))
+				return state;
+			return null;
+		}
 	}
 }

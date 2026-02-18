@@ -25,6 +25,7 @@
 <table class="table table-sm table-striped table-hover">
     <thead>
         <tr>
+            <th>Start ET</th>
             <th>Lap</th>
             <th>Driver</th>
             <th class="text-end">Time</th>
@@ -39,6 +40,7 @@
         @let lap = model.car.laps[i] ?? defaultLap(i+1);
         @let bestClasses = getBestClasses(lap);
         <tr>
+            <td>{{ lap.startTime <= 0 ? '-' : Format.time(lap.startTime) }}</td>
             <td>{{ lap.lapNumber }}</td>
             <td>{{ lap.driver }}</td>
             <td class="text-end {{ bestClasses.total }}">{{ Format.lapTime(lap.totalTime) }}</td>

@@ -37,15 +37,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			return Laps[lapNumber - 1] ?? Lap.Default(lapNumber);
 		}
 
-		public Lap Update(Standing standing, DateTime timestamp) {
-			//if(standing.lapsCompleted > 0 && (Laps.Count == 0 || standing.lapsCompleted > Laps[^1].LapNumber)) {
-			//	while(Laps.Count <= standing.lapsCompleted)
-			//		Laps.Add(Lap.Default(Laps.Count + 1));
-			//	Laps.Add(new Lap(standing));
-			//}
+		public Lap Update(CarState state, Standing standing, DateTime timestamp) {
 			Lap newLap = null;
 			if(standing.lapsCompleted > 0)
-				newLap = AddLap(new Lap(standing), timestamp);
+				newLap = AddLap(new Lap(standing, state), timestamp);
 			if(!Car.HasAllFields)
 				Car.Merge(new Car(standing));
 			return newLap;
@@ -130,6 +125,7 @@ namespace LMUSessionTracker.Core.Tracking {
 					LRTire = lap.LRTire,
 					RRTire = lap.RRTire,
 					FinishStatus = lap.FinishStatus,
+					StartTime = lap.StartTime,
 					Timestamp = lap.Timestamp,
 				});
 			}

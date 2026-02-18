@@ -15,6 +15,7 @@ namespace LMUSessionTracker.Server.Models {
 		public int LapNumber { get; set; }
 		public string Driver { get; set; }
 		public string FinishStatus { get; set; }
+		public double StartTime { get; set; }
 		public double TotalTime { get; set; }
 		public double Sector1 { get; set; }
 		public double Sector2 { get; set; }
@@ -43,6 +44,7 @@ namespace LMUSessionTracker.Server.Models {
 			LapNumber = lap.LapNumber;
 			Driver = lap.Driver;
 			FinishStatus = lap.FinishStatus;
+			StartTime = lap.StartTime;
 			TotalTime = lap.TotalTime;
 			Sector1 = lap.Sector1;
 			Sector2 = lap.Sector2;
@@ -76,6 +78,7 @@ namespace LMUSessionTracker.Server.Models {
 				LRTire = LRTire,
 				RRTire = RRTire,
 				FinishStatus = FinishStatus,
+				StartTime = StartTime,
 				Timestamp = Timestamp,
 			};
 		}
