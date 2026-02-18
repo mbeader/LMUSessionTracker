@@ -29,6 +29,7 @@ as long as one exists, data will continue to be collected uninterrupted.
 	* Live lap time tracking (data provided using websockets)
 	* Live track map (data provided using websockets)
 	* Entry list with flags, badges, and roles for humans
+	* Highlighting of best laps/sectors per class/car/driver
 	* Multiplayer event resilience
 		* Identification of clients connected to the same session
 			* Whether as drivers or race engineers on the same team or competing teams
@@ -55,7 +56,6 @@ as long as one exists, data will continue to be collected uninterrupted.
 
 * Session tracking
 	* Cars
-		* Best laps/sectors within session per class/car/driver
 		* Pit status
 	* Data
 		* Chat
@@ -144,6 +144,7 @@ Validation can be enabled via appsettings to log violations.
 	* During session transitions, the phase changing before the session type may cause an empty new session to be created
 	* When a client already exists in a session, another client joining the server may not match its state by the time it starts sending data
 	* Entry list similarity checking is currently very lenient and may result in strange behavior when a client leaves and rejoins an online practice session
+	* Sector bests of a lap in which a driver swap occurred may not be attributed to the driver the actually set them
 
 ## Building from source
 
