@@ -9,6 +9,7 @@ import { Standing } from '../../lmu';
 
 type NullabeString = string | null;
 type BestClasses = { total: NullabeString, sector1: NullabeString, sector2: NullabeString, sector3: NullabeString };
+type BestMap = { [key: string]: Best };
 
 @Component({
 	selector: 'app-session-standings',
@@ -68,6 +69,47 @@ export class Standings {
 		}
 		if (this.session?.bests)
 			this.bests = this.session.bests;
+		if (this.bests && this.session && this.session.standings) {
+			for (let standing of this.session.standings) {
+				let id = CarKey.fromStanding(standing).id;
+				let car = this.entries.get(id ?? '');
+				let carClass = (car && car.class ? car.class : standing.carClass) ?? '';
+				this.setIfBest(standing, carClass);
+			}
+		}
+	}
+
+	private setIfBest(standing: Standing, carClass: string) {
+		if (!this.bests || standing.sector == "SECTOR1")
+			return;
+		let key = CarKey.fromStanding(standing).id;
+		if (!this.bests.class[carClass])
+			this.bests.class[carClass] = this.defaultBest();
+		if (!this.bests.car[key])
+			this.bests.car[key] = this.defaultBest();
+		if (!this.bests.driver[key])
+			this.bests.driver[key] = new Object() as BestMap;
+		if (!this.bests.driver[key][standing.driverName])
+			this.bests.driver[key][standing.driverName] = this.defaultBest();
+
+		let total = standing.bestLapTime;
+		let sector1 = standing.currentSectorTime1;
+		let sector2 = standing.currentSectorTime1 > 0 && standing.currentSectorTime2 > 0 ? standing.currentSectorTime2 - standing.currentSectorTime1 : -1;
+		let sector3 = standing.lastSectorTime2 > 0 && standing.lastLapTime > 0 ? standing.lastLapTime - standing.lastSectorTime2 : -1;
+		this.setBest(this.bests.class[carClass], total, sector1, sector2, sector3);
+		this.setBest(this.bests.car[key], total, sector1, sector2, sector3);
+		this.setBest(this.bests.driver[key][standing.driverName], total, sector1, sector2, sector3);
+	}
+
+	private setBest(best: Best, total: number, sector1: number, sector2: number, sector3: number) {
+		if (total > 0 && (total < best.total || best.total <= 0))
+			best.total = total;
+		if (sector1 > 0 && (sector1 < best.sector1 || best.sector1 <= 0))
+			best.sector1 = sector1;
+		if (sector2 > 0 && (sector2 < best.sector2 || best.sector2 <= 0))
+			best.sector2 = sector2;
+		if (sector3 > 0 && (sector3 < best.sector3 || best.sector3 <= 0))
+			best.sector3 = sector3;
 	}
 
 	getLastClasses(standing: Standing, carClass: string) {
@@ -103,7 +145,7 @@ export class Standings {
 	getBestClasses(standing: Standing, carClass: string) {
 		let bestClasses: BestClasses = { total: null, sector1: null, sector2: null, sector3: null };
 		let total = standing.bestLapTime;
-		if(this.bests) {
+		if (this.bests) {
 			let classBest = this.bests.class[carClass] ?? this.defaultBest();
 			bestClasses.total = total <= 0 ? null : total <= classBest.total ? 'best-class' : null;
 		}
