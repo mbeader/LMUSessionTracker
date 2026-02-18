@@ -19,9 +19,11 @@ namespace LMUSessionTracker.Server.Services {
 			this.dateTime = dateTime;
 		}
 
-		public async Task Session(Session session) {
+		public async Task Session(Session session, bool includeBests) {
 			SessionViewModel vm = new SessionViewModel() { Info = session.LastInfo };
 			vm.SetSession(session);
+			if(includeBests)
+				vm.Bests = session.Bests;
 			string liveGroup = SessionHub.LiveGroup(session.SessionId);
 			groupCollection.Groups.AddOrUpdate(liveGroup, session.LastUpdate, (key, value) => session.LastUpdate);
 			await hubContext.Clients.Group(liveGroup).SendAsync("Live", vm);

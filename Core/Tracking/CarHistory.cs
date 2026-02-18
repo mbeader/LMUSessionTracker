@@ -18,14 +18,17 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 		}
 
-		private void AddLap(Lap lap, DateTime timestamp) {
+		private Lap AddLap(Lap lap, DateTime timestamp) {
 			while(lap.LapNumber > Laps.Count)
 				Laps.Add(null);
+			bool added = false;
 			if(Laps[lap.LapNumber - 1] == null) {
 				Laps[lap.LapNumber - 1] = lap;
 				lap.Timestamp = timestamp;
+				added = true;
 			}
 			LapsCompleted = Laps.Count;
+			return added ? lap : null;
 		}
 
 		public Lap GetLap(int lapNumber) {
@@ -34,16 +37,18 @@ namespace LMUSessionTracker.Core.Tracking {
 			return Laps[lapNumber - 1] ?? Lap.Default(lapNumber);
 		}
 
-		public void Update(Standing standing, DateTime timestamp) {
+		public Lap Update(Standing standing, DateTime timestamp) {
 			//if(standing.lapsCompleted > 0 && (Laps.Count == 0 || standing.lapsCompleted > Laps[^1].LapNumber)) {
 			//	while(Laps.Count <= standing.lapsCompleted)
 			//		Laps.Add(Lap.Default(Laps.Count + 1));
 			//	Laps.Add(new Lap(standing));
 			//}
+			Lap newLap = null;
 			if(standing.lapsCompleted > 0)
-				AddLap(new Lap(standing), timestamp);
+				newLap = AddLap(new Lap(standing), timestamp);
 			if(!Car.HasAllFields)
 				Car.Merge(new Car(standing));
+			return newLap;
 		}
 
 		public void FixLaps() {

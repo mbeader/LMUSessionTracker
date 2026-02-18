@@ -19,6 +19,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public List<Standing> LastStandings { get; private set; }
 		public EntryList Entries { get; private set; }
 		public History History { get; private set; }
+		public Bests Bests { get; private set; }
 		public DateTime Timestamp { get; private set; }
 		public DateTime LastUpdate { get; private set; }
 		public bool FirstUpdate { get; private set; } = true;
@@ -34,6 +35,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			LastInfo = info;
 			Entries = entries;
 			History = new History(history, entries);
+			Bests = new Bests(History.GetAllHistory());
 			Timestamp = timestamp;
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
@@ -128,9 +130,10 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public bool IsSecondary(string clientId) => SecondaryClientIds.Contains(clientId);
 
-		public bool Update(SessionInfo info, List<Standing> standings, MultiplayerTeams teams, DateTime timestamp) {
+		public SessionUpdateResult Update(SessionInfo info, List<Standing> standings, MultiplayerTeams teams, DateTime timestamp) {
 			LastInfo = info ?? LastInfo;
 			LastStandings = standings ?? LastStandings;
+			bool bestsChanged = false;
 			if(standings != null) {
 				standings.Sort((a, b) => a.position.CompareTo(b.position));
 				if(Online && teams != null && teams.teams.Count == standings.Count && Entries.Slots.Count == standings.Count && IsHosted(Entries, standings)) {
@@ -143,17 +146,22 @@ namespace LMUSessionTracker.Core.Tracking {
 					foreach(Standing standing in standings)
 						standing.slotID += minSlot;
 				}
-				History.Update(standings, timestamp);
+				List<CarLap> laps = History.Update(standings, timestamp);
+				foreach(CarLap lap in laps) {
+					if(Bests.Update(lap))
+						bestsChanged = true;
+				}
 			}
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
 			FirstUpdate = false;
+			bool entrySlotsChanged = false;
 			if(teams != null) {
 				EntryList entries = new EntryList(teams);
 				History.UpdateCars(entries);
-				return Entries.Merge(entries);
+				entrySlotsChanged = Entries.Merge(entries);
 			}
-			return false;
+			return new SessionUpdateResult() { BestsChanged = bestsChanged, EntrySlotsChanged = entrySlotsChanged };
 		}
 
 		public List<string> Close() {

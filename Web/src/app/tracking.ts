@@ -1,6 +1,19 @@
 import { Standing } from "./lmu";
 import { Car as CarModel } from "./models";
 
+export interface Best {
+	total: number;
+	sector1: number;
+	sector2: number;
+	sector3: number;
+}
+
+export interface Bests {
+	class: { [key: string]: Best };
+	car: { [key: string]: Best };
+	driver: { [key: string]: { [key: string]: Best } };
+}
+
 export interface CarHistory {
 	/** CarKey */
 	key: string;

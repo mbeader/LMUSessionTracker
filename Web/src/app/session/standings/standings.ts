@@ -1,10 +1,14 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SessionViewModel } from '../../view-models';
-import { Car, CarKey } from '../../tracking';
+import { Best, Bests, Car, CarKey } from '../../tracking';
 import { Format } from '../../format';
 import { classId } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
+import { Standing } from '../../lmu';
+
+type NullabeString = string | null;
+type BestClasses = { total: NullabeString, sector1: NullabeString, sector2: NullabeString, sector3: NullabeString };
 
 @Component({
 	selector: 'app-session-standings',
@@ -17,6 +21,7 @@ export class Standings {
 	entries: Map<string, Car> = new Map();
 	positionInClass: Map<string, number> = new Map();
 	classBests: Map<string, number> = new Map();
+	bests: Bests | null = null;
 	isRace: boolean = false;
 	Format = Format;
 	Utils = { classId };
@@ -61,5 +66,47 @@ export class Standings {
 				}
 			}
 		}
+		if (this.session?.bests)
+			this.bests = this.session.bests;
+	}
+
+	getLastClasses(standing: Standing, carClass: string) {
+		let bestClasses: BestClasses = { total: null, sector1: null, sector2: null, sector3: null };
+		let s1time = standing.sector == "SECTOR1" ? standing.lastSectorTime1 : standing.currentSectorTime1;
+		let s2time = standing.sector == "SECTOR1" ? standing.lastSectorTime2 : standing.currentSectorTime2;
+		let total = standing.lastLapTime;
+		let sector1 = s1time;
+		let sector2 = s1time > 0 && s2time > 0 ? s2time - s1time : -1;
+		let sector3 = standing.lastSectorTime2 > 0 && standing.lastLapTime > 0 ? standing.lastLapTime - standing.lastSectorTime2 : -1;
+		let key = CarKey.fromStanding(standing).id;
+		if (!this.bests) {
+			bestClasses.total = total > 0 ? 'best-car' : null;
+			bestClasses.sector1 = sector1 > 0 ? 'best-car' : null;
+			bestClasses.sector2 = sector2 > 0 ? 'best-car' : null;
+			bestClasses.sector3 = sector3 > 0 ? 'best-car' : null;
+		} else {
+			let classBest = this.bests.class[carClass] ?? this.defaultBest();
+			let carBest = this.bests.car[key] ?? this.defaultBest();
+			let driverBest = (this.bests.driver[key] ? this.bests.driver[key][standing.driverName] : null) ?? this.defaultBest();
+			bestClasses.total = total <= 0 ? null : total <= classBest.total ? 'best-class' : total <= carBest.total ? 'best-car' : total <= driverBest.total ? 'best-driver' : null;
+			bestClasses.sector1 = sector1 <= 0 ? null : sector1 <= classBest.sector1 ? 'best-class' : sector1 <= carBest.sector1 ? 'best-car' : sector1 <= driverBest.sector1 ? 'best-driver' : null;
+			bestClasses.sector2 = sector2 <= 0 ? null : sector2 <= classBest.sector2 ? 'best-class' : sector2 <= carBest.sector2 ? 'best-car' : sector2 <= driverBest.sector2 ? 'best-driver' : null;
+			bestClasses.sector3 = sector3 <= 0 ? null : sector3 <= classBest.sector3 ? 'best-class' : sector3 <= carBest.sector3 ? 'best-car' : sector3 <= driverBest.sector3 ? 'best-driver' : null;
+		}
+		return bestClasses;
+	}
+
+	private defaultBest() {
+		return { total: -1, sector1: -1, sector2: -1, sector3: -1 } as Best;
+	}
+
+	getBestClasses(standing: Standing, carClass: string) {
+		let bestClasses: BestClasses = { total: null, sector1: null, sector2: null, sector3: null };
+		let total = standing.bestLapTime;
+		if(this.bests) {
+			let classBest = this.bests.class[carClass] ?? this.defaultBest();
+			bestClasses.total = total <= 0 ? null : total <= classBest.total ? 'best-class' : null;
+		}
+		return bestClasses;
 	}
 }

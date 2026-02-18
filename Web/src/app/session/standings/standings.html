@@ -31,6 +31,7 @@
         @let id = CarKey.fromStanding(standing).id;
         @let car = entries.get(id ?? '');
         @let carClass = (car && car.class ? car.class : standing.carClass) ?? '';
+        @let bestClasses = getLastClasses(standing, carClass);
         @if(car) {
         <tr>
             @let status = Format.status(standing);
@@ -47,11 +48,11 @@
             <td class="text-end">{{ standing.lapsCompleted }}</td>
             <td class="text-end time-col">{{ !isRace && standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindLeader, standing.timeBehindLeader) }}</td>
             <td class="text-end time-col">{{ !isRace && standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindNext, standing.timeBehindNext) }}</td>
-            <td class="text-end time-col">{{ Format.lapTime(standing.bestLapTime) }}</td>
-            <td class="text-end time-col">{{ Format.lapTime(standing.lastLapTime) }}</td>
-            <td class="text-end time-col">{{ Format.sectorTime(0.0, standing.lastSectorTime1) }}</td>
-            <td class="text-end time-col">{{ standing.sector == "SECTOR2" ? "" : Format.sectorTime(standing.lastSectorTime1, standing.lastSectorTime2) }}</td>
-            <td class="text-end time-col">{{ standing.sector != "SECTOR1" ? "" : Format.sectorTime(standing.lastSectorTime2, standing.lastLapTime) }}</td>
+            <td class="text-end time-col {{ getBestClasses(standing, carClass).total }}">{{ Format.lapTime(standing.bestLapTime) }}</td>
+            <td class="text-end time-col {{ bestClasses.total }}">{{ Format.lapTime(standing.lastLapTime) }}</td>
+            <td class="text-end time-col {{ bestClasses.sector1 }}">{{ Format.sectorTime(0.0, standing.sector == "SECTOR1" ? standing.lastSectorTime1 : standing.currentSectorTime1) }}</td>
+            <td class="text-end time-col {{ bestClasses.sector2 }}">{{ standing.sector == "SECTOR2" ? "" : standing.sector == "SECTOR1" ? Format.sectorTime(standing.lastSectorTime1, standing.lastSectorTime2) : Format.sectorTime(standing.currentSectorTime1, standing.currentSectorTime2) }}</td>
+            <td class="text-end time-col {{ bestClasses.sector3 }}">{{ standing.sector != "SECTOR1" ? "" : Format.sectorTime(standing.lastSectorTime2, standing.lastLapTime) }}</td>
             @let fuelClass = standing.fuelFraction > .1 ? '' : standing.fuelFraction > .05 ? 'text-warning' : 'text-danger';
             <td class="text-end time-col {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</td>
             <td class="text-center"><span class="border bg-secondary-subtle" title="{{ Format.distance(standing.lapDistance, session.session.lapDistance) }}"><span class="lap-prog-{{ Format.lapProgress(standing.lapDistance, session.session.lapDistance) }}"></span></span></td>

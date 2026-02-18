@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
@@ -38,6 +39,8 @@ namespace LMUSessionTracker.Server {
 				options.Converters.Add(new CarKeyConverter());
 				options.Converters.Add(new CarKeyDictionaryConverter<int>());
 				options.Converters.Add(new CarKeyDictionaryConverter<Core.Tracking.Car>());
+				options.Converters.Add(new CarKeyDictionaryConverter<Best>());
+				options.Converters.Add(new CarKeyDictionaryConverter<Dictionary<string, Best>>());
 			}
 			builder.Services.AddControllers()
 				.AddJsonOptions(options => configureJsonSerializer(options.JsonSerializerOptions));

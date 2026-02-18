@@ -126,11 +126,11 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 
 			await managementRepo.UpdateSession(session.SessionId, data.SessionInfo, now);
-			bool entriesChanged = session.Update(data.SessionInfo, data.Standings, data.MultiplayerTeams, now);
-			if(entriesChanged)
+			SessionUpdateResult updateResult = session.Update(data.SessionInfo, data.Standings, data.MultiplayerTeams, now);
+			if(updateResult.EntrySlotsChanged)
 				await managementRepo.UpdateEntries(session.SessionId, session.Entries);
 			await managementRepo.UpdateLaps(session.SessionId, session.History.GetAllHistory());
-			await publisher.Session(session);
+			await publisher.Session(session, updateResult.BestsChanged);
 			trackMapBuilder.Update(session.SessionId, session.Track, data.Standings);
 			if(session.Finished && !inactiveSessions.ContainsKey(session.SessionId)) {
 				inactiveSessions.Add(session.SessionId, session);
