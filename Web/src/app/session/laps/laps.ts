@@ -3,9 +3,13 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { ServerApiService } from '../../server-api.service';
 import { ServerLiveService } from '../../server-live.service';
 import { LapsViewModel } from '../../view-models';
-import { Lap } from '../../tracking';
+import { Best, Lap } from '../../tracking';
 import { Format } from '../../format';
 import { ClassBadge } from '../class-badge/class-badge';
+
+type NullabeString = string | null;
+type BestClasses = { total: NullabeString, sector1: NullabeString, sector2: NullabeString, sector3: NullabeString };
+type BestMap = { [key: string]: Best };
 
 @Component({
 	selector: 'app-session-laps',
@@ -40,5 +44,30 @@ export class Laps {
 			LapsViewModel.merge(this.model, laps);
 			this.ref.markForCheck();
 		}
+	}
+
+	getBestClasses(lap: Lap) {
+		let bestClasses: BestClasses = { total: null, sector1: null, sector2: null, sector3: null };
+		let bests = this.model?.bests ?? this.model?.session?.bests;
+		if (!bests || !this.model?.car)
+			return bestClasses;
+		let key = this.model.car.key;
+		let carClass = this.model.car.car.class;
+		let classBest = bests.class[carClass] ?? this.defaultBest();
+		let carBest = bests.car[key] ?? this.defaultBest();
+		let driverBest = (bests.driver[key] ? bests.driver[key][lap.driver] : null) ?? this.defaultBest();
+		bestClasses.total = this.getBestClass(lap.totalTime, classBest.total, carBest.total, driverBest.total);
+		bestClasses.sector1 = this.getBestClass(lap.sector1, classBest.sector1, carBest.sector1, driverBest.sector1);
+		bestClasses.sector2 = this.getBestClass(lap.sector2, classBest.sector2, carBest.sector2, driverBest.sector2);
+		bestClasses.sector3 = this.getBestClass(lap.sector3, classBest.sector3, carBest.sector3, driverBest.sector3);
+		return bestClasses;
+	}
+
+	getBestClass(time: number, classTime: number, carTime: number, driverTime: number) {
+		return time <= 0 ? null : time <= classTime ? 'best-class' : time <= carTime ? 'best-car' : time <= driverTime ? 'best-driver' : null;
+	}
+
+	private defaultBest() {
+		return { total: -1, sector1: -1, sector2: -1, sector3: -1 } as Best;
 	}
 }

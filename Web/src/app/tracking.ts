@@ -121,4 +121,5 @@ export interface SessionSummary {
 	lapCount: number;
 	remaining: number;
 	phase: number;
+	bests: Bests;
 }

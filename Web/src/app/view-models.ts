@@ -38,9 +38,11 @@ export class IndexViewModel {
 export class LapsViewModel {
 	public car: CarHistory | null = null;
 	public session: SessionSummary | null = null;
+	public bests: Bests | null = null;
 
 	static merge(vm: LapsViewModel, other: LapsViewModel) {
 		vm.car = other.car;
+		vm.bests = other.bests;
 	}
 }
 

@@ -36,15 +36,15 @@
     </thead>
     <tbody>
         @for(_ of [].constructor(model.car.laps.length); track _; let i = $index) {
-        <!--@for(historyLap of model.car.laps; track $index; let i = $index) {-->
         @let lap = model.car.laps[i] ?? defaultLap(i+1);
+        @let bestClasses = getBestClasses(lap);
         <tr>
             <td>{{ lap.lapNumber }}</td>
             <td>{{ lap.driver }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.totalTime) }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.sector1) }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.sector2) }}</td>
-            <td class="text-end">{{ Format.lapTime(lap.sector3) }}</td>
+            <td class="text-end {{ bestClasses.total }}">{{ Format.lapTime(lap.totalTime) }}</td>
+            <td class="text-end {{ bestClasses.sector1 }}">{{ Format.lapTime(lap.sector1) }}</td>
+            <td class="text-end {{ bestClasses.sector2 }}">{{ Format.lapTime(lap.sector2) }}</td>
+            <td class="text-end {{ bestClasses.sector3 }}">{{ Format.lapTime(lap.sector3) }}</td>
             <td class="text-end">{{ Format.percent(lap.fuel) }}</td>
         </tr>
         }

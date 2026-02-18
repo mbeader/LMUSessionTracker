@@ -30,7 +30,7 @@ namespace LMUSessionTracker.Server.Services {
 			foreach(CarHistory car in vm.History) {
 				string group = SessionHub.LapsGroup(session.SessionId, car.Key.Id());
 				groupCollection.Groups.AddOrUpdate(group, session.LastUpdate, (key, value) => session.LastUpdate);
-				await hubContext.Clients.Group(group).SendAsync("Laps", new LapsViewModel() { Car = car });
+				await hubContext.Clients.Group(group).SendAsync("Laps", new LapsViewModel() { Car = car, Bests = session.Bests });
 			}
 		}
 
