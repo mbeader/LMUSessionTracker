@@ -5,7 +5,7 @@
 	"properties": {
 		"badge": {
 			"description": "Not present for admin driver. Always none in online practices.",
-			"enum": [ "none", "sr-noob", "sr-rookie", "sr-clean", "sr-saint", "sr-warning", "sr-danger", "sr-probation", "irl-driver", "content-creator" ]
+			"enum": [ "none", "sr-noob", "sr-rookie", "sr-clean", "sr-saint", "sr-warning", "sr-danger", "sr-probation", "irl-driver", "content-creator", "test-driver", "early-access" ]
 		},
 		"isConnected": {
 			"description": "Should always be true for humans in online practices.",

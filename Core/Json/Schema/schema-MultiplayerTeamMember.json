@@ -4,7 +4,7 @@
 	"properties": {
 		"badge": {
 			"description": "Always none in online practices and hosted.",
-			"enum": [ "none", "sr-noob", "sr-rookie", "sr-clean", "sr-saint", "sr-warning", "sr-danger", "sr-probation", "irl-driver", "content-creator" ]
+			"enum": [ "none", "sr-noob", "sr-rookie", "sr-clean", "sr-saint", "sr-warning", "sr-danger", "sr-probation", "irl-driver", "content-creator", "test-driver", "early-access" ]
 		},
 		"nationality": {
 			"description": "May be empty. Always empty in hosted.",

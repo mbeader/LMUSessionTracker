@@ -16,12 +16,20 @@
 	content: " ";
 }
 
+.sr.early-access {
+	background-image: url(../../../../public/early-access.svg);
+}
+
 .sr.content-creator {
 	background-image: url(../../../../public/content-creator.svg);
 }
 
-.sr.content-creator {
+.sr.irl-driver {
 	background-image: url(../../../../public/irl-driver.svg);
+}
+
+.sr.test-driver {
+	background-image: url(../../../../public/test-driver.svg);
 }
 
 .sr.sr-clean {
