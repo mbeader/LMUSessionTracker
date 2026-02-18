@@ -56,6 +56,11 @@ export class Session {
 				this.anonymize(result);
 			this.session = result;
 			this.hasStandings = this.session.standings != null && this.session.standings.length > 0;
+			if (!this.hasStandings && this.session.session && new Date().valueOf() - new Date(this.session.session.timestamp + 'Z').valueOf() < 10000) {
+				// actual session transitions are slow enough to notify live clients before any standings actually exist
+				this.hasStandings = true;
+				this.session.standings = [];
+			}
 			this.ref.markForCheck();
 			if (this.session?.session?.sessionId && this.hasStandings)
 				this.live.joinLive(this.session.session.sessionId, this.updateSession.bind(this), this.transitionSession.bind(this));
