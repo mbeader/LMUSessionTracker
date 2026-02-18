@@ -130,6 +130,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(updateResult.EntrySlotsChanged)
 				await managementRepo.UpdateEntries(session.SessionId, session.Entries);
 			await managementRepo.UpdateLaps(session.SessionId, session.History.GetAllHistory());
+			await managementRepo.UpdateCarStates(session.SessionId, session.CarState.GetAllStates());
 			await publisher.Session(session, updateResult.BestsChanged);
 			trackMapBuilder.Update(session.SessionId, session.Track, data.Standings);
 			if(session.Finished && !inactiveSessions.ContainsKey(session.SessionId)) {

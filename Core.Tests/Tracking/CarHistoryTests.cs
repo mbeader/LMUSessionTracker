@@ -5,11 +5,12 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 	public class CarHistoryTests {
 		private static readonly DateTime dt = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
 		private readonly CarHistory history;
-		private CarState state;
+		private readonly CarState state;
 
 		public CarHistoryTests() {
-			history = new CarHistory(new CarKey() { SlotId = 0, Veh = "someveh" }, new Car() { SlotId = 0, Veh = "someveh" });
-			state = new CarState();
+			CarKey key = new CarKey() { SlotId = 0, Veh = "someveh" };
+			history = new CarHistory(key, new Car() { SlotId = 0, Veh = "someveh" });
+			state = new CarState(key);
 		}
 
 		private void AssertLap(Lap ex, Lap ac) {

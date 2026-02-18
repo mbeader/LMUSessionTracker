@@ -52,6 +52,30 @@ namespace LMUSessionTracker.Server.Models {
 			}
 		}
 
+		public async Task UpdateCarStates(string sessionId, List<Core.Tracking.CarState> cars) {
+			using SqliteContext context = await contextFactory.CreateDbContextAsync();
+			using(var transaction = await context.Database.BeginTransactionAsync()) {
+				Dictionary<CarKey, Car> dbCars = new Dictionary<CarKey, Car>();
+				foreach(Car dbCar in await context.Cars.Include(x => x.LastState).Where(x => x.SessionId == sessionId).ToListAsync()) {
+					CarKey key = new CarKey() { SlotId = dbCar.SlotId, Veh = dbCar.Veh };
+					dbCars.Add(key, dbCar);
+				}
+				foreach(Core.Tracking.CarState car in cars) {
+					if(dbCars.TryGetValue(car.Key, out Car dbCar)) {
+						if(dbCar.LastState == null) {
+							dbCar.LastState = new CarState();
+							dbCar.LastState.SessionId = sessionId;
+							dbCar.LastState.CarId = dbCar.CarId;
+							context.CarStates.Add(dbCar.LastState);
+						}
+						dbCar.LastState.From(car);
+					}
+				}
+				await context.SaveChangesAsync();
+				await transaction.CommitAsync();
+			}
+		}
+
 		public async Task UpdateLaps(string sessionId, List<CarHistory> cars) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			using(var transaction = await context.Database.BeginTransactionAsync()) {
@@ -166,6 +190,8 @@ namespace LMUSessionTracker.Server.Models {
 				.Include(x => x.LastState)
 				.Include(x => x.Cars)
 				.ThenInclude(x => x.Laps)
+				.Include(x => x.Cars)
+				.ThenInclude(x => x.LastState)
 				.Include(x => x.Entries)
 				.ThenInclude(x => x.Members)
 				.AsSplitQuery()

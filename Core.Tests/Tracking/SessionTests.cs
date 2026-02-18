@@ -284,6 +284,13 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			};
 		}
 
+		private List<CarState> FullCarStates() {
+			return new List<CarState>() {
+				new CarState(new CarKey() { SlotId = 0, Veh = "veh1" }) { DriverName = "d1" },
+				new CarState(new CarKey() { SlotId = 1, Veh = "veh2" }) { DriverName = "d2" }
+			};
+		}
+
 		private EntryList FullEntryList() {
 			return new EntryList(FullMultiplayerTeams());
 		}
@@ -304,16 +311,16 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 
 		[Fact]
 		public void Create_SameSourceDataOnline_ReturnsIdenticalSession() {
-			Session s1 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories());
-			Session s2 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories());
+			Session s1 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories(), FullCarStates());
+			Session s2 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories(), FullCarStates());
 			Assert.Equivalent(s1, s2);
 			Assert.Equivalent(s1.History.GetAllHistory(), s1.History.GetAllHistory());
 		}
 
 		[Fact]
 		public void Create_ReloadDataOnline_ReturnsIdenticalSession() {
-			Session s1 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories());
-			Session s2 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullEntryList(), FullCarHistories());
+			Session s1 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories(), FullCarStates());
+			Session s2 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullEntryList(), FullCarHistories(), FullCarStates());
 			Assert.Equivalent(s1, s2);
 			Assert.Equivalent(s1.History.GetAllHistory(), s1.History.GetAllHistory());
 		}

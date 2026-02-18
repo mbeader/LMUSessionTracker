@@ -9,6 +9,7 @@ namespace LMUSessionTracker.Server {
 		public DbSet<Session> Sessions { get; set; }
 		public DbSet<SessionState> SessionStates { get; set; }
 		public DbSet<Car> Cars { get; set; }
+		public DbSet<CarState> CarStates { get; set; }
 		public DbSet<Lap> Laps { get; set; }
 		public DbSet<Entry> Entries { get; set; }
 		public DbSet<Member> Members { get; set; }
@@ -40,6 +41,12 @@ namespace LMUSessionTracker.Server {
 				.IsRequired(false)
 				.HasForeignKey<Car>(x => new { x.SessionId, x.EntryId })
 				.HasPrincipalKey<Entry>(x => new { x.SessionId, x.EntryId });
+			modelBuilder.Entity<CarState>()
+				.HasOne(x => x.Car)
+				.WithOne(x => x.LastState)
+				.IsRequired(true)
+				.HasForeignKey<CarState>(x => new { x.SessionId, x.CarId })
+				.HasPrincipalKey<Car>(x => new { x.SessionId, x.CarId });
 			modelBuilder.Entity<Lap>()
 				.HasOne(x => x.Car)
 				.WithMany(x => x.Laps)

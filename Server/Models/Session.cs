@@ -35,6 +35,8 @@ namespace LMUSessionTracker.Server.Models {
 		[JsonIgnore]
 		public ICollection<Car> Cars { get; } = new List<Car>();
 		[JsonIgnore]
+		public ICollection<CarState> CarStates { get; } = new List<CarState>();
+		[JsonIgnore]
 		public ICollection<Lap> Laps { get; } = new List<Lap>();
 		[JsonIgnore]
 		public ICollection<Entry> Entries { get; } = new List<Entry>();
@@ -69,17 +71,21 @@ namespace LMUSessionTracker.Server.Models {
 			} else if(IsOnline)
 				entries = new Core.Tracking.EntryList();
 			List<Core.Tracking.CarHistory> carHistories = null;
+			List<Core.Tracking.CarState> carStates = null;
 			if(Cars != null) {
 				carHistories = new List<Core.Tracking.CarHistory>();
+				carStates = new List<Core.Tracking.CarState>();
 				foreach(Car car in Cars) {
 					Core.Tracking.CarKey key = new Core.Tracking.CarKey() { SlotId = car.SlotId, Veh = car.Veh };
 					List<Core.Tracking.Lap> laps = new List<Core.Tracking.Lap>();
 					foreach(Lap lap in car.Laps)
 						laps.Add(lap.To());
 					carHistories.Add(new Core.Tracking.CarHistory(key, car.To(), laps));
+					if(car.LastState != null)
+						carStates.Add(car.LastState.To(key));
 				}
 			}
-			Core.Tracking.Session session = Core.Tracking.Session.Create(SessionId, info, Timestamp, entries, carHistories);
+			Core.Tracking.Session session = Core.Tracking.Session.Create(SessionId, info, Timestamp, entries, carHistories, carStates);
 			if(IsClosed)
 				session.Close();
 			return session;

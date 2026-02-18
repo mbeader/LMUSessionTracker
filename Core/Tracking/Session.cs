@@ -27,7 +27,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public bool Finished { get; private set; }
 		public bool Closed { get; private set; }
 
-		private Session(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history) {
+		private Session(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history, List<CarState> carState) {
 			SessionId = sessionId;
 			SecondaryClientIds = new List<string>();
 			Track = info.trackName;
@@ -37,21 +37,21 @@ namespace LMUSessionTracker.Core.Tracking {
 			Entries = entries;
 			History = new History(history, entries);
 			Bests = new Bests(History.GetAllHistory());
-			CarState = new CarStateMonitor();
+			CarState = new CarStateMonitor(carState);
 			Timestamp = timestamp;
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
 		}
 
-		public static Session Create(string sessionId, SessionInfo info, DateTime timestamp, MultiplayerTeams teams = null, List<CarHistory> history = null) {
+		public static Session Create(string sessionId, SessionInfo info, DateTime timestamp, MultiplayerTeams teams = null, List<CarHistory> history = null, List<CarState> carState = null) {
 			EntryList entries = new EntryList(teams);
-			return new Session(sessionId, info, timestamp, entries, history) {
+			return new Session(sessionId, info, timestamp, entries, history, carState) {
 				Online = teams != null
 			};
 		}
 
-		public static Session Create(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history) {
-			return new Session(sessionId, info, timestamp, entries, history) {
+		public static Session Create(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history, List<CarState> carState) {
+			return new Session(sessionId, info, timestamp, entries, history, carState) {
 				Online = entries != null
 			};
 		}
@@ -260,7 +260,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		public Session Clone() {
-			Session session = Create(SessionId, LastInfo, Timestamp, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()));
+			Session session = Create(SessionId, LastInfo, Timestamp, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()), CarState.GetAllStates().ConvertAll(x => x.Clone()));
 			session.Update(LastInfo, LastStandings, null, LastUpdate);
 			return session;
 		}

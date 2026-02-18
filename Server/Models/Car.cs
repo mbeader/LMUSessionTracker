@@ -23,6 +23,7 @@ namespace LMUSessionTracker.Server.Models {
 		public string Number { get; set; }
 		public string Id { get; set; }
 		
+		public CarState LastState { get; set; }
 		public Entry Entry { get; set; }
 		[JsonIgnore]
 		public Session Session { get; set; }
