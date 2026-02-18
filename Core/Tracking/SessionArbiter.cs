@@ -137,6 +137,9 @@ namespace LMUSessionTracker.Core.Tracking {
 				await managementRepo.CloseSession(session.SessionId);
 				logger.LogInformation($"Session {session.SessionId} is pending closure");
 			}
+			if(updateResult.CarStateChanges != null)
+				foreach(string carStateChange in updateResult.CarStateChanges)
+					logger.LogTrace(carStateChange);
 			return Accept(data.SessionId, true);
 		}
 

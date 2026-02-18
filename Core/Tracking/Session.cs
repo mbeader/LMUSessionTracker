@@ -20,6 +20,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public EntryList Entries { get; private set; }
 		public History History { get; private set; }
 		public Bests Bests { get; private set; }
+		public CarStateMonitor CarState { get; private set; }
 		public DateTime Timestamp { get; private set; }
 		public DateTime LastUpdate { get; private set; }
 		public bool FirstUpdate { get; private set; } = true;
@@ -36,6 +37,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			Entries = entries;
 			History = new History(history, entries);
 			Bests = new Bests(History.GetAllHistory());
+			CarState = new CarStateMonitor();
 			Timestamp = timestamp;
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
@@ -134,6 +136,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			LastInfo = info ?? LastInfo;
 			LastStandings = standings ?? LastStandings;
 			bool bestsChanged = false;
+			List<string> carStateChanges = null;
 			if(standings != null) {
 				standings.Sort((a, b) => a.position.CompareTo(b.position));
 				if(Online && teams != null && teams.teams.Count == standings.Count && Entries.Slots.Count == standings.Count && IsHosted(Entries, standings)) {
@@ -151,6 +154,7 @@ namespace LMUSessionTracker.Core.Tracking {
 					if(Bests.Update(lap))
 						bestsChanged = true;
 				}
+				carStateChanges = CarState.Update(standings);
 			}
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
@@ -161,7 +165,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				History.UpdateCars(entries);
 				entrySlotsChanged = Entries.Merge(entries);
 			}
-			return new SessionUpdateResult() { BestsChanged = bestsChanged, EntrySlotsChanged = entrySlotsChanged };
+			return new SessionUpdateResult() { BestsChanged = bestsChanged, EntrySlotsChanged = entrySlotsChanged, CarStateChanges = carStateChanges };
 		}
 
 		public List<string> Close() {
