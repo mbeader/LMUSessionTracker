@@ -81,3 +81,145 @@ button.btn-icon.dropdown-toggle::after {
 	vertical-align: -.125em;
 	fill: currentcolor;
 }
+
+.lap-prog-0, .lap-prog-1, .lap-prog-2, .lap-prog-3, .lap-prog-4, .lap-prog-5, .lap-prog-6, .lap-prog-7, .lap-prog-8, .lap-prog-9 {
+	background-color: var(--bs-success);
+}
+
+.lap-prog-0 {
+	margin-right: 1.8rem;
+	padding-right: .2rem;
+}
+
+.lap-prog-1 {
+	margin-right: 1.6rem;
+	padding-right: .4rem;
+}
+
+.lap-prog-2 {
+	margin-right: 1.4rem;
+	padding-right: .6rem;
+}
+
+.lap-prog-3 {
+	margin-right: 1.2rem;
+	padding-right: .8rem;
+}
+
+.lap-prog-4 {
+	margin-right: 1rem;
+	padding-right: 1rem;
+}
+
+.lap-prog-5 {
+	margin-right: .8rem;
+	padding-right: 1.2rem;
+}
+
+.lap-prog-6 {
+	margin-right: .6rem;
+	padding-right: 1.4rem;
+}
+
+.lap-prog-7 {
+	margin-right: .4rem;
+	padding-right: 1.6rem;
+}
+
+.lap-prog-8 {
+	margin-right: .2rem;
+	padding-right: 1.8rem;
+}
+
+.lap-prog-9 {
+	margin-right: 0rem;
+	padding-right: 2rem;
+}
+
+.lap-prog--9, .lap-prog--8, .lap-prog--7, .lap-prog--6, .lap-prog--5, .lap-prog--4, .lap-prog--3, .lap-prog--2, .lap-prog--1, .lap-prog--0 {
+	background-color: var(--bs-danger);
+}
+
+.lap-prog--0 {
+	margin-left: 1.8rem;
+	padding-left: .2rem;
+}
+
+.lap-prog--1 {
+	margin-left: 1.6rem;
+	padding-left: .4rem;
+}
+
+.lap-prog--2 {
+	margin-left: 1.4rem;
+	padding-left: .6rem;
+}
+
+.lap-prog--3 {
+	margin-left: 1.2rem;
+	padding-left: .8rem;
+}
+
+.lap-prog--4 {
+	margin-left: 1rem;
+	padding-left: 1rem;
+}
+
+.lap-prog--5 {
+	margin-left: .8rem;
+	padding-left: 1.2rem;
+}
+
+.lap-prog--6 {
+	margin-left: .6rem;
+	padding-left: 1.4rem;
+}
+
+.lap-prog--7 {
+	margin-left: .4rem;
+	padding-left: 1.6rem;
+}
+
+.lap-prog--8 {
+	margin-left: .2rem;
+	padding-left: 1.8rem;
+}
+
+.lap-prog--9 {
+	margin-left: 0rem;
+	padding-left: 2rem;
+}
+
+:root {
+	--lmu-hy: #e21e19;
+	--lmu-p2: #005096;
+	--lmu-p2e: #e95b0c;
+	--lmu-p3: #411c52;
+	--lmu-gte: #f08c00;
+	--lmu-gt3: #009639;
+}
+
+.pic-hy {
+	background-color: var(--lmu-hy);
+}
+
+.pic-p2 {
+	background-color: var(--lmu-p2);
+}
+
+.pic-p2e {
+	background-color: var(--lmu-p2e);
+}
+
+.pic-p3 {
+	background-color: var(--lmu-p3);
+}
+
+.pic-gte {
+	background-color: var(--lmu-gte);
+}
+
+.pic-gt3 {
+	background-color: var(--lmu-gt3);
+}
+

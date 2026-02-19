@@ -1,96 +1,59 @@
-import { ChangeDetectorRef, Component, HostListener, inject } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Component, HostListener, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Subject, debounceTime } from 'rxjs';
 import { ServerApiService } from '../../server-api.service';
-import { ServerLiveService } from '../../server-live.service';
-import { SettingsService } from '../../settings.service';
+import { SessionService } from '../session.service';
 import { classId, whenExists } from '../../utils';
 import { Format } from '../../format';
-import { Point2D, SessionTransitionViewModel, SessionViewModel, TrackMap as Track } from '../../view-models';
+import { Point2D, SessionViewModel, TrackMap as Track } from '../../view-models';
 import { Car, CarKey } from '../../tracking';
-import { Session as SessionModel } from '../../models';
 
 @Component({
 	selector: 'app-session-track-map',
 	imports: [RouterLink],
+	providers: [SessionService],
 	templateUrl: './track-map.html',
 	styleUrl: './track-map.css',
 })
 export class TrackMap {
-	private ref = inject(ChangeDetectorRef);
-	private route = inject(ActivatedRoute);
-	private router = inject(Router);
 	private api = inject(ServerApiService);
-	private live = inject(ServerLiveService);
-	private settings = inject(SettingsService);
+	private service = inject(SessionService);
 	private resize = new Subject();
 	private mousemove = new Subject<MousePosition>();
 	private map: TrackMapService | null = null
 	private trackMap: Track = new Track();
-	private sessionId?: string;
-	session: SessionViewModel | null = null;
-	hasStandings: boolean = false;
 	Format = Format;
+	flagClass = SessionViewModel.flagClass;
+
+	get session() { return this.service.session; }
+	get hasStandings() { return this.service.hasStandings; }
+	get fahrenheit() { return this.service.fahrenheit; }
 
 	constructor() {
-		let sessionId = this.route.snapshot.paramMap.get('sessionId');
-		if (!sessionId)
-			return;
-		this.route.paramMap.subscribe(paramMap => {
-			let newSessionId = paramMap.get('sessionId');
-			if (!newSessionId)
-				return;
-			if (this.sessionId != newSessionId) {
-				if (this.sessionId)
-					this.live.leave();
-				this.getTrackMap(newSessionId);
-			}
-		});
+		this.service.init(this.onInitSession.bind(this), sessionId => ['/', 'Session', sessionId, 'TrackMap']);
 	}
 
-	getTrackMap(sessionId: string) {
+	private onInitSession(sessionId: string) {
+		this.getTrackMap(sessionId);
+	}
+
+	private onUpdateSession(session: SessionViewModel) {
+		if (this.map) {
+			this.map.veh(Veh.from(session));
+		}
+	}
+
+	private getTrackMap(sessionId: string) {
 		this.api.getTrackMap(sessionId).then(result => {
 			this.trackMap = result ?? new Track();
-			this.api.getSession(sessionId).then(result => {
-				this.session = result;
-				this.hasStandings = this.session.standings != null && this.session.standings.length > 0;
-				this.ref.markForCheck();
-				whenExists('#map-wrapper', this.initMap.bind(this));
-			}, error => { console.log(error); })
+			this.service.getSession(sessionId, this.onUpdateSession.bind(this), () => whenExists('#map-wrapper', this.initMap.bind(this)));
 		}, error => { console.log(error); })
 	}
 
-	initMap(wrapper: HTMLDivElement) {
+	private initMap(wrapper: HTMLDivElement) {
 		this.map = new TrackMapService(wrapper, this.resize, this.mousemove);
 		this.map.map(this.trackMap);
 		this.resize.next({ width: window.innerWidth, height: window.innerHeight });
-		if (this.hasStandings && this.session?.session?.sessionId) {
-			this.map.veh(Veh.from(this.session));
-			this.live.joinLive(this.session.session.sessionId, this.updateSession.bind(this), this.transitionSession.bind(this));
-		}
-	}
-
-	updateSession(session: SessionViewModel) {
-		if (this.session) {
-			SessionViewModel.merge(this.session, session);
-			if (this.map) {
-				this.map.veh(Veh.from(session));
-			}
-			this.ref.markForCheck();
-		}
-	}
-
-	transitionSession(session: SessionTransitionViewModel) {
-		if (this.session && !this.session.nextSession && session.sessionId && session.info?.session) {
-			if (this.settings.get().autotransition) {
-				this.router.navigate(['/', 'Session', session.sessionId, 'TrackMap']);
-				return;
-			}
-			this.session.nextSession = new Object() as SessionModel;
-			this.session.nextSession.sessionId = session.sessionId;
-			this.session.nextSession.sessionType = session.info?.session;
-			this.ref.markForCheck();
-		}
 	}
 
 	@HostListener('window:resize', ['$event.target'])

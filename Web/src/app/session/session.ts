@@ -1,106 +1,37 @@
-import { Component, inject, ChangeDetectorRef, viewChild } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ServerApiService } from '../server-api.service';
-import { ServerLiveService } from '../server-live.service';
-import { SettingsService } from '../settings.service';
-import { Anonymizer } from '../anonymizer.service';
+import { Component, inject, viewChild } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { SessionService } from './session.service';
 import { Format } from '../format';
-import { SessionTransitionViewModel, SessionViewModel } from '../view-models';
-import { Session as SessionModel } from '../models';
+import { SessionViewModel } from '../view-models';
 import { Standings } from './standings/standings';
 import { Results } from './results/results';
 
 @Component({
 	selector: 'app-session',
 	imports: [RouterLink, Standings, Results],
+	providers: [SessionService],
 	templateUrl: './session.html',
 	styleUrl: './session.css',
 })
 export class Session {
-	private shouldAnonymize = false;
-	private ref = inject(ChangeDetectorRef);
-	private route = inject(ActivatedRoute);
-	private router = inject(Router);
-	private api = inject(ServerApiService);
-	private live = inject(ServerLiveService);
-	private settings = inject(SettingsService);
-	private anonymizer = inject(Anonymizer);
+	private service = inject(SessionService);
 	private standings = viewChild(Standings);
-	private sessionId?: string;
-	session: SessionViewModel | null = null;
-	hasStandings: boolean = false;
-	fahrenheit: boolean = true;
 	Format = Format;
 	flagClass = SessionViewModel.flagClass;
 
+	get session() { return this.service.session; }
+	get hasStandings() { return this.service.hasStandings; }
+	get fahrenheit() { return this.service.fahrenheit; }
+
 	constructor() {
-		let sessionId = this.route.snapshot.paramMap.get('sessionId');
-		if (!sessionId)
-			return;
-		this.fahrenheit = this.settings.get().fahrenheit === 'true';
-		this.route.paramMap.subscribe(paramMap => {
-			let newSessionId = paramMap.get('sessionId');
-			if (!newSessionId)
-				return;
-			if (this.sessionId != newSessionId) {
-				if (this.sessionId)
-					this.live.leave();
-				this.getSession(newSessionId);
-			}
-		});
+		this.service.init(this.onInitSession.bind(this), sessionId => ['/', 'Session', sessionId]);
 	}
 
-	getSession(sessionId: string) {
-		this.api.getSession(sessionId).then(result => {
-			if (this.shouldAnonymize)
-				this.anonymize(result);
-			this.session = result;
-			this.hasStandings = this.session.standings != null && this.session.standings.length > 0;
-			if (!this.hasStandings && this.session.session && new Date().valueOf() - new Date(this.session.session.timestamp + 'Z').valueOf() < 10000) {
-				// actual session transitions are slow enough to notify live clients before any standings actually exist
-				this.hasStandings = true;
-				this.session.standings = [];
-			}
-			this.ref.markForCheck();
-			if (this.session?.session?.sessionId && this.hasStandings)
-				this.live.joinLive(this.session.session.sessionId, this.updateSession.bind(this), this.transitionSession.bind(this));
-		}, error => { console.log(error); })
+	private onInitSession(sessionId: string) {
+		this.service.getSession(sessionId, this.onUpdateSession.bind(this));
 	}
 
-	updateSession(session: SessionViewModel) {
-		if (this.session) {
-			if (this.shouldAnonymize)
-				this.anonymize(session);
-			SessionViewModel.merge(this.session, session);
-			this.standings()?.ngOnChanges();
-			this.ref.markForCheck();
-		}
-	}
-
-	transitionSession(session: SessionTransitionViewModel) {
-		if (this.session && !this.session.nextSession && session.sessionId && session.info?.session) {
-			if (this.settings.get().autotransition) {
-				this.router.navigate(['/', 'Session', session.sessionId]);
-				return;
-			}
-			this.session.nextSession = new Object() as SessionModel;
-			this.session.nextSession.sessionId = session.sessionId;
-			this.session.nextSession.sessionType = session.info?.session;
-			this.ref.markForCheck();
-		}
-	}
-
-	anonymize(session: SessionViewModel) {
-		if (session?.standings != null) {
-			for (let standing of session.standings) {
-				standing.driverName = this.anonymizer.driver(standing.driverName);
-				standing.fullTeamName = standing.driverName;
-			}
-			for (let entry in session.entries) {
-				let car = session.entries[entry];
-				if (car)
-					car.teamName = this.anonymizer.team(car.number, car.class);
-			}
-		}
+	private onUpdateSession(session: SessionViewModel) {
+		this.standings()?.ngOnChanges();
 	}
 }
