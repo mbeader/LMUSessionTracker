@@ -17,10 +17,76 @@ namespace LMUSessionTracker.Core.Tracking {
 		public int Position { get; set; }
 		public bool ServerScored { get; set; }
 
+		public int LastPitLap { get; set; } = -1;
+		public double LastPitTime { get; set; } = -1;
+		public bool PitThisLap { get; set; } = false;
+		public bool GarageThisLap { get; set; } = false;
+		public int LastSwapLap { get; set; } = -1;
+		public double LastSwapTime { get; set; } = -1;
+		public bool SwapThisLap { get; set; } = false;
+		public int SwapLocation { get; set; } = -1;
+		public int TotalPenalties { get; set; }
+		public int TotalPitstops { get; set; }
+
 		public CarState(CarKey key, Standing standing = null) {
 			Key = key;
 			if(standing != null)
 				From(standing);
+		}
+
+		public CarState Next(Standing standing) {
+			CarState newState = new CarState(Key, standing);
+
+			newState.LastPitLap = LastPitLap;
+			newState.LastPitTime = LastPitTime;
+			newState.LastSwapLap = LastSwapLap;
+			newState.LastSwapTime = LastSwapTime;
+			newState.TotalPenalties = TotalPenalties;
+			newState.TotalPitstops = TotalPitstops;
+			if(LapsCompleted == newState.LapsCompleted) {
+				newState.PitThisLap = PitThisLap;
+				newState.GarageThisLap = GarageThisLap;
+				newState.SwapThisLap = SwapThisLap;
+				newState.SwapLocation = SwapLocation;
+			}
+
+			if(!newState.PitThisLap && newState.PitState == "ENTERING" && !(PitThisLap && PitState == "ENTERING" && LapsCompleted < newState.LapsCompleted)) {
+				newState.LastPitLap = newState.LapsCompleted + 1;
+				if(standing.timeIntoLap >= 0)
+					newState.LastPitTime = (newState.LapStartET < 0 ? 0 : newState.LapStartET) + standing.timeIntoLap;
+				newState.PitThisLap = true;
+				newState.TotalPitstops++;
+			}
+
+			// probably will miss consecutive drive-through penalties
+			if(Penalties < newState.Penalties)
+				newState.TotalPenalties++;
+
+			if(newState.InGarageStall)
+				newState.GarageThisLap = true;
+
+			if(DriverName != newState.DriverName) {
+				newState.LastSwapLap = newState.LapsCompleted + 1;
+				if(standing.timeIntoLap >= 0)
+					newState.LastSwapTime = (newState.LapStartET < 0 ? 0 : newState.LapStartET) + standing.timeIntoLap;
+				newState.SwapThisLap = true;
+				if(newState.InGarageStall)
+					newState.SwapLocation = 0;
+				else {
+					switch(standing.sector) {
+						case "SECTOR1":
+							newState.SwapLocation = 1;
+							break;
+						case "SECTOR2":
+							newState.SwapLocation = 2;
+							break;
+						case "SECTOR3":
+							newState.SwapLocation = 3;
+							break;
+					}
+				}
+			}
+			return newState;
 		}
 
 		public void From(Standing standing) {
@@ -52,6 +118,16 @@ namespace LMUSessionTracker.Core.Tracking {
 				Pitting = Pitting,
 				Position = Position,
 				ServerScored = ServerScored,
+
+				LastPitLap = LastPitLap,
+				LastPitTime = LastPitTime,
+				PitThisLap = PitThisLap,
+				LastSwapLap = LastSwapLap,
+				LastSwapTime = LastSwapTime,
+				SwapThisLap = SwapThisLap,
+				SwapLocation = SwapLocation,
+				TotalPenalties = TotalPenalties,
+				TotalPitstops = TotalPitstops,
 			};
 		}
 
@@ -81,6 +157,24 @@ namespace LMUSessionTracker.Core.Tracking {
 			//	diffs.Add($"Position: [{Position} to {other.Position}]");
 			if(ServerScored != other.ServerScored)
 				diffs.Add($"ServerScored: [{ServerScored} to {other.ServerScored}]");
+			if(LastPitLap != other.LastPitLap)
+				diffs.Add($"LastPitLap: [{LastPitLap} to {other.LastPitLap}]");
+			if(LastPitTime != other.LastPitTime)
+				diffs.Add($"LastPitTime: [{LastPitTime} to {other.LastPitTime}]");
+			if(PitThisLap != other.PitThisLap)
+				diffs.Add($"PitThisLap: [{PitThisLap} to {other.PitThisLap}]");
+			if(LastSwapLap != other.LastSwapLap)
+				diffs.Add($"LastSwapLap: [{LastSwapLap} to {other.LastSwapLap}]");
+			if(LastSwapTime != other.LastSwapTime)
+				diffs.Add($"LastSwapTime: [{LastSwapTime} to {other.LastSwapTime}]");
+			if(SwapThisLap != other.SwapThisLap)
+				diffs.Add($"SwapThisLap: [{SwapThisLap} to {other.SwapThisLap}]");
+			if(SwapLocation != other.SwapLocation)
+				diffs.Add($"SwapLocation: [{SwapLocation} to {other.SwapLocation}]");
+			if(TotalPenalties != other.TotalPenalties)
+				diffs.Add($"TotalPenalties: [{TotalPenalties} to {other.TotalPenalties}]");
+			if(TotalPitstops != other.TotalPitstops)
+				diffs.Add($"TotalPitstops: [{TotalPitstops} to {other.TotalPitstops}]");
 			return diffs;
 		}
 	}

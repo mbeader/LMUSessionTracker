@@ -53,6 +53,15 @@ namespace LMUSessionTracker.Server {
 				.HasForeignKey(x => new { x.SessionId, x.CarId })
 				.HasPrincipalKey(x => new { x.SessionId, x.CarId });
 
+			modelBuilder.Entity<CarState>().Property(x => x.LastPitLap).HasDefaultValue(-1);
+			modelBuilder.Entity<CarState>().Property(x => x.LastPitTime).HasDefaultValue(-1);
+			modelBuilder.Entity<CarState>().Property(x => x.PitThisLap).HasDefaultValue(false);
+			modelBuilder.Entity<CarState>().Property(x => x.GarageThisLap).HasDefaultValue(false);
+			modelBuilder.Entity<CarState>().Property(x => x.LastSwapLap).HasDefaultValue(-1);
+			modelBuilder.Entity<CarState>().Property(x => x.LastSwapTime).HasDefaultValue(-1);
+			modelBuilder.Entity<CarState>().Property(x => x.SwapThisLap).HasDefaultValue(false);
+			modelBuilder.Entity<CarState>().Property(x => x.SwapLocation).HasDefaultValue(-1);
+
 			var vehicleData = VehicleSeedData.GetData();
 			modelBuilder.Entity<VehicleModel>()
 				.HasData(vehicleData.models);

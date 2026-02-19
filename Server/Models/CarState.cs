@@ -25,6 +25,17 @@ namespace LMUSessionTracker.Server.Models {
 		public int Position { get; set; }
 		public bool ServerScored { get; set; }
 
+		public int LastPitLap { get; set; }
+		public double LastPitTime { get; set; }
+		public bool PitThisLap { get; set; }
+		public bool GarageThisLap { get; set; }
+		public int LastSwapLap { get; set; }
+		public double LastSwapTime { get; set; }
+		public bool SwapThisLap { get; set; }
+		public int SwapLocation { get; set; }
+		public int TotalPenalties { get; set; }
+		public int TotalPitstops { get; set; }
+
 		[JsonIgnore]
 		public Car Car { get; set; }
 		[JsonIgnore]
@@ -43,6 +54,17 @@ namespace LMUSessionTracker.Server.Models {
 			Pitting = state.Pitting;
 			Position = state.Position;
 			ServerScored = state.ServerScored;
+
+			LastPitLap = state.LastPitLap;
+			LastPitTime = state.LastPitTime;
+			PitThisLap = state.PitThisLap;
+			GarageThisLap = state.GarageThisLap;
+			LastSwapLap = state.LastSwapLap;
+			LastSwapTime = state.LastSwapTime;
+			SwapThisLap = state.SwapThisLap;
+			SwapLocation = state.SwapLocation;
+			TotalPenalties = state.TotalPenalties;
+			TotalPitstops = state.TotalPitstops;
 		}
 
 		public Core.Tracking.CarState To(CarKey key) {
@@ -59,6 +81,17 @@ namespace LMUSessionTracker.Server.Models {
 				Pitting = Pitting,
 				Position = Position,
 				ServerScored = ServerScored,
+
+				LastPitLap = LastPitLap,
+				LastPitTime = LastPitTime,
+				PitThisLap = PitThisLap,
+				GarageThisLap = GarageThisLap,
+				LastSwapLap = LastSwapLap,
+				LastSwapTime = LastSwapTime,
+				SwapThisLap = SwapThisLap,
+				SwapLocation = SwapLocation,
+				TotalPenalties = TotalPenalties,
+				TotalPitstops = TotalPitstops,
 			};
 		}
 	}

@@ -4,6 +4,11 @@ using System.Collections.Generic;
 namespace LMUSessionTracker.Core.Tracking {
 	public class CarStateMonitor {
 		private readonly Dictionary<CarKey, CarState> states = new Dictionary<CarKey, CarState>();
+		private readonly List<CarKey> keysToLogChanges = new List<CarKey>() {
+			// add keys here to log car state changes for
+			//new CarKey("56-397_24_MCLAREN"),
+			//new CarKey("21-397_25ELMS_ORECA07"),
+		};
 
 		public CarStateMonitor(List<CarState> carStates = null) {
 			if(carStates != null) {
@@ -26,12 +31,14 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		private string Update(Standing standing) {
 			CarKey key = new CarKey(standing.slotID, standing.vehicleFilename);
-			CarState newState = new CarState(key, standing);
 			if(!states.TryGetValue(key, out CarState oldState)) {
-				states.Add(key, newState);
+				states.Add(key, new CarState(key, standing));
 				return null;
-			} else
-				states[key] = newState;
+			}
+			CarState newState = oldState.Next(standing);
+			states[key] = newState;
+			if(!keysToLogChanges.Contains(key))
+				return null;
 			List<string> changes = oldState.Difference(newState);
 			if(changes.Count == 0)
 				return null;

@@ -7,6 +7,7 @@ namespace LMUSessionTracker.Server.ViewModels {
 		public SessionInfo Info { get; set; }
 		public List<Standing> Standings { get; set; }
 		public List<CarHistory> History { get; set; }
+		public List<CarState> CarState { get; set; }
 		public Dictionary<CarKey, int> PositionInClass { get; } = new Dictionary<CarKey, int>();
 		public Dictionary<CarKey, Car> Entries { get; } = new Dictionary<CarKey, Car>();
 		public List<Models.Lap> Results { get; set; }
@@ -20,6 +21,7 @@ namespace LMUSessionTracker.Server.ViewModels {
 			if(session != null) {
 				Standings = session.LastStandings;
 				History = session.History.GetAllHistory();
+				CarState = session.CarState.GetAllStates();
 				Dictionary<string, List<CarKey>> classes = new Dictionary<string, List<CarKey>>();
 				if(Standings != null) {
 					foreach(Standing standings in Standings) {
