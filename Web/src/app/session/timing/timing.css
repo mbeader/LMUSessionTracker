@@ -1,0 +1,26 @@
+:host {
+	--compact-font-size: 10px;
+}
+
+.compact-timing, .compact-info {
+	font-size: var(--compact-font-size) !important;
+	font-family: monospace !important;
+}
+
+.compact-timing td, .compact-timing th {
+	padding-top: 0px;
+	padding-bottom: 0px;
+	line-height: 13px;
+}
+
+.char2-col {
+	min-width: 28px;
+}
+
+.char5-col {
+	min-width: 58px;
+}
+
+.char7-col {
+	min-width: 78px;
+}

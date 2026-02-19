@@ -67,6 +67,33 @@ export interface Car {
 	id: string;
 }
 
+export interface CarState {
+	key: string;
+	countLapFlag: string;
+	driverName: string;
+	finishStatus: string;
+	inGarageStall: boolean;
+	lapStartET: number;
+	lapsCompleted: number;
+	penalties: number;
+	pitState: string;
+	pitstops: number;
+	pitting: boolean;
+	position: number;
+	serverScored: boolean;
+
+	lastPitLap: number;
+	lastPitTime: number;
+	pitThisLap: boolean;
+	garageThisLap: boolean;
+	lastSwapLap: number;
+	lastSwapTime: number;
+	swapThisLap: boolean;
+	swapLocation: number;
+	totalPenalties: number;
+	totalPitstops: number;
+}
+
 export interface Entry {
 	slotId: number;
 	id: string;

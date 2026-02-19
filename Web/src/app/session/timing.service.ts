@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Best, Bests, Car, CarKey } from '../tracking';
+import { Best, Bests, Car, CarKey, CarState } from '../tracking';
 import { SessionViewModel } from '../view-models';
 import { Standing } from '../lmu';
 
@@ -11,6 +11,7 @@ export type BestMap = { [key: string]: Best };
 export class TimingService {
 	session: SessionViewModel | null = null;
 	entries: Map<string, Car> = new Map();
+	carState: Map<string, CarState> = new Map();
 	positionInClass: Map<string, number> = new Map();
 	classBests: Map<string, number> = new Map();
 	bests: Bests | null = null;
@@ -63,6 +64,12 @@ export class TimingService {
 				let car = this.entries.get(id ?? '');
 				let carClass = (car && car.class ? car.class : standing.carClass) ?? '';
 				this.setIfBest(standing, carClass);
+			}
+		}
+		this.carState.clear();
+		if (this.session && this.session.carState) {
+			for (let car of this.session.carState) {
+				this.carState.set(car.key, car);
 			}
 		}
 	}

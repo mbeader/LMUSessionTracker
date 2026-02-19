@@ -200,26 +200,26 @@ button.btn-icon.dropdown-toggle::after {
 }
 
 .pic-hy {
-	background-color: var(--lmu-hy);
+	background-color: var(--lmu-hy) !important;
 }
 
 .pic-p2 {
-	background-color: var(--lmu-p2);
+	background-color: var(--lmu-p2) !important;
 }
 
 .pic-p2e {
-	background-color: var(--lmu-p2e);
+	background-color: var(--lmu-p2e) !important;
 }
 
 .pic-p3 {
-	background-color: var(--lmu-p3);
+	background-color: var(--lmu-p3) !important;
 }
 
 .pic-gte {
-	background-color: var(--lmu-gte);
+	background-color: var(--lmu-gte) !important;
 }
 
 .pic-gt3 {
-	background-color: var(--lmu-gt3);
+	background-color: var(--lmu-gt3) !important;
 }
 

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Sessions } from './sessions/sessions';
 import { Session } from './session/session';
+import { Timing } from './session/timing/timing';
 import { History } from './session/history/history';
 import { Laps } from './session/laps/laps';
 import { EntryList } from './session/entry-list/entry-list';
@@ -18,6 +19,10 @@ export const routes: Routes = [
 	{
 		path: 'Session/:sessionId',
 		component: Session,
+	},
+	{
+		path: 'Session/:sessionId/Timing',
+		component: Timing,
 	},
 	{
 		path: 'Session/:sessionId/History',

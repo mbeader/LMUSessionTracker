@@ -35,6 +35,11 @@
                             } @else {
                             <li><a class="dropdown-item" [routerLink]="['Session', sessionId]">Live</a></li>
                             }
+                            @if(navLink == 'session' && navSubLink == 'timing') {
+                            <li><a class="dropdown-item active" [routerLink]="['Session', sessionId, 'Timing']">Timing</a></li>
+                            } @else {
+                            <li><a class="dropdown-item" [routerLink]="['Session', sessionId, 'Timing']">Timing</a></li>
+                            }
                             @if(navLink == 'session' && navSubLink == 'history') {
                             <li><a class="dropdown-item active" [routerLink]="['Session', sessionId, 'History']">History</a></li>
                             } @else {

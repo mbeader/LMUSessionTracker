@@ -1,15 +1,15 @@
 @if(carClass == 'Hyper') {
-<span class="class-badge class-badge-hy" title="{{ carClass }}"><span class="d-inline-block">HY</span></span>
+<span class="class-badge class-badge-hy{{ compact ? ' compact' : null }}" title="{{ carClass }}"><span class="d-inline-block">HY</span></span>
 } @else if(carClass == 'LMP2') {
-<span class="class-badge class-badge-p2" title="{{ carClass }}"><span class="d-inline-block">P2</span></span>
+<span class="class-badge class-badge-p2{{ compact ? ' compact' : null }}" title="{{ carClass }}"><span class="d-inline-block">P2</span></span>
 } @else if(carClass == 'LMP2_ELMS') {
-<span class="class-badge class-badge-p2e" title="{{ carClass }}"><span class="d-inline-block">P2</span></span>
+<span class="class-badge class-badge-p2e{{ compact ? ' compact' : null }}" title="{{ carClass }}"><span class="d-inline-block">P2</span></span>
 } @else if(carClass == 'LMP3') {
-<span class="class-badge class-badge-p3" title="{{ carClass }}"><span class="d-inline-block">P3</span></span>
+<span class="class-badge class-badge-p3{{ compact ? ' compact' : null }}" title="{{ carClass }}"><span class="d-inline-block">P3</span></span>
 } @else if(carClass == 'GTE') {
-<span class="class-badge class-badge-gte" title="{{ carClass }}"><span class="d-inline-block">GTE</span></span>
+<span class="class-badge class-badge-gte{{ compact ? ' compact' : null }}" title="{{ carClass }}"><span class="d-inline-block">GTE</span></span>
 } @else if(carClass == 'GT3') {
-<span class="class-badge class-badge-gt3" title="{{ carClass }}"><span class="d-inline-block">GT3</span></span>
+<span class="class-badge class-badge-gt3{{ compact ? ' compact' : null }}" title="{{ carClass }}"><span class="d-inline-block">GT3</span></span>
 } @else {
 {{ carClass }}
 }

@@ -23,6 +23,10 @@ export class Header {
 					path: [(x: string) => x == 'Session', null]
 				},
 				{
+					id: 'timing',
+					path: [(x: string) => x == 'Session', null, (x: string) => x == 'Timing']
+				},
+				{
 					id: 'history',
 					path: [(x: string) => x == 'Session', null, (x: string) => x == 'History']
 				},

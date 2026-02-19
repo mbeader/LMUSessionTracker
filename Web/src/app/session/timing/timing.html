@@ -1,0 +1,151 @@
+@if(session != null && (!hasStandings || session.nextSession)) {
+<div class="alert alert-info alert-dismissible fade show text-center" role="alert">
+    @if(session.sessionState?.gamePhase == 8 && session.nextSession) {
+    <span>This session is complete and transitioned to <a [routerLink]="['/', 'Session', session.nextSession.sessionId, 'Timing']">{{ session.nextSession.sessionType }}</a></span>
+    } @else if(session.nextSession) {
+    <span>This session is not live and transitioned to <a [routerLink]="['/', 'Session', session.nextSession.sessionId, 'Timing']">{{ session.nextSession.sessionType }}</a></span>
+    } @else {
+    <span>This session is not live</span>
+    }
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+}
+@if(session && session.session && session.sessionState) {
+<div class="row compact-info">
+    <span class="col-3" title="{{ session.session.trackName }}">{{ session.session.trackName }}</span>
+    <span class="col-1" title="{{ session.session.sessionType }}">{{ session.session.sessionType }}</span>
+    <span class="col-1" title="{{ Format.phase(session.sessionState.gamePhase) }}">{{ Format.phase(session.sessionState.gamePhase) }}</span>
+    <div class="col-2 text-center">
+        <span [class]="flagClass(session.sessionState.sector1Flag)" title="{{ session.sessionState.sector1Flag }}"></span>&nbsp;
+        <span [class]="flagClass(session.sessionState.sector2Flag, true)" title="{{ session.sessionState.sector2Flag }}"></span>&nbsp;
+        <span [class]="flagClass(session.sessionState.sector3Flag)" title="{{ session.sessionState.sector3Flag }}"></span>
+    </div>
+    <div class="col-4">
+        <span title="Ambient: {{ Format.temp(session.sessionState.ambientTemp, fahrenheit, true) }}">A: {{ Format.temp(session.sessionState.ambientTemp, fahrenheit) }}</span>&nbsp;
+        <span title="Track: {{ Format.temp(session.sessionState.trackTemp, fahrenheit, true) }}">T: {{ Format.temp(session.sessionState.trackTemp, fahrenheit) }}</span>&nbsp;
+        <span title="Rain: {{ Format.percent(session.sessionState.raining) }}">R: {{ Format.percent(session.sessionState.raining) }}</span>&nbsp;
+        <span title="Wet: Min-{{ Format.percent(session.sessionState.minPathWetness) }} Avg-{{ Format.percent(session.sessionState.averagePathWetness) }} Max-{{ Format.percent(session.sessionState.maxPathWetness) }}">W: {{ Format.percent(session.sessionState.minPathWetness) }}-{{ Format.percent(session.sessionState.averagePathWetness) }}-{{ Format.percent(session.sessionState.maxPathWetness) }}</span>
+    </div>
+    <span class="col-1 text-end">{{ Format.time(session.sessionState.timeRemainingInGamePhase) }}</span>
+</div>
+<hr class="my-1" />
+}
+@if(session && session.session && session.standings) {
+<div class="overflow-x-scroll">
+    <table class="table table-sm table-striped table-hover compact-timing mb-0">
+        <thead>
+            <tr>
+                <th scope="col" class="text-center" title="Car status">Status</th>
+                <th scope="col" class="text-center" title="Position">Pos</th>
+                <th scope="col" class="text-center" title="Position in class">PIC</th>
+                <th scope="col" class="text-center" title="Start">St</th>
+                <th scope="col" class="text-center" title="Car class">Class</th>
+                <th scope="col" class="text-center" title="Car number">#</th>
+                <th scope="col" class="team-col" title="Team">Team</th>
+                <th scope="col" class="team-col" title="Car">Car</th>
+                <th scope="col" class="driver-col" title="Driver">Driver</th>
+                <th scope="col" class="text-end" title="Laps completed">Laps</th>
+                <th scope="col" class="text-end time-col" title="Time behind leader">Behind</th>
+                <th scope="col" class="text-end time-col" title="Interval from ahead">Int</th>
+                <th scope="col" class="text-end time-col" title="Current lap time">Curr</th>
+                @if(isRace) {
+                <th scope="col" class="text-end time-col" title="Best lap time">Best</th>
+                } @else {
+                <th scope="col" class="text-end time-col" title="Best lap time">Time</th>
+                }
+                <th scope="col" class="text-end time-col" title="Best lap time">Last</th>
+                <th scope="col" class="text-end time-col" title="Sector 1 time">S1</th>
+                <th scope="col" class="text-end time-col" title="Sector 2 time">S2</th>
+                <th scope="col" class="text-end time-col" title="Sector 3 time">S3</th>
+                <th scope="col" class="text-end char5-col" title="Current speed (m/s)">Speed</th>
+                <th scope="col" class="text-end char7-col" title="Current fuel">Fuel</th>
+                <th scope="col" class="text-end char2-col" title="Pitstop count">Pit</th>
+                <th scope="col" class="text-end char2-col" title="Penalty count">Pen</th>
+                <th scope="col" class="text-end char2-col" title="Last pit lap">LPL</th>
+                <th scope="col" class="text-end time-col" title="Last pit elasped time">LPET</th>
+                <th scope="col" class="text-end char2-col" title="Pit this lap">PTL</th>
+                <th scope="col" class="text-end char2-col" title="Garage this lap">GTL</th>
+                <th scope="col" class="text-end char2-col" title="Last swap lap">LSL</th>
+                <th scope="col" class="text-end time-col" title="Last swap elasped time">LSET</th>
+                <th scope="col" class="text-end char2-col" title="Swap this lap">STL</th>
+                <th scope="col" class="text-end char2-col" title="Swap location">SL</th>
+                <th scope="col" class="text-end char2-col" title="Total penalty count">TPen</th>
+                <th scope="col" class="text-end char2-col" title="Total pitstop count">TPit</th>
+                <th scope="col" class="text-end time-col" title="Last lap elasped time">LLET</th>
+                <th scope="col" class="text-center" title="Current lap progress (%)">Lap%</th>
+                <th scope="col" class="text-center" title="Server scored">SS</th>
+                <th scope="col" class="text-center" title="Under yellow">Y</th>
+                <th scope="col" class="">VEH</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (standing of session.standings; track CarKey.fromStanding(standing).id; let i = $index) {
+            @let id = CarKey.fromStanding(standing).id;
+            @let car = entries.get(id ?? '');
+            @let carClass = (car && car.class ? car.class : standing.carClass) ?? '';
+            @let bestClasses = getLastClasses(standing, carClass);
+            @if(car) {
+            <tr>
+                @let status = Format.status(standing);
+                @let statusClass = status == 'Run' ? 'link-success' : status == 'Req' ? 'link-info' : status == 'Out' ? 'link-warning' : status == 'In' || status == 'Pit' ? 'link-danger' : 'link-secondary';
+                <td class="text-center"><a class="{{ statusClass }}" [routerLink]="['Laps', `${id}`]">{{ status }}</a></td>
+                @let classId = Utils.classId(carClass);
+                <td class="text-center {{ positionInClass.get(id ?? '') == 1 ? `pic-${classId}` : null }}">{{ standing.position }}</td>
+                <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
+                <td class="text-center">{{ standing.qualification }}</td>
+                <td class="text-center"><app-session-class-badge [carClass]="carClass" [compact]="true" /></td>
+                <td class="text-center">{{ car?.number ? car.number : standing.carNumber }}</td>
+                @let team = car?.teamName ? car.teamName : (!standing.fullTeamName ? standing.vehicleName : standing.fullTeamName);
+                <td class="team-col text-truncate" title="{{ team }}">{{ team }}</td>
+                <td class="team-col text-truncate" title="{{ team }}">{{ car.vehicleName }}</td>
+                <td class="driver-col text-truncate" title="{{ standing.driverName }}">{{ standing.driverName }}</td>
+                <td class="text-end">{{ standing.lapsCompleted }}</td>
+                <td class="text-end time-col">{{ !isRace && standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindLeader, standing.timeBehindLeader) }}</td>
+                <td class="text-end time-col">{{ !isRace && standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindNext, standing.timeBehindNext) }}</td>
+                <td class="text-end time-col">{{ Format.lapTime(standing.timeIntoLap) }}</td>
+                <td class="text-end time-col {{ getBestClasses(standing, carClass).total }}">{{ Format.lapTime(standing.bestLapTime) }}</td>
+                <td class="text-end time-col {{ bestClasses.total }}">{{ Format.lapTime(standing.lastLapTime) }}</td>
+                <td class="text-end time-col {{ bestClasses.sector1 }}">{{ Format.sectorTime(0.0, standing.sector == "SECTOR1" ? standing.lastSectorTime1 : standing.currentSectorTime1) }}</td>
+                <td class="text-end time-col {{ bestClasses.sector2 }}">{{ standing.sector == "SECTOR2" ? "" : standing.sector == "SECTOR1" ? Format.sectorTime(standing.lastSectorTime1, standing.lastSectorTime2) : Format.sectorTime(standing.currentSectorTime1, standing.currentSectorTime2) }}</td>
+                <td class="text-end time-col {{ bestClasses.sector3 }}">{{ standing.sector != "SECTOR1" ? "" : Format.sectorTime(standing.lastSectorTime2, standing.lastLapTime) }}</td>
+                @let fuelClass = standing.fuelFraction > .1 ? '' : standing.fuelFraction > .05 ? 'text-warning' : 'text-danger';
+                <td class="text-end char5-col">{{ Format.speed(standing.carVelocity.velocity) }}</td>
+                <td class="text-end char7-col {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</td>
+                <td class="text-end char2-col">{{ standing.pitstops }}</td>
+                <td class="text-end char2-col">{{ standing.penalties }}</td>
+                @let state = carState.get(id ?? '');
+                @if(state) {
+                <td class="text-end char2-col">{{ state.lastPitLap < 0 ? '-' : state.lastPitLap }}</td>
+                <td class="text-end time-col">{{ state.lastPitTime < 0 ? '-' : Format.time(state.lastPitTime) }}</td>
+                <td class="text-end char2-col">{{ state.pitThisLap ? 'P' : '' }}</td>
+                <td class="text-end char2-col">{{ state.garageThisLap ? 'G' : '' }}</td>
+                <td class="text-end char2-col">{{ state.lastSwapLap < 0 ? '-' : state.lastSwapLap }}</td>
+                <td class="text-end time-col">{{ state.lastSwapTime < 0 ? '-' : Format.time(state.lastSwapTime) }}</td>
+                <td class="text-end char2-col">{{ state.swapThisLap ? 'S' : '' }}</td>
+                <td class="text-end char2-col">{{ state.swapLocation < 0 ? '-' : state.swapLocation }}</td>
+                <td class="text-end char2-col">{{ state.totalPenalties }}</td>
+                <td class="text-end char2-col">{{ state.totalPitstops }}</td>
+                } @else {
+                <td class="text-end char2-col"></td>
+                <td class="text-end time-col"></td>
+                <td class="text-end char2-col"></td>
+                <td class="text-end char2-col"></td>
+                <td class="text-end char2-col"></td>
+                <td class="text-end time-col"></td>
+                <td class="text-end char2-col"></td>
+                <td class="text-end char2-col"></td>
+                <td class="text-end char2-col"></td>
+                <td class="text-end char2-col"></td>
+                }
+                <td class="text-end time-col">{{ standing.lapStartET < 0 ? '-' : Format.time(standing.lapStartET) }}</td>
+                <td class="text-center"><span class="border bg-secondary-subtle" title="{{ Format.distance(standing.lapDistance, session.session.lapDistance) }}"><span class="lap-prog-{{ Format.lapProgress(standing.lapDistance, session.session.lapDistance) }}"></span></span></td>
+                <td class="text-center">{{ standing.serverScored ? '' : 'N' }}</td>
+                <td class="text-center">{{ standing.underYellow ? 'Y' : '' }}</td>
+                <td class="">{{ car.veh }}</td>
+            </tr>
+            }
+            }
+        </tbody>
+    </table>
+</div>
+}

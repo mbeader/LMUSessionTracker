@@ -8,4 +8,5 @@ import { Component, Input } from '@angular/core';
 })
 export class ClassBadge {
 	@Input() carClass: string | null = null;
+	@Input() compact: boolean = false;
 }

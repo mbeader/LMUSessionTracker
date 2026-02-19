@@ -162,4 +162,8 @@ export class Format {
 		}
 		return '0';
 	}
+
+	static speed(v: number) {
+		return v.toLocaleString(undefined, this.tempFormat);
+	}
 }

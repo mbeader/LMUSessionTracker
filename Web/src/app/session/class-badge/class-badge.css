@@ -82,3 +82,12 @@
 	transform: scale(calc(var(--class-badge-width) / var(--class-badge-width-gt3)), var(--class-badge-height));
 	margin-right: calc(-1px * (var(--class-badge-width-gt3) - var(--class-badge-width)));
 }
+
+.compact.class-badge {
+	border-width: 1px;
+}
+
+.compact.class-badge > span {
+	transform: none;
+	margin-right: 0px;
+}
