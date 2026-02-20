@@ -50,7 +50,10 @@ namespace LMUSessionTracker.Core.Tracking {
 				newState.SwapLocation = SwapLocation;
 			}
 
-			if(!newState.PitThisLap && newState.PitState == "ENTERING" && !(PitThisLap && PitState == "ENTERING" && LapsCompleted < newState.LapsCompleted)) {
+			if(!newState.PitThisLap && newState.PitState == "ENTERING" && PitThisLap && PitState == "ENTERING" && LapsCompleted < newState.LapsCompleted) {
+				// keep flag set when starting new lap in pit lane
+				newState.PitThisLap = true;
+			} else if(!newState.PitThisLap && newState.PitState == "ENTERING") {
 				newState.LastPitLap = newState.LapsCompleted + 1;
 				if(standing.timeIntoLap >= 0)
 					newState.LastPitTime = (newState.LapStartET < 0 ? 0 : newState.LapStartET) + standing.timeIntoLap;

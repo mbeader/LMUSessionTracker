@@ -92,9 +92,11 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[Fact]
 		public void Next_NextLapInEnteringState_ResetsLapPitStatus() {
 			CarState ex = new CarState(key, EnteringStanding(s => { s.lapsCompleted++; s.lapStartET += 60; s.timeIntoLap = 0; s.sector = "SECTOR1"; })) {
-				LastPitLap = 2, LastPitTime = 157, PitThisLap = false, TotalPitstops = 1
+				LastPitLap = 2, LastPitTime = 157, PitThisLap = true, TotalPitstops = 1
 			};
-			Assert.Equivalent(ex, new CarState(key, BasicStanding()).Next(EnteringStanding()).Next(EnteringStanding(s => { s.lapsCompleted++; s.lapStartET += 60; s.timeIntoLap = 0; s.sector = "SECTOR1"; })));
+			Assert.Equivalent(ex, new CarState(key, BasicStanding()).Next(EnteringStanding())
+				.Next(EnteringStanding(s => { s.lapsCompleted++; s.lapStartET += 60; s.timeIntoLap = 0; s.sector = "SECTOR1"; }))
+				.Next(EnteringStanding(s => { s.lapsCompleted++; s.lapStartET += 60; s.timeIntoLap = 0; s.sector = "SECTOR1"; })));
 		}
 
 		[Fact]
