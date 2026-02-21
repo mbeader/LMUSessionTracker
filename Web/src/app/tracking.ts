@@ -85,13 +85,19 @@ export interface CarState {
 	lastPitLap: number;
 	lastPitTime: number;
 	pitThisLap: boolean;
+	lastStopLap: number;
+	lastStopTime: number;
+	stopThisLap: boolean;
+	lastExitTime: number;
 	garageThisLap: boolean;
 	lastSwapLap: number;
 	lastSwapTime: number;
 	swapThisLap: boolean;
 	swapLocation: number;
+	startedLapInPit: number;
 	totalPenalties: number;
-	totalPitstops: number;
+	totalPits: number;
+	totalStops: number;
 }
 
 export interface Entry {

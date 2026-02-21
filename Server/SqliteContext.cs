@@ -56,11 +56,16 @@ namespace LMUSessionTracker.Server {
 			modelBuilder.Entity<CarState>().Property(x => x.LastPitLap).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.LastPitTime).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.PitThisLap).HasDefaultValue(false);
+			modelBuilder.Entity<CarState>().Property(x => x.LastStopLap).HasDefaultValue(-1);
+			modelBuilder.Entity<CarState>().Property(x => x.LastStopTime).HasDefaultValue(-1);
+			modelBuilder.Entity<CarState>().Property(x => x.StopThisLap).HasDefaultValue(false);
+			modelBuilder.Entity<CarState>().Property(x => x.LastExitTime).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.GarageThisLap).HasDefaultValue(false);
 			modelBuilder.Entity<CarState>().Property(x => x.LastSwapLap).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.LastSwapTime).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.SwapThisLap).HasDefaultValue(false);
 			modelBuilder.Entity<CarState>().Property(x => x.SwapLocation).HasDefaultValue(-1);
+			modelBuilder.Entity<CarState>().Property(x => x.StartedLapInPit).HasDefaultValue(false);
 
 			var vehicleData = VehicleSeedData.GetData();
 			modelBuilder.Entity<VehicleModel>()

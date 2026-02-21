@@ -17,16 +17,70 @@ namespace LMUSessionTracker.Core.Tracking {
 		public int Position { get; set; }
 		public bool ServerScored { get; set; }
 
+		/// <summary>
+		/// Lap of last entrance into pit lane
+		/// </summary>
 		public int LastPitLap { get; set; } = -1;
+		/// <summary>
+		/// Elapsed time of last entrance into pit lane
+		/// </summary>
 		public double LastPitTime { get; set; } = -1;
+		/// <summary>
+		/// Whether pit lane was entered this lap (PitState set to ENTERING)
+		/// </summary>
 		public bool PitThisLap { get; set; } = false;
+		/// <summary>
+		/// Lap of last pit stop
+		/// </summary>
+		public int LastStopLap { get; set; } = -1;
+		/// <summary>
+		/// Elapsed time of start of last pit stop
+		/// </summary>
+		public double LastStopTime { get; set; } = -1;
+		/// <summary>
+		/// Whether a pit stop was made this lap (PitState set to STOPPED)
+		/// </summary>
+		public bool StopThisLap { get; set; } = false;
+		/// <summary>
+		/// Elapsed time of end of last pit stop (PitState changed from STOPPED to anything else)
+		/// </summary>
+		public double LastExitTime { get; set; } = -1;
+		/// <summary>
+		/// Whether in garage at all during this lap (InGarageStall ever set)
+		/// </summary>
 		public bool GarageThisLap { get; set; } = false;
+		/// <summary>
+		/// Lap of last driver swap
+		/// </summary>
 		public int LastSwapLap { get; set; } = -1;
+		/// <summary>
+		/// Elapsed time of last driver swap
+		/// </summary>
 		public double LastSwapTime { get; set; } = -1;
+		/// <summary>
+		/// Whether a driver swap occurred this lap (driver name change, either in pit or garage)
+		/// </summary>
 		public bool SwapThisLap { get; set; } = false;
+		/// <summary>
+		/// Sector where driver swap occurred (garage = 0)
+		/// </summary>
 		public int SwapLocation { get; set; } = -1;
+		/// <summary>
+		/// Whether this lap began on pit lane before any pit stop (PitState set to ENTERING during lap change)
+		/// </summary>
+		public bool StartedLapInPit { get; set; } = false;
+		/// <summary>
+		/// Total penalties accrued in session (Penalties is penalties waiting to be served)
+		/// </summary>
 		public int TotalPenalties { get; set; }
-		public int TotalPitstops { get; set; }
+		/// <summary>
+		/// Total times pits were entered during this session
+		/// </summary>
+		public int TotalPits { get; set; }
+		/// <summary>
+		/// Total times pit stops were made during this session
+		/// </summary>
+		public int TotalStops { get; set; }
 
 		public CarState(CarKey key, Standing standing = null) {
 			Key = key;
@@ -34,31 +88,46 @@ namespace LMUSessionTracker.Core.Tracking {
 				From(standing);
 		}
 
-		public CarState Next(Standing standing) {
+		public CarState Next(double currentET, Standing standing) {
 			CarState newState = new CarState(Key, standing);
 
 			newState.LastPitLap = LastPitLap;
 			newState.LastPitTime = LastPitTime;
+			newState.LastStopLap = LastStopLap;
+			newState.LastStopTime = LastStopTime;
+			newState.LastExitTime = LastExitTime;
 			newState.LastSwapLap = LastSwapLap;
 			newState.LastSwapTime = LastSwapTime;
 			newState.TotalPenalties = TotalPenalties;
-			newState.TotalPitstops = TotalPitstops;
+			newState.TotalPits = TotalPits;
+			newState.TotalStops = TotalStops;
+
 			if(LapsCompleted == newState.LapsCompleted) {
 				newState.PitThisLap = PitThisLap;
+				newState.StopThisLap = StopThisLap;
 				newState.GarageThisLap = GarageThisLap;
 				newState.SwapThisLap = SwapThisLap;
 				newState.SwapLocation = SwapLocation;
+				newState.StartedLapInPit = StartedLapInPit;
+
+				if((!newState.StartedLapInPit || PitState != "ENTERING") && !newState.PitThisLap && newState.PitState == "ENTERING") {
+					newState.LastPitLap = newState.LapsCompleted + 1;
+					newState.LastPitTime = currentET;
+					newState.PitThisLap = true;
+					newState.TotalPits++;
+				}
+			} else {
+				if(newState.PitState == "ENTERING")
+					newState.StartedLapInPit = true;
 			}
 
-			if(!newState.PitThisLap && newState.PitState == "ENTERING" && PitThisLap && PitState == "ENTERING" && LapsCompleted < newState.LapsCompleted) {
-				// keep flag set when starting new lap in pit lane
-				newState.PitThisLap = true;
-			} else if(!newState.PitThisLap && newState.PitState == "ENTERING") {
-				newState.LastPitLap = newState.LapsCompleted + 1;
-				if(standing.timeIntoLap >= 0)
-					newState.LastPitTime = (newState.LapStartET < 0 ? 0 : newState.LapStartET) + standing.timeIntoLap;
-				newState.PitThisLap = true;
-				newState.TotalPitstops++;
+			if(!StopThisLap && newState.PitState == "STOPPED") {
+				newState.LastStopLap = newState.LapsCompleted + 1;
+				newState.LastStopTime = currentET;
+				newState.StopThisLap = true;
+				newState.TotalStops++;
+			} else if(StopThisLap && PitState == "STOPPED" && newState.PitState != "STOPPED" && newState.LastExitTime == -1) {
+				newState.LastExitTime = currentET;
 			}
 
 			// probably will miss consecutive drive-through penalties
@@ -70,8 +139,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 			if(DriverName != newState.DriverName) {
 				newState.LastSwapLap = newState.LapsCompleted + 1;
-				if(standing.timeIntoLap >= 0)
-					newState.LastSwapTime = (newState.LapStartET < 0 ? 0 : newState.LapStartET) + standing.timeIntoLap;
+				newState.LastSwapTime = currentET;
 				newState.SwapThisLap = true;
 				if(newState.InGarageStall)
 					newState.SwapLocation = 0;
@@ -125,12 +193,17 @@ namespace LMUSessionTracker.Core.Tracking {
 				LastPitLap = LastPitLap,
 				LastPitTime = LastPitTime,
 				PitThisLap = PitThisLap,
+				LastStopLap = LastStopLap,
+				LastStopTime = LastStopTime,
+				StopThisLap = StopThisLap,
+				LastExitTime = LastExitTime,
 				LastSwapLap = LastSwapLap,
 				LastSwapTime = LastSwapTime,
 				SwapThisLap = SwapThisLap,
 				SwapLocation = SwapLocation,
 				TotalPenalties = TotalPenalties,
-				TotalPitstops = TotalPitstops,
+				TotalPits = TotalPits,
+				TotalStops = TotalStops,
 			};
 		}
 
@@ -166,6 +239,16 @@ namespace LMUSessionTracker.Core.Tracking {
 				diffs.Add($"LastPitTime: [{LastPitTime} to {other.LastPitTime}]");
 			if(PitThisLap != other.PitThisLap)
 				diffs.Add($"PitThisLap: [{PitThisLap} to {other.PitThisLap}]");
+			if(LastStopLap != other.LastStopLap)
+				diffs.Add($"LastStopLap: [{LastStopLap} to {other.LastStopLap}]");
+			if(LastStopTime != other.LastStopTime)
+				diffs.Add($"LastStopTime: [{LastStopTime} to {other.LastStopTime}]");
+			if(StopThisLap != other.StopThisLap)
+				diffs.Add($"StopThisLap: [{StopThisLap} to {other.StopThisLap}]");
+			if(LastExitTime != other.LastExitTime)
+				diffs.Add($"LastExitTime: [{LastExitTime} to {other.LastExitTime}]");
+			if(GarageThisLap != other.GarageThisLap)
+				diffs.Add($"GarageThisLap: [{GarageThisLap} to {other.GarageThisLap}]");
 			if(LastSwapLap != other.LastSwapLap)
 				diffs.Add($"LastSwapLap: [{LastSwapLap} to {other.LastSwapLap}]");
 			if(LastSwapTime != other.LastSwapTime)
@@ -174,10 +257,14 @@ namespace LMUSessionTracker.Core.Tracking {
 				diffs.Add($"SwapThisLap: [{SwapThisLap} to {other.SwapThisLap}]");
 			if(SwapLocation != other.SwapLocation)
 				diffs.Add($"SwapLocation: [{SwapLocation} to {other.SwapLocation}]");
+			if(StartedLapInPit != other.StartedLapInPit)
+				diffs.Add($"StartedLapInPit: [{StartedLapInPit} to {other.StartedLapInPit}]");
 			if(TotalPenalties != other.TotalPenalties)
 				diffs.Add($"TotalPenalties: [{TotalPenalties} to {other.TotalPenalties}]");
-			if(TotalPitstops != other.TotalPitstops)
-				diffs.Add($"TotalPitstops: [{TotalPitstops} to {other.TotalPitstops}]");
+			if(TotalPits != other.TotalPits)
+				diffs.Add($"TotalPits: [{TotalPits} to {other.TotalPits}]");
+			if(TotalStops != other.TotalStops)
+				diffs.Add($"TotalStops: [{TotalStops} to {other.TotalStops}]");
 			return diffs;
 		}
 	}

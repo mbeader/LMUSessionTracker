@@ -28,13 +28,19 @@ namespace LMUSessionTracker.Server.Models {
 		public int LastPitLap { get; set; }
 		public double LastPitTime { get; set; }
 		public bool PitThisLap { get; set; }
+		public int LastStopLap { get; set; }
+		public double LastStopTime { get; set; }
+		public bool StopThisLap { get; set; }
+		public double LastExitTime { get; set; }
 		public bool GarageThisLap { get; set; }
 		public int LastSwapLap { get; set; }
 		public double LastSwapTime { get; set; }
 		public bool SwapThisLap { get; set; }
 		public int SwapLocation { get; set; }
+		public bool StartedLapInPit { get; set; }
 		public int TotalPenalties { get; set; }
-		public int TotalPitstops { get; set; }
+		public int TotalPits { get; set; }
+		public int TotalStops { get; set; }
 
 		[JsonIgnore]
 		public Car Car { get; set; }
@@ -58,13 +64,19 @@ namespace LMUSessionTracker.Server.Models {
 			LastPitLap = state.LastPitLap;
 			LastPitTime = state.LastPitTime;
 			PitThisLap = state.PitThisLap;
+			LastStopLap = state.LastStopLap;
+			LastStopTime = state.LastStopTime;
+			StopThisLap = state.StopThisLap;
+			LastExitTime = state.LastExitTime;
 			GarageThisLap = state.GarageThisLap;
 			LastSwapLap = state.LastSwapLap;
 			LastSwapTime = state.LastSwapTime;
 			SwapThisLap = state.SwapThisLap;
 			SwapLocation = state.SwapLocation;
+			StartedLapInPit = state.StartedLapInPit;
 			TotalPenalties = state.TotalPenalties;
-			TotalPitstops = state.TotalPitstops;
+			TotalPits = state.TotalPits;
+			TotalStops = state.TotalStops;
 		}
 
 		public Core.Tracking.CarState To(CarKey key) {
@@ -85,13 +97,19 @@ namespace LMUSessionTracker.Server.Models {
 				LastPitLap = LastPitLap,
 				LastPitTime = LastPitTime,
 				PitThisLap = PitThisLap,
+				LastStopLap = LastStopLap,
+				LastStopTime = LastStopTime,
+				StopThisLap = StopThisLap,
+				LastExitTime = LastExitTime,
 				GarageThisLap = GarageThisLap,
 				LastSwapLap = LastSwapLap,
 				LastSwapTime = LastSwapTime,
 				SwapThisLap = SwapThisLap,
 				SwapLocation = SwapLocation,
+				StartedLapInPit = StartedLapInPit,
 				TotalPenalties = TotalPenalties,
-				TotalPitstops = TotalPitstops,
+				TotalPits = TotalPits,
+				TotalStops = TotalStops,
 			};
 		}
 	}

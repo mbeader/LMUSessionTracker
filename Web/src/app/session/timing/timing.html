@@ -38,11 +38,11 @@
                 <th scope="col" class="text-center" title="Car status">Status</th>
                 <th scope="col" class="text-center" title="Position">Pos</th>
                 <th scope="col" class="text-center" title="Position in class">PIC</th>
-                <th scope="col" class="text-center" title="Start">St</th>
+                <!--<th scope="col" class="text-center" title="Start">St</th>-->
                 <th scope="col" class="text-center" title="Car class">Class</th>
                 <th scope="col" class="text-center" title="Car number">#</th>
                 <th scope="col" class="team-col" title="Team">Team</th>
-                <th scope="col" class="team-col" title="Car">Car</th>
+                <!--<th scope="col" class="team-col" title="Car">Car</th>-->
                 <th scope="col" class="driver-col" title="Driver">Driver</th>
                 <th scope="col" class="text-end" title="Laps completed">Laps</th>
                 <th scope="col" class="text-end time-col" title="Time behind leader">Behind</th>
@@ -57,25 +57,31 @@
                 <th scope="col" class="text-end time-col" title="Sector 1 time">S1</th>
                 <th scope="col" class="text-end time-col" title="Sector 2 time">S2</th>
                 <th scope="col" class="text-end time-col" title="Sector 3 time">S3</th>
-                <th scope="col" class="text-end char5-col" title="Current speed (m/s)">Speed</th>
-                <th scope="col" class="text-end char7-col" title="Current fuel">Fuel</th>
-                <th scope="col" class="text-end char2-col" title="Pitstop count">Pit</th>
+                <!--<th scope="col" class="text-end char5-col" title="Current speed (m/s)">Speed</th>-->
+                <!--<th scope="col" class="text-end char7-col" title="Current fuel">Fuel</th>-->
+                <th scope="col" class="text-end char2-col" title="Pit count">Pit</th>
                 <th scope="col" class="text-end char2-col" title="Penalty count">Pen</th>
-                <th scope="col" class="text-end char2-col" title="Last pit lap">LPL</th>
-                <th scope="col" class="text-end time-col" title="Last pit elasped time">LPET</th>
-                <th scope="col" class="text-end char2-col" title="Pit this lap">PTL</th>
+                <th scope="col" class="text-end char2-col" title="Last trip through pit lane lap">LTL</th>
+                <th scope="col" class="text-end time-col" title="Last trip through pit lane elasped time">LTET</th>
+                <th scope="col" class="text-end char2-col" title="Trip through pit lane this lap">TTL</th>
+                <th scope="col" class="text-end char2-col" title="Last pit stop lap">LPL</th>
+                <th scope="col" class="text-end time-col" title="Last pit stop elasped time">LPET</th>
+                <th scope="col" class="text-end char2-col" title="Pit stop this lap">PTL</th>
+                <th scope="col" class="text-end time-col" title="Last pit stop end elasped time">LPEET</th>
                 <th scope="col" class="text-end char2-col" title="Garage this lap">GTL</th>
                 <th scope="col" class="text-end char2-col" title="Last swap lap">LSL</th>
                 <th scope="col" class="text-end time-col" title="Last swap elasped time">LSET</th>
                 <th scope="col" class="text-end char2-col" title="Swap this lap">STL</th>
                 <th scope="col" class="text-end char2-col" title="Swap location">SL</th>
+                <th scope="col" class="text-end char2-col" title="Started lap in pit">SP</th>
                 <th scope="col" class="text-end char2-col" title="Total penalty count">TPen</th>
-                <th scope="col" class="text-end char2-col" title="Total pitstop count">TPit</th>
+                <th scope="col" class="text-end char2-col" title="Total trip through pit lane count">TTrp</th>
+                <th scope="col" class="text-end char2-col" title="Total pit stop count">TPit</th>
                 <th scope="col" class="text-end time-col" title="Last lap elasped time">LLET</th>
                 <th scope="col" class="text-center" title="Current lap progress (%)">Lap%</th>
                 <th scope="col" class="text-center" title="Server scored">SS</th>
                 <th scope="col" class="text-center" title="Under yellow">Y</th>
-                <th scope="col" class="">VEH</th>
+                <!--<th scope="col" class="">VEH</th>-->
             </tr>
         </thead>
         <tbody>
@@ -92,12 +98,12 @@
                 @let classId = Utils.classId(carClass);
                 <td class="text-center {{ positionInClass.get(id ?? '') == 1 ? `pic-${classId}` : null }}">{{ standing.position }}</td>
                 <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
-                <td class="text-center">{{ standing.qualification }}</td>
+                <!--<td class="text-center">{{ standing.qualification }}</td>-->
                 <td class="text-center"><app-session-class-badge [carClass]="carClass" [compact]="true" /></td>
                 <td class="text-center">{{ car?.number ? car.number : standing.carNumber }}</td>
                 @let team = car?.teamName ? car.teamName : (!standing.fullTeamName ? standing.vehicleName : standing.fullTeamName);
                 <td class="team-col text-truncate" title="{{ team }}">{{ team }}</td>
-                <td class="team-col text-truncate" title="{{ team }}">{{ car.vehicleName }}</td>
+                <!--<td class="team-col text-truncate" title="{{ team }}">{{ car.vehicleName }}</td>-->
                 <td class="driver-col text-truncate" title="{{ standing.driverName }}">{{ standing.driverName }}</td>
                 <td class="text-end">{{ standing.lapsCompleted }}</td>
                 <td class="text-end time-col">{{ !isRace && standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindLeader, standing.timeBehindLeader) }}</td>
@@ -109,8 +115,8 @@
                 <td class="text-end time-col {{ bestClasses.sector2 }}">{{ standing.sector == "SECTOR2" ? "" : standing.sector == "SECTOR1" ? Format.sectorTime(standing.lastSectorTime1, standing.lastSectorTime2) : Format.sectorTime(standing.currentSectorTime1, standing.currentSectorTime2) }}</td>
                 <td class="text-end time-col {{ bestClasses.sector3 }}">{{ standing.sector != "SECTOR1" ? "" : Format.sectorTime(standing.lastSectorTime2, standing.lastLapTime) }}</td>
                 @let fuelClass = standing.fuelFraction > .1 ? '' : standing.fuelFraction > .05 ? 'text-warning' : 'text-danger';
-                <td class="text-end char5-col">{{ Format.speed(standing.carVelocity.velocity) }}</td>
-                <td class="text-end char7-col {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</td>
+                <!--<td class="text-end char5-col">{{ Format.speed(standing.carVelocity.velocity) }}</td>-->
+                <!--<td class="text-end char7-col {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</td>-->
                 <td class="text-end char2-col">{{ standing.pitstops }}</td>
                 <td class="text-end char2-col">{{ standing.penalties }}</td>
                 @let state = carState.get(id ?? '');
@@ -118,20 +124,33 @@
                 <td class="text-end char2-col">{{ state.lastPitLap < 0 ? '-' : state.lastPitLap }}</td>
                 <td class="text-end time-col">{{ state.lastPitTime < 0 ? '-' : Format.time(state.lastPitTime) }}</td>
                 <td class="text-end char2-col">{{ state.pitThisLap ? 'P' : '' }}</td>
+                <td class="text-end char2-col">{{ state.lastStopLap < 0 ? '-' : state.lastStopLap }}</td>
+                <td class="text-end time-col">{{ state.lastStopTime < 0 ? '-' : Format.time(state.lastStopTime) }}</td>
+                <td class="text-end char2-col">{{ state.stopThisLap ? 'P' : '' }}</td>
+                <td class="text-end time-col">{{ state.lastExitTime < 0 ? '-' : Format.time(state.lastExitTime) }}</td>
                 <td class="text-end char2-col">{{ state.garageThisLap ? 'G' : '' }}</td>
                 <td class="text-end char2-col">{{ state.lastSwapLap < 0 ? '-' : state.lastSwapLap }}</td>
                 <td class="text-end time-col">{{ state.lastSwapTime < 0 ? '-' : Format.time(state.lastSwapTime) }}</td>
                 <td class="text-end char2-col">{{ state.swapThisLap ? 'S' : '' }}</td>
                 <td class="text-end char2-col">{{ state.swapLocation < 0 ? '-' : state.swapLocation }}</td>
+                <td class="text-end char2-col">{{ state.startedLapInPit ? 'P' : '' }}</td>
                 <td class="text-end char2-col">{{ state.totalPenalties }}</td>
-                <td class="text-end char2-col">{{ state.totalPitstops }}</td>
+                <td class="text-end char2-col">{{ state.totalPits }}</td>
+                <td class="text-end char2-col">{{ state.totalStops }}</td>
                 } @else {
                 <td class="text-end char2-col"></td>
                 <td class="text-end time-col"></td>
                 <td class="text-end char2-col"></td>
                 <td class="text-end char2-col"></td>
+                <td class="text-end time-col"></td>
                 <td class="text-end char2-col"></td>
                 <td class="text-end time-col"></td>
+                <td class="text-end char2-col"></td>
+                <td class="text-end char2-col"></td>
+                <td class="text-end time-col"></td>
+                <td class="text-end char2-col"></td>
+                <td class="text-end char2-col"></td>
+                <td class="text-end char2-col"></td>
                 <td class="text-end char2-col"></td>
                 <td class="text-end char2-col"></td>
                 <td class="text-end char2-col"></td>
@@ -141,7 +160,7 @@
                 <td class="text-center"><span class="border bg-secondary-subtle" title="{{ Format.distance(standing.lapDistance, session.session.lapDistance) }}"><span class="lap-prog-{{ Format.lapProgress(standing.lapDistance, session.session.lapDistance) }}"></span></span></td>
                 <td class="text-center">{{ standing.serverScored ? '' : 'N' }}</td>
                 <td class="text-center">{{ standing.underYellow ? 'Y' : '' }}</td>
-                <td class="">{{ car.veh }}</td>
+                <!--<td class="">{{ car.veh }}</td>-->
             </tr>
             }
             }

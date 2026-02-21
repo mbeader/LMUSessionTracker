@@ -19,23 +19,23 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 		}
 
-		public List<string> Update(List<Standing> standings) {
+		public List<string> Update(double currentET, List<Standing> standings) {
 			List<string> changes = new List<string>();
 			foreach(Standing standing in standings) {
-				string change = Update(standing);
+				string change = Update(currentET, standing);
 				if(change != null)
 					changes.Add(change);
 			}
 			return changes;
 		}
 
-		private string Update(Standing standing) {
+		private string Update(double currentET, Standing standing) {
 			CarKey key = new CarKey(standing.slotID, standing.vehicleFilename);
 			if(!states.TryGetValue(key, out CarState oldState)) {
 				states.Add(key, new CarState(key, standing));
 				return null;
 			}
-			CarState newState = oldState.Next(standing);
+			CarState newState = oldState.Next(currentET, standing);
 			states[key] = newState;
 			if(!keysToLogChanges.Contains(key))
 				return null;
