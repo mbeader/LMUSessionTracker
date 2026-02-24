@@ -1,5 +1,15 @@
-@if(id) {
+@if(id && info) {
 <dl class="row">
+    @let session = info.session;
+    @let car = info.car;
+    @let state = info.state;
+    @let standing = info.standing;
+    @let carClass = info.carClass;
+    @let lastClasses = info.lastClasses;
+    @let bestClasses = info.bestClasses;
+    @let positionInClass = info.positionInClass;
+    @let lastStop = info.lastStop;
+    @let lastSwap = info.lastSwap;
     @if(car) {
     <dt class="col-3">Slot ID</dt>
     <dd class="col-9">{{ car.slotId }}</dd>

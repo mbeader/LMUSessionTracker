@@ -1,7 +1,7 @@
 import { Component, inject, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SessionService } from '../session.service';
-import { CarStatusDescription, TimingService } from '../timing.service';
+import { CarStatusDescription, TimingField, TimingService } from '../timing.service';
 import { Format } from '../../format';
 import { SessionViewModel } from '../../view-models';
 import { Standing } from '../../lmu';
@@ -18,9 +18,17 @@ import { CarStatus } from '../car-status/car-status';
 	styleUrl: './timing.css',
 })
 export class Timing {
+	private defaultColumns = [
+		1, 2, 3, /*4,*/ 5, 6, 7, /*8,*/ 9, 10,
+		11, 12, 13, 14, 15, 16, 17, 18, /*19, 20,*/
+		21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+		31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+		41, 42, /*43*/
+	];
 	private service = inject(SessionService);
 	private timingService = inject(TimingService);
 	private carStatus = viewChild(CarStatus);
+	columns: TimingField[] = [];
 	carStatusDesc?: CarStatusDescription;
 	Utils = { classId, statusClass };
 	CarKey = CarKey;
@@ -35,10 +43,12 @@ export class Timing {
 		this.service.init(this.onInitSession.bind(this), sessionId => ['/', 'Session', sessionId, 'Timing']);
 		whenExists('main', main => { if (main.parentElement) main.parentElement.className = 'container-fluid'; });
 		whenExists('#statusModal', el => el.addEventListener('show.bs.modal', this.updateCarStatusModal.bind(this)));
+		whenExists('#columnsModal', el => el.addEventListener('show.bs.modal', this.setColumnCheckboxes.bind(this)));
 	}
 
 	ngOnInit() {
 		this.carStatus()?.init(this.timingService);
+		this.columns = this.getColumns(this.readColumns());
 	}
 
 	private onInitSession(sessionId: string) {
@@ -60,6 +70,7 @@ export class Timing {
 
 	getLastClasses(standing: Standing, carClass: string) { return this.timingService.getLastClasses(standing, carClass); }
 	getBestClasses(standing: Standing, carClass: string) { return this.timingService.getBestClasses(standing, carClass); }
+	getCars() { return this.timingService.getCars(); }
 
 	updateCarStatusModal(e: any) {
 		if (e && e.relatedTarget && e.relatedTarget instanceof HTMLButtonElement) {
@@ -75,5 +86,62 @@ export class Timing {
 				this.carStatusDesc = undefined;
 			}
 		}
+	}
+
+	private readColumns() {
+		let columns;
+		try {
+			let json = localStorage.getItem('timing-cols');
+			if(json)
+				columns = JSON.parse(json);
+		} catch {
+
+		}
+		if(!columns)
+			columns = this.defaultColumns;
+		return columns;
+	}
+
+	private getColumns(columns: number[]) {
+		let cols = [];
+		for (let id of columns) {
+			let col = this.timingService.fields.byId(id);
+			if (col)
+				cols.push(col);
+		}
+		return cols;
+	}
+
+	getAllColumns() {
+		return this.timingService.fields.fields;
+	}
+
+	columnEnabled(id: number) {
+		return this.columns.some(x => x.id == id);
+	}
+
+	setColumnCheckboxes(e: any) {
+		if (e && e.relatedTarget && e.relatedTarget instanceof HTMLButtonElement) {
+			let button: HTMLButtonElement = e.relatedTarget;
+			if (button.getAttribute('data-bs-target') != '#columnsModal')
+				return;
+			let checks = document.querySelectorAll<HTMLInputElement>('#columnsModal .modal-body input');
+			for (let check of checks) {
+				let id = parseInt(check.getAttribute('col-id') ?? '');
+				check.checked = this.columns.some(x => x.id == id);
+			}
+		}
+	}
+
+	setColumns() {
+		let cols = [];
+		let checks = document.querySelectorAll<HTMLInputElement>('#columnsModal .modal-body input');
+		for (let check of checks) {
+			let id = parseInt(check.getAttribute('col-id') ?? '');
+			if (check.checked)
+				cols.push(id);
+		}
+		localStorage.setItem('timing-cols', JSON.stringify(cols));
+		this.columns = this.getColumns(cols);
 	}
 }

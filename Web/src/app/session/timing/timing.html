@@ -35,135 +35,34 @@
     <table class="table table-sm table-striped table-hover compact-timing mb-0">
         <thead>
             <tr>
-                <th scope="col" class="text-center" title="Car status">Status</th>
-                <th scope="col" class="text-center" title="Position">Pos</th>
-                <th scope="col" class="text-center" title="Position in class">PIC</th>
-                <!--<th scope="col" class="text-center" title="Start">St</th>-->
-                <th scope="col" class="text-center" title="Car class">Class</th>
-                <th scope="col" class="text-center" title="Car number">#</th>
-                <th scope="col" class="team-col" title="Team">Team</th>
-                <!--<th scope="col" class="team-col" title="Car">Car</th>-->
-                <th scope="col" class="driver-col" title="Driver">Driver</th>
-                <th scope="col" class="text-end" title="Laps completed">Laps</th>
-                <th scope="col" class="text-end time-col" title="Time behind leader">Behind</th>
-                <th scope="col" class="text-end time-col" title="Interval from ahead">Int</th>
-                <th scope="col" class="text-end time-col" title="Current lap time">Curr</th>
-                @if(isRace) {
-                <th scope="col" class="text-end time-col" title="Best lap time">Best</th>
-                } @else {
-                <th scope="col" class="text-end time-col" title="Best lap time">Time</th>
+                @for (col of columns; track col.id) {
+                <th scope="col" class="{{ col.align == 'end' ? 'text-end' : col.align == 'center' ? 'text-center' : '' }} {{ col.colType }}" title="{{ col.desc }}">{{ col.name }}</th>
                 }
-                <th scope="col" class="text-end time-col" title="Best lap time">Last</th>
-                <th scope="col" class="text-end time-col" title="Sector 1 time">S1</th>
-                <th scope="col" class="text-end time-col" title="Sector 2 time">S2</th>
-                <th scope="col" class="text-end time-col" title="Sector 3 time">S3</th>
-                <!--<th scope="col" class="text-end char5-col" title="Current speed (m/s)">Speed</th>-->
-                <!--<th scope="col" class="text-end char7-col" title="Current fuel">Fuel</th>-->
-                <th scope="col" class="text-end char2-col" title="Pit count">Pit</th>
-                <th scope="col" class="text-end char2-col" title="Penalty count">Pen</th>
-                <th scope="col" class="text-end char2-col" title="Last trip through pit lane lap">LTL</th>
-                <th scope="col" class="text-end time-col" title="Last trip through pit lane elasped time">LTET</th>
-                <th scope="col" class="text-end char2-col" title="Trip through pit lane this lap">TTL</th>
-                <th scope="col" class="text-end char2-col" title="Last pit stop lap">LPL</th>
-                <th scope="col" class="text-end time-col" title="Last pit stop elasped time">LPET</th>
-                <th scope="col" class="text-end char2-col" title="Pit stop this lap">PTL</th>
-                <th scope="col" class="text-end time-col" title="Last pit stop end elasped time">LPEET</th>
-                <th scope="col" class="text-end char2-col" title="Garage this lap">GTL</th>
-                <th scope="col" class="text-end char2-col" title="Last swap lap">LSL</th>
-                <th scope="col" class="text-end time-col" title="Last swap elasped time">LSET</th>
-                <th scope="col" class="text-end char2-col" title="Swap this lap">STL</th>
-                <th scope="col" class="text-end char2-col" title="Swap location">SL</th>
-                <th scope="col" class="text-end char2-col" title="Started lap in pit">SP</th>
-                <th scope="col" class="text-end char2-col" title="Total penalty count">TPen</th>
-                <th scope="col" class="text-end char2-col" title="Total trip through pit lane count">TTrp</th>
-                <th scope="col" class="text-end char2-col" title="Total pit stop count">TPit</th>
-                <th scope="col" class="text-end time-col" title="Last lap elasped time">LLET</th>
-                <th scope="col" class="text-center" title="Current lap progress (%)">Lap%</th>
-                <th scope="col" class="text-center" title="Server scored">SS</th>
-                <th scope="col" class="text-center" title="Under yellow">Y</th>
-                <!--<th scope="col" class="">VEH</th>-->
-                <th scope="col" class=""></th>
+                <th scope="col">
+                    <button class="btn-icon ms-auto" type="button" data-bs-toggle="modal" data-bs-target="#columnsModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+                            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+                        </svg>
+                    </button>
+                </th>
             </tr>
         </thead>
         <tbody>
-            @for (standing of session.standings; track CarKey.fromStanding(standing).id; let i = $index) {
-            @let id = CarKey.fromStanding(standing).id;
-            @let car = entries.get(id ?? '');
-            @let carClass = (car && car.class ? car.class : standing.carClass) ?? '';
-            @let bestClasses = getLastClasses(standing, carClass);
+            @for (car of getCars(); track car.id; let i = $index) {
             @if(car) {
-            <tr [attr.car-id]="id">
-                @let status = Format.status(standing);
-                @let statusClass = Utils.statusClass(status);
-                <td class="text-center"><span class="{{ statusClass }}">{{ status }}</span></td>
-                @let classId = Utils.classId(carClass);
-                <td class="text-center {{ positionInClass.get(id ?? '') == 1 ? `pic-${classId}` : null }}">{{ standing.position }}</td>
-                <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
-                <!--<td class="text-center">{{ standing.qualification }}</td>-->
-                <td class="text-center"><app-session-class-badge [carClass]="carClass" [compact]="true" /></td>
-                <td class="text-center">{{ car?.number ? car.number : standing.carNumber }}</td>
-                @let team = car?.teamName ? car.teamName : (!standing.fullTeamName ? standing.vehicleName : standing.fullTeamName);
-                <td class="team-col text-truncate" title="{{ team }}">{{ team }}</td>
-                <!--<td class="team-col text-truncate" title="{{ team }}">{{ car.vehicleName }}</td>-->
-                <td class="driver-col text-truncate" title="{{ standing.driverName }}">{{ standing.driverName }}</td>
-                <td class="text-end">{{ standing.lapsCompleted }}</td>
-                <td class="text-end time-col">{{ !isRace && standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindLeader, standing.timeBehindLeader) }}</td>
-                <td class="text-end time-col">{{ !isRace && standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindNext, standing.timeBehindNext) }}</td>
-                <td class="text-end time-col">{{ Format.lapTime(standing.timeIntoLap) }}</td>
-                <td class="text-end time-col {{ getBestClasses(standing, carClass).total }}">{{ Format.lapTime(standing.bestLapTime) }}</td>
-                <td class="text-end time-col {{ bestClasses.total }}">{{ Format.lapTime(standing.lastLapTime) }}</td>
-                <td class="text-end time-col {{ bestClasses.sector1 }}">{{ Format.sectorTime(0.0, standing.sector == "SECTOR1" ? standing.lastSectorTime1 : standing.currentSectorTime1) }}</td>
-                <td class="text-end time-col {{ bestClasses.sector2 }}">{{ standing.sector == "SECTOR2" ? "" : standing.sector == "SECTOR1" ? Format.sectorTime(standing.lastSectorTime1, standing.lastSectorTime2) : Format.sectorTime(standing.currentSectorTime1, standing.currentSectorTime2) }}</td>
-                <td class="text-end time-col {{ bestClasses.sector3 }}">{{ standing.sector != "SECTOR1" ? "" : Format.sectorTime(standing.lastSectorTime2, standing.lastLapTime) }}</td>
-                @let fuelClass = standing.fuelFraction > .1 ? '' : standing.fuelFraction > .05 ? 'text-warning' : 'text-danger';
-                <!--<td class="text-end char5-col">{{ Format.speed(standing.carVelocity.velocity) }}</td>-->
-                <!--<td class="text-end char7-col {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</td>-->
-                <td class="text-end char2-col">{{ standing.pitstops }}</td>
-                <td class="text-end char2-col">{{ standing.penalties }}</td>
-                @let state = carState.get(id ?? '');
-                @if(state) {
-                <td class="text-end char2-col">{{ state.lastPitLap < 0 ? '-' : state.lastPitLap }}</td>
-                <td class="text-end time-col">{{ state.lastPitTime < 0 ? '-' : Format.time(state.lastPitTime) }}</td>
-                <td class="text-end char2-col">{{ state.pitThisLap ? 'P' : '' }}</td>
-                <td class="text-end char2-col">{{ state.lastStopLap < 0 ? '-' : state.lastStopLap }}</td>
-                <td class="text-end time-col">{{ state.lastStopTime < 0 ? '-' : Format.time(state.lastStopTime) }}</td>
-                <td class="text-end char2-col">{{ state.stopThisLap ? 'P' : '' }}</td>
-                <td class="text-end time-col">{{ state.lastExitTime < 0 ? '-' : Format.time(state.lastExitTime) }}</td>
-                <td class="text-end char2-col">{{ state.garageThisLap ? 'G' : '' }}</td>
-                <td class="text-end char2-col">{{ state.lastSwapLap < 0 ? '-' : state.lastSwapLap }}</td>
-                <td class="text-end time-col">{{ state.lastSwapTime < 0 ? '-' : Format.time(state.lastSwapTime) }}</td>
-                <td class="text-end char2-col">{{ state.swapThisLap ? 'S' : '' }}</td>
-                <td class="text-end char2-col">{{ state.swapLocation < 0 ? '-' : state.swapLocation }}</td>
-                <td class="text-end char2-col">{{ state.startedLapInPit ? 'P' : '' }}</td>
-                <td class="text-end char2-col">{{ state.totalPenalties }}</td>
-                <td class="text-end char2-col">{{ state.totalPits }}</td>
-                <td class="text-end char2-col">{{ state.totalStops }}</td>
+            <tr [attr.car-id]="car.id">
+                @for (col of columns; track col.id) {
+                @if(col.id == 5) {
+                <td class="text-center"><app-session-class-badge [carClass]="car.carClass" [compact]="true" /></td>
+                } @else if(col.id == 40) {
+                <td class="text-center"><span class="border bg-secondary-subtle" title="{{ col.value(car) }}"><span class="{{ col.classes ? col.classes(car) : null }}"></span></span></td>
                 } @else {
-                <td class="text-end char2-col"></td>
-                <td class="text-end time-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end time-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end time-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end time-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end char2-col"></td>
-                <td class="text-end char2-col"></td>
+                <td class="{{ col.align == 'end' ? 'text-end' : col.align == 'center' ? 'text-center' : '' }} {{ col.colType }} {{ col.classes ? col.classes(car) : null }}" title="{{ col.desc }}">{{ col.value(car) }}</td>
                 }
-                <td class="text-end time-col">{{ standing.lapStartET < 0 ? '-' : Format.time(standing.lapStartET) }}</td>
-                <td class="text-center"><span class="border bg-secondary-subtle" title="{{ Format.distance(standing.lapDistance, session.session.lapDistance) }}"><span class="lap-prog-{{ Format.lapProgress(standing.lapDistance, session.session.lapDistance) }}"></span></span></td>
-                <td class="text-center">{{ standing.serverScored ? '' : 'N' }}</td>
-                <td class="text-center">{{ standing.underYellow ? 'Y' : '' }}</td>
-                <!--<td class="">{{ car.veh }}</td>-->
+                }
                 <td class="">
-                    <div class="dropdown">
+                    <div class="dropdown car-dropdown">
                         <button class="btn-icon ms-auto dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
                                 <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
@@ -171,7 +70,7 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#statusModal">View full status</button></li>
-                            <li><a class="dropdown-item" [routerLink]="['../', 'Laps', `${id}`]">Laps</a></li>
+                            <li><a class="dropdown-item" [routerLink]="['../', 'Laps', `${car.id}`]">Laps</a></li>
                         </ul>
                     </div>
                 </td>
@@ -199,6 +98,30 @@
             </div>
             <div class="modal-body">
                 <app-session-car-status />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="columnsModal" tabindex="-1" aria-labelledby="columnsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="columnsModalLabel">Customize columns</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    @for (col of getAllColumns(); track col.id) {
+                    <li class="form-check">
+                        <input type="checkbox" class="form-check-input" id="col-{{ col.id }}" [attr.col-id]="col.id" (change)="setColumns()" />
+                        <label class="form-check-label" for="col-{{ col.id }}">{{ col.desc }}</label>
+                    </li>
+                    }
+                </ul>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

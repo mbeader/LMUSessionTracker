@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Best, Bests, Car, CarKey, CarState } from '../tracking';
+import { Best, Bests, Car, CarKey, CarState, Pit } from '../tracking';
 import { SessionViewModel } from '../view-models';
 import { Standing } from '../lmu';
+import { Format } from '../format';
+import { classId, statusClass } from '../utils';
 
 export type NullabeString = string | null;
 export type BestClasses = { total: NullabeString, sector1: NullabeString, sector2: NullabeString, sector3: NullabeString };
@@ -10,6 +12,7 @@ export type CarStatusDescription = { carClass: string, number: string, team: str
 
 @Injectable()
 export class TimingService {
+	fields: TimingFields = new TimingFields();
 	session: SessionViewModel | null = null;
 	entries: Map<string, Car> = new Map();
 	carState: Map<string, CarState> = new Map();
@@ -158,5 +161,459 @@ export class TimingService {
 		let number = car?.number ? car.number : standing?.carNumber ?? '?';
 		let team = car?.teamName ? car.teamName : (!standing?.fullTeamName ? standing?.vehicleName : standing?.fullTeamName) ?? driver;
 		return { carClass: carClass, number: number, team: team } as CarStatusDescription;
+	}
+
+	getCar(id: string) {
+		let info = new TimingCarInfo();
+		info.id = id;
+		info.set(this);
+		return info;
+	}
+
+	getCars() {
+		let cars = [];
+		if (this.session?.standings) {
+			for (let standing of this.session.standings) {
+				cars.push(this.getCar(CarKey.fromStanding(standing).id));
+			}
+		}
+		return cars;
+	}
+}
+
+export interface TimingField {
+	id: number;
+	name: string;
+	desc: string;
+	value: (service: TimingCarInfo) => string | null | undefined;
+	classes?: (service: TimingCarInfo) => string;
+	align?: string;
+	colType?: string;
+}
+
+class TimingFields {
+	fields: TimingField[] = [
+		{
+			id: 1,
+			name: 'Status',
+			desc: 'Car status',
+			value: i => Format.status(i.standing),
+			classes: i => statusClass(Format.status(i.standing)),
+			align: 'center'
+		},
+		{
+			id: 2,
+			name: 'Pos',
+			desc: 'Position',
+			value: i => i.standing?.position.toString(),
+			classes: i => i.positionInClass == 1 ? `pic-${classId(i.carClass)}` : '',
+			align: 'center'
+		},
+		{
+			id: 3,
+			name: 'PIC',
+			desc: 'Position in class',
+			value: i => i.positionInClass.toString(),
+			classes: i => `pic-${classId(i.carClass)}`,
+			align: 'center'
+		},
+		{
+			id: 4,
+			name: 'St',
+			desc: 'Start',
+			value: i => i.standing?.qualification.toString(),
+			align: 'center'
+		},
+		{
+			id: 5,
+			name: 'Class',
+			desc: 'Car class',
+			value: i => i.carClass,
+			align: 'center'
+		},
+		{
+			id: 6,
+			name: '#',
+			desc: 'Car number',
+			value: i => i.car?.number ? i.car.number : i.standing?.carNumber,
+			align: 'center'
+		},
+		{
+			id: 7,
+			name: 'Team',
+			desc: 'Team',
+			value: i => i.car?.teamName ? i.car.teamName : (!i.standing?.fullTeamName ? i.standing?.vehicleName : i.standing.fullTeamName),
+			classes: () => 'team-col text-truncate'
+		},
+		{
+			id: 8,
+			name: 'Car',
+			desc: 'Car',
+			value: i => i.car?.vehicleName,
+			classes: () => 'team-col text-truncate'
+		},
+		{
+			id: 9,
+			name: 'Driver',
+			desc: 'Driver',
+			value: i => i.standing?.driverName,
+			classes: () => 'driver-col text-truncate'
+		},
+		{
+			id: 10,
+			name: 'Laps',
+			desc: 'Laps completed',
+			value: i => i.standing?.lapsCompleted.toString(),
+			align: 'end'
+		},
+		{
+			id: 11,
+			name: 'Behind',
+			desc: 'Time behind leader',
+			value: i => typeof i.standing === 'undefined' || (!i.isRace && i.standing.timeBehindLeader <= 0) ? '-' : Format.diff(i.standing.lapsBehindLeader, i.standing.timeBehindLeader),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 12,
+			name: 'Int',
+			desc: 'Interval from ahead',
+			value: i => typeof i.standing === 'undefined' || (!i.isRace && i.standing.timeBehindNext <= 0) ? '-' : Format.diff(i.standing.lapsBehindNext, i.standing.timeBehindNext),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 13,
+			name: 'Curr',
+			desc: 'Current lap time',
+			value: i => Format.lapTime(i.standing?.timeIntoLap),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 14,
+			name: 'Best',
+			desc: 'Best lap time',
+			value: i => Format.lapTime(i.standing?.bestLapTime),
+			classes: i => i.bestClasses.total ?? '',
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 15,
+			name: 'Last',
+			desc: 'Last lap time',
+			value: i => Format.lapTime(i.standing?.lastLapTime),
+			classes: i => i.lastClasses.total ?? '',
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 16,
+			name: 'S1',
+			desc: 'Sector 1 time',
+			value: i => typeof i.standing === 'undefined' ? '-' : Format.sectorTime(0.0, i.standing.sector == 'SECTOR1' ? i.standing.lastSectorTime1 : i.standing.currentSectorTime1),
+			classes: i => i.lastClasses.sector1 ?? '',
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 17,
+			name: 'S2',
+			desc: 'Sector 2 time',
+			value: i => typeof i.standing === 'undefined' ? '-' : i.standing.sector == 'SECTOR2' ? '' : i.standing.sector == 'SECTOR1' ? Format.sectorTime(i.standing.lastSectorTime1, i.standing.lastSectorTime2) : Format.sectorTime(i.standing.currentSectorTime1, i.standing.currentSectorTime2),
+			classes: i => i.lastClasses.sector2 ?? '',
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 18,
+			name: 'S3',
+			desc: 'Sector 3 time',
+			value: i => typeof i.standing === 'undefined' ? '-' : i.standing.sector != 'SECTOR1' ? '' : Format.sectorTime(i.standing.lastSectorTime2, i.standing.lastLapTime),
+			classes: i => i.lastClasses.sector3 ?? '',
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 19,
+			name: 'Speed',
+			desc: 'Current speed (m/s)',
+			value: i => typeof i.standing?.lapStartET === 'undefined' ? '-' : Format.speed(i.standing?.carVelocity.velocity),
+			align: 'end',
+			colType: 'char5-col'
+		},
+		{
+			id: 20,
+			name: 'Fuel',
+			desc: 'Current fuel',
+			value: i => typeof i.standing === 'undefined' ? '-' : Format.percent(i.standing.fuelFraction),
+			classes: i => typeof i.standing === 'undefined' || i.standing.fuelFraction > .1 ? '' : i.standing.fuelFraction > .05 ? 'text-warning' : 'text-danger',
+			align: 'end',
+			colType: 'char7-col'
+		},
+		{
+			id: 21,
+			name: 'Pit',
+			desc: 'Pit count',
+			value: i => i.standing?.pitstops.toString(),
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 22,
+			name: 'Pen',
+			desc: 'Penalty count',
+			value: i => i.standing?.penalties.toString(),
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 23,
+			name: 'LTL',
+			desc: 'Last trip through pit lane lap',
+			value: i => typeof i.state === 'undefined' || i.state.lastPitLap < 0 ? '-' : i.state.lastPitLap.toString(),
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 24,
+			name: 'LTET',
+			desc: 'Last trip through pit lane elasped time',
+			value: i => typeof i.state === 'undefined' || i.state.lastPitTime < 0 ? '-' : Format.time(i.state.lastPitTime),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 25,
+			name: 'TTL',
+			desc: 'Trip through pit lane this lap',
+			value: i => i.state?.pitThisLap ? 'P' : '',
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 26,
+			name: 'LPL',
+			desc: 'Last pit stop lap',
+			value: i => typeof i.state === 'undefined' || i.state.lastStopLap < 0 ? '-' : i.state.lastStopLap.toString(),
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 27,
+			name: 'LPET',
+			desc: 'Last pit stop elasped time',
+			value: i => typeof i.state === 'undefined' || i.state.lastStopTime < 0 ? '-' : Format.time(i.state.lastStopTime),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 28,
+			name: 'PTL',
+			desc: 'Pit stop this lap',
+			value: i => i.state?.stopThisLap ? 'P' : '',
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 29,
+			name: 'LPEET',
+			desc: 'Last pit stop end elasped time',
+			value: i => typeof i.state === 'undefined' || i.state.lastExitTime < 0 ? '-' : Format.time(i.state.lastExitTime),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 30,
+			name: 'GTL',
+			desc: 'Garage this lap',
+			value: i => i.state?.garageThisLap ? 'G' : '',
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 31,
+			name: 'LSL',
+			desc: 'Last swap lap',
+			value: i => typeof i.state === 'undefined' || i.state.lastSwapLap < 0 ? '-' : i.state.lastSwapLap.toString(),
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 32,
+			name: 'LSET',
+			desc: 'Last swap elasped time',
+			value: i => typeof i.state === 'undefined' || i.state.lastSwapTime < 0 ? '-' : Format.time(i.state.lastSwapTime),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 33,
+			name: 'STL',
+			desc: 'Swap this lap',
+			value: i => i.state?.swapThisLap ? 'S' : '',
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 34,
+			name: 'SL',
+			desc: 'Swap location',
+			value: i => typeof i.state === 'undefined' || i.state.swapLocation < 0 ? '-' : i.state.swapLocation.toString(),
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 35,
+			name: 'SP',
+			desc: 'Started lap in pit',
+			value: i => i.state?.startedLapInPit ? 'P' : '',
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 36,
+			name: 'TPen',
+			desc: 'Total penalty count',
+			value: i => i.state?.totalPenalties.toString(),
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 37,
+			name: 'TTrp',
+			desc: 'Total trip through pit lane count',
+			value: i => i.state?.totalPits.toString(),
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 38,
+			name: 'TPit',
+			desc: 'Total pit stop count',
+			value: i => i.state?.totalStops.toString(),
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 39,
+			name: 'LLET',
+			desc: 'Last lap elasped time',
+			value: i => typeof i.standing === 'undefined' || i.standing.lapStartET < 0 ? '-' : Format.time(i.standing.lapStartET),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 40,
+			name: 'Lap%',
+			desc: 'Current lap progress (%)',
+			value: i => Format.distance(i.standing?.lapDistance ?? 0, i.session?.session?.lapDistance ?? 0),
+			classes: i => `lap-prog-${Format.lapProgress(i.standing?.lapDistance ?? 0, i.session?.session?.lapDistance ?? 0)}`,
+			align: 'center'
+		},
+		{
+			id: 41,
+			name: 'SS',
+			desc: 'Server scored',
+			value: i => i.standing?.serverScored ? '' : 'N',
+			align: 'center'
+		},
+		{
+			id: 42,
+			name: 'Y',
+			desc: 'Under yellow',
+			value: i => i.standing?.underYellow ? 'Y' : '',
+			align: 'center'
+		},
+		{
+			id: 43,
+			name: 'VEH',
+			desc: 'VEH file',
+			value: i => i.car?.veh
+		}
+	];
+	private idMap = new Map<number, TimingField>();
+	private nameMap = new Map<string, TimingField>();
+
+	constructor() {
+		for (let field of this.fields) {
+			this.idMap.set(field.id, field);
+			this.nameMap.set(field.name, field);
+		}
+	}
+
+	byId(id: number) {
+		return this.idMap.get(id);
+	}
+
+	byName(name: string) {
+		return this.nameMap.get(name);
+	}
+}
+
+export class TimingCarInfo {
+	id?: string;
+	session?: SessionViewModel;
+	car?: Car;
+	state?: CarState;
+	standing?: Standing;
+	carClass: string = '';
+	lastClasses: BestClasses = this.defaultBestClasses();
+	bestClasses: BestClasses = this.defaultBestClasses();
+	positionInClass: number = 0;
+	lastStop?: Pit;
+	lastSwap?: Pit;
+	isRace: boolean = false;
+
+	private defaultBestClasses() {
+		return { total: null, sector1: null, sector2: null, sector3: null } as BestClasses;
+	}
+
+	set(timingService: TimingService) {
+		this.session = timingService.session ?? undefined;
+		this.isRace = timingService.isRace;
+		this.lastStop = undefined;
+		this.lastSwap = undefined;
+		if (this.id) {
+			this.car = timingService.entries.get(this.id);
+			this.state = timingService.carState.get(this.id);
+			if (this.car) {
+				this.standing = this.session?.standings?.find(x => CarKey.fromStanding(x).id == this.id);
+				this.carClass = (this.car && this.car.class ? this.car.class : this.standing?.carClass) ?? '';
+				if (this.standing) {
+					this.lastClasses = timingService.getLastClasses(this.standing, this.carClass);
+					this.bestClasses = timingService.getBestClasses(this.standing, this.carClass);
+					this.positionInClass = timingService.positionInClass.get(this.id) ?? 0;
+				} else {
+					this.standing = undefined;
+					this.lastClasses = this.defaultBestClasses();
+					this.bestClasses = this.defaultBestClasses();
+				}
+				let pits = this.session?.history?.find(x => x.key == this.id)?.pits;
+				if (pits) {
+					for (let pit of pits) {
+						if (pit.stopTime >= 0)
+							this.lastStop = pit;
+						if (pit.swapTime >= 0)
+							this.lastSwap = pit;
+					}
+				}
+			} else {
+				this.car = undefined;
+				this.state = undefined;
+				this.standing = undefined;
+				this.carClass = '';
+				this.lastClasses = this.defaultBestClasses();
+				this.bestClasses = this.defaultBestClasses();
+			}
+		} else {
+			this.car = undefined;
+			this.state = undefined;
+			this.standing = undefined;
+			this.carClass = '';
+			this.lastClasses = this.defaultBestClasses();
+			this.bestClasses = this.defaultBestClasses();
+		}
 	}
 }
