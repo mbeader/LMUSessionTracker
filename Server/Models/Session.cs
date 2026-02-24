@@ -39,6 +39,8 @@ namespace LMUSessionTracker.Server.Models {
 		[JsonIgnore]
 		public ICollection<Lap> Laps { get; } = new List<Lap>();
 		[JsonIgnore]
+		public ICollection<Pit> Pits { get; } = new List<Pit>();
+		[JsonIgnore]
 		public ICollection<Entry> Entries { get; } = new List<Entry>();
 		[JsonIgnore]
 		public ICollection<Member> Members { get; } = new List<Member>();
@@ -80,7 +82,10 @@ namespace LMUSessionTracker.Server.Models {
 					List<Core.Tracking.Lap> laps = new List<Core.Tracking.Lap>();
 					foreach(Lap lap in car.Laps)
 						laps.Add(lap.To());
-					carHistories.Add(new Core.Tracking.CarHistory(key, car.To(), laps));
+					List<Core.Tracking.Pit> pits = new List<Core.Tracking.Pit>();
+					foreach(Pit pit in car.Pits)
+						pits.Add(pit.To());
+					carHistories.Add(new Core.Tracking.CarHistory(key, car.To(), laps, pits));
 					if(car.LastState != null)
 						carStates.Add(car.LastState.To(key));
 				}

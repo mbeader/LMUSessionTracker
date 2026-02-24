@@ -38,6 +38,7 @@ namespace LMUSessionTracker.Server.Models {
 		public bool SwapThisLap { get; set; }
 		public int SwapLocation { get; set; }
 		public bool StartedLapInPit { get; set; }
+		public bool PenaltyThisLap { get; set; }
 		public int TotalPenalties { get; set; }
 		public int TotalPits { get; set; }
 		public int TotalStops { get; set; }
@@ -74,6 +75,7 @@ namespace LMUSessionTracker.Server.Models {
 			SwapThisLap = state.SwapThisLap;
 			SwapLocation = state.SwapLocation;
 			StartedLapInPit = state.StartedLapInPit;
+			PenaltyThisLap = state.PenaltyThisLap;
 			TotalPenalties = state.TotalPenalties;
 			TotalPits = state.TotalPits;
 			TotalStops = state.TotalStops;
@@ -107,6 +109,7 @@ namespace LMUSessionTracker.Server.Models {
 				SwapThisLap = SwapThisLap,
 				SwapLocation = SwapLocation,
 				StartedLapInPit = StartedLapInPit,
+				PenaltyThisLap = PenaltyThisLap,
 				TotalPenalties = TotalPenalties,
 				TotalPits = TotalPits,
 				TotalStops = TotalStops,

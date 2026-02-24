@@ -19,7 +19,8 @@ export interface CarHistory {
 	key: string;
 	car: Car;
 	laps: Array<Lap | null>;
-	lapsCompleted: number;
+	lapsCompleted: number
+	pits: Array<Pit>;
 }
 
 //export interface CarKey {
@@ -118,6 +119,8 @@ export interface Lap {
 	driver: string;
 	isValid: boolean;
 	position: number;
+	penalty: boolean;
+	garage: boolean;
 	pit: boolean;
 	fuel: number;
 	virtualEnergy: number;
@@ -137,6 +140,38 @@ export interface Member {
 	isDriver: boolean;
 	isEngineer: boolean;
 	isAdmin: boolean;
+}
+
+export interface Pit {
+	lap: number;
+	pitTime: number;
+	stopTime: number;
+	exitTime: number;
+	swapTime: number;
+	stopAfterLine: boolean;
+	swap: boolean;
+	swapLocation: number;
+	penalty: boolean;
+	fuel: number;
+	virtualEnergy: number;
+	lfChanged: boolean;
+	lfCompound: string | null;
+	lfNew: boolean;
+	lfUsage: number;
+	rfChanged: boolean;
+	rfCompound: string | null;
+	rfNew: boolean;
+	rfUsage: number;
+	lrChanged: boolean;
+	lrCompound: string | null;
+	lrNew: boolean;
+	lrUsage: number;
+	rrChanged: boolean;
+	rrCompound: string | null;
+	rrNew: boolean;
+	rrUsage: number;
+	previousStnumberDuration: number;
+	time: number;
 }
 
 export interface SessionSummary {

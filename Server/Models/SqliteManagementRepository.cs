@@ -81,13 +81,15 @@ namespace LMUSessionTracker.Server.Models {
 			using(var transaction = await context.Database.BeginTransactionAsync()) {
 				Dictionary<CarKey, Car> dbCars = new Dictionary<CarKey, Car>();
 				Dictionary<CarKey, Dictionary<int, Lap>> allDbLaps = new Dictionary<CarKey, Dictionary<int, Lap>>();
-				foreach(Car dbCar in await context.Cars.Include(x => x.Laps).Where(x => x.SessionId == sessionId).ToListAsync()) {
+				Dictionary<CarKey, List<Pit>> allDbPits = new Dictionary<CarKey, List<Pit>>();
+				foreach(Car dbCar in await context.Cars.Include(x => x.Laps).Include(x => x.Pits).Where(x => x.SessionId == sessionId).ToListAsync()) {
 					CarKey key = new CarKey() { SlotId = dbCar.SlotId, Veh = dbCar.Veh };
 					dbCars.Add(key, dbCar);
 					Dictionary<int, Lap> dbLaps = new Dictionary<int, Lap>();
 					allDbLaps.Add(key, dbLaps);
 					foreach(Lap dbLap in dbCar.Laps)
 						dbLaps.Add(dbLap.LapNumber, dbLap);
+					allDbPits.Add(key, new List<Pit>(dbCar.Pits.OrderBy(x => x.PitTime)));
 				}
 				int c = 0;
 				foreach(CarHistory car in cars) {
@@ -111,6 +113,20 @@ namespace LMUSessionTracker.Server.Models {
 							dbCar.Laps.Add(dbLap);
 						}
 						dbLap.From(lap);
+					}
+					if(!allDbPits.TryGetValue(car.Key, out List<Pit> dbPits)) {
+						dbPits = new List<Pit>();
+						allDbPits.Add(car.Key, dbPits);
+					}
+					for(int i = 0; i < car.Pits.Count; i++) {
+						Pit dbPit;
+						if(i < dbPits.Count)
+							dbPit = dbPits[i];
+						else {
+							dbPit = new Pit();
+							dbCar.Pits.Add(dbPit);
+						}
+						dbPit.From(car.Pits[i]);
 					}
 				}
 				if(c > 0)
@@ -190,6 +206,8 @@ namespace LMUSessionTracker.Server.Models {
 				.Include(x => x.LastState)
 				.Include(x => x.Cars)
 				.ThenInclude(x => x.Laps)
+				.Include(x => x.Cars)
+				.ThenInclude(x => x.Pits)
 				.Include(x => x.Cars)
 				.ThenInclude(x => x.LastState)
 				.Include(x => x.Entries)

@@ -149,12 +149,12 @@ namespace LMUSessionTracker.Core.Tracking {
 					foreach(Standing standing in standings)
 						standing.slotID += minSlot;
 				}
+				carStateChanges = CarState.Update(info.currentEventTime, standings);
 				List<CarLap> laps = History.Update(CarState, standings, timestamp);
 				foreach(CarLap lap in laps) {
 					if(Bests.Update(lap))
 						bestsChanged = true;
 				}
-				carStateChanges = CarState.Update(info.currentEventTime, standings);
 			}
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);

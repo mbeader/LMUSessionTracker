@@ -11,6 +11,8 @@ namespace LMUSessionTracker.Core.Tracking {
 		public string Driver { get; set; }
 		public bool IsValid => TotalTime != -1.0;
 		public int Position { get; set; }
+		public bool Penalty { get; set; }
+		public bool Garage { get; set; }
 		public bool Pit { get; set; }
 		public double Fuel { get; set; }
 		public double VirtualEnergy { get; set; }
@@ -35,7 +37,35 @@ namespace LMUSessionTracker.Core.Tracking {
 			Fuel = standing.fuelFraction;
 			FinishStatus = standing.finishStatus;
 			StartTime = state?.LapStartET ?? -1;
+			Penalty = state?.PenaltyThisLap ?? false;
+			Garage = state?.GarageThisLap ?? false;
+			Pit = state?.PitThisLap ?? false;
 		}
+
+		public Lap Clone() {
+			return new Lap() {
+				LapNumber = LapNumber,
+				TotalTime = TotalTime,
+				Sector1 = Sector1,
+				Sector2 = Sector2,
+				Sector3 = Sector3,
+				Driver = Driver,
+				Position = Position,
+				Penalty = Penalty,
+				Garage = Garage,
+				Pit = Pit,
+				Fuel = Fuel,
+				VirtualEnergy = VirtualEnergy,
+				LFTire = LFTire,
+				RFTire = RFTire,
+				LRTire = LRTire,
+				RRTire = RRTire,
+				FinishStatus = FinishStatus,
+				StartTime = StartTime,
+				Timestamp = Timestamp,
+			};
+		}
+
 		public static Lap Default(int lap) {
 			return new Lap() { LapNumber = lap, TotalTime = -1.0, Sector1 = -1.0, Sector2 = -1.0, Sector3 = -1.0, StartTime = -1.0 };
 		}

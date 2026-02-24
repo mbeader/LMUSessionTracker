@@ -22,11 +22,18 @@
     <dd class="col-lg-3 col-10 text-truncate">{{ model.car.car.id }}</dd>
 </dl>
 
+<div class="d-flex">
+    <h3 class="flex-grow-1">Laps</h3>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pitModal">Pit summary</button>
+</div>
 <table class="table table-sm table-striped table-hover">
     <thead>
         <tr>
             <th>Start ET</th>
             <th>Lap</th>
+            <th title="Pit">P</th>
+            <th title="Garage">G</th>
+            <th title="Penalty">!</th>
             <th>Driver</th>
             <th class="text-end">Time</th>
             <th class="text-end">S1</th>
@@ -42,6 +49,9 @@
         <tr>
             <td>{{ lap.startTime <= 0 ? '-' : Format.time(lap.startTime) }}</td>
             <td>{{ lap.lapNumber }}</td>
+            <td>{{ lap.pit ? 'P' : '' }}</td>
+            <td>{{ lap.garage ? 'G' : '' }}</td>
+            <td>{{ lap.penalty ? '!' : '' }}</td>
             <td>{{ lap.driver }}</td>
             <td class="text-end {{ bestClasses.total }}">{{ Format.lapTime(lap.totalTime) }}</td>
             <td class="text-end {{ bestClasses.sector1 }}">{{ Format.lapTime(lap.sector1) }}</td>
@@ -52,4 +62,68 @@
         }
     </tbody>
 </table>
+
+<div class="modal fade" id="pitModal" tabindex="-1" aria-labelledby="pitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="pitModalLabel">Pit summary</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-4 order-1">Total pits</dt>
+                    <dd class="col-4 order-2">{{ model.car.pits.length }}</dd>
+                    <dt class="col-4 order-1">Total stops</dt>
+                    <dd class="col-4 order-2">{{ getTotalStops() }}</dd>
+                    <dt class="col-4 order-1">Total swaps</dt>
+                    <dd class="col-4 order-2">{{ getTotalSwaps() }}</dd>
+                    <dt class="col-12 order-2">Total time stopped</dt>
+                    <dd class="col-12 order-2">{{ Format.time(getTotalTimeStopped()) }}</dd>
+                </dl>
+                <table class="table table-sm table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Lap</th>
+                            <th>Entry ET</th>
+                            <th>Stop ET</th>
+                            <th>Swap ET</th>
+                            <th>Exit ET</th>
+                            <th class="text-end">Time</th>
+                            <th class="text-center" title="Box after S/F line">BAL</th>
+                            <th class="text-center" title="Swap locations">SL</th>
+                            <th class="text-center" title="Penalty">Pen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for(pit of model.car.pits; track i; let i = $index) {
+                        @let pitNum = getPitNumber(i);
+                        <tr>
+                            <td>{{ pitNum <= 0 ? '-' : pitNum }}</td>
+                            <td>{{ pit.lap }}</td>
+                            <td>{{ pit.pitTime <= 0 ? '-' : Format.time(pit.pitTime) }}</td>
+                            <td>{{ pit.stopTime <= 0 ? '-' : Format.time(pit.stopTime) }}</td>
+                            <td>{{ pit.swapTime <= 0 ? '-' : Format.time(pit.swapTime) }}</td>
+                            <td>{{ pit.exitTime <= 0 ? '-' : Format.time(pit.exitTime) }}</td>
+                            <td class="text-end">{{ pit.stopTime <= 0 || pit.exitTime <= 0 ? '-' : Format.lapTime(pit.exitTime - pit.stopTime) }}</td>
+                            <td class="text-center">{{ pit.stopAfterLine ? 'True' : '' }}</td>
+                            <td class="text-center">{{ pit.swapLocation < 0 ? '' : pit.swapLocation == 0 ? 'Gar' : `S${pit.swapLocation}` }}</td>
+                            <td class="text-center">{{ pit.penalty ? 'True' : '' }}</td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="10" class="text-center">No pit stops have been made</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 }

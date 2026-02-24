@@ -70,6 +70,10 @@ namespace LMUSessionTracker.Core.Tracking {
 		/// </summary>
 		public bool StartedLapInPit { get; set; } = false;
 		/// <summary>
+		/// Whether a penalty was given this lap (Penalties increased)
+		/// </summary>
+		public bool PenaltyThisLap { get; set; } = false;
+		/// <summary>
 		/// Total penalties accrued in session (Penalties is penalties waiting to be served)
 		/// </summary>
 		public int TotalPenalties { get; set; }
@@ -109,6 +113,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				newState.SwapThisLap = SwapThisLap;
 				newState.SwapLocation = SwapLocation;
 				newState.StartedLapInPit = StartedLapInPit;
+				newState.PenaltyThisLap = PenaltyThisLap;
 
 				if((!newState.StartedLapInPit || PitState != "ENTERING") && !newState.PitThisLap && newState.PitState == "ENTERING") {
 					newState.LastPitLap = newState.LapsCompleted + 1;
@@ -126,13 +131,19 @@ namespace LMUSessionTracker.Core.Tracking {
 				newState.LastStopTime = currentET;
 				newState.StopThisLap = true;
 				newState.TotalStops++;
+				newState.LastExitTime = -1;
 			} else if(StopThisLap && PitState == "STOPPED" && newState.PitState != "STOPPED" && newState.LastExitTime == -1) {
 				newState.LastExitTime = currentET;
+			} else if(StopThisLap && PitState != "STOPPED" && newState.PitState == "STOPPED" && newState.LastExitTime != -1) {
+				// PitState seems to become NONE during driver swaps
+				newState.LastExitTime = -1;
 			}
 
 			// probably will miss consecutive drive-through penalties
-			if(Penalties < newState.Penalties)
+			if(Penalties < newState.Penalties) {
 				newState.TotalPenalties++;
+				newState.PenaltyThisLap = true;
+			}
 
 			if(newState.InGarageStall)
 				newState.GarageThisLap = true;
@@ -197,10 +208,13 @@ namespace LMUSessionTracker.Core.Tracking {
 				LastStopTime = LastStopTime,
 				StopThisLap = StopThisLap,
 				LastExitTime = LastExitTime,
+				GarageThisLap = GarageThisLap,
 				LastSwapLap = LastSwapLap,
 				LastSwapTime = LastSwapTime,
 				SwapThisLap = SwapThisLap,
 				SwapLocation = SwapLocation,
+				StartedLapInPit = StartedLapInPit,
+				PenaltyThisLap = PenaltyThisLap,
 				TotalPenalties = TotalPenalties,
 				TotalPits = TotalPits,
 				TotalStops = TotalStops,
@@ -259,6 +273,8 @@ namespace LMUSessionTracker.Core.Tracking {
 				diffs.Add($"SwapLocation: [{SwapLocation} to {other.SwapLocation}]");
 			if(StartedLapInPit != other.StartedLapInPit)
 				diffs.Add($"StartedLapInPit: [{StartedLapInPit} to {other.StartedLapInPit}]");
+			if(PenaltyThisLap != other.PenaltyThisLap)
+				diffs.Add($"PenaltyThisLap: [{PenaltyThisLap} to {other.PenaltyThisLap}]");
 			if(TotalPenalties != other.TotalPenalties)
 				diffs.Add($"TotalPenalties: [{TotalPenalties} to {other.TotalPenalties}]");
 			if(TotalPits != other.TotalPits)

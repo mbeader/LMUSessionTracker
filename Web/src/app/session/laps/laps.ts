@@ -70,4 +70,53 @@ export class Laps {
 	private defaultBest() {
 		return { total: -1, sector1: -1, sector2: -1, sector3: -1 } as Best;
 	}
+
+	getPitNumber(index: number) {
+		if (this.model?.car?.pits && index >= 0 && index < this.model.car.pits.length) {
+			let stops = 0;
+			for (let i = 0; i < this.model.car.pits.length; i++) {
+				let stopped = this.model.car.pits[i].stopTime >= 0;
+				if (stopped)
+					stops++;
+				if (i == index)
+					return stopped ? stops : -1;
+			}
+		}
+		return -1;
+	}
+
+	getTotalStops() {
+		let stops = 0;
+		if (this.model?.car?.pits) {
+			for (let i = 0; i < this.model.car.pits.length; i++) {
+				let stopped = this.model.car.pits[i].stopTime >= 0;
+				if (stopped)
+					stops++;
+			}
+		}
+		return stops;
+	}
+
+	getTotalSwaps() {
+		let swaps = 0;
+		if (this.model?.car?.pits) {
+			for (let i = 0; i < this.model.car.pits.length; i++) {
+				let swapped = this.model.car.pits[i].swapTime >= 0;
+				if (swapped)
+					swaps++;
+			}
+		}
+		return swaps;
+	}
+
+	getTotalTimeStopped() {
+		let stopTime = 0;
+		if (this.model?.car?.pits) {
+			for (let i = 0; i < this.model.car.pits.length; i++) {
+				if (this.model.car.pits[i].stopTime > 0 && this.model.car.pits[i].exitTime > 0)
+					stopTime += this.model.car.pits[i].exitTime - this.model.car.pits[i].stopTime;
+			}
+		}
+		return stopTime;
+	}
 }

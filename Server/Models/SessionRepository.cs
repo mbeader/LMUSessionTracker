@@ -37,6 +37,8 @@ namespace LMUSessionTracker.Server.Models {
 				.Include(x => x.Cars)
 				.ThenInclude(x => x.Laps)
 				.Include(x => x.Cars)
+				.ThenInclude(x => x.Pits)
+				.Include(x => x.Cars)
 				.ThenInclude(x => x.LastState)
 				.Include(x => x.Entries)
 				.ThenInclude(x => x.Members)

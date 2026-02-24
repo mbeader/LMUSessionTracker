@@ -3,6 +3,7 @@ using System;
 using LMUSessionTracker.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMUSessionTracker.Server.Migrations
 {
     [DbContext(typeof(SqliteContext))]
-    partial class SqliteContextModelSnapshot : ModelSnapshot
+    [Migration("20260223012007_Pit")]
+    partial class Pit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.22");
@@ -129,11 +132,6 @@ namespace LMUSessionTracker.Server.Migrations
 
                     b.Property<int>("Penalties")
                         .HasColumnType("INTEGER");
-
-                    b.Property<bool>("PenaltyThisLap")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(false);
 
                     b.Property<string>("PitState")
                         .HasColumnType("TEXT");
@@ -399,11 +397,6 @@ namespace LMUSessionTracker.Server.Migrations
 
                     b.Property<long>("CarId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<double>("ExitTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("REAL")
-                        .HasDefaultValue(-1.0);
 
                     b.Property<double>("Fuel")
                         .ValueGeneratedOnAdd()

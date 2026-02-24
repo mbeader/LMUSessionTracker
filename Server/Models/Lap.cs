@@ -22,6 +22,8 @@ namespace LMUSessionTracker.Server.Models {
 		public double Sector3 { get; set; }
 		public bool IsValid { get; set; }
 		public int Position { get; set; }
+		public bool Penalty { get; set; }
+		public bool Garage { get; set; }
 		public bool Pit { get; set; }
 		public double Fuel { get; set; }
 		public double VirtualEnergy { get; set; }
@@ -51,6 +53,8 @@ namespace LMUSessionTracker.Server.Models {
 			Sector3 = lap.Sector3;
 			IsValid = lap.IsValid;
 			Position = lap.Position;
+			Penalty = lap.Penalty;
+			Garage = lap.Garage;
 			Pit = lap.Pit;
 			Fuel = lap.Fuel;
 			VirtualEnergy = lap.VirtualEnergy;
@@ -70,6 +74,8 @@ namespace LMUSessionTracker.Server.Models {
 				Sector3 = Sector3,
 				Driver = Driver,
 				Position = Position,
+				Penalty = Penalty,
+				Garage = Garage,
 				Pit = Pit,
 				Fuel = Fuel,
 				VirtualEnergy = VirtualEnergy,

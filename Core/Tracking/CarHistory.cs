@@ -7,14 +7,18 @@ namespace LMUSessionTracker.Core.Tracking {
 		public CarKey Key { get; private set; }
 		public Car Car { get; private set; }
 		public List<Lap> Laps { get; } = new List<Lap>();
+		public List<Pit> Pits { get; } = new List<Pit>();
 		public int LapsCompleted { get; private set; }
 
-		public CarHistory(CarKey key, Car car, List<Lap> laps = null) {
+		public CarHistory(CarKey key, Car car, List<Lap> laps = null, List<Pit> pits = null) {
 			Key = key;
 			Car = car;
 			if(laps != null) {
 				Laps.AddRange(laps);
 				LapsCompleted = Laps.Count;
+			}
+			if(pits != null) {
+				Pits.AddRange(pits);
 			}
 		}
 
@@ -37,13 +41,27 @@ namespace LMUSessionTracker.Core.Tracking {
 			return Laps[lapNumber - 1] ?? Lap.Default(lapNumber);
 		}
 
-		public Lap Update(CarState state, Standing standing, DateTime timestamp) {
+		public Lap Update(CarStateChange state, Standing standing, DateTime timestamp) {
 			Lap newLap = null;
 			if(standing.lapsCompleted > 0)
-				newLap = AddLap(new Lap(standing, state), timestamp);
+				newLap = AddLap(new Lap(standing, state.Previous), timestamp);
+			AddPit(state, newLap);
 			if(!Car.HasAllFields)
 				Car.Merge(new Car(standing));
 			return newLap;
+		}
+
+		private void AddPit(CarStateChange state, Lap newLap) {
+			bool inPit = state.Current.PitThisLap || state.Current.StartedLapInPit;
+			if(!inPit)
+				return;
+			int lap = state.Current.LapsCompleted + (state.Current.PitThisLap ? 1 : 0);
+			Pit pit = Pits.Count == 0 ? null : Pits[^1];
+			if(pit == null || pit.Lap != lap) {
+				pit = new Pit(state.Current);
+				Pits.Add(pit);
+			} else
+				pit.Merge(state.Current);
 		}
 
 		public void FixLaps() {
@@ -109,25 +127,10 @@ namespace LMUSessionTracker.Core.Tracking {
 				Id = Car.Id,
 			});
 			foreach(Lap lap in Laps) {
-				car.Laps.Add(lap == null ? null : new Lap() {
-					LapNumber = lap.LapNumber,
-					TotalTime = lap.TotalTime,
-					Sector1 = lap.Sector1,
-					Sector2 = lap.Sector2,
-					Sector3 = lap.Sector3,
-					Driver = lap.Driver,
-					Position = lap.Position,
-					Pit = lap.Pit,
-					Fuel = lap.Fuel,
-					VirtualEnergy = lap.VirtualEnergy,
-					LFTire = lap.LFTire,
-					RFTire = lap.RFTire,
-					LRTire = lap.LRTire,
-					RRTire = lap.RRTire,
-					FinishStatus = lap.FinishStatus,
-					StartTime = lap.StartTime,
-					Timestamp = lap.Timestamp,
-				});
+				car.Laps.Add(lap?.Clone());
+			}
+			foreach(Pit pit in Pits) {
+				car.Pits.Add(pit.Clone());
 			}
 			return car;
 		}

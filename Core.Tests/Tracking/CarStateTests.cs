@@ -184,14 +184,14 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 
 		[Fact]
 		public void Next_OnTrackPenalty_SetsPenalty() {
-			CarState ex = new CarState(key, BasicStanding(s => s.penalties++)) { TotalPenalties = 1 };
+			CarState ex = new CarState(key, BasicStanding(s => s.penalties++)) { TotalPenalties = 1, PenaltyThisLap = true };
 			AssertCarState(ex, new List<Standing>() { BasicStanding(), BasicStanding(s => s.penalties++) });
 		}
 
 		[Fact]
 		public void Next_OnTrackPenaltyServed_KeepsPenalty() {
-			CarState ex = new CarState(key, BasicStanding()) { TotalPenalties = 1 };
-			AssertCarState(ex, new List<Standing>() { BasicStanding(), BasicStanding(s => s.penalties++), BasicStanding() });
+			CarState ex = new CarState(key, BasicStanding(s => s.lapsCompleted++)) { TotalPenalties = 1 };
+			AssertCarState(ex, new List<Standing>() { BasicStanding(), BasicStanding(s => s.penalties++), BasicStanding(s => s.lapsCompleted++) });
 		}
 
 		[Fact]
@@ -256,6 +256,21 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 				EnteringStanding(),
 				ExitingStanding(s => s.driverName = "driver2"),
 				BasicStanding(s => s.driverName = "driver2")
+			});
+		}
+
+		[Fact]
+		public void Next_PitStateNoneDuringDriverSwap_SetsStatus() {
+			CarState ex = new CarState(key, ExitingStanding(s => { s.timeIntoLap = 70; s.driverName = "driver2"; })) {
+				LastStopLap = 2, LastStopTime = 160, StopThisLap = true, LastExitTime = 163, LastSwapLap = 2, LastSwapTime = 162, SwapThisLap = true, SwapLocation = 3, TotalStops = 1
+			};
+			AssertCarState(ex, new List<Standing>() {
+				EnteringStanding(s => s.timeIntoLap = 50),
+				StoppedStanding(s => s.timeIntoLap = 60),
+				StoppedStanding(s => { s.timeIntoLap = 61; s.pitState = "NONE"; }),
+				StoppedStanding(s => { s.timeIntoLap = 62; s.pitState = "STOPPED"; s.driverName = "driver2"; }),
+				ExitingStanding(s => { s.timeIntoLap = 63; s.driverName = "driver2"; }),
+				ExitingStanding(s => { s.timeIntoLap = 70; s.driverName = "driver2"; })
 			});
 		}
 	}

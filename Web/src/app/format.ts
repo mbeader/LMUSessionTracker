@@ -18,6 +18,8 @@ export class Format {
 	static time(time: number | null) {
 		if (time == null)
 			return '';
+		else if (time < 0)
+			return '--:--:--';
 		time = Math.round(time);
 		let hours = Math.floor(time / (60 * 60));
 		let minutes = Math.floor((time - hours * 60 * 60) / 60);

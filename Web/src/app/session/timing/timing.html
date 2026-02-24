@@ -94,7 +94,7 @@
             <tr>
                 @let status = Format.status(standing);
                 @let statusClass = status == 'Run' ? 'link-success' : status == 'Req' ? 'link-info' : status == 'Out' ? 'link-warning' : status == 'In' || status == 'Pit' ? 'link-danger' : 'link-secondary';
-                <td class="text-center"><a class="{{ statusClass }}" [routerLink]="['Laps', `${id}`]">{{ status }}</a></td>
+                <td class="text-center"><a class="{{ statusClass }}" [routerLink]="['../', 'Laps', `${id}`]">{{ status }}</a></td>
                 @let classId = Utils.classId(carClass);
                 <td class="text-center {{ positionInClass.get(id ?? '') == 1 ? `pic-${classId}` : null }}">{{ standing.position }}</td>
                 <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>

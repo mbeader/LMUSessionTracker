@@ -11,6 +11,7 @@ namespace LMUSessionTracker.Server {
 		public DbSet<Car> Cars { get; set; }
 		public DbSet<CarState> CarStates { get; set; }
 		public DbSet<Lap> Laps { get; set; }
+		public DbSet<Pit> Pits { get; set; }
 		public DbSet<Entry> Entries { get; set; }
 		public DbSet<Member> Members { get; set; }
 		public DbSet<Chat> Chats { get; set; }
@@ -52,6 +53,11 @@ namespace LMUSessionTracker.Server {
 				.WithMany(x => x.Laps)
 				.HasForeignKey(x => new { x.SessionId, x.CarId })
 				.HasPrincipalKey(x => new { x.SessionId, x.CarId });
+			modelBuilder.Entity<Pit>()
+				.HasOne(x => x.Car)
+				.WithMany(x => x.Pits)
+				.HasForeignKey(x => new { x.SessionId, x.CarId })
+				.HasPrincipalKey(x => new { x.SessionId, x.CarId });
 
 			modelBuilder.Entity<CarState>().Property(x => x.LastPitLap).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.LastPitTime).HasDefaultValue(-1);
@@ -66,6 +72,20 @@ namespace LMUSessionTracker.Server {
 			modelBuilder.Entity<CarState>().Property(x => x.SwapThisLap).HasDefaultValue(false);
 			modelBuilder.Entity<CarState>().Property(x => x.SwapLocation).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.StartedLapInPit).HasDefaultValue(false);
+			modelBuilder.Entity<CarState>().Property(x => x.PenaltyThisLap).HasDefaultValue(false);
+			modelBuilder.Entity<Pit>().Property(x => x.PitTime).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.StopTime).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.ExitTime).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.SwapTime).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.SwapLocation).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.Fuel).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.VirtualEnergy).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.LFUsage).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.RFUsage).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.LRUsage).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.RRUsage).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.PreviousStintDuration).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.Time).HasDefaultValue(-1);
 
 			var vehicleData = VehicleSeedData.GetData();
 			modelBuilder.Entity<VehicleModel>()

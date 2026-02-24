@@ -29,6 +29,8 @@ namespace LMUSessionTracker.Server.Models {
 		public Session Session { get; set; }
 		[JsonIgnore]
 		public ICollection<Lap> Laps { get; } = new List<Lap>();
+		[JsonIgnore]
+		public ICollection<Pit> Pits { get; } = new List<Pit>();
 
 		public void From(Core.Tracking.Car car) {
 			if(Veh != null && (SlotId != car.SlotId || Veh != car.Veh))
