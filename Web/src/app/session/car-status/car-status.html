@@ -1,0 +1,116 @@
+@if(id) {
+<dl class="row">
+    @if(car) {
+    <dt class="col-3">Slot ID</dt>
+    <dd class="col-9">{{ car.slotId }}</dd>
+    <dt class="col-3">Veh</dt>
+    <dd class="col-9">{{ car.veh }}</dd>
+    <dt class="col-3">Number</dt>
+    <dd class="col-9">{{ car.number }}</dd>
+    <dt class="col-3">Team</dt>
+    <dd class="col-9">{{ car.teamName }}</dd>
+    <dt class="col-3">Vehicle</dt>
+    <dd class="col-9">{{ car.vehicleName }}</dd>
+    }
+    <dt class="col-3">Class</dt>
+    <dd class="col-9"><app-session-class-badge [carClass]="carClass" /></dd>
+    @if(standing) {
+    <dt class="col-3">Driver</dt>
+    <dd class="col-9">{{ standing.driverName }}</dd>
+    @let status = Format.status(standing);
+    @let statusClass = status == 'Run' ? 'link-success' : status == 'Req' ? 'link-info' : status == 'Out' ? 'link-warning' : status == 'In' || status == 'Pit' ? 'link-danger' : 'link-secondary';
+    <dt class="col-3">Status</dt>
+    <dd class="col-9 {{ statusClass }}">{{ status }}</dd>
+    <dt class="col-3">Position</dt>
+    <dd class="col-9">{{ standing.position }}</dd>
+    <dt class="col-3">PIC</dt>
+    <dd class="col-9">{{ positionInClass }}</dd>
+    <dt class="col-3">Start</dt>
+    <dd class="col-9">{{ standing.qualification }}</dd>
+    <dt class="col-3">Laps</dt>
+    <dd class="col-9">{{ standing.lapsCompleted }}</dd>
+    <dt class="col-3">Behind</dt>
+    <dd class="col-9">{{ standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindLeader, standing.timeBehindLeader) }}</dd>
+    <dt class="col-3">Int</dt>
+    <dd class="col-9">{{ standing.timeBehindLeader <= 0 ? '-' : Format.diff(standing.lapsBehindNext, standing.timeBehindNext) }}</dd>
+    <dt class="col-3">Curr</dt>
+    <dd class="col-9">{{ Format.lapTime(standing.timeIntoLap) }}</dd>
+    <dt class="col-3">Best</dt>
+    <dd class="col-9 {{ bestClasses.total }}">{{ Format.lapTime(standing.bestLapTime) }}</dd>
+    <dt class="col-3">Last</dt>
+    <dd class="col-9 {{ lastClasses.total }}">{{ Format.lapTime(standing.lastLapTime) }}</dd>
+    <dt class="col-3">S1</dt>
+    <dd class="col-9 {{ lastClasses.sector1 }}">{{ Format.sectorTime(0.0, standing.sector == "SECTOR1" ? standing.lastSectorTime1 : standing.currentSectorTime1) }}</dd>
+    <dt class="col-3">S2</dt>
+    <dd class="col-9 {{ lastClasses.sector2 }}">{{ standing.sector == "SECTOR2" ? '&nbsp;' : standing.sector == "SECTOR1" ? Format.sectorTime(standing.lastSectorTime1, standing.lastSectorTime2) : Format.sectorTime(standing.currentSectorTime1, standing.currentSectorTime2) }}</dd>
+    <dt class="col-3">S3</dt>
+    <dd class="col-9 {{ lastClasses.sector3 }}">{{ standing.sector != "SECTOR1" ? '&nbsp;' : Format.sectorTime(standing.lastSectorTime2, standing.lastLapTime) }}</dd>
+    @let fuelClass = standing.fuelFraction > .1 ? '' : standing.fuelFraction > .05 ? 'text-warning' : 'text-danger';
+    <dt class="col-3">Speed</dt>
+    <dd class="col-9">{{ Format.speed(standing.carVelocity.velocity) }}</dd>
+    <dt class="col-3">Fuel</dt>
+    <dd class="col-9 {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</dd>
+    <dt class="col-3">Pit</dt>
+    <dd class="col-9">{{ standing.pitstops }}</dd>
+    <dt class="col-3">Pen</dt>
+    <dd class="col-9">{{ standing.penalties }}</dd>
+    }
+    @if(state) {
+    @let currentET = session?.info?.currentEventTime ?? 0;
+    @if(standing) {
+    <dt class="col-3">LSP</dt>
+    <dd class="col-9">{{ !lastStop ? standing.lapsCompleted : lastStop.lap > standing.lapsCompleted ? 0 : standing.lapsCompleted - lastStop.lap }}</dd>
+    <dt class="col-3">SLP</dt>
+    <dd class="col-9">{{ Format.time(!lastStop ? currentET : currentET - lastStop.pitTime) }}</dd>
+    <dt class="col-3">LSS</dt>
+    <dd class="col-9">{{ !lastSwap ? standing.lapsCompleted : lastSwap.lap > standing.lapsCompleted ? 0 : standing.lapsCompleted - lastSwap.lap }}</dd>
+    <dt class="col-3">SLS</dt>
+    <dd class="col-9">{{ Format.time(!lastSwap ? currentET : currentET - lastSwap.pitTime) }}</dd>
+    }
+    <dt class="col-3">LTL</dt>
+    <dd class="col-9">{{ state.lastPitLap < 0 ? '-' : state.lastPitLap }}</dd>
+    <dt class="col-3">LTET</dt>
+    <dd class="col-9">{{ state.lastPitTime < 0 ? '-' : Format.time(state.lastPitTime) }}</dd>
+    <dt class="col-3">TTL</dt>
+    <dd class="col-9">{{ state.pitThisLap ? 'P' : '&nbsp;' }}</dd>
+    <dt class="col-3">LPL</dt>
+    <dd class="col-9">{{ state.lastStopLap < 0 ? '-' : state.lastStopLap }}</dd>
+    <dt class="col-3">LPET</dt>
+    <dd class="col-9">{{ state.lastStopTime < 0 ? '-' : Format.time(state.lastStopTime) }}</dd>
+    <dt class="col-3">PTL</dt>
+    <dd class="col-9">{{ state.stopThisLap ? 'P' : '&nbsp;' }}</dd>
+    <dt class="col-3">LPEET</dt>
+    <dd class="col-9">{{ state.lastExitTime < 0 ? '-' : Format.time(state.lastExitTime) }}</dd>
+    <dt class="col-3">GTL</dt>
+    <dd class="col-9">{{ state.garageThisLap ? 'G' : '&nbsp;' }}</dd>
+    <dt class="col-3">LSL</dt>
+    <dd class="col-9">{{ state.lastSwapLap < 0 ? '-' : state.lastSwapLap }}</dd>
+    <dt class="col-3">LSET</dt>
+    <dd class="col-9">{{ state.lastSwapTime < 0 ? '-' : Format.time(state.lastSwapTime) }}</dd>
+    <dt class="col-3">STL</dt>
+    <dd class="col-9">{{ state.swapThisLap ? 'S' : '&nbsp;' }}</dd>
+    <dt class="col-3">SL</dt>
+    <dd class="col-9">{{ state.swapLocation < 0 ? '-' : state.swapLocation }}</dd>
+    <dt class="col-3">SP</dt>
+    <dd class="col-9">{{ state.startedLapInPit ? 'P' : '&nbsp;' }}</dd>
+    <dt class="col-3">TPen</dt>
+    <dd class="col-9">{{ state.totalPenalties }}</dd>
+    <dt class="col-3">TTrp</dt>
+    <dd class="col-9">{{ state.totalPits }}</dd>
+    <dt class="col-3">TPit</dt>
+    <dd class="col-9">{{ state.totalStops }}</dd>
+    }
+    @if(standing) {
+    <dt class="col-3">LLET</dt>
+    <dd class="col-9">{{ standing.lapStartET < 0 ? '-' : Format.time(standing.lapStartET) }}</dd>
+    <dt class="col-3">Lap%</dt>
+    <dd class="col-9"><span class="border bg-secondary-subtle" title="{{ Format.distance(standing.lapDistance, session?.session?.lapDistance ?? -1) }}"><span class="lap-prog-{{ Format.lapProgress(standing.lapDistance, session?.session?.lapDistance ?? -1) }}"></span></span></dd>
+    <dt class="col-3">SS</dt>
+    <dd class="col-9">{{ standing.serverScored ? '&nbsp;' : 'N' }}</dd>
+    <dt class="col-3">Y</dt>
+    <dd class="col-9">{{ standing.underYellow ? 'Y' : '&nbsp;' }}</dd>
+    }
+</dl>
+} @else {
+<div class="text-center">Invalid car ID</div>
+}

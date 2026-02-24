@@ -6,6 +6,7 @@ import { Standing } from '../lmu';
 export type NullabeString = string | null;
 export type BestClasses = { total: NullabeString, sector1: NullabeString, sector2: NullabeString, sector3: NullabeString };
 export type BestMap = { [key: string]: Best };
+export type CarStatusDescription = { carClass: string, number: string, team: string };
 
 @Injectable()
 export class TimingService {
@@ -145,5 +146,17 @@ export class TimingService {
 			bestClasses.total = total <= 0 ? null : total <= classBest.total ? 'best-class' : null;
 		}
 		return bestClasses;
+	}
+
+	getCarDescription(id: string) {
+		let car = this.entries.get(id);
+		if (!car)
+			return;
+		let standing = this.session?.standings?.find(x => CarKey.fromStanding(x).id == id);
+		let driver = standing?.driverName ?? '';
+		let carClass = (car && car.class ? car.class : standing?.carClass) ?? '';
+		let number = car?.number ? car.number : standing?.carNumber ?? '?';
+		let team = car?.teamName ? car.teamName : (!standing?.fullTeamName ? standing?.vehicleName : standing?.fullTeamName) ?? driver;
+		return { carClass: carClass, number: number, team: team } as CarStatusDescription;
 	}
 }

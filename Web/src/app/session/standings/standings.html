@@ -24,6 +24,7 @@
             <th scope="col" class="text-end time-col">S3</th>
             <th scope="col" class="text-end time-col">Fuel</th>
             <th scope="col" class="text-center">Lap%</th>
+            <th scope="col" class="text-center"></th>
         </tr>
     </thead>
     <tbody>
@@ -33,7 +34,7 @@
         @let carClass = (car && car.class ? car.class : standing.carClass) ?? '';
         @let bestClasses = getLastClasses(standing, carClass);
         @if(car) {
-        <tr>
+        <tr [attr.car-id]="id">
             @let status = Format.status(standing);
             @let statusClass = status == 'Run' ? 'link-success' : status == 'Req' ? 'link-info' : status == 'Out' ? 'link-warning' : status == 'In' || status == 'Pit' ? 'link-danger' : 'link-secondary';
             <td class="text-center"><a class="{{ statusClass }}" [routerLink]="['Laps', `${id}`]">{{ status }}</a></td>
@@ -56,9 +57,45 @@
             @let fuelClass = standing.fuelFraction > .1 ? '' : standing.fuelFraction > .05 ? 'text-warning' : 'text-danger';
             <td class="text-end time-col {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</td>
             <td class="text-center"><span class="border bg-secondary-subtle" title="{{ Format.distance(standing.lapDistance, session.session.lapDistance) }}"><span class="lap-prog-{{ Format.lapProgress(standing.lapDistance, session.session.lapDistance) }}"></span></span></td>
+            <td class="">
+                <div class="dropdown">
+                    <button class="btn-icon ms-auto dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                        </svg>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#statusModal">View full status</button></li>
+                    </ul>
+                </div>
+            </td>
         </tr>
         }
         }
     </tbody>
 </table>
 }
+
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="statusModalLabel">
+                    Status
+                    @if(carStatusDesc) {
+                    -
+                    <span class="fs-6"><app-session-class-badge [carClass]="carStatusDesc.carClass" /></span>
+                    <span> #{{ carStatusDesc.number }} {{ carStatusDesc.team }}</span>
+                    }
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <app-session-car-status />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
