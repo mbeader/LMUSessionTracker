@@ -13,6 +13,10 @@
 	line-height: 13px;
 }
 
+.compact-timing td button {
+	font-size: calc(var(--compact-font-size) - 2px);
+}
+
 .char2-col {
 	min-width: 28px;
 }

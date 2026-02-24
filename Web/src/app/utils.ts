@@ -24,3 +24,7 @@ export function classId(carClass: string) {
 		default: return '';
 	}
 }
+
+export function statusClass(status: string) {
+	return status == 'Run' ? 'text-success' : status == 'Req' ? 'text-info' : status == 'Out' ? 'text-warning' : status == 'In' || status == 'Pit' ? 'text-danger' : 'text-secondary';
+}

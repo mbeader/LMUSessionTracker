@@ -4,7 +4,7 @@ import { ServerApiService } from '../../server-api.service';
 import { SessionViewModel } from '../../view-models';
 import { CarKey } from '../../tracking';
 import { Format } from '../../format';
-import { classId } from '../../utils';
+import { classId, statusClass } from '../../utils';
 import { Lap } from '../../models';
 import { ClassBadge } from '../class-badge/class-badge';
 
@@ -23,7 +23,7 @@ export class Results {
 	results: Lap[] = [];
 	isRace: boolean = false;
 	Format = Format;
-	Utils = { classId };
+	Utils = { classId, statusClass };
 	CarKey = CarKey;
 
 	ngOnChanges() {

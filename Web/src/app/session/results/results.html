@@ -27,6 +27,7 @@
             <th scope="col" class="text-end time-col">S2</th>
             <th scope="col" class="text-end time-col">S3</th>
             <th scope="col" class="text-end time-col">Fuel</th>
+            <th scope="col" class=""></th>
         </tr>
     </thead>
     <tbody>
@@ -37,8 +38,8 @@
         @if(car) {
         <tr>
             @let status = Format.status(lap);
-            @let statusClass = status == 'Run' ? 'link-success' : status == 'Req' ? 'link-info' : status == 'Out' ? 'link-warning' : status == 'In' || status == 'Pit' ? 'link-danger' : 'link-secondary';
-            <td class="text-center"><a class="{{ statusClass }}" [routerLink]="['Laps', `${id}`]">{{ status }}</a></td>
+            @let statusClass = Utils.statusClass(status);
+            <td class="text-center"><span class="{{ statusClass }}">{{ status }}</span></td>
             @let classId = Utils.classId(carClass);
             <td class="text-center {{ positionInClass.get(id ?? '') == 1 ? `pic-${classId}` : null }}">{{ i + 1 }}</td>
             <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
@@ -57,6 +58,18 @@
             <td class="text-end time-col">{{ Format.lapTime(lap.sector2) }}</td>
             @let fuelClass = lap.fuel > .1 ? '' : lap.fuel > .05 ? 'text-warning' : 'text-danger';
             <td class="text-end time-col {{ fuelClass }}">{{ Format.percent(lap.fuel) }}</td>
+            <td class="">
+                <div class="dropdown">
+                    <button class="btn-icon ms-auto dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                        </svg>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" [routerLink]="['Laps', `${id}`]">Laps</a></li>
+                    </ul>
+                </div>
+            </td>
         </tr>
         }
         }

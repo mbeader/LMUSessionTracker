@@ -4,6 +4,7 @@ import { SessionViewModel } from '../../view-models';
 import { Car, CarKey, CarState, Pit } from '../../tracking';
 import { Standing } from '../../lmu';
 import { Format } from '../../format';
+import { statusClass } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
 
 @Component({
@@ -28,6 +29,7 @@ export class CarStatus {
 	lastStop?: Pit;
 	lastSwap?: Pit;
 	Format = Format;
+	Utils = { statusClass };
 
 	init(timingService: TimingService) {
 		this.timingService = timingService;

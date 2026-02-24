@@ -5,7 +5,7 @@ import { SessionViewModel } from '../../view-models';
 import { CarKey } from '../../tracking';
 import { Standing } from '../../lmu';
 import { Format } from '../../format';
-import { classId, whenExists } from '../../utils';
+import { classId, statusClass, whenExists } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
 import { CarStatus } from '../car-status/car-status';
 
@@ -22,7 +22,7 @@ export class Standings {
 	@Input() session: SessionViewModel | null = null;
 	carStatusDesc?: CarStatusDescription;
 	Format = Format;
-	Utils = { classId };
+	Utils = { classId, statusClass };
 	CarKey = CarKey;
 
 	constructor() {

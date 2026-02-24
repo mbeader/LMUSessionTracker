@@ -94,8 +94,8 @@
             @if(car) {
             <tr [attr.car-id]="id">
                 @let status = Format.status(standing);
-                @let statusClass = status == 'Run' ? 'link-success' : status == 'Req' ? 'link-info' : status == 'Out' ? 'link-warning' : status == 'In' || status == 'Pit' ? 'link-danger' : 'link-secondary';
-                <td class="text-center"><a class="{{ statusClass }}" [routerLink]="['../', 'Laps', `${id}`]">{{ status }}</a></td>
+                @let statusClass = Utils.statusClass(status);
+                <td class="text-center"><span class="{{ statusClass }}">{{ status }}</span></td>
                 @let classId = Utils.classId(carClass);
                 <td class="text-center {{ positionInClass.get(id ?? '') == 1 ? `pic-${classId}` : null }}">{{ standing.position }}</td>
                 <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
@@ -171,6 +171,7 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#statusModal">View full status</button></li>
+                            <li><a class="dropdown-item" [routerLink]="['../', 'Laps', `${id}`]">Laps</a></li>
                         </ul>
                     </div>
                 </td>

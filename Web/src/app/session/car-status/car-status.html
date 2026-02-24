@@ -18,7 +18,7 @@
     <dt class="col-3">Driver</dt>
     <dd class="col-9">{{ standing.driverName }}</dd>
     @let status = Format.status(standing);
-    @let statusClass = status == 'Run' ? 'link-success' : status == 'Req' ? 'link-info' : status == 'Out' ? 'link-warning' : status == 'In' || status == 'Pit' ? 'link-danger' : 'link-secondary';
+    @let statusClass = Utils.statusClass(status);
     <dt class="col-3">Status</dt>
     <dd class="col-9 {{ statusClass }}">{{ status }}</dd>
     <dt class="col-3">Position</dt>

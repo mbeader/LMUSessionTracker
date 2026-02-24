@@ -6,7 +6,7 @@ import { Format } from '../../format';
 import { SessionViewModel } from '../../view-models';
 import { Standing } from '../../lmu';
 import { CarKey } from '../../tracking';
-import { classId, whenExists } from '../../utils';
+import { classId, statusClass, whenExists } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
 import { CarStatus } from '../car-status/car-status';
 
@@ -22,7 +22,7 @@ export class Timing {
 	private timingService = inject(TimingService);
 	private carStatus = viewChild(CarStatus);
 	carStatusDesc?: CarStatusDescription;
-	Utils = { classId };
+	Utils = { classId, statusClass };
 	CarKey = CarKey;
 	Format = Format;
 	flagClass = SessionViewModel.flagClass;
