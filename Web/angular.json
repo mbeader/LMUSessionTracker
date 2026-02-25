@@ -76,7 +76,8 @@
 					"defaultConfiguration": "development"
 				},
 				"test": {
-					"builder": "@angular/build:unit-test"
+					"builder": "@angular/build:unit-test",
+					"options": { "runnerConfig": "vitest.config.ts" }
 				}
 			}
 		}

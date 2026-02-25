@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Sessions } from './sessions';
+import { Sessions, SessionsService } from './sessions';
 import { ServerLiveService } from '../server-live.service';
 import { ServerApiService } from '../server-api.service';
 
@@ -14,6 +14,7 @@ describe('Sessions', () => {
 			providers: [
 				{ provide: ServerApiService, useValue: { getLiveSessions: vi.fn().mockReturnValueOnce({ subscribe: vi.fn() }) } },
 				{ provide: ServerLiveService, useValue: { join: vi.fn() } },
+				{ provide: SessionsService, useValue: { sessions: { subscribe: vi.fn() } } }
 			]
 		}).compileComponents();
 

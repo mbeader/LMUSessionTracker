@@ -4,6 +4,8 @@ export function whenExists<T extends Element>(selector: string, callback: (el: T
 	new Promise<T>((resolve) => {
 		let fn = (fn: any) => {
 			let el = document.querySelector<T>(selector);
+			if (!fn) // becomes undefined in tests
+				return;
 			if (!el)
 				setTimeout(fn, 100);
 			else
