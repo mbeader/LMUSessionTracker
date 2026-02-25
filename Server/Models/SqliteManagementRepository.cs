@@ -82,7 +82,7 @@ namespace LMUSessionTracker.Server.Models {
 				Dictionary<CarKey, Car> dbCars = new Dictionary<CarKey, Car>();
 				Dictionary<CarKey, Dictionary<int, Lap>> allDbLaps = new Dictionary<CarKey, Dictionary<int, Lap>>();
 				Dictionary<CarKey, List<Pit>> allDbPits = new Dictionary<CarKey, List<Pit>>();
-				foreach(Car dbCar in await context.Cars.Include(x => x.Laps).Include(x => x.Pits).Where(x => x.SessionId == sessionId).ToListAsync()) {
+				foreach(Car dbCar in await context.Cars.Include(x => x.Laps).Include(x => x.Pits).Where(x => x.SessionId == sessionId).AsSplitQuery().ToListAsync()) {
 					CarKey key = new CarKey() { SlotId = dbCar.SlotId, Veh = dbCar.Veh };
 					dbCars.Add(key, dbCar);
 					Dictionary<int, Lap> dbLaps = new Dictionary<int, Lap>();
