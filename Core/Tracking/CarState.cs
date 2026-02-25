@@ -44,7 +44,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		/// <summary>
 		/// Elapsed time of end of last pit stop (PitState changed from STOPPED to anything else)
 		/// </summary>
-		public double LastExitTime { get; set; } = -1;
+		public double LastReleaseTime { get; set; } = -1;
 		/// <summary>
 		/// Whether in garage at all during this lap (InGarageStall ever set)
 		/// </summary>
@@ -99,7 +99,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			newState.LastPitTime = LastPitTime;
 			newState.LastStopLap = LastStopLap;
 			newState.LastStopTime = LastStopTime;
-			newState.LastExitTime = LastExitTime;
+			newState.LastReleaseTime = LastReleaseTime;
 			newState.LastSwapLap = LastSwapLap;
 			newState.LastSwapTime = LastSwapTime;
 			newState.TotalPenalties = TotalPenalties;
@@ -131,12 +131,12 @@ namespace LMUSessionTracker.Core.Tracking {
 				newState.LastStopTime = currentET;
 				newState.StopThisLap = true;
 				newState.TotalStops++;
-				newState.LastExitTime = -1;
-			} else if(StopThisLap && PitState == "STOPPED" && newState.PitState != "STOPPED" && newState.LastExitTime == -1) {
-				newState.LastExitTime = currentET;
-			} else if(StopThisLap && PitState != "STOPPED" && newState.PitState == "STOPPED" && newState.LastExitTime != -1) {
+				newState.LastReleaseTime = -1;
+			} else if(StopThisLap && PitState == "STOPPED" && newState.PitState != "STOPPED" && newState.LastReleaseTime == -1) {
+				newState.LastReleaseTime = currentET;
+			} else if(StopThisLap && PitState != "STOPPED" && newState.PitState == "STOPPED" && newState.LastReleaseTime != -1) {
 				// PitState seems to become NONE during driver swaps
-				newState.LastExitTime = -1;
+				newState.LastReleaseTime = -1;
 			}
 
 			// probably will miss consecutive drive-through penalties
@@ -207,7 +207,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				LastStopLap = LastStopLap,
 				LastStopTime = LastStopTime,
 				StopThisLap = StopThisLap,
-				LastExitTime = LastExitTime,
+				LastReleaseTime = LastReleaseTime,
 				GarageThisLap = GarageThisLap,
 				LastSwapLap = LastSwapLap,
 				LastSwapTime = LastSwapTime,
@@ -259,8 +259,8 @@ namespace LMUSessionTracker.Core.Tracking {
 				diffs.Add($"LastStopTime: [{LastStopTime} to {other.LastStopTime}]");
 			if(StopThisLap != other.StopThisLap)
 				diffs.Add($"StopThisLap: [{StopThisLap} to {other.StopThisLap}]");
-			if(LastExitTime != other.LastExitTime)
-				diffs.Add($"LastExitTime: [{LastExitTime} to {other.LastExitTime}]");
+			if(LastReleaseTime != other.LastReleaseTime)
+				diffs.Add($"LastReleaseTime: [{LastReleaseTime} to {other.LastReleaseTime}]");
 			if(GarageThisLap != other.GarageThisLap)
 				diffs.Add($"GarageThisLap: [{GarageThisLap} to {other.GarageThisLap}]");
 			if(LastSwapLap != other.LastSwapLap)

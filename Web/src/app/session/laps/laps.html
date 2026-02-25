@@ -89,7 +89,7 @@
                             <th>Entry ET</th>
                             <th>Stop ET</th>
                             <th>Swap ET</th>
-                            <th>Exit ET</th>
+                            <th>Release ET</th>
                             <th class="text-end">Time</th>
                             <th class="text-center" title="Box after S/F line">BAL</th>
                             <th class="text-center" title="Swap locations">SL</th>
@@ -105,8 +105,8 @@
                             <td>{{ pit.pitTime <= 0 ? '-' : Format.time(pit.pitTime) }}</td>
                             <td>{{ pit.stopTime <= 0 ? '-' : Format.time(pit.stopTime) }}</td>
                             <td>{{ pit.swapTime <= 0 ? '-' : Format.time(pit.swapTime) }}</td>
-                            <td>{{ pit.exitTime <= 0 ? '-' : Format.time(pit.exitTime) }}</td>
-                            <td class="text-end">{{ pit.stopTime <= 0 || pit.exitTime <= 0 ? '-' : Format.lapTime(pit.exitTime - pit.stopTime) }}</td>
+                            <td>{{ pit.releaseTime <= 0 ? '-' : Format.time(pit.releaseTime) }}</td>
+                            <td class="text-end">{{ pit.stopTime <= 0 || pit.releaseTime <= 0 ? '-' : Format.lapTime(pit.releaseTime - pit.stopTime) }}</td>
                             <td class="text-center">{{ pit.stopAfterLine ? 'True' : '' }}</td>
                             <td class="text-center">{{ pit.swapLocation < 0 ? '' : pit.swapLocation == 0 ? 'Gar' : `S${pit.swapLocation}` }}</td>
                             <td class="text-center">{{ pit.penalty ? 'True' : '' }}</td>

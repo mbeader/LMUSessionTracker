@@ -3,7 +3,7 @@
 		public int Lap { get; set; }
 		public double PitTime { get; set; } = -1;
 		public double StopTime { get; set; } = -1;
-		public double ExitTime { get; set; } = -1;
+		public double ReleaseTime { get; set; } = -1;
 		public double SwapTime { get; set; } = -1;
 		public bool StopAfterLine { get; set; }
 		public bool Swap { get; set; }
@@ -44,8 +44,8 @@
 			if((sameLap || state.StartedLapInPit) && state.StopThisLap) {
 				if(state.LastStopTime > state.LastPitTime)
 					StopTime = state.LastStopTime;
-				if(state.LastExitTime > state.LastPitTime)
-					ExitTime = state.LastExitTime;
+				if(state.LastReleaseTime > state.LastPitTime)
+					ReleaseTime = state.LastReleaseTime;
 			}
 			if((sameLap || state.StartedLapInPit) && state.SwapThisLap && state.LastSwapTime > state.LastPitTime) {
 				SwapTime = state.LastSwapTime;
@@ -60,7 +60,7 @@
 				Lap = Lap,
 				PitTime = PitTime,
 				StopTime = StopTime,
-				ExitTime = ExitTime,
+				ReleaseTime = ReleaseTime,
 				SwapTime = SwapTime,
 				StopAfterLine = StopAfterLine,
 				Swap = Swap,

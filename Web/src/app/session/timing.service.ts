@@ -461,9 +461,9 @@ class TimingFields {
 		},
 		{
 			id: 29,
-			name: 'LPEET',
-			desc: 'Last pit stop end elasped time',
-			value: i => typeof i.state === 'undefined' || i.state.lastExitTime < 0 ? '-' : Format.time(i.state.lastExitTime),
+			name: 'LPRET',
+			desc: 'Last pit stop release (end) elasped time',
+			value: i => typeof i.state === 'undefined' || i.state.lastReleaseTime < 0 ? '-' : Format.time(i.state.lastReleaseTime),
 			align: 'end',
 			colType: 'time-col'
 		},

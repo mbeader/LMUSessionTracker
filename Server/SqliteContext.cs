@@ -65,7 +65,7 @@ namespace LMUSessionTracker.Server {
 			modelBuilder.Entity<CarState>().Property(x => x.LastStopLap).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.LastStopTime).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.StopThisLap).HasDefaultValue(false);
-			modelBuilder.Entity<CarState>().Property(x => x.LastExitTime).HasDefaultValue(-1);
+			modelBuilder.Entity<CarState>().Property(x => x.LastReleaseTime).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.GarageThisLap).HasDefaultValue(false);
 			modelBuilder.Entity<CarState>().Property(x => x.LastSwapLap).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.LastSwapTime).HasDefaultValue(-1);
@@ -75,7 +75,7 @@ namespace LMUSessionTracker.Server {
 			modelBuilder.Entity<CarState>().Property(x => x.PenaltyThisLap).HasDefaultValue(false);
 			modelBuilder.Entity<Pit>().Property(x => x.PitTime).HasDefaultValue(-1);
 			modelBuilder.Entity<Pit>().Property(x => x.StopTime).HasDefaultValue(-1);
-			modelBuilder.Entity<Pit>().Property(x => x.ExitTime).HasDefaultValue(-1);
+			modelBuilder.Entity<Pit>().Property(x => x.ReleaseTime).HasDefaultValue(-1);
 			modelBuilder.Entity<Pit>().Property(x => x.SwapTime).HasDefaultValue(-1);
 			modelBuilder.Entity<Pit>().Property(x => x.SwapLocation).HasDefaultValue(-1);
 			modelBuilder.Entity<Pit>().Property(x => x.Fuel).HasDefaultValue(-1);

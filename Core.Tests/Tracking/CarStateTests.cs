@@ -172,7 +172,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[Fact]
 		public void Next_NextLapInExitingState_ResetsLapStopStatus() {
 			CarState ex = new CarState(key, ExitingStanding(s => { s.lapsCompleted++; s.lapStartET += 70; s.timeIntoLap = 0; s.sector = "SECTOR1"; })) {
-				LastStopLap = 2, LastStopTime = 157, LastExitTime = 160, StopThisLap = false, TotalStops = 1
+				LastStopLap = 2, LastStopTime = 157, LastReleaseTime = 160, StopThisLap = false, TotalStops = 1
 			};
 			AssertCarState(ex, new List<Standing>() {
 				BasicStanding(),
@@ -262,7 +262,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[Fact]
 		public void Next_PitStateNoneDuringDriverSwap_SetsStatus() {
 			CarState ex = new CarState(key, ExitingStanding(s => { s.timeIntoLap = 70; s.driverName = "driver2"; })) {
-				LastStopLap = 2, LastStopTime = 160, StopThisLap = true, LastExitTime = 163, LastSwapLap = 2, LastSwapTime = 162, SwapThisLap = true, SwapLocation = 3, TotalStops = 1
+				LastStopLap = 2, LastStopTime = 160, StopThisLap = true, LastReleaseTime = 163, LastSwapLap = 2, LastSwapTime = 162, SwapThisLap = true, SwapLocation = 3, TotalStops = 1
 			};
 			AssertCarState(ex, new List<Standing>() {
 				EnteringStanding(s => s.timeIntoLap = 50),

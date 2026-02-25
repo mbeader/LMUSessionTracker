@@ -113,8 +113,8 @@ export class Laps {
 		let stopTime = 0;
 		if (this.model?.car?.pits) {
 			for (let i = 0; i < this.model.car.pits.length; i++) {
-				if (this.model.car.pits[i].stopTime > 0 && this.model.car.pits[i].exitTime > 0)
-					stopTime += this.model.car.pits[i].exitTime - this.model.car.pits[i].stopTime;
+				if (this.model.car.pits[i].stopTime > 0 && this.model.car.pits[i].releaseTime > 0)
+					stopTime += this.model.car.pits[i].releaseTime - this.model.car.pits[i].stopTime;
 			}
 		}
 		return stopTime;

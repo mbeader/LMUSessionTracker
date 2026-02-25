@@ -31,7 +31,7 @@ namespace LMUSessionTracker.Server.Models {
 		public int LastStopLap { get; set; }
 		public double LastStopTime { get; set; }
 		public bool StopThisLap { get; set; }
-		public double LastExitTime { get; set; }
+		public double LastReleaseTime { get; set; }
 		public bool GarageThisLap { get; set; }
 		public int LastSwapLap { get; set; }
 		public double LastSwapTime { get; set; }
@@ -68,7 +68,7 @@ namespace LMUSessionTracker.Server.Models {
 			LastStopLap = state.LastStopLap;
 			LastStopTime = state.LastStopTime;
 			StopThisLap = state.StopThisLap;
-			LastExitTime = state.LastExitTime;
+			LastReleaseTime = state.LastReleaseTime;
 			GarageThisLap = state.GarageThisLap;
 			LastSwapLap = state.LastSwapLap;
 			LastSwapTime = state.LastSwapTime;
@@ -102,7 +102,7 @@ namespace LMUSessionTracker.Server.Models {
 				LastStopLap = LastStopLap,
 				LastStopTime = LastStopTime,
 				StopThisLap = StopThisLap,
-				LastExitTime = LastExitTime,
+				LastReleaseTime = LastReleaseTime,
 				GarageThisLap = GarageThisLap,
 				LastSwapLap = LastSwapLap,
 				LastSwapTime = LastSwapTime,
