@@ -13,7 +13,7 @@
 	line-height: 13px;
 }
 
-.compact-timing td .car-dropdown > button {
+.compact-timing td .car-dropdown > button, .compact-timing th > button {
 	font-size: calc(var(--compact-font-size) - 2px);
 }
 

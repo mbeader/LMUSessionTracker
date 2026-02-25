@@ -96,6 +96,7 @@ export interface CarState {
 	swapThisLap: boolean;
 	swapLocation: number;
 	startedLapInPit: number;
+	penaltyThisLap: number;
 	totalPenalties: number;
 	totalPits: number;
 	totalStops: number;

@@ -58,7 +58,7 @@
                 } @else if(col.id == 40) {
                 <td class="text-center"><span class="border bg-secondary-subtle" title="{{ col.value(car) }}"><span class="{{ col.classes ? col.classes(car) : null }}"></span></span></td>
                 } @else {
-                <td class="{{ col.align == 'end' ? 'text-end' : col.align == 'center' ? 'text-center' : '' }} {{ col.colType }} {{ col.classes ? col.classes(car) : null }}" title="{{ col.desc }}">{{ col.value(car) }}</td>
+                <td class="{{ col.align == 'end' ? 'text-end' : col.align == 'center' ? 'text-center' : '' }} {{ col.colType }} {{ col.classes ? col.classes(car) : null }}" title="{{ col.desc }}">{{ col.value(car) ?? '&nbsp;' }}</td>
                 }
                 }
                 <td class="">
@@ -118,12 +118,18 @@
                     @for (col of getAllColumns(); track col.id) {
                     <li class="form-check">
                         <input type="checkbox" class="form-check-input" id="col-{{ col.id }}" [attr.col-id]="col.id" (change)="setColumns()" />
-                        <label class="form-check-label" for="col-{{ col.id }}">{{ col.desc }}</label>
+                        <label class="form-check-label" for="col-{{ col.id }}">
+                            {{ col.desc }}
+                            @if(isDefaultColumn(col.id)) {
+                            <span class="text-warning" title="Default">&#x2605;</span>
+                            }
+                        </label>
                     </li>
                     }
                 </ul>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-danger" (click)="resetColumns()">Reset to default</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>

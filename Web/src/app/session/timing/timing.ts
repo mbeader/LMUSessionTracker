@@ -19,11 +19,9 @@ import { CarStatus } from '../car-status/car-status';
 })
 export class Timing {
 	private defaultColumns = [
-		1, 2, 3, /*4,*/ 5, 6, 7, /*8,*/ 9, 10,
-		11, 12, 13, 14, 15, 16, 17, 18, /*19, 20,*/
-		21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-		31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-		41, 42, /*43*/
+		1, 2, 3, 5, 6, 7, 9, 10, 11, 12,
+		13, 14, 15, 16, 17, 18, 19, 20, 22, 44,
+		45, 46, 47, 36, 38, 40
 	];
 	private service = inject(SessionService);
 	private timingService = inject(TimingService);
@@ -92,12 +90,12 @@ export class Timing {
 		let columns;
 		try {
 			let json = localStorage.getItem('timing-cols');
-			if(json)
+			if (json)
 				columns = JSON.parse(json);
 		} catch {
 
 		}
-		if(!columns)
+		if (!columns)
 			columns = this.defaultColumns;
 		return columns;
 	}
@@ -125,11 +123,15 @@ export class Timing {
 			let button: HTMLButtonElement = e.relatedTarget;
 			if (button.getAttribute('data-bs-target') != '#columnsModal')
 				return;
-			let checks = document.querySelectorAll<HTMLInputElement>('#columnsModal .modal-body input');
-			for (let check of checks) {
-				let id = parseInt(check.getAttribute('col-id') ?? '');
-				check.checked = this.columns.some(x => x.id == id);
-			}
+			this.applyColumns();
+		}
+	}
+
+	private applyColumns() {
+		let checks = document.querySelectorAll<HTMLInputElement>('#columnsModal .modal-body input');
+		for (let check of checks) {
+			let id = parseInt(check.getAttribute('col-id') ?? '');
+			check.checked = this.columns.some(x => x.id == id);
 		}
 	}
 
@@ -143,5 +145,15 @@ export class Timing {
 		}
 		localStorage.setItem('timing-cols', JSON.stringify(cols));
 		this.columns = this.getColumns(cols);
+	}
+
+	isDefaultColumn(id: number) {
+		return this.defaultColumns.includes(id);
+	}
+
+	resetColumns() {
+		this.columns = this.getColumns(this.defaultColumns);
+		this.applyColumns();
+		this.setColumns();
 	}
 }

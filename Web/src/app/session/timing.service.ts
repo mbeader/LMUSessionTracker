@@ -192,6 +192,7 @@ export interface TimingField {
 }
 
 class TimingFields {
+	private static nextId: number = 50;
 	fields: TimingField[] = [
 		{
 			id: 1,
@@ -363,10 +364,42 @@ class TimingFields {
 		{
 			id: 22,
 			name: 'Pen',
-			desc: 'Penalty count',
+			desc: 'Penalty count (active)',
 			value: i => i.standing?.penalties.toString(),
 			align: 'end',
 			colType: 'char2-col'
+		},
+		{
+			id: 44,
+			name: 'LSP',
+			desc: 'Laps since pit',
+			value: i => i.standing ? (!i.lastStop ? i.standing.lapsCompleted : i.lastStop.lap > i.standing.lapsCompleted ? 0 : i.standing.lapsCompleted - i.lastStop.lap).toString() : null,
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 45,
+			name: 'SLP',
+			desc: 'Since last pit (from pit entry of stop)',
+			value: i => Format.time(!i.lastStop ? i.currentET : i.currentET - i.lastStop.pitTime),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 46,
+			name: 'LSS',
+			desc: 'Laps since swap',
+			value: i => i.standing ? (!i.lastSwap ? i.standing.lapsCompleted : i.lastSwap.lap > i.standing.lapsCompleted ? 0 : i.standing.lapsCompleted - i.lastSwap.lap).toString() : null,
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 47,
+			name: 'SLS',
+			desc: 'Since last swap (from pit entry of stop)',
+			value: i => Format.time(!i.lastSwap ? i.currentET : i.currentET - i.lastSwap.pitTime),
+			align: 'end',
+			colType: 'time-col'
 		},
 		{
 			id: 23,
@@ -473,6 +506,14 @@ class TimingFields {
 			colType: 'char2-col'
 		},
 		{
+			id: 48,
+			name: '!TL',
+			desc: 'Penalty this lap',
+			value: i => i.state?.penaltyThisLap ? '!' : '',
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
 			id: 36,
 			name: 'TPen',
 			desc: 'Total penalty count',
@@ -531,6 +572,12 @@ class TimingFields {
 			name: 'VEH',
 			desc: 'VEH file',
 			value: i => i.car?.veh
+		},
+		{
+			id: 49,
+			name: 'Slot',
+			desc: 'Slot ID',
+			value: i => i.car?.slotId.toString()
 		}
 	];
 	private idMap = new Map<number, TimingField>();
@@ -538,6 +585,12 @@ class TimingFields {
 
 	constructor() {
 		for (let field of this.fields) {
+			if (this.idMap.get(field.id))
+				throw new Error(`Timing field conflict on ID: ${field.id}`);
+			if (this.nameMap.get(field.name))
+				throw new Error(`Timing field conflict on name: ${field.name}`);
+			if (field.id >= TimingFields.nextId)
+				throw new Error(`Timing field ID exceeded expected (<${TimingFields.nextId}): ${field.id}`);
 			this.idMap.set(field.id, field);
 			this.nameMap.set(field.name, field);
 		}
@@ -565,6 +618,7 @@ export class TimingCarInfo {
 	lastStop?: Pit;
 	lastSwap?: Pit;
 	isRace: boolean = false;
+	currentET: number = 0;
 
 	private defaultBestClasses() {
 		return { total: null, sector1: null, sector2: null, sector3: null } as BestClasses;
@@ -573,6 +627,7 @@ export class TimingCarInfo {
 	set(timingService: TimingService) {
 		this.session = timingService.session ?? undefined;
 		this.isRace = timingService.isRace;
+		this.currentET = this.session?.info?.currentEventTime ?? this.session?.sessionState?.currentEventTime ?? 0;
 		this.lastStop = undefined;
 		this.lastSwap = undefined;
 		if (this.id) {
