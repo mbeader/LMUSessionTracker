@@ -65,6 +65,7 @@ export class Timing {
 	get classBests() { return this.timingService.classBests; }
 	get bests() { return this.timingService.bests; }
 	get isRace() { return this.timingService.isRace; }
+	get speed() { return this.timingService.speed; }
 
 	getLastClasses(standing: Standing, carClass: string) { return this.timingService.getLastClasses(standing, carClass); }
 	getBestClasses(standing: Standing, carClass: string) { return this.timingService.getBestClasses(standing, carClass); }

@@ -36,19 +36,24 @@ export class SettingsService {
 interface Settings {
 	autotransition: boolean;
 	fahrenheit: string;
+	speed: string;
 }
 
 class SettingsInternal implements Settings {
 	autotransition: boolean = true;
 	fahrenheit: string = 'true';
+	speed: string = 'mph';
 
 	constructor() {
-		this.fahrenheit = navigator.language === 'en-US' ? 'true' : 'false';
+		let us = navigator.language === 'en-US';
+		this.fahrenheit = us ? 'true' : 'false';
+		this.speed = us ? 'mph' : 'km/h';
 	}
 
 	load(settings: Settings) {
 		this.autotransition = this.loadBoolean(settings, 'autotransition');
 		this.fahrenheit = this.loadBooleanString(settings, 'fahrenheit');
+		this.speed = this.loadString(settings, 'speed', ['km/h', 'm/s', 'mph']);
 	}
 
 	private loadBoolean(settings: Settings, prop: string): boolean {
@@ -58,5 +63,10 @@ class SettingsInternal implements Settings {
 	private loadBooleanString(settings: Settings, prop: string): 'true' | 'false' {
 		let value = (settings as any)[prop];
 		return value === 'true' ? 'true' : value === 'false' ? 'false' : (this as any)[prop];
+	}
+
+	private loadString(settings: Settings, prop: string, values: string[]): string {
+		let value = (settings as any)[prop];
+		return values.includes(value) ? value : (this as any)[prop];
 	}
 }

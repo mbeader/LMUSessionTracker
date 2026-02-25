@@ -30,7 +30,7 @@ describe('SettingsService', () => {
 		let defaults: any;
 
 		beforeEach(() => {
-			defaults = { autotransition: true, fahrenheit: 'true' };
+			defaults = { autotransition: true, fahrenheit: 'true', speed: 'mph' };
 		});
 
 		it('without localstorage should return defaults', () => {
@@ -50,14 +50,14 @@ describe('SettingsService', () => {
 		});
 
 		it('with localstorage should return stored nondefault settings', () => {
-			let settings = { autotransition: false, fahrenheit: 'false' };
+			let settings = { autotransition: false, fahrenheit: 'false', speed: 'km/h' };
 			localStorage.items = { settings: JSON.stringify(settings) };
 			service.load();
 			expect(service.get()).toEqual(settings);
 		});
 
 		it('with invalid localstorage should return stored default settings', () => {
-			localStorage.items = { settings: JSON.stringify({ autotransition: 'foo', fahrenheit: 'foo', invalid: 1 }) };
+			localStorage.items = { settings: JSON.stringify({ autotransition: 'foo', fahrenheit: 'foo', speed: 'foo', invalid: 1 }) };
 			service.load();
 			expect(service.get()).toEqual(defaults);
 		});

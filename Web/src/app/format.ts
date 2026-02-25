@@ -165,7 +165,11 @@ export class Format {
 		return '0';
 	}
 
-	static speed(v: number) {
+	static speed(v: number, unit: string) {
+		if(unit == 'mph')
+			v *= 2.237;
+		else if(unit == 'km/h')
+			v *= 3.6;
 		return v.toLocaleString(undefined, this.tempFormat);
 	}
 }

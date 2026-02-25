@@ -36,7 +36,8 @@
         <thead>
             <tr>
                 @for (col of columns; track col.id) {
-                <th scope="col" class="{{ col.align == 'end' ? 'text-end' : col.align == 'center' ? 'text-center' : '' }} {{ col.colType }}" title="{{ col.desc }}">{{ col.name }}</th>
+                @let extra = col.id == 19 ? ` (${speed})` : null;
+                <th scope="col" class="{{ col.align == 'end' ? 'text-end' : col.align == 'center' ? 'text-center' : '' }} {{ col.colType }}" title="{{ extra ? col.desc + extra : col.desc }}">{{ col.name }}</th>
                 }
                 <th scope="col">
                     <button class="btn-icon ms-auto" type="button" data-bs-toggle="modal" data-bs-target="#columnsModal">
@@ -58,7 +59,8 @@
                 } @else if(col.id == 40) {
                 <td class="text-center"><span class="border bg-secondary-subtle" title="{{ col.value(car) }}"><span class="{{ col.classes ? col.classes(car) : null }}"></span></span></td>
                 } @else {
-                <td class="{{ col.align == 'end' ? 'text-end' : col.align == 'center' ? 'text-center' : '' }} {{ col.colType }} {{ col.classes ? col.classes(car) : null }}" title="{{ col.desc }}">{{ col.value(car) ?? '&nbsp;' }}</td>
+                @let truncate = col.colType == 'team-col' || col.colType == 'driver-col';
+                <td class="{{ col.align == 'end' ? 'text-end' : col.align == 'center' ? 'text-center' : '' }} {{ col.colType }} {{ col.classes ? col.classes(car) : null }}" title="{{ truncate ? col.value(car) : null }}">{{ col.value(car) ?? '&nbsp;' }}</td>
                 }
                 }
                 <td class="">

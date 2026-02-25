@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Best, Bests, Car, CarKey, CarState, Pit } from '../tracking';
 import { SessionViewModel } from '../view-models';
 import { Standing } from '../lmu';
 import { Format } from '../format';
 import { classId, statusClass } from '../utils';
+import { SettingsService } from '../settings.service';
 
 export type NullabeString = string | null;
 export type BestClasses = { total: NullabeString, sector1: NullabeString, sector2: NullabeString, sector3: NullabeString };
@@ -12,6 +13,7 @@ export type CarStatusDescription = { carClass: string, number: string, team: str
 
 @Injectable()
 export class TimingService {
+	private settings = inject(SettingsService);
 	fields: TimingFields = new TimingFields();
 	session: SessionViewModel | null = null;
 	entries: Map<string, Car> = new Map();
@@ -20,6 +22,11 @@ export class TimingService {
 	classBests: Map<string, number> = new Map();
 	bests: Bests | null = null;
 	isRace: boolean = false;
+	speed: string = 'mph';
+
+	constructor() {
+		this.speed = this.settings.get().speed;
+	}
 
 	onChange() {
 		this.isRace = this.session?.session?.sessionType.startsWith('RACE') ?? false;
@@ -244,21 +251,24 @@ class TimingFields {
 			name: 'Team',
 			desc: 'Team',
 			value: i => i.car?.teamName ? i.car.teamName : (!i.standing?.fullTeamName ? i.standing?.vehicleName : i.standing.fullTeamName),
-			classes: () => 'team-col text-truncate'
+			classes: () => 'text-truncate',
+			colType: 'team-col'
 		},
 		{
 			id: 8,
 			name: 'Car',
 			desc: 'Car',
 			value: i => i.car?.vehicleName,
-			classes: () => 'team-col text-truncate'
+			classes: () => 'text-truncate',
+			colType: 'team-col'
 		},
 		{
 			id: 9,
 			name: 'Driver',
 			desc: 'Driver',
 			value: i => i.standing?.driverName,
-			classes: () => 'driver-col text-truncate'
+			classes: () => 'text-truncate',
+			colType: 'driver-col'
 		},
 		{
 			id: 10,
@@ -339,8 +349,8 @@ class TimingFields {
 		{
 			id: 19,
 			name: 'Speed',
-			desc: 'Current speed (m/s)',
-			value: i => typeof i.standing?.lapStartET === 'undefined' ? '-' : Format.speed(i.standing?.carVelocity.velocity),
+			desc: 'Current speed',
+			value: i => typeof i.standing?.lapStartET === 'undefined' ? '-' : Format.speed(i.standing?.carVelocity.velocity, i.speed),
 			align: 'end',
 			colType: 'char5-col'
 		},
@@ -619,6 +629,7 @@ export class TimingCarInfo {
 	lastSwap?: Pit;
 	isRace: boolean = false;
 	currentET: number = 0;
+	speed: string = '';
 
 	private defaultBestClasses() {
 		return { total: null, sector1: null, sector2: null, sector3: null } as BestClasses;
@@ -628,6 +639,7 @@ export class TimingCarInfo {
 		this.session = timingService.session ?? undefined;
 		this.isRace = timingService.isRace;
 		this.currentET = this.session?.info?.currentEventTime ?? this.session?.sessionState?.currentEventTime ?? 0;
+		this.speed = timingService.speed;
 		this.lastStop = undefined;
 		this.lastSwap = undefined;
 		if (this.id) {

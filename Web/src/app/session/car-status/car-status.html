@@ -57,7 +57,7 @@
     <dd class="col-9 {{ lastClasses.sector3 }}">{{ standing.sector != "SECTOR1" ? '&nbsp;' : Format.sectorTime(standing.lastSectorTime2, standing.lastLapTime) }}</dd>
     @let fuelClass = standing.fuelFraction > .1 ? '' : standing.fuelFraction > .05 ? 'text-warning' : 'text-danger';
     <dt class="col-3">Speed</dt>
-    <dd class="col-9">{{ Format.speed(standing.carVelocity.velocity) }}</dd>
+    <dd class="col-9">{{ Format.speed(standing.carVelocity.velocity, info.speed) }}</dd>
     <dt class="col-3">Fuel</dt>
     <dd class="col-9 {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</dd>
     <dt class="col-3">Pit</dt>
