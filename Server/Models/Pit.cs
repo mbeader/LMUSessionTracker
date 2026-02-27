@@ -60,6 +60,7 @@ namespace LMUSessionTracker.Server.Models {
 			GarageOutTime = pit.GarageOutTime;
 			SwapTime = pit.SwapTime;
 			StopAfterLine = pit.StopAfterLine;
+			StopLocation = pit.StopLocation;
 			Swap = pit.Swap;
 			SwapLocation = pit.SwapLocation;
 			Penalty = pit.Penalty;
@@ -96,6 +97,7 @@ namespace LMUSessionTracker.Server.Models {
 				GarageOutTime = GarageOutTime,
 				SwapTime = SwapTime,
 				StopAfterLine = StopAfterLine,
+				StopLocation = StopLocation,
 				Swap = Swap,
 				SwapLocation = SwapLocation,
 				Penalty = Penalty,

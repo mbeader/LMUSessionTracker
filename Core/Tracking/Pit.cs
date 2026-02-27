@@ -101,6 +101,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				GarageOutTime = GarageOutTime,
 				SwapTime = SwapTime,
 				StopAfterLine = StopAfterLine,
+				StopLocation = StopLocation,
 				Swap = Swap,
 				SwapLocation = SwapLocation,
 				Penalty = Penalty,
