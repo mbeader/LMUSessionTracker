@@ -2,6 +2,10 @@
 	--compact-font-size: 10px;
 }
 
+.compact-timing-container {
+	min-height: 10em;
+}
+
 .compact-timing, .compact-info {
 	font-size: var(--compact-font-size) !important;
 	font-family: monospace !important;
@@ -15,6 +19,15 @@
 
 .compact-timing td .car-dropdown > button, .compact-timing th > button {
 	font-size: calc(var(--compact-font-size) - 2px);
+}
+
+.compact-timing td .dropdown-menu {
+	font-size: var(--compact-font-size) !important;
+	padding: .5em 0;
+}
+
+.compact-timing td .dropdown-menu .dropdown-item {
+	padding: .25em 1em;
 }
 
 .char2-col {

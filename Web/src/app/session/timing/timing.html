@@ -12,12 +12,13 @@
 }
 @if(session && session.session && session.sessionState) {
 <div class="row compact-info">
-    <span class="col-3" title="{{ session.session.trackName }}">{{ session.session.trackName }}</span>
-    <span class="col-1" title="{{ session.session.sessionType }}">{{ session.session.sessionType }}</span>
-    <span class="col-1" title="{{ Format.phase(session.sessionState.gamePhase) }}">{{ Format.phase(session.sessionState.gamePhase) }}</span>
+    <span class="col-4" title="{{ session.session.sessionType }} @ {{ session.session.trackName }}">{{ session.session.sessionType }} @ {{ session.session.trackName }}</span>
+    <span class="col-1 text-end" title="{{ Format.phase(session.sessionState.gamePhase) }}">{{ Format.phase(session.sessionState.gamePhase) }}</span>
     <div class="col-2 text-center">
-        <span [class]="flagClass(session.sessionState.sector1Flag)" title="{{ session.sessionState.sector1Flag }}"></span>&nbsp;
-        <span [class]="flagClass(session.sessionState.sector2Flag, true)" title="{{ session.sessionState.sector2Flag }}"></span>&nbsp;
+        <span [class]="flagClass(session.sessionState.sector1Flag)" title="{{ session.sessionState.sector1Flag }}"></span>
+        <span>&nbsp;</span>
+        <span [class]="flagClass(session.sessionState.sector2Flag, true)" title="{{ session.sessionState.sector2Flag }}"></span>
+        <span>&nbsp;</span>
         <span [class]="flagClass(session.sessionState.sector3Flag)" title="{{ session.sessionState.sector3Flag }}"></span>
     </div>
     <div class="col-4">
@@ -31,7 +32,7 @@
 <hr class="my-1" />
 }
 @if(session && session.session && session.standings) {
-<div class="overflow-x-scroll">
+<div class="overflow-x-auto compact-timing-container">
     <table class="table table-sm table-striped table-hover compact-timing mb-0">
         <thead>
             <tr>
