@@ -193,9 +193,16 @@ export interface TimingField {
 	name: string;
 	desc: string;
 	value: (service: TimingCarInfo) => string | null | undefined;
+	eval?: (service: TimingCarInfo) => TimingFieldValue;
 	classes?: (service: TimingCarInfo) => string;
 	align?: string;
 	colType?: string;
+}
+
+export interface TimingFieldValue {
+	value: string | null | undefined;
+	classes: string | null | undefined;
+	title: string | null | undefined;
 }
 
 class TimingFields {
@@ -383,15 +390,48 @@ class TimingFields {
 			id: 44,
 			name: 'LSP',
 			desc: 'Laps since pit',
-			value: i => i.standing ? (!i.lastStop ? i.standing.lapsCompleted : i.lastStop.lap > i.standing.lapsCompleted ? 0 : i.standing.lapsCompleted - i.lastStop.lap).toString() : null,
+			value: i => {
+				let lap = -1;
+				if (i.standing && !(i.standing.inGarageStall || i.standing.pitState == 'STOPPED')) {
+					if (i.lastStop) {
+						lap = i.lastStop.lap > i.standing.lapsCompleted ? 0 : i.standing.lapsCompleted - i.lastStop.lap;
+					} else
+						lap = i.standing.lapsCompleted;
+				}
+				return lap < 0 ? '-' : lap.toString();
+			},
 			align: 'end',
 			colType: 'char2-col'
 		},
 		{
 			id: 45,
 			name: 'SLP',
-			desc: 'Since last pit (from pit entry of stop)',
-			value: i => Format.time(!i.lastStop ? i.currentET : i.currentET - i.lastStop.pitTime),
+			desc: 'Since last pit (from pit exit if available)',
+			value: () => undefined,
+			eval: i => {
+				let time = i.currentET;
+				let source = 'session';
+				let since = true;
+				if (i.standing?.inGarageStall || i.standing?.pitState == 'STOPPED') {
+					time = -1;
+					source = i.standing?.inGarageStall ? 'In garage' : 'In box';
+					since = false;
+				} else if (i.lastStop) {
+					if (i.lastStop.garageInTime >= 0 || i.lastStop.garageOutTime >= 0) {
+						time = Math.max(i.lastStop.garageInTime, i.lastStop.garageOutTime);
+						source = time == i.lastStop.garageOutTime ? 'garage out' : 'garage in';
+					} else {
+						time = Math.max(i.lastStop.exitTime, i.lastStop.releaseTime, i.lastStop.stopTime, i.lastStop.pitTime);
+						source = time == i.lastStop.exitTime ? 'pit exit' : time == i.lastStop.releaseTime ? 'pit release' : time == i.lastStop.stopTime ? 'pit stop' : 'pit entry';
+					}
+					time = i.currentET - time;
+				}
+				return {
+					value: Format.time(time),
+					classes: time < 0 || source == 'pit exit' ? undefined : 'text-body-secondary',
+					title: !since ? source : source == 'pit exit' ? undefined : `Since ${source}`
+				};
+			},
 			align: 'end',
 			colType: 'time-col'
 		},
@@ -692,7 +732,7 @@ export class TimingCarInfo {
 				let pits = this.session?.history?.find(x => x.key == this.id)?.pits;
 				if (pits) {
 					for (let pit of pits) {
-						if (pit.stopTime >= 0)
+						if (pit.stopTime >= 0 || pit.garageInTime >= 0 || pit.garageOutTime >= 0)
 							this.lastStop = pit;
 						if (pit.swapTime >= 0)
 							this.lastSwap = pit;

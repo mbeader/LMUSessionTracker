@@ -60,8 +60,9 @@
                 } @else if(col.id == 40) {
                 <td class="text-center"><span class="border bg-secondary-subtle" title="{{ col.value(car) }}"><span class="{{ col.classes ? col.classes(car) : null }}"></span></span></td>
                 } @else {
+                @let eval = col.eval ? col.eval(car) : null;
                 @let truncate = col.colType == 'team-col' || col.colType == 'driver-col';
-                <td class="{{ col.align == 'end' ? 'text-end' : col.align == 'center' ? 'text-center' : '' }} {{ col.colType }} {{ col.classes ? col.classes(car) : null }}" title="{{ truncate ? col.value(car) : null }}">{{ col.value(car) ?? '&nbsp;' }}</td>
+                <td class="{{ col.align == 'end' ? 'text-end' : col.align == 'center' ? 'text-center' : '' }} {{ col.colType }} {{ eval ? eval.classes : col.classes ? col.classes(car) : null }}" title="{{ eval ? eval.title : truncate ? col.value(car) : null }}">{{ eval ? eval.value : col.value(car) ?? '&nbsp;' }}</td>
                 }
                 }
                 <td class="">
