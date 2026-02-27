@@ -49,6 +49,10 @@ export class Timing {
 		this.columns = this.getColumns(this.readColumns());
 	}
 
+	ngOnDestroy() {
+		document.querySelector('.modal-backdrop')?.remove();
+	}
+
 	private onInitSession(sessionId: string) {
 		this.service.getSession(sessionId, this.onUpdateSession.bind(this));
 	}

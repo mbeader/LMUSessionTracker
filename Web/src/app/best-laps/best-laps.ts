@@ -238,4 +238,8 @@ export class BestLaps {
 			}
 		}
 	}
+
+	ngOnDestroy() {
+		document.querySelector('.modal-backdrop')?.remove();
+	}
 }

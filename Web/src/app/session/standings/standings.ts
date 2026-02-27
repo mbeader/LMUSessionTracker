@@ -39,6 +39,10 @@ export class Standings {
 		this.carStatus()?.onChange();
 	}
 
+	ngOnDestroy() {
+		document.querySelector('.modal-backdrop')?.remove();
+	}
+
 	get entries() { return this.timingService.entries; }
 	get positionInClass() { return this.timingService.positionInClass; }
 	get classBests() { return this.timingService.classBests; }
