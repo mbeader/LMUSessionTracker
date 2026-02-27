@@ -34,7 +34,7 @@ export class Sessions {
 		});
 		this.sessions = this.service.sessions;
 		this.total = this.service.total;
-		this.sessions.subscribe(() => { if (this.init && this.initCount++ > 0) this.init = false; });
+		this.liveSessions.subscribe(() => { if (this.init && this.initCount++ > 0) this.init = false; });
 		whenExists('#all-tab', tab => {
 			tab.addEventListener('shown.bs.tab', event => {
 				this.init = true;
