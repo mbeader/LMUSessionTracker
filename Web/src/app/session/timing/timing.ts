@@ -9,10 +9,11 @@ import { CarKey } from '../../tracking';
 import { classId, statusClass, whenExists } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
 import { CarStatus } from '../car-status/car-status';
+import { PitSummary } from '../pit-summary/pit-summary';
 
 @Component({
 	selector: 'app-session-timing',
-	imports: [RouterLink, ClassBadge, CarStatus],
+	imports: [RouterLink, ClassBadge, CarStatus, PitSummary],
 	providers: [SessionService, TimingService],
 	templateUrl: './timing.html',
 	styleUrl: './timing.css',
@@ -26,7 +27,9 @@ export class Timing {
 	private service = inject(SessionService);
 	private timingService = inject(TimingService);
 	private carStatus = viewChild(CarStatus);
+	private pitSummary = viewChild(PitSummary);
 	columns: TimingField[] = [];
+	carId?: string;
 	carStatusDesc?: CarStatusDescription;
 	Utils = { classId, statusClass };
 	CarKey = CarKey;
@@ -41,6 +44,7 @@ export class Timing {
 		this.service.init(this.onInitSession.bind(this), sessionId => ['/', 'Session', sessionId, 'Timing']);
 		whenExists('main', main => { if (main.parentElement) main.parentElement.className = 'container-fluid'; });
 		whenExists('#statusModal', el => el.addEventListener('show.bs.modal', this.updateCarStatusModal.bind(this)));
+		whenExists('#pitModal', el => el.addEventListener('show.bs.modal', this.updatePitModal.bind(this)));
 		whenExists('#columnsModal', el => el.addEventListener('show.bs.modal', this.setColumnCheckboxes.bind(this)));
 	}
 
@@ -61,6 +65,7 @@ export class Timing {
 		this.timingService.session = this.session;
 		this.timingService.onChange();
 		this.carStatus()?.onChange();
+		this.pitSummary()?.onChange();
 	}
 
 	get entries() { return this.timingService.entries; }
@@ -86,6 +91,23 @@ export class Timing {
 				this.carStatusDesc = this.timingService.getCarDescription(id);
 			} else {
 				this.carStatus()?.clear();
+				this.carStatusDesc = undefined;
+			}
+		}
+	}
+
+	updatePitModal(e: any) {
+		if (e && e.relatedTarget && e.relatedTarget instanceof HTMLButtonElement) {
+			let button: HTMLButtonElement = e.relatedTarget;
+			if (button.getAttribute('data-bs-target') != '#pitModal')
+				return;
+			let id = button.closest('tr')?.getAttribute('car-id');
+			if (id) {
+				this.carId = id;
+				this.pitSummary()?.setCar(id);
+				this.carStatusDesc = this.timingService.getCarDescription(id);
+			} else {
+				this.pitSummary()?.clear();
 				this.carStatusDesc = undefined;
 			}
 		}

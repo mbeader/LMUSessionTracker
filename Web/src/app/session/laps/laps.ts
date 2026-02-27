@@ -1,19 +1,17 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, viewChild } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { ServerApiService } from '../../server-api.service';
 import { ServerLiveService } from '../../server-live.service';
+import { BestClasses } from '../timing.service';
 import { LapsViewModel } from '../../view-models';
 import { Best, Lap } from '../../tracking';
 import { Format } from '../../format';
 import { ClassBadge } from '../class-badge/class-badge';
-
-type NullabeString = string | null;
-type BestClasses = { total: NullabeString, sector1: NullabeString, sector2: NullabeString, sector3: NullabeString };
-type BestMap = { [key: string]: Best };
+import { PitSummary } from '../pit-summary/pit-summary';
 
 @Component({
 	selector: 'app-session-laps',
-	imports: [RouterLink, ClassBadge],
+	imports: [RouterLink, ClassBadge, PitSummary],
 	templateUrl: './laps.html',
 	styleUrl: './laps.css',
 })
@@ -22,6 +20,7 @@ export class Laps {
 	private route = inject(ActivatedRoute);
 	private api = inject(ServerApiService);
 	private live = inject(ServerLiveService);
+	private pitSummary = viewChild(PitSummary);
 	model: LapsViewModel | null = null;
 	defaultLap = (number: number) => { return { lapNumber: number, totalTime: -1, sector1: -1, sector2: -1, sector3: -1, isValid: false } as Lap };
 	Format = Format;
@@ -33,15 +32,21 @@ export class Laps {
 			return;
 		this.api.getLaps(sessionId, carId).then(result => {
 			this.model = result;
+			this.pitSummary()?.setLaps(this.model);
 			this.ref.markForCheck();
 			if (this.route.snapshot.url[2].path != 'History' && this.model.session?.sessionId && this.model.car?.key)
 				this.live.joinLaps(this.model.session.sessionId, this.model.car.key, this.updateLaps.bind(this));
 		}, error => { console.log(error); })
 	}
 
+	ngOnDestroy() {
+		document.querySelector('.modal-backdrop')?.remove();
+	}
+
 	updateLaps(laps: LapsViewModel) {
 		if (this.model) {
 			LapsViewModel.merge(this.model, laps);
+			this.pitSummary()?.setLaps(this.model);
 			this.ref.markForCheck();
 		}
 	}
@@ -69,54 +74,5 @@ export class Laps {
 
 	private defaultBest() {
 		return { total: -1, sector1: -1, sector2: -1, sector3: -1 } as Best;
-	}
-
-	getPitNumber(index: number) {
-		if (this.model?.car?.pits && index >= 0 && index < this.model.car.pits.length) {
-			let stops = 0;
-			for (let i = 0; i < this.model.car.pits.length; i++) {
-				let stopped = this.model.car.pits[i].stopTime >= 0;
-				if (stopped)
-					stops++;
-				if (i == index)
-					return stopped ? stops : -1;
-			}
-		}
-		return -1;
-	}
-
-	getTotalStops() {
-		let stops = 0;
-		if (this.model?.car?.pits) {
-			for (let i = 0; i < this.model.car.pits.length; i++) {
-				let stopped = this.model.car.pits[i].stopTime >= 0;
-				if (stopped)
-					stops++;
-			}
-		}
-		return stops;
-	}
-
-	getTotalSwaps() {
-		let swaps = 0;
-		if (this.model?.car?.pits) {
-			for (let i = 0; i < this.model.car.pits.length; i++) {
-				let swapped = this.model.car.pits[i].swapTime >= 0;
-				if (swapped)
-					swaps++;
-			}
-		}
-		return swaps;
-	}
-
-	getTotalTimeStopped() {
-		let stopTime = 0;
-		if (this.model?.car?.pits) {
-			for (let i = 0; i < this.model.car.pits.length; i++) {
-				if (this.model.car.pits[i].stopTime > 0 && this.model.car.pits[i].releaseTime > 0)
-					stopTime += this.model.car.pits[i].releaseTime - this.model.car.pits[i].stopTime;
-			}
-		}
-		return stopTime;
 	}
 }
