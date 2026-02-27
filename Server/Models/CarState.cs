@@ -32,12 +32,18 @@ namespace LMUSessionTracker.Server.Models {
 		public double LastStopTime { get; set; }
 		public bool StopThisLap { get; set; }
 		public double LastReleaseTime { get; set; }
+		public int StopLocation { get; set; }
+		public double LastExitTime { get; set; }
+		public int LastGarageLap { get; set; }
+		public double LastGarageInTime { get; set; }
+		public double LastGarageOutTime { get; set; }
 		public bool GarageThisLap { get; set; }
 		public int LastSwapLap { get; set; }
 		public double LastSwapTime { get; set; }
 		public bool SwapThisLap { get; set; }
 		public int SwapLocation { get; set; }
-		public bool StartedLapInPit { get; set; }
+		public string LastLapEndPitState { get; set; }
+		public string ThisLapStartPitState { get; set; }
 		public bool PenaltyThisLap { get; set; }
 		public int TotalPenalties { get; set; }
 		public int TotalPits { get; set; }
@@ -69,13 +75,19 @@ namespace LMUSessionTracker.Server.Models {
 			LastStopTime = state.LastStopTime;
 			StopThisLap = state.StopThisLap;
 			LastReleaseTime = state.LastReleaseTime;
+			StopLocation = state.StopLocation;
+			LastExitTime = state.LastExitTime;
+			LastGarageLap = state.LastGarageLap;
+			LastGarageInTime = state.LastGarageInTime;
+			LastGarageOutTime = state.LastGarageOutTime;
 			GarageThisLap = state.GarageThisLap;
 			LastSwapLap = state.LastSwapLap;
 			LastSwapTime = state.LastSwapTime;
 			SwapThisLap = state.SwapThisLap;
 			SwapLocation = state.SwapLocation;
-			StartedLapInPit = state.StartedLapInPit;
 			PenaltyThisLap = state.PenaltyThisLap;
+			LastLapEndPitState = state.LastLapEndPitState;
+			ThisLapStartPitState = state.ThisLapStartPitState;
 			TotalPenalties = state.TotalPenalties;
 			TotalPits = state.TotalPits;
 			TotalStops = state.TotalStops;
@@ -103,12 +115,18 @@ namespace LMUSessionTracker.Server.Models {
 				LastStopTime = LastStopTime,
 				StopThisLap = StopThisLap,
 				LastReleaseTime = LastReleaseTime,
+				StopLocation = StopLocation,
+				LastExitTime = LastExitTime,
+				LastGarageLap = LastGarageLap,
+				LastGarageInTime = LastGarageInTime,
+				LastGarageOutTime = LastGarageOutTime,
 				GarageThisLap = GarageThisLap,
 				LastSwapLap = LastSwapLap,
 				LastSwapTime = LastSwapTime,
 				SwapThisLap = SwapThisLap,
 				SwapLocation = SwapLocation,
-				StartedLapInPit = StartedLapInPit,
+				LastLapEndPitState = LastLapEndPitState,
+				ThisLapStartPitState = ThisLapStartPitState,
 				PenaltyThisLap = PenaltyThisLap,
 				TotalPenalties = TotalPenalties,
 				TotalPits = TotalPits,

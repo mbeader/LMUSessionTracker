@@ -89,7 +89,7 @@ namespace LMUSessionTracker.Server.Models {
 					allDbLaps.Add(key, dbLaps);
 					foreach(Lap dbLap in dbCar.Laps)
 						dbLaps.Add(dbLap.LapNumber, dbLap);
-					allDbPits.Add(key, new List<Pit>(dbCar.Pits.OrderBy(x => x.PitTime)));
+					allDbPits.Add(key, new List<Pit>(dbCar.Pits.OrderBy(x => x.Lap).ThenBy(x => x.PitId)));
 				}
 				int c = 0;
 				foreach(CarHistory car in cars) {

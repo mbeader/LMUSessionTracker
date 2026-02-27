@@ -64,7 +64,7 @@
 </table>
 
 <div class="modal fade" id="pitModal" tabindex="-1" aria-labelledby="pitModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="pitModalLabel">Pit summary</h1>
@@ -90,9 +90,12 @@
                             <th>Stop ET</th>
                             <th>Swap ET</th>
                             <th>Release ET</th>
+                            <th>Exit ET</th>
+                            <th>Garage in ET</th>
+                            <th>Garage out ET</th>
                             <th class="text-end">Time</th>
                             <th class="text-center" title="Box after S/F line">BAL</th>
-                            <th class="text-center" title="Swap locations">SL</th>
+                            <th class="text-center" title="Stop location (swap location)">SLoc</th>
                             <th class="text-center" title="Penalty">Pen</th>
                         </tr>
                     </thead>
@@ -106,14 +109,17 @@
                             <td>{{ pit.stopTime <= 0 ? '-' : Format.time(pit.stopTime) }}</td>
                             <td>{{ pit.swapTime <= 0 ? '-' : Format.time(pit.swapTime) }}</td>
                             <td>{{ pit.releaseTime <= 0 ? '-' : Format.time(pit.releaseTime) }}</td>
+                            <td>{{ pit.exitTime <= 0 ? '-' : Format.time(pit.exitTime) }}</td>
+                            <td>{{ pit.garageInTime <= 0 ? '-' : Format.time(pit.garageInTime) }}</td>
+                            <td>{{ pit.garageOutTime <= 0 ? '-' : Format.time(pit.garageOutTime) }}</td>
                             <td class="text-end">{{ pit.stopTime <= 0 || pit.releaseTime <= 0 ? '-' : Format.lapTime(pit.releaseTime - pit.stopTime) }}</td>
                             <td class="text-center">{{ pit.stopAfterLine ? 'True' : '' }}</td>
-                            <td class="text-center">{{ pit.swapLocation < 0 ? '' : pit.swapLocation == 0 ? 'Gar' : `S${pit.swapLocation}` }}</td>
+                            <td class="text-center">{{ pit.stopLocation < 0 ? '-' : pit.stopLocation == 0 ? 'Gar' : `S${pit.stopLocation}` }} ({{ pit.swapLocation < 0 ? '-' : pit.swapLocation == 0 ? 'Gar' : `S${pit.swapLocation}` }})</td>
                             <td class="text-center">{{ pit.penalty ? 'True' : '' }}</td>
                         </tr>
                         } @empty {
                         <tr>
-                            <td colspan="10" class="text-center">No pit stops have been made</td>
+                            <td colspan="13" class="text-center">No pit stops have been made</td>
                         </tr>
                         }
                     </tbody>

@@ -32,7 +32,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		private string Update(double currentET, Standing standing) {
 			CarKey key = new CarKey(standing.slotID, standing.vehicleFilename);
 			if(!states.TryGetValue(key, out CarStateChange state)) {
-				states.Add(key, new CarStateChange(new CarState(key, standing)));
+				states.Add(key, new CarStateChange(new CarState(key, currentET, standing)));
 				return null;
 			}
 			CarState newState = state.Current.Next(currentET, standing);

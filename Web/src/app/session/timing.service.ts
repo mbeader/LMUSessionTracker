@@ -199,7 +199,7 @@ export interface TimingField {
 }
 
 class TimingFields {
-	private static nextId: number = 50;
+	private static nextId: number = 54;
 	fields: TimingField[] = [
 		{
 			id: 1,
@@ -468,6 +468,38 @@ class TimingFields {
 			colType: 'time-col'
 		},
 		{
+			id: 50,
+			name: 'LPEET',
+			desc: 'Last pit exit elasped time',
+			value: i => typeof i.state === 'undefined' || i.state.lastExitTime < 0 ? '-' : Format.time(i.state.lastExitTime),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 51,
+			name: 'LGL',
+			desc: 'Last garage lap',
+			value: i => typeof i.state === 'undefined' || i.state.lastGarageLap < 0 ? '-' : i.state.lastGarageLap.toString(),
+			align: 'end',
+			colType: 'char2-col'
+		},
+		{
+			id: 52,
+			name: 'LGIET',
+			desc: 'Last garage in elasped time',
+			value: i => typeof i.state === 'undefined' || i.state.lastGarageInTime < 0 ? '-' : Format.time(i.state.lastGarageInTime),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
+			id: 53,
+			name: 'LGOET',
+			desc: 'Last garage out elasped time',
+			value: i => typeof i.state === 'undefined' || i.state.lastGarageOutTime < 0 ? '-' : Format.time(i.state.lastGarageOutTime),
+			align: 'end',
+			colType: 'time-col'
+		},
+		{
 			id: 30,
 			name: 'GTL',
 			desc: 'Garage this lap',
@@ -501,11 +533,11 @@ class TimingFields {
 		},
 		{
 			id: 34,
-			name: 'SL',
-			desc: 'Swap location',
-			value: i => typeof i.state === 'undefined' || i.state.swapLocation < 0 ? '-' : i.state.swapLocation.toString(),
+			name: 'SLoc',
+			desc: 'Stop location (swap location)',
+			value: i => `${typeof i.state === 'undefined' || i.state.stopLocation < 0 ? '-' : i.state.stopLocation} (${typeof i.state === 'undefined' || i.state.swapLocation < 0 ? '-' : i.state.swapLocation})`,
 			align: 'end',
-			colType: 'char2-col'
+			colType: 'char5-col'
 		},
 		{
 			id: 35,

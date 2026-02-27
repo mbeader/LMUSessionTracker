@@ -15,8 +15,12 @@ namespace LMUSessionTracker.Server.Models {
 		public double PitTime { get; set; }
 		public double StopTime { get; set; }
 		public double ReleaseTime { get; set; }
+		public double ExitTime { get; set; }
+		public double GarageInTime { get; set; }
+		public double GarageOutTime { get; set; }
 		public double SwapTime { get; set; }
 		public bool StopAfterLine { get; set; }
+		public int StopLocation { get; set; }
 		public bool Swap { get; set; }
 		public int SwapLocation { get; set; }
 		public bool Penalty { get; set; }
@@ -51,6 +55,9 @@ namespace LMUSessionTracker.Server.Models {
 			PitTime = pit.PitTime;
 			StopTime = pit.StopTime;
 			ReleaseTime = pit.ReleaseTime;
+			ExitTime = pit.ExitTime;
+			GarageInTime = pit.GarageInTime;
+			GarageOutTime = pit.GarageOutTime;
 			SwapTime = pit.SwapTime;
 			StopAfterLine = pit.StopAfterLine;
 			Swap = pit.Swap;
@@ -84,6 +91,9 @@ namespace LMUSessionTracker.Server.Models {
 				PitTime = PitTime,
 				StopTime = StopTime,
 				ReleaseTime = ReleaseTime,
+				ExitTime = ExitTime,
+				GarageInTime = GarageInTime,
+				GarageOutTime = GarageOutTime,
 				SwapTime = SwapTime,
 				StopAfterLine = StopAfterLine,
 				Swap = Swap,

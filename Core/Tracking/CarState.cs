@@ -1,5 +1,7 @@
 ﻿using LMUSessionTracker.Core.LMU;
+using System;
 using System.Collections.Generic;
+using static LMUSessionTracker.Core.LMU.PitState;
 
 namespace LMUSessionTracker.Core.Tracking {
 	public class CarState {
@@ -46,6 +48,26 @@ namespace LMUSessionTracker.Core.Tracking {
 		/// </summary>
 		public double LastReleaseTime { get; set; } = -1;
 		/// <summary>
+		/// Sector where driver swap occurred
+		/// </summary>
+		public int StopLocation { get; set; } = -1;
+		/// <summary>
+		/// Elapsed time of last exit from pit lane (PitState changed from EXITING to anything while in the pits)
+		/// </summary>
+		public double LastExitTime { get; set; } = -1;
+		/// <summary>
+		/// Lap of last visit to garage
+		/// </summary>
+		public int LastGarageLap { get; set; } = -1;
+		/// <summary>
+		/// Elapsed time of last entrance to garage
+		/// </summary>
+		public double LastGarageInTime { get; set; } = -1;
+		/// <summary>
+		/// Elapsed time of last exit from garage
+		/// </summary>
+		public double LastGarageOutTime { get; set; } = -1;
+		/// <summary>
 		/// Whether in garage at all during this lap (InGarageStall ever set)
 		/// </summary>
 		public bool GarageThisLap { get; set; } = false;
@@ -66,9 +88,13 @@ namespace LMUSessionTracker.Core.Tracking {
 		/// </summary>
 		public int SwapLocation { get; set; } = -1;
 		/// <summary>
-		/// Whether this lap began on pit lane before any pit stop (PitState set to ENTERING during lap change)
+		/// Last recorded PitState of last lap
 		/// </summary>
-		public bool StartedLapInPit { get; set; } = false;
+		public string LastLapEndPitState { get; set; }
+		/// <summary>
+		/// First recorded PitState of this lap
+		/// </summary>
+		public string ThisLapStartPitState { get; set; }
 		/// <summary>
 		/// Whether a penalty was given this lap (Penalties increased)
 		/// </summary>
@@ -86,20 +112,62 @@ namespace LMUSessionTracker.Core.Tracking {
 		/// </summary>
 		public int TotalStops { get; set; }
 
-		public CarState(CarKey key, Standing standing = null) {
+		/// <summary>
+		/// Whether this lap began on pit lane before any pit stop
+		/// </summary>
+		public bool StartedLapInPit => LastLapEndPitState == ENTERING || LastLapEndPitState == STOPPED;
+
+		public CarState(CarKey key) {
 			Key = key;
-			if(standing != null)
+		}
+
+		public CarState(CarKey key, double currentET, Standing standing) : this(key) {
+			if(standing != null) {
 				From(standing);
+				Init(currentET, standing.sector);
+			}
+		}
+
+		private void Init(double currentET, string sector) {
+			if(PitState == ENTERING || PitState == STOPPED) {
+				LastPitLap = LapsCompleted + 1;
+				LastPitTime = currentET;
+				PitThisLap = true;
+				TotalPits++;
+				if(PitState == STOPPED) {
+					LastStopLap = LapsCompleted + 1;
+					LastStopTime = currentET;
+					StopThisLap = true;
+					StopLocation = Sector(sector);
+					TotalStops++;
+				}
+			}
+
+			if(Penalties > 0) {
+				TotalPenalties = Penalties;
+				PenaltyThisLap = true;
+			}
+
+			if(InGarageStall) {
+				LastGarageLap = LapsCompleted + 1;
+				LastGarageInTime = currentET;
+				GarageThisLap = true;
+			}
 		}
 
 		public CarState Next(double currentET, Standing standing) {
-			CarState newState = new CarState(Key, standing);
+			CarState newState = new CarState(Key);
+			newState.From(standing);
 
 			newState.LastPitLap = LastPitLap;
 			newState.LastPitTime = LastPitTime;
 			newState.LastStopLap = LastStopLap;
 			newState.LastStopTime = LastStopTime;
 			newState.LastReleaseTime = LastReleaseTime;
+			newState.LastExitTime = LastExitTime;
+			newState.LastGarageLap = LastGarageLap;
+			newState.LastGarageInTime = LastGarageInTime;
+			newState.LastGarageOutTime = LastGarageOutTime;
 			newState.LastSwapLap = LastSwapLap;
 			newState.LastSwapTime = LastSwapTime;
 			newState.TotalPenalties = TotalPenalties;
@@ -109,34 +177,51 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(LapsCompleted == newState.LapsCompleted) {
 				newState.PitThisLap = PitThisLap;
 				newState.StopThisLap = StopThisLap;
+				newState.StopLocation = StopLocation;
 				newState.GarageThisLap = GarageThisLap;
 				newState.SwapThisLap = SwapThisLap;
 				newState.SwapLocation = SwapLocation;
-				newState.StartedLapInPit = StartedLapInPit;
+				newState.LastLapEndPitState = LastLapEndPitState;
+				newState.ThisLapStartPitState = ThisLapStartPitState;
 				newState.PenaltyThisLap = PenaltyThisLap;
 
-				if((!newState.StartedLapInPit || PitState != "ENTERING") && !newState.PitThisLap && newState.PitState == "ENTERING") {
+				if(newState.PitThisLap && newState.PitState == ENTERING && PitState != ENTERING) {
+					// already pit this lap
+					newState.LastPitTime = currentET;
+					newState.TotalPits++;
+				} else if((!newState.StartedLapInPit || PitState != ENTERING) && !newState.PitThisLap && newState.PitState == ENTERING) {
 					newState.LastPitLap = newState.LapsCompleted + 1;
 					newState.LastPitTime = currentET;
 					newState.PitThisLap = true;
 					newState.TotalPits++;
 				}
 			} else {
-				if(newState.PitState == "ENTERING")
-					newState.StartedLapInPit = true;
+				newState.LastLapEndPitState = PitState;
+				newState.ThisLapStartPitState = newState.PitState;
 			}
 
-			if(!StopThisLap && newState.PitState == "STOPPED") {
+			if(!StopThisLap && newState.PitState == STOPPED) {
 				newState.LastStopLap = newState.LapsCompleted + 1;
 				newState.LastStopTime = currentET;
 				newState.StopThisLap = true;
+				newState.StopLocation = Sector(standing.sector);
 				newState.TotalStops++;
 				newState.LastReleaseTime = -1;
-			} else if(StopThisLap && PitState == "STOPPED" && newState.PitState != "STOPPED" && newState.LastReleaseTime == -1) {
+			} else if(StopThisLap && newState.PitState == STOPPED && newState.LastPitTime > newState.LastStopTime) {
+				// already stopped this lap
+				newState.LastStopTime = currentET;
+				newState.StopLocation = Sector(standing.sector);
+				newState.TotalStops++;
+				newState.LastReleaseTime = -1;
+			} else if(StopThisLap && PitState == STOPPED && newState.PitState != STOPPED && newState.LastReleaseTime == -1) {
 				newState.LastReleaseTime = currentET;
-			} else if(StopThisLap && PitState != "STOPPED" && newState.PitState == "STOPPED" && newState.LastReleaseTime != -1) {
+			} else if(StopThisLap && PitState != STOPPED && newState.PitState == STOPPED && newState.LastReleaseTime != -1) {
 				// PitState seems to become NONE during driver swaps
 				newState.LastReleaseTime = -1;
+			}
+
+			if((PitThisLap || StartedLapInPit || ThisLapStartPitState == EXITING) && PitState == EXITING && newState.PitState != EXITING) {
+				newState.LastExitTime = currentET;
 			}
 
 			// probably will miss consecutive drive-through penalties
@@ -145,8 +230,13 @@ namespace LMUSessionTracker.Core.Tracking {
 				newState.PenaltyThisLap = true;
 			}
 
-			if(newState.InGarageStall)
+			if(!InGarageStall && newState.InGarageStall) {
+				newState.LastGarageLap = newState.LapsCompleted + 1;
+				newState.LastGarageInTime = currentET;
 				newState.GarageThisLap = true;
+			} else if(InGarageStall && !newState.InGarageStall) {
+				newState.LastGarageOutTime = currentET;
+			}
 
 			if(DriverName != newState.DriverName) {
 				newState.LastSwapLap = newState.LapsCompleted + 1;
@@ -155,23 +245,26 @@ namespace LMUSessionTracker.Core.Tracking {
 				if(newState.InGarageStall)
 					newState.SwapLocation = 0;
 				else {
-					switch(standing.sector) {
-						case "SECTOR1":
-							newState.SwapLocation = 1;
-							break;
-						case "SECTOR2":
-							newState.SwapLocation = 2;
-							break;
-						case "SECTOR3":
-							newState.SwapLocation = 3;
-							break;
-					}
+					newState.SwapLocation = Sector(standing.sector);
 				}
 			}
 			return newState;
 		}
 
-		public void From(Standing standing) {
+		private int Sector(string sector) {
+			switch(sector) {
+				case "SECTOR1":
+					return 1;
+				case "SECTOR2":
+					return 2;
+				case "SECTOR3":
+					return 3;
+				default:
+					return -1;
+			}
+		}
+
+		private void From(Standing standing) {
 			CountLapFlag = standing.countLapFlag;
 			DriverName = standing.driverName;
 			FinishStatus = standing.finishStatus;
@@ -208,12 +301,18 @@ namespace LMUSessionTracker.Core.Tracking {
 				LastStopTime = LastStopTime,
 				StopThisLap = StopThisLap,
 				LastReleaseTime = LastReleaseTime,
+				StopLocation = StopLocation,
+				LastExitTime = LastExitTime,
+				LastGarageLap = LastGarageLap,
+				LastGarageInTime = LastGarageInTime,
+				LastGarageOutTime = LastGarageOutTime,
 				GarageThisLap = GarageThisLap,
 				LastSwapLap = LastSwapLap,
 				LastSwapTime = LastSwapTime,
 				SwapThisLap = SwapThisLap,
 				SwapLocation = SwapLocation,
-				StartedLapInPit = StartedLapInPit,
+				LastLapEndPitState = LastLapEndPitState,
+				ThisLapStartPitState = ThisLapStartPitState,
 				PenaltyThisLap = PenaltyThisLap,
 				TotalPenalties = TotalPenalties,
 				TotalPits = TotalPits,
@@ -223,65 +322,55 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public List<string> Difference(CarState other) {
 			List<string> diffs = new List<string>();
-			if(CountLapFlag != other.CountLapFlag)
-				diffs.Add($"CountLapFlag: [{CountLapFlag} to {other.CountLapFlag}]");
-			if(DriverName != other.DriverName)
-				diffs.Add($"DriverName: [{DriverName} to {other.DriverName}]");
-			if(FinishStatus != other.FinishStatus)
-				diffs.Add($"FinishStatus: [{FinishStatus} to {other.FinishStatus}]");
-			if(InGarageStall != other.InGarageStall)
-				diffs.Add($"InGarageStall: [{InGarageStall} to {other.InGarageStall}]");
-			if(LapStartET != other.LapStartET)
-				diffs.Add($"LapStartET: [{LapStartET} to {other.LapStartET}]");
-			if(LapsCompleted != other.LapsCompleted)
-				diffs.Add($"LapsCompleted: [{LapsCompleted} to {other.LapsCompleted}]");
-			if(Penalties != other.Penalties)
-				diffs.Add($"Penalties: [{Penalties} to {other.Penalties}]");
-			if(PitState != other.PitState)
-				diffs.Add($"PitState: [{PitState} to {other.PitState}]");
-			if(Pitstops != other.Pitstops)
-				diffs.Add($"Pitstops: [{Pitstops} to {other.Pitstops}]");
-			if(Pitting != other.Pitting)
-				diffs.Add($"Pitting: [{Pitting} to {other.Pitting}]");
-			//if(Position != other.Position)
-			//	diffs.Add($"Position: [{Position} to {other.Position}]");
-			if(ServerScored != other.ServerScored)
-				diffs.Add($"ServerScored: [{ServerScored} to {other.ServerScored}]");
-			if(LastPitLap != other.LastPitLap)
-				diffs.Add($"LastPitLap: [{LastPitLap} to {other.LastPitLap}]");
-			if(LastPitTime != other.LastPitTime)
-				diffs.Add($"LastPitTime: [{LastPitTime} to {other.LastPitTime}]");
-			if(PitThisLap != other.PitThisLap)
-				diffs.Add($"PitThisLap: [{PitThisLap} to {other.PitThisLap}]");
-			if(LastStopLap != other.LastStopLap)
-				diffs.Add($"LastStopLap: [{LastStopLap} to {other.LastStopLap}]");
-			if(LastStopTime != other.LastStopTime)
-				diffs.Add($"LastStopTime: [{LastStopTime} to {other.LastStopTime}]");
-			if(StopThisLap != other.StopThisLap)
-				diffs.Add($"StopThisLap: [{StopThisLap} to {other.StopThisLap}]");
-			if(LastReleaseTime != other.LastReleaseTime)
-				diffs.Add($"LastReleaseTime: [{LastReleaseTime} to {other.LastReleaseTime}]");
-			if(GarageThisLap != other.GarageThisLap)
-				diffs.Add($"GarageThisLap: [{GarageThisLap} to {other.GarageThisLap}]");
-			if(LastSwapLap != other.LastSwapLap)
-				diffs.Add($"LastSwapLap: [{LastSwapLap} to {other.LastSwapLap}]");
-			if(LastSwapTime != other.LastSwapTime)
-				diffs.Add($"LastSwapTime: [{LastSwapTime} to {other.LastSwapTime}]");
-			if(SwapThisLap != other.SwapThisLap)
-				diffs.Add($"SwapThisLap: [{SwapThisLap} to {other.SwapThisLap}]");
-			if(SwapLocation != other.SwapLocation)
-				diffs.Add($"SwapLocation: [{SwapLocation} to {other.SwapLocation}]");
-			if(StartedLapInPit != other.StartedLapInPit)
-				diffs.Add($"StartedLapInPit: [{StartedLapInPit} to {other.StartedLapInPit}]");
-			if(PenaltyThisLap != other.PenaltyThisLap)
-				diffs.Add($"PenaltyThisLap: [{PenaltyThisLap} to {other.PenaltyThisLap}]");
-			if(TotalPenalties != other.TotalPenalties)
-				diffs.Add($"TotalPenalties: [{TotalPenalties} to {other.TotalPenalties}]");
-			if(TotalPits != other.TotalPits)
-				diffs.Add($"TotalPits: [{TotalPits} to {other.TotalPits}]");
-			if(TotalStops != other.TotalStops)
-				diffs.Add($"TotalStops: [{TotalStops} to {other.TotalStops}]");
+			foreach((string name, Func<CarState, object> prop) in DiffProps.Props) {
+				var thisProp = prop(this);
+				var otherProp = prop(other);
+				if((thisProp == null && otherProp != null) || (thisProp != null && !thisProp.Equals(otherProp)))
+					diffs.Add($"{name}: [{prop(this)} to {prop(other)}]");
+			}
 			return diffs;
+		}
+
+		private static class DiffProps {
+			private static readonly List<(string name, Func<CarState, object> prop)> props = new List<(string name, Func<CarState, object> prop)>() {
+				(nameof(CountLapFlag), x => x.CountLapFlag),
+				(nameof(DriverName), x => x.DriverName),
+				(nameof(FinishStatus), x => x.FinishStatus),
+				(nameof(InGarageStall), x => x.InGarageStall),
+				(nameof(LapStartET), x => x.LapStartET),
+				(nameof(LapsCompleted), x => x.LapsCompleted),
+				(nameof(Penalties), x => x.Penalties),
+				(nameof(PitState), x => x.PitState),
+				(nameof(Pitstops), x => x.Pitstops),
+				(nameof(Pitting), x => x.Pitting),
+				//(nameof(Position), x => x.Position),
+				(nameof(ServerScored), x => x.ServerScored),
+				(nameof(LastPitLap), x => x.LastPitLap),
+				(nameof(LastPitTime), x => x.LastPitTime),
+				(nameof(PitThisLap), x => x.PitThisLap),
+				(nameof(LastStopLap), x => x.LastStopLap),
+				(nameof(LastStopTime), x => x.LastStopTime),
+				(nameof(StopThisLap), x => x.StopThisLap),
+				(nameof(LastReleaseTime), x => x.LastReleaseTime),
+				(nameof(StopLocation), x => x.StopLocation),
+				(nameof(LastExitTime), x => x.LastExitTime),
+				(nameof(LastGarageLap), x => x.LastGarageLap),
+				(nameof(LastGarageInTime), x => x.LastGarageInTime),
+				(nameof(LastGarageOutTime), x => x.LastGarageOutTime),
+				(nameof(GarageThisLap), x => x.GarageThisLap),
+				(nameof(LastSwapLap), x => x.LastSwapLap),
+				(nameof(LastSwapTime), x => x.LastSwapTime),
+				(nameof(SwapThisLap), x => x.SwapThisLap),
+				(nameof(SwapLocation), x => x.SwapLocation),
+				(nameof(LastLapEndPitState), x => x.LastLapEndPitState),
+				(nameof(ThisLapStartPitState), x => x.ThisLapStartPitState),
+				(nameof(PenaltyThisLap), x => x.PenaltyThisLap),
+				(nameof(TotalPenalties), x => x.TotalPenalties),
+				(nameof(TotalPits), x => x.TotalPits),
+				(nameof(TotalStops), x => x.TotalStops),
+			};
+
+			public static IReadOnlyList<(string name, Func<CarState, object> prop)> Props => props;
 		}
 	}
 }

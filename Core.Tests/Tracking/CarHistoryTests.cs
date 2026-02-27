@@ -1,6 +1,7 @@
 using LMUSessionTracker.Core.Tracking;
 using System;
 using System.Collections.Generic;
+using static LMUSessionTracker.Core.LMU.PitState;
 
 namespace LMUSessionTracker.Core.Tests.Tracking {
 	public class CarHistoryTests {
@@ -99,6 +100,45 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public void Update_PitStopLap2Sequence_OnePit() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true,
+				LastPitTime = 10 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true,
+				LastPitTime = 10, LastStopTime = 20 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30, LastExitTime = 40 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, PitTime = 10, StopTime = 20, ReleaseTime = 30, ExitTime = 40 } }, history.Pits);
+		}
+
+		[Fact]
+		public void Update_PitStopLap2CrossLineWhileExitingSequence_OnePit() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, LastPitLap = 2,
+				LastPitTime = 10 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, LastPitLap = 2, StopThisLap = true,
+				LastPitTime = 10, LastStopTime = 20 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, LastPitLap = 2, StopThisLap = true,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 2, LastPitLap = 2, LastLapEndPitState = EXITING, ThisLapStartPitState = EXITING,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30 });
+			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 2, LastPitLap = 2, LastLapEndPitState = EXITING, ThisLapStartPitState = EXITING,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30, LastExitTime = 40 });
+			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, PitTime = 10, StopTime = 20, ReleaseTime = 30, ExitTime = 40 } }, history.Pits);
+		}
+
+		[Fact]
 		public void Update_PitStopSwapLap2_OnePit() {
 			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
 			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true, SwapThisLap = true,
@@ -122,7 +162,10 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true, SwapThisLap = true,
 				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30, LastSwapTime = 25, SwapLocation = 3 });
 			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
-			AssertEquivalent(new() { new() { Lap = 2, PitTime = 10, StopTime = 20, ReleaseTime = 30, SwapTime = 25, SwapLocation = 3, Swap = true } }, history.Pits);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true, SwapThisLap = true,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30, LastExitTime = 40, LastSwapTime = 25, SwapLocation = 3 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, PitTime = 10, StopTime = 20, ReleaseTime = 30, ExitTime = 40, SwapTime = 25, SwapLocation = 3, Swap = true } }, history.Pits);
 		}
 
 		[Fact]
@@ -153,10 +196,28 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true,
 				LastPitTime = 10 });
 			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
-			state.Next(new CarState(key) { LapsCompleted = 2, StopThisLap = true, StartedLapInPit = true,
+			state.Next(new CarState(key) { LapsCompleted = 2, StopThisLap = true, LastLapEndPitState = ENTERING,
 				LastPitTime = 10, LastStopTime = 20 });
 			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
 			AssertEquivalent(new() { new() { Lap = 2, PitTime = 10, StopTime = 20, StopAfterLine = true } }, history.Pits);
+		}
+
+		[Fact]
+		public void Update_PitStopLap2ReleaseLap3_OnePit() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true,
+				LastPitTime = 10 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true,
+				LastPitTime = 10, LastStopTime = 20 });
+			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 2, LastLapEndPitState = STOPPED, ThisLapStartPitState = EXITING,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30 });
+			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 2, LastLapEndPitState = STOPPED, ThisLapStartPitState = EXITING,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30, LastExitTime = 40 });
+			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, PitTime = 10, StopTime = 20, ReleaseTime = 30, ExitTime = 40 } }, history.Pits);
 		}
 
 		[Fact]
@@ -165,13 +226,13 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true,
 				LastPitTime = 10 });
 			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
-			state.Next(new CarState(key) { LapsCompleted = 2, StopThisLap = true, StartedLapInPit = true,
+			state.Next(new CarState(key) { LapsCompleted = 2, StopThisLap = true, LastLapEndPitState = ENTERING,
 				LastPitTime = 10, LastStopTime = 20 });
 			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
-			state.Next(new CarState(key) { LapsCompleted = 2, PitThisLap = true, StartedLapInPit = true,
+			state.Next(new CarState(key) { LapsCompleted = 2, PitThisLap = true, LastLapEndPitState = ENTERING,
 				LastPitTime = 40, LastStopTime = 20 });
 			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
-			state.Next(new CarState(key) { LapsCompleted = 3, StopThisLap = true, StartedLapInPit = true,
+			state.Next(new CarState(key) { LapsCompleted = 3, StopThisLap = true, LastLapEndPitState = ENTERING,
 				LastPitTime = 40, LastStopTime = 50 });
 			history.Update(state, new() { lapsCompleted = 3, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
 			AssertEquivalent(new() { new() { Lap = 2, PitTime = 10, StopTime = 20, StopAfterLine = true }, new() { Lap = 3, PitTime = 40, StopTime = 50, StopAfterLine = true } }, history.Pits);
@@ -183,19 +244,118 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true,
 				LastPitTime = 10 });
 			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
-			state.Next(new CarState(key) { LapsCompleted = 2, StopThisLap = true, StartedLapInPit = true,
+			state.Next(new CarState(key) { LapsCompleted = 2, StopThisLap = true, LastLapEndPitState = ENTERING,
 				LastPitTime = 10, LastStopTime = 20 });
 			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
-			state.Next(new CarState(key) { LapsCompleted = 2, StopThisLap = true, StartedLapInPit = true,
+			state.Next(new CarState(key) { LapsCompleted = 2, StopThisLap = true, LastLapEndPitState = ENTERING,
 				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 25 });
 			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
-			state.Next(new CarState(key) { LapsCompleted = 2, PitThisLap = true, StartedLapInPit = true,
+			state.Next(new CarState(key) { LapsCompleted = 2, PitThisLap = true, LastLapEndPitState = ENTERING,
 				LastPitTime = 40, LastStopTime = 20, LastReleaseTime = 25 });
 			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
-			state.Next(new CarState(key) { LapsCompleted = 3, StartedLapInPit = true,
+			state.Next(new CarState(key) { LapsCompleted = 3, LastLapEndPitState = ENTERING,
 				LastPitTime = 40, LastStopTime = 20, LastReleaseTime = 25 });
 			history.Update(state, new() { lapsCompleted = 3, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
 			AssertEquivalent(new() { new() { Lap = 2, PitTime = 10, StopTime = 20, ReleaseTime = 25, StopAfterLine = true }, new() { Lap = 3, PitTime = 40, StopAfterLine = true } }, history.Pits);
+		}
+
+		[Fact]
+		public void Update_PitStopLap2ThenEnterAgainSameLap_TwoPits() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30, LastExitTime = 40, });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true,
+				LastPitTime = 50, LastStopTime = 20, LastReleaseTime = 30, LastExitTime = 40, });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, PitTime = 10, StopTime = 20, ReleaseTime = 30, ExitTime = 40 }, new() { Lap = 2, PitTime = 50 } }, history.Pits);
+		}
+
+		[Fact]
+		public void Update_GarageLap2_OnePit() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true,
+				LastGarageInTime = 10 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, GarageInTime = 10 } }, history.Pits);
+		}
+
+		[Fact]
+		public void Update_GarageLap2ThenSwap_OnePit() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true,
+				LastGarageInTime = 10 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true, SwapThisLap = true, SwapLocation = 0,
+				LastGarageInTime = 10, LastSwapTime = 20 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, GarageInTime = 10, SwapTime = 20, Swap = true, SwapLocation = 0 } }, history.Pits);
+		}
+
+		[Fact]
+		public void Update_GarageLap2ThenExitThenSwap_OnePit() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true,
+				LastGarageInTime = 10 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true,
+				LastGarageInTime = 10, LastGarageOutTime = 15 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true, SwapThisLap = true, SwapLocation = 0,
+				LastGarageInTime = 10, LastGarageOutTime = 15, LastSwapTime = 20 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, GarageInTime = 10, GarageOutTime = 15 } }, history.Pits);
+		}
+
+		[Fact]
+		public void Update_GarageLap2SuccessiveWithPitSet_OnePit() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true,
+				LastGarageInTime = 10 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true,
+				LastGarageInTime = 10, LastPitTime = 9 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, GarageInTime = 10 } }, history.Pits);
+		}
+
+		[Fact]
+		public void Update_PitStopLap2ThenGarage_TwoPits() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true, GarageThisLap = true,
+				LastPitTime = 10, LastStopTime = 20, LastReleaseTime = 30, LastGarageInTime = 40 });
+			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, PitTime = 10, StopTime = 20, ReleaseTime = 30 }, new() { Lap = 2, GarageInTime = 40 } }, history.Pits);
+		}
+
+		[Fact]
+		public void Update_StopLap2ThenGarage_TwoPits() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true,
+				LastStopTime = 20, LastReleaseTime = 30 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, PitThisLap = true, StopThisLap = true, GarageThisLap = true,
+				LastStopTime = 20, LastReleaseTime = 30, LastGarageInTime = 40 });
+			history.Update(state, new() { lapsCompleted = 2, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, StopTime = 20, ReleaseTime = 30 }, new() { Lap = 2, GarageInTime = 40 } }, history.Pits);
+		}
+
+		[Fact]
+		public void Update_GarageLap2ThenEnterAgainSameLap_TwoPits() {
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true,
+				LastGarageInTime = 10 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true,
+				LastGarageInTime = 10, LastGarageOutTime = 20 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			state.Next(new CarState(key) { LapsCompleted = 1, GarageThisLap = true,
+				LastGarageInTime = 30, LastGarageOutTime = 20 });
+			history.Update(state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 }, dt);
+			AssertEquivalent(new() { new() { Lap = 2, GarageInTime = 10, GarageOutTime = 20 }, new() { Lap = 2, GarageInTime = 30 } }, history.Pits);
 		}
 	}
 }

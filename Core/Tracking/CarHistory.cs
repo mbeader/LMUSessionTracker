@@ -52,16 +52,25 @@ namespace LMUSessionTracker.Core.Tracking {
 		}
 
 		private void AddPit(CarStateChange state, Lap newLap) {
-			bool inPit = state.Current.PitThisLap || state.Current.StartedLapInPit;
+			bool inPit = state.Current.PitThisLap || state.Current.StartedLapInPit || state.Current.GarageThisLap || (state.Current.LastLapEndPitState == PitState.EXITING && state.Current.LastPitLap == state.Current.LapsCompleted);
 			if(!inPit)
 				return;
-			int lap = state.Current.LapsCompleted + (state.Current.PitThisLap ? 1 : 0);
 			Pit pit = Pits.Count == 0 ? null : Pits[^1];
-			if(pit == null || pit.Lap != lap) {
+			if(!IsSamePit(pit, state)) {
 				pit = new Pit(state.Current);
 				Pits.Add(pit);
 			} else
 				pit.Merge(state.Current);
+		}
+
+		private bool IsSamePit(Pit pit, CarStateChange state) {
+			int lap = state.Current.LapsCompleted + (state.Current.PitThisLap || state.Current.GarageThisLap ? 1 : 0);
+			bool isGarage = pit != null && (pit.GarageInTime >= 0 || pit.GarageOutTime >= 0);
+			if(pit == null || pit.Lap != lap || (!isGarage && pit.PitTime != state.Current.LastPitTime) || (isGarage && state.Current.LastPitTime > Math.Max(pit.GarageInTime, pit.GarageOutTime)))
+				return false;
+			if((!isGarage && state.Current.LastGarageInTime > pit.PitTime) || (isGarage && pit.GarageInTime != state.Current.LastGarageInTime))
+				return false;
+			return true;
 		}
 
 		public void FixLaps() {
