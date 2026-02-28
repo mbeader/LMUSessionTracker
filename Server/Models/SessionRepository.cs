@@ -75,6 +75,7 @@ namespace LMUSessionTracker.Server.Models {
 					Active = false,
 					CarCount = Math.Max(cars.Find(x => x.SessionId == session.SessionId)?.Count ?? 0, entries.Find(x => x.SessionId == session.SessionId)?.Count ?? 0),
 					LapCount = laps.Find(x => x.SessionId == session.SessionId)?.Count ?? 0,
+					CurrentET = session.LastState?.CurrentEventTime ?? 0,
 					Remaining = session.LastState?.TimeRemainingInGamePhase ?? 0,
 					Phase = session.LastState?.GamePhase ?? -1,
 				});

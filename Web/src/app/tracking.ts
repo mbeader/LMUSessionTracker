@@ -200,6 +200,7 @@ export interface SessionSummary {
 	active: boolean;
 	carCount: number;
 	lapCount: number;
+	currentET: number;
 	remaining: number;
 	phase: number;
 	bests: Bests;

@@ -39,10 +39,12 @@ export class LapsViewModel {
 	public car: CarHistory | null = null;
 	public session: SessionSummary | null = null;
 	public bests: Bests | null = null;
+	public currentET: number | null = null;
 
 	static merge(vm: LapsViewModel, other: LapsViewModel) {
 		vm.car = other.car;
 		vm.bests = other.bests;
+		vm.currentET = other.currentET;
 	}
 }
 

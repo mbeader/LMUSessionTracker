@@ -1,49 +1,75 @@
 @if(car) {
 <dl class="row">
-    <dt class="col-4 order-1">Total pits</dt>
-    <dd class="col-4 order-2">{{ car.pits.length }}</dd>
-    <dt class="col-4 order-1">Total stops</dt>
-    <dd class="col-4 order-2">{{ getTotalStops() }}</dd>
-    <dt class="col-4 order-1">Total swaps</dt>
-    <dd class="col-4 order-2">{{ getTotalSwaps() }}</dd>
-    <dt class="col-12 order-2">Total time stopped</dt>
-    <dd class="col-12 order-2">{{ Format.time(getTotalTimeStopped()) }}</dd>
+    <dt class="col-3 order-1">Total pits</dt>
+    <dd class="col-3 order-2">{{ getTotalPits() }}</dd>
+    <dt class="col-3 order-1">Total stops</dt>
+    <dd class="col-3 order-2">{{ getTotalStops() }}</dd>
+    <dt class="col-3 order-1">Total swaps</dt>
+    <dd class="col-3 order-2">{{ getTotalSwaps() }}</dd>
+    <dt class="col-3 order-1">Total garage visits</dt>
+    <dd class="col-3 order-2">{{ getTotalGarages() }}</dd>
+    <dt class="col-3 order-3">Total time in pit</dt>
+    <dd class="col-3 order-4">{{ Format.time(getTotalTimeInPit()) }}</dd>
+    <dt class="col-6 order-3">Total time stopped</dt>
+    <dd class="col-6 order-4">{{ Format.time(getTotalTimeStopped()) }}</dd>
+    <dt class="col-3 order-3">Total time in garage</dt>
+    <dd class="col-3 order-4">{{ Format.time(getTotalTimeInGarage()) }}</dd>
 </dl>
 <table class="table table-sm table-striped table-hover">
     <thead>
         <tr>
             <th>#</th>
             <th>Lap</th>
-            <th>Entry ET</th>
-            <th>Stop ET</th>
-            <th>Swap ET</th>
-            <th>Release ET</th>
-            <th>Exit ET</th>
-            <th>Garage in ET</th>
-            <th>Garage out ET</th>
-            <th class="text-end">Time</th>
-            <th class="text-center" title="Box after S/F line">BAL</th>
-            <th class="text-center" title="Stop location (swap location)">SLoc</th>
+            <th class="text-center">Type</th>
+            <th class="text-center">Swap</th>
             <th class="text-center" title="Penalty">Pen</th>
+            <th class="text-end">Stop time</th>
+            <th class="text-end">Total time</th>
+            <th class="text-end" title="Stop location (swap location)">SLoc</th>
+            <th class="text-center" title="Box after S/F line">BAL</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         @for(pit of car.pits; track i; let i = $index) {
         @let pitNum = getPitNumber(i);
+        @let type = getType(pit);
         <tr>
             <td>{{ pitNum <= 0 ? '-' : pitNum }}</td>
             <td>{{ pit.lap }}</td>
-            <td>{{ pit.pitTime <= 0 ? '-' : Format.time(pit.pitTime) }}</td>
-            <td>{{ pit.stopTime <= 0 ? '-' : Format.time(pit.stopTime) }}</td>
-            <td>{{ pit.swapTime <= 0 ? '-' : Format.time(pit.swapTime) }}</td>
-            <td>{{ pit.releaseTime <= 0 ? '-' : Format.time(pit.releaseTime) }}</td>
-            <td>{{ pit.exitTime <= 0 ? '-' : Format.time(pit.exitTime) }}</td>
-            <td>{{ pit.garageInTime <= 0 ? '-' : Format.time(pit.garageInTime) }}</td>
-            <td>{{ pit.garageOutTime <= 0 ? '-' : Format.time(pit.garageOutTime) }}</td>
-            <td class="text-end">{{ pit.stopTime <= 0 || pit.releaseTime <= 0 ? '-' : Format.lapTime(pit.releaseTime - pit.stopTime) }}</td>
-            <td class="text-center">{{ pit.stopAfterLine ? 'True' : '' }}</td>
-            <td class="text-center">{{ pit.stopLocation < 0 ? '-' : pit.stopLocation == 0 ? 'Gar' : `S${pit.stopLocation}` }} ({{ pit.swapLocation < 0 ? '-' : pit.swapLocation == 0 ? 'Gar' : `S${pit.swapLocation}` }})</td>
+            <td class="text-center">{{ type ?? '&nbsp;' }}</td>
+            <td class="text-center">{{ pit.swap ? 'Swap' : '&nbsp;' }}</td>
             <td class="text-center">{{ pit.penalty ? 'True' : '' }}</td>
+            <td class="text-end">{{ Format.lapTime(getStopTime(pit) ?? -1) }}</td>
+            <td class="text-end">{{ Format.lapTime(getTotalTime(pit, car.pits.length - 1 == i) ?? -1) }}</td>
+            <td class="text-end">{{ pit.stopLocation < 0 ? '-' : pit.stopLocation == 0 ? 'Gar' : `S${pit.stopLocation}` }} ({{ pit.swapLocation < 0 ? '-' : pit.swapLocation == 0 ? 'Gar' : `S${pit.swapLocation}` }})</td>
+            <td class="text-center">{{ pit.stopAfterLine ? 'True' : '' }}</td>
+            <td>
+                <ng-template #popContent>
+                    <dl class="row mb-0">
+                        <dt class="col-6">Entry ET</dt>
+                        <dd class="col-6">{{ pit.pitTime <= 0 ? '-' : Format.time(pit.pitTime) }}</dd>
+                        <dt class="col-6">Stop ET</dt>
+                        <dd class="col-6">{{ pit.stopTime <= 0 ? '-' : Format.time(pit.stopTime) }}</dd>
+                        <dt class="col-6">Swap ET</dt>
+                        <dd class="col-6">{{ pit.swapTime <= 0 ? '-' : Format.time(pit.swapTime) }}</dd>
+                        <dt class="col-6">Release ET</dt>
+                        <dd class="col-6">{{ pit.releaseTime <= 0 ? '-' : Format.time(pit.releaseTime) }}</dd>
+                        <dt class="col-6">Exit ET</dt>
+                        <dd class="col-6">{{ pit.exitTime <= 0 ? '-' : Format.time(pit.exitTime) }}</dd>
+                        <dt class="col-6">Garage in ET</dt>
+                        <dd class="col-6">{{ pit.garageInTime <= 0 ? '-' : Format.time(pit.garageInTime) }}</dd>
+                        <dt class="col-6">Garage out ET</dt>
+                        <dd class="col-6">{{ pit.garageOutTime <= 0 ? '-' : Format.time(pit.garageOutTime) }}</dd>
+                    </dl>
+                </ng-template>
+                <button class="btn-icon ms-auto" title="Timing" placement="start" [ngbPopover]="popContent">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stopwatch" viewBox="0 0 16 16">
+                        <path d="M8.5 5.6a.5.5 0 1 0-1 0v2.9h-3a.5.5 0 0 0 0 1H8a.5.5 0 0 0 .5-.5z" />
+                        <path d="M6.5 1A.5.5 0 0 1 7 .5h2a.5.5 0 0 1 0 1v.57c1.36.196 2.594.78 3.584 1.64l.012-.013.354-.354-.354-.353a.5.5 0 0 1 .707-.708l1.414 1.415a.5.5 0 1 1-.707.707l-.353-.354-.354.354-.013.012A7 7 0 1 1 7 2.071V1.5a.5.5 0 0 1-.5-.5M8 3a6 6 0 1 0 .001 12A6 6 0 0 0 8 3" />
+                    </svg>
+                </button>
+            </td>
         </tr>
         } @empty {
         <tr>

@@ -284,6 +284,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				Active = active,
 				CarCount = Math.Max(Math.Max(History.Count, Entries?.Slots.Count ?? 0), LastStandings?.Count ?? 0),
 				LapCount = lapCount,
+				CurrentET = LastInfo?.currentEventTime ?? 0,
 				Remaining = LastInfo?.timeRemainingInGamePhase ?? 0,
 				Phase = LastInfo?.gamePhase ?? -1,
 			};
