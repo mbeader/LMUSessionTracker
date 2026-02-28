@@ -39,6 +39,7 @@ namespace LMUSessionTracker.Server.ViewModels {
 			} else if(Session != null) {
 				Session coreSession = Session.To();
 				History = coreSession.History.GetAllHistory();
+				History.ForEach(x => Entries.Add(x.Key, x.Car));
 			}
 		}
 	}

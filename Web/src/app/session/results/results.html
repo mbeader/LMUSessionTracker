@@ -36,7 +36,7 @@
         @let car = lap.car;
         @let carClass = (car && car.class ? car.class : '') ?? '';
         @if(car) {
-        <tr>
+        <tr [attr.car-id]="id">
             @let status = Format.status(lap);
             @let statusClass = Utils.statusClass(status);
             <td class="text-center"><span class="{{ statusClass }}">{{ status }}</span></td>
@@ -66,6 +66,7 @@
                         </svg>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#pitModal">View pit summary</button></li>
                         <li><a class="dropdown-item" [routerLink]="['Laps', `${id}`]">Laps</a></li>
                     </ul>
                 </div>
@@ -78,3 +79,27 @@
 } @else {
 <p class="text-center">This session is not live. View the <a [routerLink]="['History']">history</a> instead.</p>
 }
+
+<div class="modal fade" id="pitModal" tabindex="-1" aria-labelledby="pitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="pitModalLabel">
+                    Pit summary
+                    @if(carStatusDesc) {
+                    -
+                    <span class="fs-6"><app-session-class-badge [carClass]="carStatusDesc.carClass" /></span>
+                    <span> #{{ carStatusDesc.number }} {{ carStatusDesc.team }}</span>
+                    }
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <app-session-pit-summary [id]="carId" [session]="session" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

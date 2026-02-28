@@ -158,16 +158,20 @@ export class TimingService {
 		return bestClasses;
 	}
 
-	getCarDescription(id: string) {
-		let car = this.entries.get(id);
-		if (!car)
-			return;
-		let standing = this.session?.standings?.find(x => CarKey.fromStanding(x).id == id);
+	static getCarDescription(car?: Car, standing?: Standing) {
 		let driver = standing?.driverName ?? '';
 		let carClass = (car && car.class ? car.class : standing?.carClass) ?? '';
 		let number = car?.number ? car.number : standing?.carNumber ?? '?';
 		let team = car?.teamName ? car.teamName : (!standing?.fullTeamName ? standing?.vehicleName : standing?.fullTeamName) ?? driver;
 		return { carClass: carClass, number: number, team: team } as CarStatusDescription;
+	}
+
+	getCarDescription(id: string) {
+		let car = this.entries.get(id);
+		if (!car)
+			return;
+		let standing = this.session?.standings?.find(x => CarKey.fromStanding(x).id == id);
+		return TimingService.getCarDescription(car, standing);
 	}
 
 	getCar(id: string) {
