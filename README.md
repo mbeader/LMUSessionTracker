@@ -23,11 +23,14 @@ as long as one exists, data will continue to be collected uninterrupted.
 ## Features
 
 * Unified view of active sessions
-	* Live session conditions (data provided using websockets)
-	* [Live standings](standings.webm) (data provided using websockets)
-		* Including standard timing information, fuel, lap progess, and car status
-	* Live lap time tracking (data provided using websockets)
-	* Live track map (data provided using websockets)
+	* Live data provided using websockets 
+		* Session conditions
+		* [Standings](standings.webm)
+			* Including standard timing information, fuel, lap progess, and car status
+		* Extended timing with customizable columns
+		* Lap time tracking
+		* Track map
+		* Pit tracking
 	* Entry list with flags, badges, and roles for humans
 	* Highlighting of best laps/sectors per class/car/driver
 	* Multiplayer event resilience
@@ -37,8 +40,9 @@ as long as one exists, data will continue to be collected uninterrupted.
 * Historical view of old sessions
 	* Last known conditions
 	* Final standings based on recorded lap data (not equivalent to game results)
+	* Pit summary
 	* Lap times for each car
-* Live active sessions list (data provided using websockets)
+* Live active sessions list
 * Best laps per driver per car per track
 	* Prominent display of drivers marked as "known"
 	* Highlighting of best sector times
@@ -55,13 +59,9 @@ as long as one exists, data will continue to be collected uninterrupted.
 ### Planned features
 
 * Session tracking
-	* Cars
-		* Pit status
 	* Data
 		* Chat
 		* Tires/fuel/VE from history
-* Front-end
-	* Page for full live timing
 * Accept data from rF2 plugin
 
 ## Client
