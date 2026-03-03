@@ -1,7 +1,7 @@
 @if(session && session.session) {
 <h3 class="mb-0">Results</h3>
 @if(isRace) {
-<div class="mb-2"><small class="fst-italic">Only accurate to last completed lap</small></div>
+<div class="mb-2"><small class="fst-italic">Last recorded state</small></div>
 } @else {
 <div class="mb-2"><small class="fst-italic">Fastest recorded laps</small></div>
 }
@@ -16,11 +16,11 @@
             <th scope="col" class="team-col">Team</th>
             <th scope="col" class="driver-col">Driver</th>
             <th scope="col" class="text-end">Laps</th>
-            @if(isRace) {
-            <th scope="col" class="text-end time-col">Last</th>
-            } @else {
             <th scope="col" class="text-end time-col">Behind</th>
             <th scope="col" class="text-end time-col">Int</th>
+            @if(isRace) {
+            <th scope="col" class="text-end time-col">Best</th>
+            } @else {
             <th scope="col" class="text-end time-col">Time</th>
             }
             <th scope="col" class="text-end time-col">S1</th>
@@ -31,13 +31,15 @@
         </tr>
     </thead>
     <tbody>
-        @for (lap of results; track CarKey.fromCar(lap.car).id; let i = $index) {
-        @let id = CarKey.fromCar(lap.car).id;
-        @let car = lap.car;
+        @for (result of results; track CarKey.fromCar(result.car).id; let i = $index) {
+        @let id = CarKey.fromCar(result.car).id;
+        @let car = result.car;
         @let carClass = (car && car.class ? car.class : '') ?? '';
+        @let lap = result.bestLap;
+        @let bestClasses = getBestClasses(id, lap, carClass);
         @if(car) {
         <tr [attr.car-id]="id">
-            @let status = Format.status(lap);
+            @let status = Format.status(result.carState ?? {});
             @let statusClass = Utils.statusClass(status);
             <td class="text-center"><span class="{{ statusClass }}">{{ status }}</span></td>
             @let classId = Utils.classId(carClass);
@@ -46,18 +48,16 @@
             <td class="text-center"><app-session-class-badge [carClass]="carClass" /></td>
             <td class="text-center">{{ car?.number ? car.number : '' }}</td>
             <td class="team-col text-truncate" title="{{ car?.teamName }}">{{ car?.teamName ? car.teamName : '' }}</td>
-            <td class="driver-col text-truncate" title="{{ lap.driver }}">{{ lap.driver }}</td>
-            <td class="text-end">{{ lap.lapNumber }}</td>
-            @if(!isRace) {
-            <td class="text-end time-col">{{ gaps[i].behind <= 0 ? '-' : Format.diff(0, gaps[i].behind) }}</td>
-            <td class="text-end time-col">{{ gaps[i].interval <= 0 ? '-' : Format.diff(0, gaps[i].interval) }}</td>
-            }
-            <td class="text-end time-col">{{ Format.lapTime(lap.totalTime) }}</td>
-            <td class="text-end time-col">{{ Format.lapTime(lap.sector1) }}</td>
-            <td class="text-end time-col">{{ Format.lapTime(lap.sector2) }}</td>
-            <td class="text-end time-col">{{ Format.lapTime(lap.sector2) }}</td>
-            @let fuelClass = lap.fuel > .1 ? '' : lap.fuel > .05 ? 'text-warning' : 'text-danger';
-            <td class="text-end time-col {{ fuelClass }}">{{ Format.percent(lap.fuel) }}</td>
+            <td class="driver-col text-truncate" title="{{ lap?.driver }}">{{ lap?.driver }}</td>
+            <td class="text-end">{{ result.carState?.lapsCompleted }}</td>
+            <td class="text-end time-col">{{ gaps[i].behind <= 0 && gaps[i].behindLaps <= 0 ? '-' : Format.diff(gaps[i].behindLaps, gaps[i].behind) }}</td>
+            <td class="text-end time-col">{{ gaps[i].interval <= 0 && gaps[i].intervalLaps <= 0 ? '-' : Format.diff(gaps[i].intervalLaps, gaps[i].interval) }}</td>
+            <td class="text-end time-col {{ bestClasses.total }}">{{ Format.lapTime(lap?.totalTime ?? -1) }}</td>
+            <td class="text-end time-col {{ bestClasses.sector1 }}">{{ Format.lapTime(lap?.sector1 ?? -1) }}</td>
+            <td class="text-end time-col {{ bestClasses.sector2 }}">{{ Format.lapTime(lap?.sector2 ?? -1) }}</td>
+            <td class="text-end time-col {{ bestClasses.sector3 }}">{{ Format.lapTime(lap?.sector2 ?? -1) }}</td>
+            @let fuelClass = !lap || lap.fuel > .1 ? '' : lap.fuel > .05 ? 'text-warning' : 'text-danger';
+            <td class="text-end time-col {{ fuelClass }}">{{ Format.percent(lap?.fuel ?? null) }}</td>
             <td class="">
                 <div class="dropdown">
                     <button class="btn-icon ms-auto dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">

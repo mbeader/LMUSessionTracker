@@ -1,4 +1,5 @@
-﻿using LMUSessionTracker.Server.ViewModels;
+﻿using LMUSessionTracker.Core.Tracking;
+using LMUSessionTracker.Server.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,8 +14,8 @@ namespace LMUSessionTracker.Server.Models {
 		public Task<List<Core.Tracking.SessionSummary>> GetSessions(int page, int pageSize);
 		public Task<SessionState> GetSessionState(string sessionId);
 		public Task<List<Car>> GetEntries(string sessionId);
-		public Task<List<Lap>> GetResults(string sessionId);
-		public Task<List<Lap>> GetTimedResults(string sessionId);
+		public Task<List<Result>> GetResults(string sessionId);
+		public Task<List<Result>> GetTimedResults(string sessionId);
 		public Task<List<string>> GetTracks();
 		public Task<List<BestLap>> GetLaps(BestLapsFilters filters);
 		public Task<Dictionary<string, ClassBest>> GetClassBests(BestLapsFilters filters);
@@ -91,7 +92,48 @@ namespace LMUSessionTracker.Server.Models {
 			return await context.Cars.Include(x => x.Entry).Include(x => x.Entry.Members).Where(x => x.SessionId == sessionId).OrderBy(x => x.CarId).ToListAsync();
 		}
 
-		public async Task<List<Lap>> GetResults(string sessionId) {
+		public async Task<List<Result>> GetResults(string sessionId) {
+			List<Car> cars = await context.Cars.Include(x => x.LastState).Include(x => x.Entry)
+				.Where(x => x.SessionId == sessionId)
+				.OrderBy(x => x.LastState.Position)
+				.ToListAsync();
+			List<Lap> bestLaps = await GetBestLaps(sessionId);
+			List<Lap> lastLaps = await GetLastLaps(sessionId);
+
+			List<Result> res = new List<Result>();
+			bool allWithoutState = true;
+			foreach(Car car in cars) {
+				CarKey key = new CarKey(car.SlotId, car.Veh);
+				int lastLap = (car.LastState?.LapsCompleted ?? 0) - 1;
+				res.Add(new Result() {
+					Car = car.To(),
+					CarState = car.LastState?.To(key),
+					BestLap = bestLaps.Find(x => x.CarId == car.CarId)?.To(),
+					LastLap = lastLaps.Find(x => x.CarId == car.CarId && x.LapNumber == lastLap)?.To(),
+				});
+				if(allWithoutState && car.LastState != null)
+					allWithoutState = false;
+			}
+
+			if(allWithoutState) {
+				// special handling for sessions created before persisting car state
+				foreach(Result result in res) {
+					CarKey key = new CarKey(result.Car.SlotId, result.Car.Veh);
+					result.LastLap = cars
+						.Where(x => x.SlotId == key.SlotId && x.Veh == key.Veh)
+						.Join(lastLaps, x => x.CarId, x => x.CarId, (x, y) => y)
+						.FirstOrDefault()?.To();
+					result.CarState = new Core.Tracking.CarState(key) { LapsCompleted = result.LastLap?.LapNumber ?? 0, FinishStatus = result.LastLap?.FinishStatus };
+				}
+				res = res.OrderByDescending(x => x.LastLap?.FinishStatus != "FSTAT_DQ")
+					.ThenByDescending(x => x.LastLap?.LapNumber)
+					.ThenBy(x => x.LastLap?.Position)
+					.ToList();
+			}
+			return res;
+		}
+
+		private async Task<List<Lap>> GetLastLaps(string sessionId) {
 			return await context.Laps.Include(x => x.Car).Include(x => x.Car.Entry)
 				.Where(x => x.SessionId == sessionId)
 				.Join(
@@ -99,26 +141,71 @@ namespace LMUSessionTracker.Server.Models {
 						.Where(x => x.SessionId == sessionId)
 						.GroupBy(x => x.CarId)
 						.Select(x => new { CarId = x.Key, LapNumber = x.Max(x => x.LapNumber) }),
-					x => new { x.CarId, x.LapNumber }, x => x, (x, y) => x)
-				.OrderByDescending(x => x.FinishStatus != "FSTAT_DQ").ThenByDescending(x => x.LapNumber).ThenBy(x => x.Position)
+					x => new { x.CarId, x.LapNumber }, x => new { x.CarId, x.LapNumber }, (x, y) => x)
+				.OrderBy(x => x.TotalTime)
 				.ToListAsync();
 		}
 
-		public async Task<List<Lap>> GetTimedResults(string sessionId) {
-			var laps = await context.Laps.Include(x => x.Car).Include(x => x.Car.Entry)
-				.Where(x => x.SessionId == sessionId)
+		private async Task<List<Lap>> GetBestLaps(string sessionId) {
+			return await context.Laps.Include(x => x.Car).Include(x => x.Car.Entry)
+				.Where(x => x.SessionId == sessionId && x.TotalTime > 0 && x.IsValid)
 				.Join(
 					context.Laps
 						.Where(x => x.SessionId == sessionId && x.TotalTime > 0 && x.IsValid)
 						.GroupBy(x => x.CarId)
-						.Select(x => new { CarId = x.Key, TotalTime = x.Min(x => x.TotalTime), TotalLaps = x.Max(x => x.LapNumber) }),
-					x => new { x.CarId, x.TotalTime }, x => new { x.CarId, x.TotalTime }, (x, y) => new { Lap = x, y.TotalLaps })
-				.OrderBy(x => x.Lap.TotalTime)
+						.Select(x => new { CarId = x.Key, TotalTime = x.Min(x => x.TotalTime) }),
+					x => new { x.CarId, x.TotalTime }, x => new { x.CarId, x.TotalTime }, (x, y) => x)
+				.OrderBy(x => x.TotalTime)
 				.ToListAsync();
-			List<Lap> res = new List<Lap>();
-			foreach(var lap in laps) {
-				lap.Lap.LapNumber = lap.TotalLaps;
-				res.Add(lap.Lap);
+		}
+
+		public async Task<List<Result>> GetTimedResults(string sessionId) {
+			List<Car> cars = await context.Cars.Include(x => x.LastState).Include(x => x.Entry)
+				.Where(x => x.SessionId == sessionId)
+				.OrderBy(x => x.SlotId).ThenBy(x => x.Veh)
+				.ToListAsync();
+			List<Lap> laps = await GetBestLaps(sessionId);
+
+			List<Result> res = new List<Result>();
+			bool allWithoutState = true;
+			foreach(Lap lap in laps) {
+				Car car = cars.Find(x => x.CarId == lap.CarId);
+				CarKey key = new CarKey(car.SlotId, car.Veh);
+				res.Add(new Result() {
+					Car = car.To(),
+					CarState = car.LastState?.To(key),
+					BestLap = lap.To()
+				});
+				cars.Remove(car);
+				if(allWithoutState && car.LastState != null)
+					allWithoutState = false;
+			}
+			foreach(Car car in cars) {
+				CarKey key = new CarKey(car.SlotId, car.Veh);
+				res.Add(new Result() {
+					Car = car.To(),
+					CarState = car.LastState?.To(key)
+				});
+				if(allWithoutState && car.LastState != null)
+					allWithoutState = false;
+			}
+
+			if(allWithoutState) {
+				// special handling for sessions created before persisting car state
+				var lapCounts = await context.Cars
+					.Where(x => x.SessionId == sessionId)
+					.Join(
+						context.Laps
+							.Where(x => x.SessionId == sessionId)
+							.GroupBy(x => x.CarId)
+							.Select(x => new { CarId = x.Key, LapCount = x.Max(x => x.LapNumber) }),
+						x => new { x.CarId }, x => new { x.CarId }, (x, y) => new { Car = x, y.LapCount })
+					.ToListAsync();
+				foreach(Result result in res) {
+					CarKey key = new CarKey(result.Car.SlotId, result.Car.Veh);
+					var lapCount = lapCounts.Find(x => x.Car.SlotId == key.SlotId && x.Car.Veh == key.Veh);
+					result.CarState = new Core.Tracking.CarState(key) { LapsCompleted = lapCount?.LapCount ?? 0 };
+				}
 			}
 			return res;
 		}

@@ -1,15 +1,14 @@
 import { ChangeDetectorRef, Component, inject, Input, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ServerApiService } from '../../server-api.service';
-import { SessionViewModel } from '../../view-models';
-import { Car, CarKey } from '../../tracking';
+import { BestClasses, CarStatusDescription, TimingService } from '../timing.service';
+import { Result, SessionViewModel } from '../../view-models';
+import { Best, Car, CarKey, Lap } from '../../tracking';
+import { Standing } from '../../lmu';
 import { Format } from '../../format';
 import { classId, statusClass, whenExists } from '../../utils';
-import { Lap } from '../../models';
 import { ClassBadge } from '../class-badge/class-badge';
 import { PitSummary } from '../pit-summary/pit-summary';
-import { CarStatusDescription, TimingService } from '../timing.service';
-import { Standing } from '../../lmu';
 
 @Component({
 	selector: 'app-session-results',
@@ -24,8 +23,8 @@ export class Results {
 	@Input() session: SessionViewModel | null = null;
 	positionInClass: Map<string, number> = new Map();
 	entries: Map<string, Car> = new Map();
-	gaps: { behind: number, interval: number }[] = [];
-	results: Lap[] = [];
+	gaps: { behind: number, interval: number, behindLaps: number, intervalLaps: number }[] = [];
+	results: Result[] = [];
 	isRace: boolean = false;
 	carId?: string;
 	carStatusDesc?: CarStatusDescription;
@@ -48,25 +47,73 @@ export class Results {
 				}
 			}
 			this.positionInClass.clear();
-			let classCount = new Map<string, number>();
-			let classTimes = new Map<string, { leader: number, last: number }>();
-			for (let lap of this.results) {
-				let key = CarKey.fromCar(lap.car);
-				let pic = (classCount.get(lap.car.class) ?? 0) + 1;
-				classCount.set(lap.car.class, pic);
-				this.positionInClass.set(key.id, pic);
-
-				let times = (classTimes.get(lap.car.class) ?? { leader: -1, last: -1 });
-				if (times.leader < 0 || lap.totalTime <= 0)
-					this.gaps.push({ behind: -1, interval: -1 });
-				else
-					this.gaps.push({ behind: lap.totalTime - times.leader, interval: lap.totalTime - times.last });
-				if (times.leader < 0)
-					classTimes.set(lap.car.class, { leader: lap.totalTime, last: lap.totalTime });
-				else
-					times.last = lap.totalTime;
+			if (this.session && this.session.positionInClass) {
+				for (let car in this.session.positionInClass) {
+					this.positionInClass.set(car ?? '', this.session.positionInClass[car]);
+				}
 			}
+			if (this.isRace)
+				this.calcGaps();
+			else
+				this.calcTimedGaps();
 			this.ref.markForCheck();
+		}
+	}
+
+	private calcGaps() {
+		let leadInClass = new Map<string, Result>();
+		let prevInClass = new Map<string, Result>();
+		for (let i = 0; i < this.results.length; i++) {
+			let result = this.results[i];
+			let lead = leadInClass.get(result.car.class);
+			if (!lead || !result.carState || !lead.carState) {
+				this.gaps.push({ behind: -1, interval: -1, behindLaps: 0, intervalLaps: 0 });
+				leadInClass.set(result.car.class, result);
+				prevInClass.set(result.car.class, result);
+				continue;
+			}
+			let prev = prevInClass.get(result.car.class);
+			if (!prev || !result.carState || !prev.carState) {
+				this.gaps.push({ behind: -1, interval: -1, behindLaps: 0, intervalLaps: 0 });
+				prevInClass.set(result.car.class, result);
+				continue;
+			}
+			let gap = { behind: -1, interval: -1, behindLaps: 0, intervalLaps: 0 };
+
+			if (result.carState.lapsCompleted == lead.carState.lapsCompleted) {
+				gap.behind = result.carState.lapStartET - lead.carState.lapStartET;
+			} else {
+				gap.behindLaps = lead.carState.lapsCompleted - result.carState.lapsCompleted;
+			}
+
+			if (result.carState.lapsCompleted == prev.carState.lapsCompleted) {
+				gap.interval = result.carState.lapStartET - prev.carState.lapStartET;
+			} else {
+				gap.intervalLaps = prev.carState.lapsCompleted - result.carState.lapsCompleted;
+			}
+			prevInClass.set(result.car.class, result);
+			this.gaps.push(gap);
+		}
+	}
+
+	private calcTimedGaps() {
+		let classTimes = new Map<string, { leader: number, last: number }>();
+		for (let result of this.results) {
+			let lap = result.bestLap;
+			if (!lap) {
+				this.gaps.push({ behind: -1, interval: -1, behindLaps: 0, intervalLaps: 0 });
+				continue;
+			}
+
+			let times = (classTimes.get(result.car.class) ?? { leader: -1, last: -1 });
+			if (times.leader < 0 || lap.totalTime <= 0)
+				this.gaps.push({ behind: -1, interval: -1, behindLaps: 0, intervalLaps: 0 });
+			else
+				this.gaps.push({ behind: lap.totalTime - times.leader, interval: lap.totalTime - times.last, behindLaps: 0, intervalLaps: 0 });
+			if (times.leader < 0)
+				classTimes.set(result.car.class, { leader: lap.totalTime, last: lap.totalTime });
+			else
+				times.last = lap.totalTime;
 		}
 	}
 
@@ -81,11 +128,36 @@ export class Results {
 			if (id && car && result) {
 				this.carId = id;
 				this.pitSummary()?.setCar(id);
-				this.carStatusDesc = TimingService.getCarDescription(car, { driverName: result.driver } as Standing);
+				this.carStatusDesc = TimingService.getCarDescription(car, { driverName: result.bestLap?.driver } as Standing);
 			} else {
 				this.pitSummary()?.clear();
 				this.carStatusDesc = undefined;
 			}
 		}
+	}
+
+	getBestClasses(key: string, lap: Lap | undefined, carClass: string) {
+		let bestClasses: BestClasses = { total: null, sector1: null, sector2: null, sector3: null };
+		if (!lap)
+			return bestClasses;
+		let total = lap.totalTime;
+		let sector1 = lap.sector1;
+		let sector2 = lap.sector2;
+		let sector3 = lap.sector3;
+		if (this.session?.bests) {
+			let bests = this.session.bests;
+			let classBest = bests.class[carClass] ?? this.defaultBest();
+			let carBest = bests.car[key] ?? this.defaultBest();
+			let driverBest = (bests.driver[key] ? bests.driver[key][lap.driver] : null) ?? this.defaultBest();
+			bestClasses.total = total <= 0 ? null : total <= classBest.total ? 'best-class' : null;
+			bestClasses.sector1 = sector1 <= 0 ? null : sector1 <= classBest.sector1 ? 'best-class' : sector1 <= carBest.sector1 ? 'best-car' : sector1 <= driverBest.sector1 ? 'best-driver' : null;
+			bestClasses.sector2 = sector2 <= 0 ? null : sector2 <= classBest.sector2 ? 'best-class' : sector2 <= carBest.sector2 ? 'best-car' : sector2 <= driverBest.sector2 ? 'best-driver' : null;
+			bestClasses.sector3 = sector3 <= 0 ? null : sector3 <= classBest.sector3 ? 'best-class' : sector3 <= carBest.sector3 ? 'best-car' : sector3 <= driverBest.sector3 ? 'best-driver' : null;
+		}
+		return bestClasses;
+	}
+
+	private defaultBest() {
+		return { total: -1, sector1: -1, sector2: -1, sector3: -1 } as Best;
 	}
 }

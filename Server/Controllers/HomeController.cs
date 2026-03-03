@@ -57,11 +57,10 @@ namespace LMUSessionTracker.Server.Controllers {
 			if(vm.Session == null)
 				return NotFound();
 			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId);
-			vm.SetSession(session);
-			if(vm.Standings == null) {
+			if(session == null) {
 				vm.Results = vm.Session.SessionType.StartsWith("RACE") ? await sessionRepo.GetResults(sessionId) : await sessionRepo.GetTimedResults(sessionId);
-			} else
-				vm.Bests = session.Bests;
+			}
+			vm.SetSession(session);
 			if(vm.Session.FutureSessions.Count > 0)
 				vm.NextSession = await sessionRepo.GetSession(vm.Session.FutureSessions.First().ToSessionId);
 			return Ok(vm);

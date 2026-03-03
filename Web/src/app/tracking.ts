@@ -53,7 +53,7 @@ export class CarKey {
 		return new CarKey(standing.slotID, standing.vehicleFilename);
 	}
 
-	static fromCar(car: CarModel) {
+	static fromCar(car: Car) {
 		return new CarKey(car.slotId, car.veh);
 	}
 }
