@@ -5,11 +5,11 @@ namespace LMUSessionTracker.Server.ViewModels {
 		private double? currentET = null;
 
 		public CarHistory Car { get; set; }
-		public Session Session { get; set; }
+		public SessionSummary Session { get; set; }
 		public Bests Bests { get; set; }
 		public double CurrentET {
 			get {
-				return currentET ?? Session?.LastInfo?.currentEventTime ?? -1;
+				return currentET ?? Session?.CurrentET ?? -1;
 			}
 			set {
 				currentET = value;

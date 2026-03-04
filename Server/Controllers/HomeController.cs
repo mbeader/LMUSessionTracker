@@ -70,10 +70,11 @@ namespace LMUSessionTracker.Server.Controllers {
 			if(!ModelState.IsValid)
 				return BadRequest();
 			LapsViewModel vm = new LapsViewModel();
-			vm.Session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
-			if(vm.Session == null)
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
+			if(session == null)
 				return NotFound();
-			vm.Car = vm.Session?.History.GetAllHistory().Find(x => x.Key.Matches(carId));
+			vm.Session = session.Summarize(false);
+			vm.Car = session?.History.GetAllHistory().Find(x => x.Key.Matches(carId));
 			if(vm.Car == null)
 				return NotFound();
 			return Ok(vm);

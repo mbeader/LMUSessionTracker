@@ -41,6 +41,9 @@ namespace LMUSessionTracker.Server {
 				options.Converters.Add(new CarKeyDictionaryConverter<Core.Tracking.Car>());
 				options.Converters.Add(new CarKeyDictionaryConverter<Best>());
 				options.Converters.Add(new CarKeyDictionaryConverter<Dictionary<string, Best>>());
+				options.Converters.Add(new AntiConverter<Core.Tracking.Session>() { ThrowOnRead = true, ThrowOnWrite = true });
+				options.Converters.Add(new AntiConverter<Core.Tracking.History>() { ThrowOnRead = true, ThrowOnWrite = true });
+				options.Converters.Add(new AntiConverter<Core.Tracking.CarStateMonitor>() { ThrowOnRead = true, ThrowOnWrite = true });
 			}
 			builder.Services.AddControllers()
 				.AddJsonOptions(options => configureJsonSerializer(options.JsonSerializerOptions));
