@@ -42,7 +42,6 @@ export class Timing {
 
 	constructor() {
 		this.service.init(this.onInitSession.bind(this), sessionId => ['/', 'Session', sessionId, 'Timing']);
-		whenExists('main', main => { if (main.parentElement) main.parentElement.className = 'container-fluid'; });
 		whenExists('#statusModal', el => el.addEventListener('show.bs.modal', this.updateCarStatusModal.bind(this)));
 		whenExists('#pitModal', el => el.addEventListener('show.bs.modal', this.updatePitModal.bind(this)));
 		whenExists('#columnsModal', el => el.addEventListener('show.bs.modal', this.setColumnCheckboxes.bind(this)));
