@@ -19,7 +19,6 @@ export class App {
 	];
 	private readonly router = inject(Router);
 	private readonly route = inject(ActivatedRoute);
-	protected readonly title = signal('Web');
 	protected readonly container = signal('container');
 
 	constructor() {

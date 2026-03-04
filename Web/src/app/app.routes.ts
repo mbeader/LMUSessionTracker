@@ -11,53 +11,67 @@ import { Settings } from './settings/settings';
 import { About } from './about/about';
 import { NotFound } from './not-found/not-found';
 
+const title = function(t: string) { return `${t} - LMUSessionTracker`; };
+
 export const routes: Routes = [
 	{
 		path: '',
 		component: Sessions,
+		title: title('Sessions')
 	},
 	{
 		path: 'Session/:sessionId',
 		component: Session,
+		title: title('Session')
 	},
 	{
 		path: 'Session/:sessionId/Timing',
 		component: Timing,
+		title: title('Timing')
 	},
 	{
 		path: 'Session/:sessionId/History',
 		component: History,
+		title: title('History')
 	},
 	{
 		path: 'Session/:sessionId/Laps/:carId',
 		component: Laps,
+		title: title('Laps')
 	},
 	{
 		path: 'Session/:sessionId/History/Laps/:carId',
 		component: Laps,
+		title: title('Laps')
 	},
 	{
 		path: 'Session/:sessionId/EntryList',
 		component: EntryList,
+		title: title('Entry list')
 	},
 	{
 		path: 'Session/:sessionId/TrackMap',
 		component: TrackMap,
+		title: title('Track map')
 	},
 	{
 		path: 'BestLaps',
 		component: BestLaps,
+		title: title('Best laps')
 	},
 	{
 		path: 'Settings',
 		component: Settings,
+		title: title('Settings')
 	},
 	{
 		path: 'About',
 		component: About,
+		title: title('About')
 	},
 	{
 		path: '**',
 		component: NotFound,
+		title: title('Not found')
 	},
 ];
