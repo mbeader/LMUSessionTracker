@@ -7,5 +7,6 @@ namespace LMUSessionTracker.Core.Protocol {
 		public ProtocolRole Role { get; set; }
 		[JsonConverter(typeof(JsonStringEnumConverter<ProtocolResult>))]
 		public ProtocolResult Result { get; set; }
+		public ProtocolState State { get; set; }
 	}
 }

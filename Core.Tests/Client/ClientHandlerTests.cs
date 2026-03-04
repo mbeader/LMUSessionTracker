@@ -46,11 +46,12 @@ namespace LMUSessionTracker.Core.Tests.Client {
 			public static TestState Disconnected(string sessionId = null, ProtocolRole role = ProtocolRole.None) => new TestState() { State = ClientState.Disconnected, Role = role, SessionId = sessionId };
 		}
 
-		private void AssertState(TestState ex) {
+		private void AssertState(TestState ex, ProtocolState remoteState = null) {
 			Assert.Equal(ex.State, handler.State);
 			Assert.Equal(ex.Role, handler.Role);
 			Assert.Equal(ex.SessionId, handler.SessionId);
 			Assert.Equal(clientId.Hash, handler.ClientId);
+			Assert.Equivalent(remoteState, handler.RemoteState);
 		}
 
 		[Fact]
@@ -514,6 +515,57 @@ namespace LMUSessionTracker.Core.Tests.Client {
 			AssertState(TestState.OnlineWorking("s1"));
 			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Promoted, Role = ProtocolRole.Primary, SessionId = "s1" });
 			await Assert.ThrowsAsync<Exception>(() => handler.Handle(baseTimestamp));
+		}
+
+		private void Setup_Handle_OnlineSessionChatWithoutInitialState(List<Chat> chat = null) {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
+			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
+			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
+			lmuClient.Setup(x => x.GetChat()).ReturnsAsync(chat ?? new List<Chat>() { new() { timestamp = 1, message = "a" } });
+		}
+
+		private async Task Assert_Handle_OnlineSessionChatWithoutInitialState(ProtocolState remoteState1, List<Chat> chat2, ProtocolState remoteState2) {
+			Setup_Handle_OnlineSessionChatWithoutInitialState();
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1", State = remoteState1 });
+			AssertState(TestState.Idle());
+			await handler.Handle(baseTimestamp);
+			AssertState(TestState.OnlineWorking("s1"), remoteState1);
+			if(chat2 != null)
+				lmuClient.Setup(x => x.GetChat()).ReturnsAsync(chat2);
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = "s1", State = remoteState2 });
+			await handler.Handle(baseTimestamp + new TimeSpan(0, 0, 1));
+			AssertState(TestState.OnlineWorking("s1"), remoteState2);
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionChatWithoutInitialState_IsWorking() {
+			await Assert_Handle_OnlineSessionChatWithoutInitialState(null, null, new() { Chat = new() { timestamp = 1, message = "a" } });
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionChatWithoutInitialStateChat_IsWorking() {
+			await Assert_Handle_OnlineSessionChatWithoutInitialState(new(), null, new() { Chat = new() { timestamp = 1, message = "a" } });
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionChatUnchanged_IsWorking() {
+			await Assert_Handle_OnlineSessionChatWithoutInitialState(new() { Chat = new() { timestamp = 1, message = "a" } }, null, new() { Chat = new() { timestamp = 1, message = "a" } });
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionChatChanged_IsWorking() {
+			await Assert_Handle_OnlineSessionChatWithoutInitialState(new() { Chat = new() { timestamp = 1, message = "a" } }, new List<Chat>() { new() { timestamp = 1, message = "a" }, new() { timestamp = 2, message = "b" }, new() { timestamp = 3, message = "c" } }, new() { Chat = new() { timestamp = 3, message = "c" } });
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionChatChangedSameTimestamp_IsWorking() {
+			await Assert_Handle_OnlineSessionChatWithoutInitialState(new() { Chat = new() { timestamp = 1, message = "a" } }, new List<Chat>() { new() { timestamp = 1, message = "a" }, new() { timestamp = 1, message = "b" } }, new() { Chat = new() { timestamp = 1, message = "b" } });
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionChatRemoteStateAhead_IsWorking() {
+			await Assert_Handle_OnlineSessionChatWithoutInitialState(new() { Chat = new() { timestamp = 2, message = "b" } }, null, new() { Chat = new() { timestamp = 2, message = "b" } });
 		}
 	}
 }

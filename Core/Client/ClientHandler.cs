@@ -17,12 +17,15 @@ namespace LMUSessionTracker.Core.Client {
 	}
 
 	public class DefaultClientHandler : ClientHandler {
+		private static readonly long majorIntervalSeconds = 1;
+		private static readonly int majorIntervalCount = 5;
 		private readonly ILogger<DefaultClientHandler> logger;
 		private readonly ClientInfo client;
 		private readonly LMUClient lmuClient;
 		private readonly ProtocolClient protocolClient;
 		private ClientState state = ClientState.Idle;
 		private ProtocolRole role = ProtocolRole.None;
+		private ProtocolState remoteState;
 		private string sessionId;
 		private string lastMultiplayerJoinState;
 		private string lastMultiStintState;
@@ -30,9 +33,12 @@ namespace LMUSessionTracker.Core.Client {
 		private int lastLongStateCount;
 		private string lastPhase;
 		private int lastPhaseCount;
+		private long lastUnixSeconds;
+		private int countSinceMajorInterval;
 
 		public ClientState State => state;
 		public ProtocolRole Role => role;
+		public ProtocolState RemoteState => remoteState;
 		public string SessionId => sessionId;
 		public string ClientId => client.ClientId.Hash;
 
@@ -44,6 +50,11 @@ namespace LMUSessionTracker.Core.Client {
 		}
 
 		public async Task Handle(DateTime timestamp) {
+			long unixSeconds = (long)(timestamp - DateTime.UnixEpoch).TotalSeconds;
+			bool majorInterval = unixSeconds - lastUnixSeconds >= majorIntervalSeconds || countSinceMajorInterval >= majorIntervalCount;
+			lastUnixSeconds = unixSeconds;
+			countSinceMajorInterval++;
+
 			ProtocolMessage message = new ProtocolMessage() { ClientId = client.ClientId.Hash, SessionId = sessionId, Timestamp = timestamp };
 			await GetMainData(message);
 
@@ -91,7 +102,7 @@ namespace LMUSessionTracker.Core.Client {
 				await protocolClient.Send(message);
 				return;
 			}
-			await HandleActiveSession(message);
+			await HandleActiveSession(message, majorInterval);
 		}
 
 		private async Task GetMainData(ProtocolMessage message) {
@@ -103,26 +114,37 @@ namespace LMUSessionTracker.Core.Client {
 			await Task.WhenAll(tasks);
 		}
 
-		private async Task GetAllData(ProtocolMessage message) {
+		private async Task GetSecondaryData(ProtocolMessage message, bool majorInterval) {
 			List<Task> tasks = new List<Task>() {
 				Task.Run(async () => { message.MultiplayerTeams = await lmuClient.GetMultiplayerTeams(); }),
 				Task.Run(async () => { message.Standings = await lmuClient.GetStandings(); }),
+			};
+			if(majorInterval) {
+				tasks.Add(Task.Run(async () => { message.Chat = FindNew(await lmuClient.GetChat()); }));
+			}
+			await Task.WhenAll(tasks);
+		}
+
+		private async Task GetAllData(ProtocolMessage message, bool majorInterval = false) {
+			List<Task> tasks = new List<Task>() {
+				GetSecondaryData(message, majorInterval),
 				Task.Run(async () => { await lmuClient.GetStrategy(); }),
-				Task.Run(async () => { await lmuClient.GetChat(); }),
 				Task.Run(async () => { await lmuClient.GetStrategyUsage(); }),
 				Task.Run(async () => { await lmuClient.GetStandingsHistory(); }),
 				Task.Run(async () => { await lmuClient.GetSessionsInfoForEvent(); }),
 			};
+			if(!majorInterval) {
+				tasks.Add(Task.Run(async () => { await lmuClient.GetChat(); }));
+			}
 			await Task.WhenAll(tasks);
 		}
 
-		private async Task HandleActiveSession(ProtocolMessage message) {
+		private async Task HandleActiveSession(ProtocolMessage message, bool majorInterval) {
 			if(client.DebugMode)
-				await GetAllData(message);
-			else {
-				message.Standings = await lmuClient.GetStandings();
-				message.MultiplayerTeams = await lmuClient.GetMultiplayerTeams();
-			}
+				await GetAllData(message, majorInterval);
+			else
+				await GetSecondaryData(message, majorInterval);
+
 			if(message.MultiplayerTeams == null && message.MultiplayerJoinState == "JOIN_JOINED_SERVER") {
 				logger.LogDebug("Missing multiplayer teams");
 				return;
@@ -156,6 +178,7 @@ namespace LMUSessionTracker.Core.Client {
 				state = ClientState.Disconnected;
 				return;
 			}
+			remoteState = result.State;
 			bool online = message.MultiplayerTeams != null;
 			switch((state, result.Result, online)) {
 				case (ClientState.Working, ProtocolResult.Accepted, true):
@@ -214,6 +237,28 @@ namespace LMUSessionTracker.Core.Client {
 			role = ProtocolRole.None;
 			state = ClientState.Idle;
 			sessionId = null;
+		}
+
+		private List<Chat> FindNew(List<Chat> chats) {
+			if(chats == null || chats.Count == 0)
+				return null;
+			if(remoteState == null || remoteState.Chat == null)
+				return chats;
+			Chat last = chats[^1];
+			if(last.timestamp == remoteState.Chat.timestamp && last.message == remoteState.Chat.message)
+				return null;
+			int startIndex = -1;
+			for(int i = chats.Count - 1; i >= 0; i--) {
+				if(chats[i].timestamp > remoteState.Chat.timestamp)
+					startIndex = i;
+				else if(chats[i].timestamp == remoteState.Chat.timestamp && chats[i].message != remoteState.Chat.message)
+					startIndex = i;
+				else
+					break;
+			}
+			if(startIndex < 0)
+				return null;
+			return chats.GetRange(startIndex, chats.Count - startIndex);
 		}
 	}
 }
