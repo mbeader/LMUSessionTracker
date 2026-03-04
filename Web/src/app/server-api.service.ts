@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, Observable } from 'rxjs';
-import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel, AboutOptions, TrackMap } from './view-models';
+import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel, AboutOptions, TrackMap, ChatMessage } from './view-models';
 import { Car } from './models';
 
 @Injectable({
@@ -35,6 +35,10 @@ export class ServerApiService {
 
 	getTrackMap(sessionId: string): Promise<TrackMap> {
 		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/TrackMap?sessionId=' + sessionId)) as Promise<TrackMap>;
+	}
+
+	getChat(sessionId: string): Promise<ChatMessage[]> {
+		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Chat?sessionId=' + sessionId)) as Promise<ChatMessage[]>;
 	}
 
 	getTracks(): Promise<string[]> {

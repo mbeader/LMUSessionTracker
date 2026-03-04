@@ -98,6 +98,15 @@ namespace LMUSessionTracker.Server.Controllers {
 			return Ok(trackMapService.GetTrack(session.Track));
 		}
 
+		public async Task<IActionResult> Chat([Required] string sessionId) {
+			if(!ModelState.IsValid)
+				return BadRequest();
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
+			if(session == null)
+				return NotFound();
+			return Ok((await sessionRepo.GetChat(sessionId)).ConvertAll(x => new ChatMessage(x)));
+		}
+
 		public async Task<IActionResult> Tracks() {
 			return Ok(await sessionRepo.GetTracks());
 		}

@@ -28,3 +28,23 @@ export function classId(carClass: string) {
 export function statusClass(status: string) {
 	return status == 'Run' ? 'text-success' : status == 'Req' ? 'text-info' : status == 'Out' ? 'text-warning' : status == 'In' || status == 'Pit' ? 'text-danger' : 'text-secondary';
 }
+
+/**
+ * Converts team member nationality (mostly ISO 3166-1-alpha-2) to available flag icon
+ */
+export function getFlag(country: string) {
+	if (!country)
+		return 'none';
+	country = country.toLowerCase();
+	switch (country) {
+		case 'ac':
+			return 'sh-ac';
+		case 'ea':
+			return 'es';
+		case 'sh':
+			return 'sh-hl';
+		case 'ta':
+			return 'sh-ta';
+	}
+	return country;
+}

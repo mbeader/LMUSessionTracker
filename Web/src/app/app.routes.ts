@@ -6,6 +6,7 @@ import { History } from './session/history/history';
 import { Laps } from './session/laps/laps';
 import { EntryList } from './session/entry-list/entry-list';
 import { TrackMap } from './session/track-map/track-map';
+import { Chat } from './session/chat/chat';
 import { BestLaps } from './best-laps/best-laps';
 import { Settings } from './settings/settings';
 import { About } from './about/about';
@@ -53,6 +54,11 @@ export const routes: Routes = [
 		path: 'Session/:sessionId/TrackMap',
 		component: TrackMap,
 		title: title('Track map')
+	},
+	{
+		path: 'Session/:sessionId/Chat',
+		component: Chat,
+		title: title('Chat')
 	},
 	{
 		path: 'BestLaps',

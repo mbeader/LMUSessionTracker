@@ -30,6 +30,11 @@ export class BestLapsViewModel {
 	public classBests: { [key: string]: ClassBest } | null = null;
 }
 
+export class ChatMessage {
+	public timestamp!: number;
+	public message!: string;
+}
+
 export class IndexViewModel {
 	public sessions: SessionSummary[] | null = null;
 	public total: number = 0;

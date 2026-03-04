@@ -14,6 +14,7 @@ namespace LMUSessionTracker.Server.Models {
 		public Task<List<Core.Tracking.SessionSummary>> GetSessions(int page, int pageSize);
 		public Task<SessionState> GetSessionState(string sessionId);
 		public Task<List<Car>> GetEntries(string sessionId);
+		public Task<List<Chat>> GetChat(string sessionId);
 		public Task<List<Result>> GetResults(string sessionId);
 		public Task<List<Result>> GetTimedResults(string sessionId);
 		public Task<List<string>> GetTracks();
@@ -90,6 +91,10 @@ namespace LMUSessionTracker.Server.Models {
 
 		public async Task<List<Car>> GetEntries(string sessionId) {
 			return await context.Cars.Include(x => x.Entry).Include(x => x.Entry.Members).Where(x => x.SessionId == sessionId).OrderBy(x => x.CarId).ToListAsync();
+		}
+
+		public async Task<List<Chat>> GetChat(string sessionId) {
+			return await context.Chats.Where(x => x.SessionId == sessionId).OrderBy(x => x.Timestamp).ToListAsync();
 		}
 
 		public async Task<List<Result>> GetResults(string sessionId) {

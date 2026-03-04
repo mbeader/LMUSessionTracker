@@ -27,6 +27,7 @@ namespace LMUSessionTracker.Server.Hubs {
 				switch(request.Type) {
 					case "live":
 					case "laps":
+					case "chat":
 						break;
 					default:
 						return;
@@ -47,6 +48,7 @@ namespace LMUSessionTracker.Server.Hubs {
 		public static string SessionsGroup() => "sessions";
 		public static string LiveGroup(string sessionId) => Group(sessionId, "live");
 		public static string LapsGroup(string sessionId, string carId) => Group(sessionId, "laps", carId);
+		public static string ChatGroup(string sessionId) => Group(sessionId, "chat");
 		private static string Group(JoinRequest request) => Group(request.SessionId, request.Type, request.Key);
 		private static string Group(string sessionId, string type, string key = null) => $"{sessionId}-{type}{(key != null ? $"-{key}" : string.Empty)}";
 	}

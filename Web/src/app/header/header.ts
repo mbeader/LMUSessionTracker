@@ -37,6 +37,10 @@ export class Header {
 				{
 					id: 'track-map',
 					path: [(x: string) => x == 'Session', null, (x: string) => x == 'TrackMap']
+				},
+				{
+					id: 'chat',
+					path: [(x: string) => x == 'Session', null, (x: string) => x == 'Chat']
 				}
 			]
 		},

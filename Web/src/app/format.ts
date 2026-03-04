@@ -118,17 +118,17 @@ export class Format {
 		else {
 			let totalMinutes = totalSeconds / 60;
 			if (totalMinutes < 1)
-				return `${totalSeconds} seconds ago`;
+				return `${Math.floor(totalSeconds)} seconds ago`;
 			else {
 				let totalHours = totalMinutes / 60;
 				if (totalHours < 1)
-					return `${totalMinutes} minutes ago`;
+					return `${Math.floor(totalMinutes)} minutes ago`;
 				else {
 					let totalDays = totalHours / 24;
 					if (totalDays < 1)
-						return `${totalHours} hours ago`;
+						return `${Math.floor(totalHours)} hours ago`;
 					else if (totalDays < 31)
-						return `${totalDays} days ago`;
+						return `${Math.floor(totalDays)} days ago`;
 					else
 						return 'long ago';
 				}
@@ -136,12 +136,14 @@ export class Format {
 		}
 	}
 
-	static date(date: Date | string | null) {
+	static date(date: Date | string | number | null) {
 		if (date == null)
 			return;
 		if (typeof (date) === 'string') {
 			if (!date.endsWith('Z'))
 				date += 'Z';
+			date = new Date(date);
+		} else if (typeof (date) === 'number') {
 			date = new Date(date);
 		}
 		let format = (number: number, digits: number) => Math.floor(number).toString().padStart(digits, '0');
