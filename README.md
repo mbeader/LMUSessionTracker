@@ -39,7 +39,9 @@ as long as one exists, data will continue to be collected uninterrupted.
 		* Continuous data collection when a client leaves a session where other clients were present
 * Historical view of old sessions
 	* Last known conditions
-	* Final standings based on recorded lap data (not equivalent to game results)
+	* Final standings based on recorded data
+		* For race sessions uses last known car state 
+		* For practice/qualifying uses best lap (not necessarily equivalent to game results)
 	* Pit summary
 	* Lap times for each car
 * Live active sessions list
