@@ -76,7 +76,6 @@ namespace LMUSessionTracker.Server {
 			modelBuilder.Entity<CarState>().Property(x => x.LastSwapTime).HasDefaultValue(-1);
 			modelBuilder.Entity<CarState>().Property(x => x.SwapThisLap).HasDefaultValue(false);
 			modelBuilder.Entity<CarState>().Property(x => x.SwapLocation).HasDefaultValue(-1);
-			//modelBuilder.Entity<CarState>().Property(x => x.StartedLapInPit).HasDefaultValue(false);
 			modelBuilder.Entity<CarState>().Property(x => x.PenaltyThisLap).HasDefaultValue(false);
 			modelBuilder.Entity<Pit>().Property(x => x.PitTime).HasDefaultValue(-1);
 			modelBuilder.Entity<Pit>().Property(x => x.StopTime).HasDefaultValue(-1);

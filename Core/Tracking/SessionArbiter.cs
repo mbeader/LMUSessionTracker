@@ -88,7 +88,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 			if(data.SessionInfo.gamePhase == 9) {
 				logger.LogInformation($"Client {client.ClientId} observed paused session {session.SessionId}");
-				return Accept(data.SessionId, true);
+				return Accept(data.SessionId, true, new ProtocolState() { Chat = session.Chat.LastChat });
 			}
 
 			if(!session.IsSameSession(data.SessionInfo, data.MultiplayerTeams).IsSame) {
@@ -126,11 +126,12 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 
 			await managementRepo.UpdateSession(session.SessionId, data.SessionInfo, now);
-			SessionUpdateResult updateResult = session.Update(data.SessionInfo, data.Standings, data.MultiplayerTeams, now);
+			SessionUpdateResult updateResult = session.Update(data.SessionInfo, data.Standings, data.MultiplayerTeams, data.Chat, now);
 			if(updateResult.EntrySlotsChanged)
 				await managementRepo.UpdateEntries(session.SessionId, session.Entries);
 			await managementRepo.UpdateLaps(session.SessionId, session.History.GetAllHistory());
 			await managementRepo.UpdateCarStates(session.SessionId, session.CarState.GetAllStates());
+			await managementRepo.UpdateChat(session.SessionId, session.Chat.NewMessages);
 			await publisher.Session(session, updateResult.BestsChanged);
 			trackMapBuilder.Update(session.SessionId, session.Track, data.Standings);
 			if(session.Finished && !inactiveSessions.ContainsKey(session.SessionId)) {
@@ -141,7 +142,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(updateResult.CarStateChanges != null)
 				foreach(string carStateChange in updateResult.CarStateChanges)
 					logger.LogTrace(carStateChange);
-			return Accept(data.SessionId, true);
+			return Accept(data.SessionId, true, new ProtocolState() { Chat = session.Chat.LastChat });
 		}
 
 		private ProtocolStatus HandleInvalid(Client client, ProtocolMessage data, DateTime now) {
@@ -243,11 +244,12 @@ namespace LMUSessionTracker.Core.Tracking {
 			};
 		}
 
-		private ProtocolStatus Accept(string sessionId, bool isPrimary) {
+		private ProtocolStatus Accept(string sessionId, bool isPrimary, ProtocolState state = null) {
 			return new ProtocolStatus() {
+				SessionId = sessionId,
 				Result = ProtocolResult.Accepted,
 				Role = isPrimary ? ProtocolRole.Primary : ProtocolRole.Secondary,
-				SessionId = sessionId
+				State = state
 			};
 		}
 

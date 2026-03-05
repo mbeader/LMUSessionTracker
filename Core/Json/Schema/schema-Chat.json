@@ -6,6 +6,7 @@
 			"type": "string"
 		},
 		"timestamp": {
+			"description": "Unix timestamp to the hundred nanoseconds.",
 			"type": "integer",
 			"minimum": 0
 		}

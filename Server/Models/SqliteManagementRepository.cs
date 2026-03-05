@@ -76,6 +76,21 @@ namespace LMUSessionTracker.Server.Models {
 			}
 		}
 
+		public async Task UpdateChat(string sessionId, List<Core.LMU.Chat> chat) {
+			if(chat.Count == 0)
+				return;
+			using SqliteContext context = await contextFactory.CreateDbContextAsync();
+			using(var transaction = await context.Database.BeginTransactionAsync()) {
+				foreach(Core.LMU.Chat coreChat in chat) {
+					Chat dbChat = new Chat() { SessionId = sessionId };
+					dbChat.From(coreChat);
+					context.Chats.Add(dbChat);
+				}
+				await context.SaveChangesAsync();
+				await transaction.CommitAsync();
+			}
+		}
+
 		public async Task UpdateLaps(string sessionId, List<CarHistory> cars) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			using(var transaction = await context.Database.BeginTransactionAsync()) {
@@ -212,6 +227,7 @@ namespace LMUSessionTracker.Server.Models {
 				.ThenInclude(x => x.LastState)
 				.Include(x => x.Entries)
 				.ThenInclude(x => x.Members)
+				.Include(x => x.Chats.OrderBy(x => x.Timestamp).ThenBy(x => x.Nanoseconds).ThenBy(x => x.ChatId))
 				.AsSplitQuery()
 				.SingleOrDefaultAsync(x => x.SessionId == sessionId);
 			return session.To();

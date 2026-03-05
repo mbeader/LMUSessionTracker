@@ -21,13 +21,14 @@ namespace LMUSessionTracker.Core.Tracking {
 		public History History { get; private set; }
 		public Bests Bests { get; private set; }
 		public CarStateMonitor CarState { get; private set; }
+		public ChatCollection Chat { get; private set; }
 		public DateTime Timestamp { get; private set; }
 		public DateTime LastUpdate { get; private set; }
 		public bool FirstUpdate { get; private set; } = true;
 		public bool Finished { get; private set; }
 		public bool Closed { get; private set; }
 
-		private Session(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history, List<CarState> carState) {
+		private Session(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history, List<CarState> carState, List<Chat> chat) {
 			SessionId = sessionId;
 			SecondaryClientIds = new List<string>();
 			Track = info.trackName;
@@ -38,20 +39,21 @@ namespace LMUSessionTracker.Core.Tracking {
 			History = new History(history, entries);
 			Bests = new Bests(History.GetAllHistory());
 			CarState = new CarStateMonitor(carState);
+			Chat = new ChatCollection(chat);
 			Timestamp = timestamp;
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
 		}
 
-		public static Session Create(string sessionId, SessionInfo info, DateTime timestamp, MultiplayerTeams teams = null, List<CarHistory> history = null, List<CarState> carState = null) {
+		public static Session Create(string sessionId, SessionInfo info, DateTime timestamp, MultiplayerTeams teams = null, List<CarHistory> history = null, List<CarState> carState = null, List<Chat> chat = null) {
 			EntryList entries = new EntryList(teams);
-			return new Session(sessionId, info, timestamp, entries, history, carState) {
+			return new Session(sessionId, info, timestamp, entries, history, carState, chat) {
 				Online = teams != null
 			};
 		}
 
-		public static Session Create(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history, List<CarState> carState) {
-			return new Session(sessionId, info, timestamp, entries, history, carState) {
+		public static Session Create(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history, List<CarState> carState, List<Chat> chat) {
+			return new Session(sessionId, info, timestamp, entries, history, carState, chat) {
 				Online = entries != null
 			};
 		}
@@ -132,7 +134,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public bool IsSecondary(string clientId) => SecondaryClientIds.Contains(clientId);
 
-		public SessionUpdateResult Update(SessionInfo info, List<Standing> standings, MultiplayerTeams teams, DateTime timestamp) {
+		public SessionUpdateResult Update(SessionInfo info, List<Standing> standings, MultiplayerTeams teams, List<Chat> chat, DateTime timestamp) {
 			LastInfo = info ?? LastInfo;
 			LastStandings = standings ?? LastStandings;
 			bool bestsChanged = false;
@@ -156,6 +158,7 @@ namespace LMUSessionTracker.Core.Tracking {
 						bestsChanged = true;
 				}
 			}
+			Chat.Update(chat);
 			LastUpdate = timestamp;
 			Finished = IsFinished(info);
 			FirstUpdate = false;
@@ -261,7 +264,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public Session Clone() {
 			Session session = Create(SessionId, LastInfo, Timestamp, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()), CarState.GetAllStates().ConvertAll(x => x.Clone()));
-			session.Update(LastInfo, LastStandings, null, LastUpdate);
+			session.Update(LastInfo, LastStandings, null, null, LastUpdate);
 			return session;
 		}
 

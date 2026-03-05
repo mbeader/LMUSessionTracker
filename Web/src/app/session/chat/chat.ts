@@ -40,7 +40,6 @@ export class Chat {
 							names.push(`${member.name[0]} ${member.name.substring(space + 1)}`);
 							space = member.name.indexOf(' ', space + 1);
 						}
-						console.log(names);
 
 						for (let name of names) {
 							let cars = this.cars.get(name);
@@ -48,7 +47,8 @@ export class Chat {
 								cars = [];
 								this.cars.set(name, cars);
 							}
-							cars.push(car);
+							if (!cars.includes(car))
+								cars.push(car);
 						}
 					}
 				}

@@ -41,7 +41,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			public static ProtocolStatus Rejected() => new() { Result = ProtocolResult.Rejected, Role = ProtocolRole.None, SessionId = null };
 			public static ProtocolStatus ChangedPrimary(string sessionId) => new() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = sessionId };
 			public static ProtocolStatus ChangedSecondary(string sessionId) => new() { Result = ProtocolResult.Changed, Role = ProtocolRole.Secondary, SessionId = sessionId };
-			public static ProtocolStatus AcceptedPrimary(string sessionId) => new() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = sessionId };
+			public static ProtocolStatus AcceptedPrimary(string sessionId) => new() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = sessionId, State = new() };
 			public static ProtocolStatus AcceptedSecondary(string sessionId) => new() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Secondary, SessionId = sessionId };
 			public static ProtocolStatus Promoted(string sessionId) => new() { Result = ProtocolResult.Promoted, Role = ProtocolRole.Primary, SessionId = sessionId };
 			public static ProtocolStatus Demoted(string sessionId) => new() { Result = ProtocolResult.Demoted, Role = ProtocolRole.Secondary, SessionId = sessionId };

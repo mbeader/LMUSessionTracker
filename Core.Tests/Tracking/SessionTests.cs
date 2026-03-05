@@ -105,7 +105,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		public void IsSameSession_OfflineValidPhaseTransition_ReturnsTrue(string prev, string inter, string next) {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }, baseTimestamp);
 			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }).Difference);
-			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, null, baseTimestamp);
+			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, null, null, baseTimestamp);
 			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }).Difference);
 		}
 
@@ -116,7 +116,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		public void IsSameSession_OfflineInvalidPhaseTransition_ReturnsFalse(string prev, string inter, string next) {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }, baseTimestamp);
 			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }).Difference);
-			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, null, baseTimestamp);
+			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, null, null, baseTimestamp);
 			Assert.Equal(SessionDifference.PhaseTransition, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }).Difference);
 		}
 
@@ -291,6 +291,13 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			};
 		}
 
+		private List<Chat> FullChat() {
+			return new List<Chat>() {
+				new Chat() { timestamp = 1, message = "a" },
+				new Chat() { timestamp = 2, message = "b" }
+			};
+		}
+
 		private EntryList FullEntryList() {
 			return new EntryList(FullMultiplayerTeams());
 		}
@@ -311,16 +318,16 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 
 		[Fact]
 		public void Create_SameSourceDataOnline_ReturnsIdenticalSession() {
-			Session s1 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories(), FullCarStates());
-			Session s2 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories(), FullCarStates());
+			Session s1 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories(), FullCarStates(), FullChat());
+			Session s2 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories(), FullCarStates(), FullChat());
 			Assert.Equivalent(s1, s2);
 			Assert.Equivalent(s1.History.GetAllHistory(), s1.History.GetAllHistory());
 		}
 
 		[Fact]
 		public void Create_ReloadDataOnline_ReturnsIdenticalSession() {
-			Session s1 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories(), FullCarStates());
-			Session s2 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullEntryList(), FullCarHistories(), FullCarStates());
+			Session s1 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullMultiplayerTeams(), FullCarHistories(), FullCarStates(), FullChat());
+			Session s2 = Session.Create(id1, FullSessionInfo(), baseTimestamp, FullEntryList(), FullCarHistories(), FullCarStates(), FullChat());
 			Assert.Equivalent(s1, s2);
 			Assert.Equivalent(s1.History.GetAllHistory(), s1.History.GetAllHistory());
 		}

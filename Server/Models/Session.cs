@@ -90,7 +90,13 @@ namespace LMUSessionTracker.Server.Models {
 						carStates.Add(car.LastState.To(key));
 				}
 			}
-			Core.Tracking.Session session = Core.Tracking.Session.Create(SessionId, info, Timestamp, entries, carHistories, carStates);
+			List<Core.LMU.Chat> chats = null;
+			if(Chats != null && Chats.Count > 0) {
+				chats = new List<Core.LMU.Chat>();
+				foreach(Chat chat in Chats)
+					chats.Add(chat.To());
+			}
+			Core.Tracking.Session session = Core.Tracking.Session.Create(SessionId, info, Timestamp, entries, carHistories, carStates, chats);
 			if(IsClosed)
 				session.Close();
 			return session;

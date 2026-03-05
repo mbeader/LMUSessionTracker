@@ -25,6 +25,11 @@ namespace LMUSessionTracker.Server.Services {
 			string liveGroup = SessionHub.LiveGroup(session.SessionId);
 			groupCollection.Groups.AddOrUpdate(liveGroup, session.LastUpdate, (key, value) => session.LastUpdate);
 			await hubContext.Clients.Group(liveGroup).SendAsync("Live", vm);
+			if(session.Chat.NewMessages.Count > 0) {
+				string chatGroup = SessionHub.ChatGroup(session.SessionId);
+				groupCollection.Groups.AddOrUpdate(chatGroup, session.LastUpdate, (key, value) => session.LastUpdate);
+				await hubContext.Clients.Group(chatGroup).SendAsync("Chat", session.Chat.NewMessages.ConvertAll(x => new ChatMessage(x)));
+			}
 			foreach(CarHistory car in vm.History) {
 				string group = SessionHub.LapsGroup(session.SessionId, car.Key.Id());
 				groupCollection.Groups.AddOrUpdate(group, session.LastUpdate, (key, value) => session.LastUpdate);

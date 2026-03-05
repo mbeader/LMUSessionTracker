@@ -1,5 +1,5 @@
 ﻿using LMUSessionTracker.Server.Models;
-using System;
+using CoreChat = LMUSessionTracker.Core.LMU.Chat;
 
 namespace LMUSessionTracker.Server.ViewModels {
 	public class ChatMessage {
@@ -8,8 +8,15 @@ namespace LMUSessionTracker.Server.ViewModels {
 
 		public ChatMessage(Chat chat = null) {
 			if(chat != null) {
-				Timestamp = (long)(chat.Timestamp - DateTime.UnixEpoch).TotalMilliseconds;
+				Timestamp = chat.UnixMilliseconds;
 				Message = chat.Message;
+			}
+		}
+
+		public ChatMessage(CoreChat chat) {
+			if(chat != null) {
+				Timestamp = (long)(chat.timestamp / 10000);
+				Message = chat.message;
 			}
 		}
 	}
