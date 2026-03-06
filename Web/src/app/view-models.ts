@@ -136,11 +136,13 @@ export class JoinRequest {
 	public readonly type: string;
 	public readonly sessionId: string | null;
 	public readonly key: string | null;
+	public readonly refresh: boolean;
 
-	constructor(type: string, sessionId?: string, key?: string) {
+	constructor(type: string, sessionId?: string, key?: string, refresh?: boolean) {
 		this.type = type;
 		this.sessionId = sessionId ?? null;
 		this.key = key ?? null;
+		this.refresh = refresh ?? false;
 	}
 };
 

@@ -15,9 +15,17 @@ namespace LMUSessionTracker.Core.Tracking {
 		public void Update(List<Chat> chat) {
 			NewMessages.Clear();
 			if(chat != null) {
-				Chat.AddRange(chat);
-				NewMessages.AddRange(chat);
+				foreach(Chat c in chat) {
+					if(!Chat.Exists(x => IsSameChat(c, x))) {
+						Chat.Add(c);
+						NewMessages.Add(c);
+					}
+				}
 			}
+		}
+
+		private static bool IsSameChat(Chat a, Chat b) {
+			return a.timestamp == b.timestamp && a.message == b.message;
 		}
 	}
 }

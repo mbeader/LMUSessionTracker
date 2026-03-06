@@ -88,7 +88,7 @@ export class ServerLiveService {
 	}
 
 	joinChat(sessionId: string, callback: (chat: ChatViewModel) => void) {
-		this.join(new JoinRequest('chat', sessionId), connection => {
+		this.join(new JoinRequest('chat', sessionId, undefined, true), connection => {
 			connection.on('Chat', (chat: ChatViewModel) => {
 				callback(chat);
 			});

@@ -41,20 +41,19 @@ namespace LMUSessionTracker.Server.Services {
 		}
 
 		private async Task SendChat(Session session, SessionViewModel vm) {
-			if(session.Chat.NewMessages.Count > 0) {
-				string chatGroup = SessionHub.ChatGroup(session.SessionId, false);
+			string chatGroup = SessionHub.ChatGroup(session.SessionId, false);
+			string chatGroupRefresh = SessionHub.ChatGroup(session.SessionId, true);
+			if(session.Chat.NewMessages.Count > 0 && groupCollection.GetConnections(chatGroup).Count > 0) {
 				groupCollection.AddOrUpdateGroup(chatGroup, session.LastUpdate);
 				await hubContext.Clients.Group(chatGroup).SendAsync("Chat", new ChatViewModel(session.Chat.NewMessages) { Append = true });
 			}
-			if(session.Chat.Chat.Count > 0) {
-				string chatGroup = SessionHub.ChatGroup(session.SessionId, true);
+			if(session.Chat.Chat.Count > 0 && groupCollection.GetConnections(chatGroupRefresh).Count > 0) {
+				groupCollection.AddOrUpdateGroup(chatGroupRefresh, session.LastUpdate);
+				await hubContext.Clients.Group(chatGroupRefresh).SendAsync("Chat", new ChatViewModel(session.Chat.Chat));
 				groupCollection.AddOrUpdateGroup(chatGroup, session.LastUpdate);
-				await hubContext.Clients.Group(chatGroup).SendAsync("Chat", new ChatViewModel(session.Chat.Chat));
-				string newGroup = SessionHub.ChatGroup(session.SessionId, false);
-				groupCollection.AddOrUpdateGroup(newGroup, session.LastUpdate);
-				foreach(string connection in groupCollection.SwapConnectionGroups(chatGroup, newGroup)) {
-					await hubContext.Groups.RemoveFromGroupAsync(connection, chatGroup);
-					await hubContext.Groups.AddToGroupAsync(connection, newGroup);
+				foreach(string connection in groupCollection.SwapConnectionGroups(chatGroupRefresh, chatGroup)) {
+					await hubContext.Groups.RemoveFromGroupAsync(connection, chatGroupRefresh);
+					await hubContext.Groups.AddToGroupAsync(connection, chatGroup);
 				}
 			}
 		}

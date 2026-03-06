@@ -81,5 +81,14 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			AssertHelpers.Equivalent(new() { C() }, chat.NewMessages);
 			Assert.Equivalent(C(), chat.LastChat);
 		}
+
+		[Fact]
+		public void Update_TwoMessagesThenSame_TwoMessages() {
+			chat.Update(new() { A(), B() });
+			chat.Update(new() { A(), B() });
+			AssertHelpers.Equivalent(new() { A(), B() }, chat.Chat);
+			Assert.Empty(chat.NewMessages);
+			Assert.Equivalent(B(), chat.LastChat);
+		}
 	}
 }
