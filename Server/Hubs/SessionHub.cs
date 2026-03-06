@@ -34,15 +34,16 @@ namespace LMUSessionTracker.Server.Hubs {
 				}
 				group = Group(request);
 			}
-			groupCollection.Groups.TryAdd(group, DateTime.UnixEpoch);
+			groupCollection.AddOrUpdateGroup(group, DateTime.UnixEpoch);
+			groupCollection.AddConnectionToGroup(group, Context.ConnectionId);
 			await Groups.AddToGroupAsync(Context.ConnectionId, group);
 			await Clients.Caller.SendAsync("Joined", request);
 		}
 
 		public async Task Leave() {
-			// TODO: work around microsoft's garbage
-			foreach(string group in groupCollection.Groups.Keys)
+			foreach(string group in groupCollection.Groups)
 				await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
+			groupCollection.RemoveConnectionFromAllGroups(Context.ConnectionId);
 		}
 
 		public static string SessionsGroup() => "sessions";
