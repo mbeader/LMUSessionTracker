@@ -22,14 +22,32 @@ namespace LMUSessionTracker.Server.Services {
 		public async Task Session(Session session, bool includeBests) {
 			SessionViewModel vm = new SessionViewModel() { Info = session.LastInfo };
 			vm.SetSession(session, includeBests);
+			await SendLive(session, vm);
+			await SendChat(session, vm);
+			await SendLaps(session, vm);
+		}
+
+		private async Task SendLive(Session session, SessionViewModel vm) {
 			string liveGroup = SessionHub.LiveGroup(session.SessionId);
 			groupCollection.Groups.AddOrUpdate(liveGroup, session.LastUpdate, (key, value) => session.LastUpdate);
 			await hubContext.Clients.Group(liveGroup).SendAsync("Live", vm);
+		}
+
+		private async Task SendChat(Session session, SessionViewModel vm) {
 			if(session.Chat.NewMessages.Count > 0) {
-				string chatGroup = SessionHub.ChatGroup(session.SessionId);
+				string chatGroup = SessionHub.ChatGroup(session.SessionId, false);
 				groupCollection.Groups.AddOrUpdate(chatGroup, session.LastUpdate, (key, value) => session.LastUpdate);
-				await hubContext.Clients.Group(chatGroup).SendAsync("Chat", session.Chat.NewMessages.ConvertAll(x => new ChatMessage(x)));
+				await hubContext.Clients.Group(chatGroup).SendAsync("Chat", new ChatViewModel(session.Chat.NewMessages) { Append = true });
 			}
+			if(session.Chat.Chat.Count > 0) {
+				string chatGroup = SessionHub.ChatGroup(session.SessionId, true);
+				groupCollection.Groups.AddOrUpdate(chatGroup, session.LastUpdate, (key, value) => session.LastUpdate);
+				await hubContext.Clients.Group(chatGroup).SendAsync("Chat", new ChatViewModel(session.Chat.Chat));
+				// switch groups
+			}
+		}
+
+		private async Task SendLaps(Session session, SessionViewModel vm) {
 			foreach(CarHistory car in vm.History) {
 				string group = SessionHub.LapsGroup(session.SessionId, car.Key.Id());
 				groupCollection.Groups.AddOrUpdate(group, session.LastUpdate, (key, value) => session.LastUpdate);

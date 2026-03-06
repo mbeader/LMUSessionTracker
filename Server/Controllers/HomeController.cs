@@ -104,7 +104,7 @@ namespace LMUSessionTracker.Server.Controllers {
 			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
 			if(session == null)
 				return NotFound();
-			return Ok((await sessionRepo.GetChat(sessionId)).ConvertAll(x => new ChatMessage(x)));
+			return Ok(new ChatViewModel(await sessionRepo.GetChat(sessionId)));
 		}
 
 		public async Task<IActionResult> Tracks() {

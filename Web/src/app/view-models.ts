@@ -35,6 +35,11 @@ export class ChatMessage {
 	public message!: string;
 }
 
+export class ChatViewModel {
+	public chat: ChatMessage[] = [];
+	public append: boolean = false;
+}
+
 export class IndexViewModel {
 	public sessions: SessionSummary[] | null = null;
 	public total: number = 0;

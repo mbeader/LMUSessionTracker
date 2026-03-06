@@ -48,8 +48,20 @@ namespace LMUSessionTracker.Server.Hubs {
 		public static string SessionsGroup() => "sessions";
 		public static string LiveGroup(string sessionId) => Group(sessionId, "live");
 		public static string LapsGroup(string sessionId, string carId) => Group(sessionId, "laps", carId);
-		public static string ChatGroup(string sessionId) => Group(sessionId, "chat");
-		private static string Group(JoinRequest request) => Group(request.SessionId, request.Type, request.Key);
-		private static string Group(string sessionId, string type, string key = null) => $"{sessionId}-{type}{(key != null ? $"-{key}" : string.Empty)}";
+		public static string ChatGroup(string sessionId, bool refresh) => Group(sessionId, "chat", refresh: refresh);
+		private static string Group(JoinRequest request) => Group(request.SessionId, request.Type, request.Key, request.Refresh);
+
+		/// <summary>
+		/// Produces group names of the forms:
+		/// sessionId-type
+		/// sessionId-type[refresh]
+		/// sessionId-type-key
+		/// sessionId-type[refresh]-key
+		/// </summary>
+		private static string Group(string sessionId, string type, string key = null, bool refresh = false) {
+			string keyPart = key != null ? $"-{key}" : string.Empty;
+			string refreshPart = refresh ? "[refresh]" : string.Empty;
+			return $"{sessionId}-{type}{refreshPart}{keyPart}";
+		}
 	}
 }

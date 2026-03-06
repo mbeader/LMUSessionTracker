@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
-import { ChatMessage, JoinRequest, LapsViewModel, SessionTransitionViewModel, SessionViewModel } from './view-models';
+import { ChatViewModel, JoinRequest, LapsViewModel, SessionTransitionViewModel, SessionViewModel } from './view-models';
 import { SessionSummary } from './tracking';
 
 declare var signalR: any;
@@ -87,9 +87,9 @@ export class ServerLiveService {
 		});
 	}
 
-	joinChat(sessionId: string, callback: (chat: ChatMessage[]) => void) {
+	joinChat(sessionId: string, callback: (chat: ChatViewModel) => void) {
 		this.join(new JoinRequest('chat', sessionId), connection => {
-			connection.on('Chat', (chat: ChatMessage[]) => {
+			connection.on('Chat', (chat: ChatViewModel) => {
 				callback(chat);
 			});
 		});

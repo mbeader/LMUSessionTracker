@@ -4,7 +4,7 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { ServerApiService } from '../../server-api.service';
 import { ServerLiveService } from '../../server-live.service';
 import { Car } from '../../models';
-import { ChatMessage } from '../../view-models';
+import { ChatMessage, ChatViewModel } from '../../view-models';
 import { Format } from '../../format';
 import { getFlag } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
@@ -54,15 +54,17 @@ export class Chat {
 				}
 			}
 			this.api.getChat(sessionId).then(result => {
-				this.updateChat(result ?? []);
+				this.updateChat(result ?? new ChatViewModel());
 				this.live.joinChat(sessionId, this.updateChat.bind(this));
 			}, error => { console.log(error); })
 		}, error => { console.log(error); })
 		setInterval(() => this.now = new Date(), 10000);
 	}
 
-	updateChat(chat: ChatMessage[]) {
-		for (let message of chat) {
+	updateChat(chat: ChatViewModel) {
+		if(!chat.append)
+			this.messages.length = 0;
+		for (let message of chat.chat) {
 			let msg = new ChatMessageData(message);
 			msg.findSender(this.cars);
 			this.messages.push(msg);
