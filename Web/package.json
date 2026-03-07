@@ -43,6 +43,7 @@
     "@angular/compiler-cli": "^21.0.8",
     "@angular/localize": "^21.0.8",
     "@vitest/coverage-v8": "^4.0.16",
+    "angular-cli-ghpages": "^3.0.2",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

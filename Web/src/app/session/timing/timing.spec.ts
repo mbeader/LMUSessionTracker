@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ServerLiveService } from '../../server-live.service';
+import { ServerApiServiceToken } from '../../server-api.service/server-api.service';
+import { ServerLiveServiceToken } from '../../server-live.service/server-live.service';
 
 import { Timing } from './timing';
 
@@ -15,7 +16,8 @@ describe('Timing', () => {
 			providers: [
 				{ provide: ChangeDetectorRef, useValue: {} },
 				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } },
-				{ provide: ServerLiveService, useValue: { join: vi.fn() } },
+				{ provide: ServerApiServiceToken, useValue: { } },
+				{ provide: ServerLiveServiceToken, useValue: { join: vi.fn() } },
 			]
 		})
 			.compileComponents();

@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ServerApiServiceToken } from '../server-api.service/server-api.service';
+import { ServerLiveServiceToken } from '../server-live.service/server-live.service';
 
 import { BestLaps } from './best-laps';
 
@@ -13,7 +15,9 @@ describe('BestLaps', () => {
 			imports: [BestLaps],
 			providers: [
 				{ provide: ChangeDetectorRef, useValue: {} },
-				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() }, queryParamMap: { subscribe: vi.fn() } } }
+				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() }, queryParamMap: { subscribe: vi.fn() } } },
+				{ provide: ServerApiServiceToken, useValue: { getTracks: vi.fn().mockReturnValue({ then: vi.fn() }) } },
+				{ provide: ServerLiveServiceToken, useValue: { } },
 			]
 		})
 			.compileComponents();

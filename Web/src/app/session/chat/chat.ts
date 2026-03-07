@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { ServerApiService } from '../../server-api.service';
-import { ServerLiveService } from '../../server-live.service';
+import { ServerApiService, ServerApiServiceToken } from '../../server-api.service/server-api.service';
+import { ServerLiveService, ServerLiveServiceToken } from '../../server-live.service/server-live.service';
 import { Car } from '../../models';
 import { ChatMessage, ChatViewModel } from '../../view-models';
 import { Format } from '../../format';
@@ -18,8 +18,8 @@ import { ClassBadge } from '../class-badge/class-badge';
 export class Chat {
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
-	private api = inject(ServerApiService);
-	private live = inject(ServerLiveService);
+	private api = inject(ServerApiServiceToken);
+	private live = inject(ServerLiveServiceToken);
 	cars = new Map<string, Car[]>();
 	messages: ChatMessageData[] = [];
 	now: Date = new Date();

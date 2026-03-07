@@ -2,8 +2,8 @@ import { Component, inject, Injectable } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap/pagination';
 import { BehaviorSubject, debounceTime, delay, Observable, Subject, switchMap, tap } from 'rxjs';
-import { ServerApiService } from '../server-api.service';
-import { ServerLiveService } from '../server-live.service';
+import { ServerApiService, ServerApiServiceToken } from '../server-api.service/server-api.service';
+import { ServerLiveService, ServerLiveServiceToken } from '../server-live.service/server-live.service';
 import { whenExists } from '../utils';
 import { SessionSummary } from '../tracking';
 import { IndexViewModel } from '../view-models';
@@ -18,8 +18,8 @@ import { SessionsTable } from './sessions-table/sessions-table';
 export class Sessions {
 	private initCount: number = 0;
 	private _liveSessions = new BehaviorSubject<SessionSummary[]>([]);
-	private api = inject(ServerApiService);
-	private live = inject(ServerLiveService);
+	private api = inject(ServerApiServiceToken);
+	private live = inject(ServerLiveServiceToken);
 	service = inject(SessionsService);
 	liveSessions: Observable<SessionSummary[]>;
 	sessions: Observable<SessionSummary[]>;
@@ -52,7 +52,7 @@ interface State {
 
 @Injectable({ providedIn: 'root' })
 export class SessionsService {
-	private api = inject(ServerApiService);
+	private api = inject(ServerApiServiceToken);
 	private _loading = new BehaviorSubject<boolean>(true);
 	private _search = new Subject<void>();
 	private _sessions = new BehaviorSubject<SessionSummary[]>([]);

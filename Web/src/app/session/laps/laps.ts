@@ -1,7 +1,7 @@
 import { Component, inject, ChangeDetectorRef, viewChild } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-import { ServerApiService } from '../../server-api.service';
-import { ServerLiveService } from '../../server-live.service';
+import { ServerApiService, ServerApiServiceToken } from '../../server-api.service/server-api.service';
+import { ServerLiveService, ServerLiveServiceToken } from '../../server-live.service/server-live.service';
 import { BestClasses } from '../timing.service';
 import { LapsViewModel } from '../../view-models';
 import { Best, Lap } from '../../tracking';
@@ -18,8 +18,8 @@ import { PitSummary } from '../pit-summary/pit-summary';
 export class Laps {
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
-	private api = inject(ServerApiService);
-	private live = inject(ServerLiveService);
+	private api = inject(ServerApiServiceToken);
+	private live = inject(ServerLiveServiceToken);
 	private pitSummary = viewChild(PitSummary);
 	model: LapsViewModel | null = null;
 	defaultLap = (number: number) => { return { lapNumber: number, totalTime: -1, sector1: -1, sector2: -1, sector3: -1, isValid: false } as Lap };

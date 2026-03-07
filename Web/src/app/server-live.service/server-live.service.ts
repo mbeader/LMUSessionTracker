@@ -1,15 +1,25 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, InjectionToken } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
-import { ChatViewModel, JoinRequest, LapsViewModel, SessionTransitionViewModel, SessionViewModel } from './view-models';
-import { SessionSummary } from './tracking';
+import { ChatViewModel, JoinRequest, LapsViewModel, SessionTransitionViewModel, SessionViewModel } from '../view-models';
+import { SessionSummary } from '../tracking';
+
+export const ServerLiveServiceToken = new InjectionToken<ServerLiveService>('server live');
+
+export interface ServerLiveService {
+	joinSessions(callback: (sessions: SessionSummary[]) => void): void;
+	joinLive(sessionId: string, callback: (session: SessionViewModel) => void, transitionCallback: (session: SessionTransitionViewModel) => void): void;
+	joinLaps(sessionId: string, carId: string, callback: (laps: LapsViewModel) => void): void;
+	joinChat(sessionId: string, callback: (chat: ChatViewModel) => void): void;
+	leave(): void;
+}
 
 declare var signalR: any;
 @Injectable({
 	providedIn: 'root',
 })
-export class ServerLiveService {
+export class HttpServerLiveService implements ServerLiveService {
 	private readonly retryDelay = [0, 2000, 5000, 10000, 30000, 60000, 120000, 300000, 600000, 1800000, 3600000];
 	private readonly router = inject(Router);
 	private connection: HubConnection | null = null;
@@ -117,4 +127,22 @@ export class ServerLiveService {
 			setTimeout(this.start.bind(this, req), delay);
 		}
 	};
+}
+
+export class StaticServerLiveService implements ServerLiveService {
+    joinSessions(callback: (sessions: SessionSummary[]) => void): void {
+        throw new Error('Method not implemented.');
+    }
+    joinLive(sessionId: string, callback: (session: SessionViewModel) => void, transitionCallback: (session: SessionTransitionViewModel) => void): void {
+        throw new Error('Method not implemented.');
+    }
+    joinLaps(sessionId: string, carId: string, callback: (laps: LapsViewModel) => void): void {
+        throw new Error('Method not implemented.');
+    }
+    joinChat(sessionId: string, callback: (chat: ChatViewModel) => void): void {
+        throw new Error('Method not implemented.');
+    }
+    leave(): void {
+        throw new Error('Method not implemented.');
+    }
 }

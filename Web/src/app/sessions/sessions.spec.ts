@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ServerApiServiceToken } from '../server-api.service/server-api.service';
+import { ServerLiveServiceToken } from '../server-live.service/server-live.service';
 
 import { Sessions, SessionsService } from './sessions';
-import { ServerLiveService } from '../server-live.service';
-import { ServerApiService } from '../server-api.service';
 
 describe('Sessions', () => {
 	let component: Sessions;
@@ -12,8 +12,8 @@ describe('Sessions', () => {
 		await TestBed.configureTestingModule({
 			imports: [Sessions],
 			providers: [
-				{ provide: ServerApiService, useValue: { getLiveSessions: vi.fn().mockReturnValueOnce({ subscribe: vi.fn() }) } },
-				{ provide: ServerLiveService, useValue: { join: vi.fn() } },
+				{ provide: ServerApiServiceToken, useValue: { getLiveSessions: vi.fn().mockReturnValueOnce({ subscribe: vi.fn() }) } },
+				{ provide: ServerLiveServiceToken, useValue: { join: vi.fn() } },
 				{ provide: SessionsService, useValue: { sessions: { subscribe: vi.fn() } } }
 			]
 		}).compileComponents();

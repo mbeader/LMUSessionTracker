@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ServerApiService } from '../server-api.service';
+import { ServerApiService, ServerApiServiceToken } from '../server-api.service/server-api.service';
 import { AboutOptions } from '../view-models';
+import { environment } from '../../environments/environment';
 import packageJson from '../../../package.json';
 
 @Component({
@@ -13,7 +14,8 @@ import packageJson from '../../../package.json';
 })
 export class About {
 	private _aboutOptions = new BehaviorSubject<AboutOptions>(new AboutOptions());
-	private api = inject(ServerApiService);
+	private api = inject(ServerApiServiceToken);
+	static: boolean = environment.static;
 	version: string = packageJson.version;
 	aboutOptions: Observable<AboutOptions>;
 	url: string;

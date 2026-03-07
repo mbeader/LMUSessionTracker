@@ -1,7 +1,7 @@
 import { inject, ChangeDetectorRef, Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ServerApiService } from '../server-api.service';
-import { ServerLiveService } from '../server-live.service';
+import { ServerApiService, ServerApiServiceToken } from '../server-api.service/server-api.service';
+import { ServerLiveService, ServerLiveServiceToken } from '../server-live.service/server-live.service';
 import { SettingsService } from '../settings.service';
 import { Anonymizer } from '../anonymizer.service';
 import { SessionTransitionViewModel, SessionViewModel } from '../view-models';
@@ -13,8 +13,8 @@ export class SessionService {
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
-	private api = inject(ServerApiService);
-	private live = inject(ServerLiveService);
+	private api = inject(ServerApiServiceToken);
+	private live = inject(ServerLiveServiceToken);
 	private settings = inject(SettingsService);
 	private anonymizer = inject(Anonymizer);
 	private buildAutotransitionRoute: (sessionId: string) => string[] = () => [];

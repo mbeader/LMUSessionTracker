@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ServerApiService } from '../server-api.service';
+import { ServerApiService, ServerApiServiceToken } from '../server-api.service/server-api.service';
 import { BestLap, ClassBest, Lap as LapModel } from '../models';
 import { Format } from '../format';
 import { BestLapsFilters } from '../view-models';
@@ -19,7 +19,7 @@ export class BestLaps {
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
 	private ref = inject(ChangeDetectorRef);
-	private api = inject(ServerApiService);
+	private api = inject(ServerApiServiceToken);
 	private filterModal: any;
 	tracks: string[] | null = null;
 	laps: BestLap[] | null = null;

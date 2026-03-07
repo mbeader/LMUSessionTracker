@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject, Input, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ServerApiService } from '../../server-api.service';
+import { ServerApiService, ServerApiServiceToken } from '../../server-api.service/server-api.service';
 import { BestClasses, CarStatusDescription, TimingService } from '../timing.service';
 import { Result, SessionViewModel } from '../../view-models';
 import { Best, Car, CarKey, Lap } from '../../tracking';
@@ -18,7 +18,7 @@ import { PitSummary } from '../pit-summary/pit-summary';
 })
 export class Results {
 	private ref = inject(ChangeDetectorRef);
-	private api = inject(ServerApiService);
+	private api = inject(ServerApiServiceToken);
 	private pitSummary = viewChild(PitSummary);
 	@Input() session: SessionViewModel | null = null;
 	positionInClass: Map<string, number> = new Map();

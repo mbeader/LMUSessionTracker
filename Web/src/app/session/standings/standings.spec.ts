@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ServerApiServiceToken } from '../../server-api.service/server-api.service';
+import { ServerLiveServiceToken } from '../../server-live.service/server-live.service';
 
 import { Standings } from './standings';
 
@@ -8,7 +10,11 @@ describe('Standings', () => {
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [Standings]
+			imports: [Standings],
+			providers: [
+				{ provide: ServerApiServiceToken, useValue: { } },
+				{ provide: ServerLiveServiceToken, useValue: { } },
+			]
 		})
 			.compileComponents();
 

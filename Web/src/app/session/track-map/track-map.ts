@@ -1,7 +1,7 @@
 import { Component, HostListener, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Subject, debounceTime } from 'rxjs';
-import { ServerApiService } from '../../server-api.service';
+import { ServerApiService, ServerApiServiceToken } from '../../server-api.service/server-api.service';
 import { SessionService } from '../session.service';
 import { classId, whenExists } from '../../utils';
 import { Format } from '../../format';
@@ -16,7 +16,7 @@ import { Car, CarKey } from '../../tracking';
 	styleUrl: './track-map.css',
 })
 export class TrackMap {
-	private api = inject(ServerApiService);
+	private api = inject(ServerApiServiceToken);
 	private service = inject(SessionService);
 	private resize = new Subject();
 	private mousemove = new Subject<MousePosition>();

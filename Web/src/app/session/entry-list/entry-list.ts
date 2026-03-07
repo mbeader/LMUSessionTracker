@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Car } from '../../models';
-import { ServerApiService } from '../../server-api.service';
+import { ServerApiService, ServerApiServiceToken } from '../../server-api.service/server-api.service';
 import { ClassBadge } from '../class-badge/class-badge';
 import { getFlag } from '../../utils';
 
@@ -14,7 +14,7 @@ import { getFlag } from '../../utils';
 export class EntryList {
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
-	private api = inject(ServerApiService);
+	private api = inject(ServerApiServiceToken);
 	cars: Car[] | null = null;
 	Utils = { getFlag };
 
