@@ -31,6 +31,7 @@ as long as one exists, data will continue to be collected uninterrupted.
 		* Lap time tracking
 		* Track map
 		* Pit tracking
+		* Server chat
 	* Entry list with flags, badges, and roles for humans
 	* Highlighting of best laps/sectors per class/car/driver
 	* Multiplayer event resilience
@@ -62,7 +63,6 @@ as long as one exists, data will continue to be collected uninterrupted.
 
 * Session tracking
 	* Data
-		* Chat
 		* Tires/fuel/VE from history
 * Accept data from rF2 plugin
 
