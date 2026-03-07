@@ -10,9 +10,11 @@ declare var signalR: any;
 	providedIn: 'root',
 })
 export class ServerLiveService {
+	private readonly retryDelay = [0, 2000, 5000, 10000, 30000, 60000, 120000, 300000, 600000, 1800000, 3600000];
 	private readonly router = inject(Router);
 	private connection: HubConnection | null = null;
 	private stop: boolean = false;
+	private retries: number = 0;
 
 	constructor() {
 		this.router.events.pipe(
@@ -24,6 +26,7 @@ export class ServerLiveService {
 
 	private async reset() {
 		this.stop = true;
+		this.retries = 0;
 		if (this.connection) {
 			if (this.connection.state == HubConnectionState.Connected) {
 				await this.connection.invoke('Leave');
@@ -108,7 +111,10 @@ export class ServerLiveService {
 			await this.connection.invoke('Join', req);
 		} catch (err) {
 			console.log(err);
-			setTimeout(this.start.bind(this, req), 5000);
+			let delay = this.retryDelay[this.retries < this.retryDelay.length ? this.retries : this.retryDelay.length - 1];
+			this.retries++;
+			console.debug(`Retry #${this.retries} in ${delay / 1000}s`);
+			setTimeout(this.start.bind(this, req), delay);
 		}
 	};
 }
