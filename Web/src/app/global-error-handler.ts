@@ -12,6 +12,6 @@ export class GlobalErrorHandler implements ErrorHandler {
 	handleError(error: any) {
 		const url = this.router.url;
 		this.alertService.showAlert(error);
-		console.error(url, GlobalErrorHandler.name, { error });
+		console.error(url, GlobalErrorHandler.name, error);
 	}
 }
