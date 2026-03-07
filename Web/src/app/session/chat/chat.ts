@@ -33,22 +33,24 @@ export class Chat {
 		this.api.getEntryList(sessionId).then(result => {
 			if (result) {
 				for (let car of result) {
-					for (let member of car.entry.members) {
-						let names = [];
-						let space = member.name.indexOf(' ');
-						while (space > 0) {
-							names.push(`${member.name[0]} ${member.name.substring(space + 1)}`);
-							space = member.name.indexOf(' ', space + 1);
-						}
-
-						for (let name of names) {
-							let cars = this.cars.get(name);
-							if (!cars) {
-								cars = [];
-								this.cars.set(name, cars);
+					if (car?.entry?.members) {
+						for (let member of car.entry.members) {
+							let names = [];
+							let space = member.name.indexOf(' ');
+							while (space > 0) {
+								names.push(`${member.name[0]} ${member.name.substring(space + 1)}`);
+								space = member.name.indexOf(' ', space + 1);
 							}
-							if (!cars.includes(car))
-								cars.push(car);
+
+							for (let name of names) {
+								let cars = this.cars.get(name);
+								if (!cars) {
+									cars = [];
+									this.cars.set(name, cars);
+								}
+								if (!cars.includes(car))
+									cars.push(car);
+							}
 						}
 					}
 				}
@@ -62,7 +64,7 @@ export class Chat {
 	}
 
 	updateChat(chat: ChatViewModel) {
-		if(!chat.append)
+		if (!chat.append)
 			this.messages.length = 0;
 		for (let message of chat.chat) {
 			let msg = new ChatMessageData(message);
