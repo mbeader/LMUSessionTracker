@@ -18,9 +18,57 @@ export interface Car {
 	number: string;
 	id: string;
 
+	lastState: CarState;
 	entry: Entry;
 	session: Session;
 	laps: Array<Lap>;
+	pits: Array<Pit>;
+}
+
+export interface CarState {
+	carStateId: BigInt;
+	carId: BigInt;
+	sessionId: string;
+
+	countLapFlag: string;
+	driverName: string;
+	finishStatus: string;
+	inGarageStall: boolean;
+	lapStartET: number;
+	lapsCompleted: number;
+	penalties: number;
+	pitState: string;
+	pitstops: number;
+	pitting: boolean;
+	position: number;
+	serverScored: boolean;
+
+	lastPitLap: number;
+	lastPitTime: number;
+	pitThisLap: boolean;
+	lastStopLap: number;
+	lastStopTime: number;
+	stopThisLap: boolean;
+	lastReleaseTime: number;
+	stopLocation: number;
+	lastExitTime: number;
+	lastGarageLap: number;
+	lastGarageInTime: number;
+	lastGarageOutTime: number;
+	garageThisLap: boolean;
+	lastSwapLap: number;
+	lastSwapTime: number;
+	swapThisLap: boolean;
+	swapLocation: number;
+	lastLapEndPitState: string;
+	thisLapStartPitState: string;
+	penaltyThisLap: boolean;
+	totalPenalties: number;
+	totalPits: number;
+	totalStops: number;
+
+	car: Car;
+	session: Session;
 }
 
 export interface Chat {
@@ -28,7 +76,8 @@ export interface Chat {
 	sessionId: string;
 
 	message: string;
-	timestamp: Date;
+	timestamp: BigInt;
+	nanoseconds: BigInt;
 
 	session: Session;
 }
@@ -63,12 +112,15 @@ export interface Lap {
 	lapNumber: number;
 	driver: string;
 	finishStatus: string;
+	startTime: number;
 	totalTime: number;
 	sector1: number;
 	sector2: number;
 	sector3: number;
 	isValid: boolean;
 	position: number;
+	penalty: boolean;
+	garage: boolean;
 	pit: boolean;
 	fuel: number;
 	virtualEnergy: number;
@@ -99,6 +151,49 @@ export interface Member {
 
 	entry: Entry;
 	session: Session;
+}
+
+export interface Pit {
+	pitId: BigInt;
+	sessionId: string;
+	carId: BigInt;
+
+	lap: number;
+	pitTime: number;
+	stopTime: number;
+	releaseTime: number;
+	exitTime: number;
+	garageInTime: number;
+	garageOutTime: number;
+	swapTime: number;
+	stopAfterLine: boolean;
+	stopLocation: number;
+	swap: boolean;
+	swapLocation: number;
+	penalty: boolean;
+	fuel: number;
+	virtualEnergy: number;
+	lfChanged: boolean;
+	lfCompound: string;
+	lfNew: boolean;
+	lfUsage: number;
+	rfChanged: boolean;
+	rfCompound: string;
+	rfNew: boolean;
+	rfUsage: number;
+	lrChanged: boolean;
+	lrCompound: string;
+	lrNew: boolean;
+	lrUsage: number;
+	rrChanged: boolean;
+	rrCompound: string;
+	rrNew: boolean;
+	rrUsage: number;
+	previousStintDuration: number;
+	time: number;
+
+	session: Session;
+	car: Car;
 }
 
 export interface SessionState {

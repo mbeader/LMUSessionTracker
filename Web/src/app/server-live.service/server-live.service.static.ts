@@ -17,21 +17,21 @@ declare var signalR: any;
 	providedIn: 'root',
 })
 export class HttpServerLiveService implements ServerLiveService {
-    joinSessions(callback: (sessions: SessionSummary[]) => void): void {
-        throw new Error('Method not implemented.');
-    }
-    joinLive(sessionId: string, callback: (session: SessionViewModel) => void, transitionCallback: (session: SessionTransitionViewModel) => void): void {
-        throw new Error('Method not implemented.');
-    }
-    joinLaps(sessionId: string, carId: string, callback: (laps: LapsViewModel) => void): void {
-        throw new Error('Method not implemented.');
-    }
-    joinChat(sessionId: string, callback: (chat: ChatViewModel) => void): void {
-        throw new Error('Method not implemented.');
-    }
-    leave(): void {
-        throw new Error('Method not implemented.');
-    }
+	joinSessions(callback: (sessions: SessionSummary[]) => void): void {
+		throw new Error('Method not implemented.');
+	}
+	joinLive(sessionId: string, callback: (session: SessionViewModel) => void, transitionCallback: (session: SessionTransitionViewModel) => void): void {
+		throw new Error('Method not implemented.');
+	}
+	joinLaps(sessionId: string, carId: string, callback: (laps: LapsViewModel) => void): void {
+		throw new Error('Method not implemented.');
+	}
+	joinChat(sessionId: string, callback: (chat: ChatViewModel) => void): void {
+		throw new Error('Method not implemented.');
+	}
+	leave(): void {
+		throw new Error('Method not implemented.');
+	}
 }
 
 export class StaticServerLiveService implements ServerLiveService {
@@ -48,7 +48,9 @@ export class StaticServerLiveService implements ServerLiveService {
 	}
 
 	joinChat(sessionId: string, callback: (chat: ChatViewModel) => void) {
-		callback(new ChatViewModel());
+		let vm = new ChatViewModel();
+		vm.append = true;
+		callback(vm);
 	}
 
 	leave() {

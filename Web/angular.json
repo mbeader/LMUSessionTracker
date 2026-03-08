@@ -36,6 +36,9 @@
 						],
 						"polyfills": [
 							"@angular/localize/init"
+						],
+						"allowedCommonJsDependencies": [
+							"sql.js"
 						]
 					},
 					"configurations": {
@@ -67,6 +70,18 @@
 							]
 						},
 						"static": {
+							"assets": [
+								{
+									"glob": "**/sql-wasm-browser.wasm",
+									"input": "./node_modules/sql.js/dist/",
+									"output": "."
+								},
+								{
+									"glob": "sample.db",
+									"input": ".",
+									"output": "."
+								}
+							],
 							"outputHashing": "all",
 							"fileReplacements": [
 								{

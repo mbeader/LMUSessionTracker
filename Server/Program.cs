@@ -136,7 +136,7 @@ namespace LMUSessionTracker.Server {
 
 			var fileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "./wwwroot/browser"));
 			app.UseDefaultFiles(new DefaultFilesOptions() { FileProvider = fileProvider });
-			app.UseStaticFiles(new StaticFileOptions() { FileProvider = fileProvider });
+			app.UseStaticFiles(new StaticFileOptions() { FileProvider = fileProvider, ServeUnknownFileTypes = app.Environment.IsDevelopment() });
 			app.MapFallbackToFile("index.html", new StaticFileOptions() { FileProvider = fileProvider });
 
 			app.Use(async (context, next) => {

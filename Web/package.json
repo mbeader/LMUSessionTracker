@@ -42,9 +42,11 @@
     "@angular/cli": "^21.0.5",
     "@angular/compiler-cli": "^21.0.8",
     "@angular/localize": "^21.0.8",
+    "@types/sql.js": "^1.4.9",
     "@vitest/coverage-v8": "^4.0.16",
     "angular-cli-ghpages": "^3.0.2",
     "jsdom": "^27.1.0",
+    "sql.js": "^1.14.1",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
   }

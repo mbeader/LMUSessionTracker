@@ -101,8 +101,8 @@ export interface CarState {
 	swapThisLap: boolean;
 	swapLocation: number;
 	startedLapInPit: boolean;
-	LastLapEndPitState: string;
-	ThisLapStartPitState: string;
+	lastLapEndPitState: string;
+	thisLapStartPitState: string;
 	penaltyThisLap: boolean;
 	totalPenalties: number;
 	totalPits: number;
@@ -182,7 +182,7 @@ export interface Pit {
 	rrCompound: string | null;
 	rrNew: boolean;
 	rrUsage: number;
-	previousStnumberDuration: number;
+	previousStintDuration: number;
 	time: number;
 }
 
