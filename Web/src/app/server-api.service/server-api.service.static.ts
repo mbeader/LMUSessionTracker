@@ -6,7 +6,7 @@ import { Car, CarState, Chat, Entry, Lap, Member, Pit, Session, SessionState } f
 import { Car as TCar, CarState as TCarState, CarKey, CarHistory, Lap as TLap, Pit as TPit, SessionSummary } from '../tracking';
 import initSqlJs, { Database } from 'sql.js';
 
-const sqlPromise = initSqlJs({ locateFile: file => `/${file}` });
+const sqlPromise = initSqlJs({ locateFile: file => `./${file}` });
 const dataPromise = fetch('sample.db').then(res => res.arrayBuffer());
 const [SQL, buf] = await Promise.all([sqlPromise, dataPromise]);
 const db = buf.byteLength == 0 ? null : new SQL.Database(new Uint8Array(buf));
