@@ -2,7 +2,7 @@ import { Injectable, InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel, AboutOptions, TrackMap, ChatViewModel, ChatMessage, Result } from '../view-models';
-import { Car, CarState, Chat, Entry, Lap, Member, Pit, Session, SessionState } from '../models';
+import { BestLap, Car, CarState, Chat, Entry, Lap, Member, Pit, Session, SessionState } from '../models';
 import { Car as TCar, CarState as TCarState, CarKey, CarHistory, Lap as TLap, Pit as TPit, SessionSummary } from '../tracking';
 import initSqlJs, { Database } from 'sql.js';
 
@@ -331,11 +331,62 @@ export class StaticServerApiService implements ServerApiService {
 	}
 
 	getTracks(): Promise<string[]> {
-		return new Promise(resolve => resolve([]));
+		//let tracks = new Set<string>();
+		//for (let session of )
+		//	tracks.add(session.trackName);
+		let sorted = Array.from(this.repo.getLaps().keys());
+		sorted.sort();
+		return new Promise(resolve => resolve(sorted));
 	}
 
 	getBestLaps(filters: BestLapsFilters): Promise<BestLapsViewModel> {
-		return new Promise(resolve => resolve(new BestLapsViewModel()));
+		let vm = new BestLapsViewModel();
+		vm.laps = [];
+		let sessions = new Map<string, Session>();
+		this.repo.getSessions().forEach(x => sessions.set(x.sessionId, x));
+		let trackMap = this.repo.getLaps().get(filters.track ?? '');
+		if (trackMap) {
+			let since = filters.since ? new Date(filters.since) : null;
+			for (let [veh, vehMap] of trackMap.entries()) {
+				for (let [driver, driverLaps] of vehMap.entries()) {
+					let bestLap = {} as BestLap;
+					for (let lap of driverLaps) {
+						let session = sessions.get(lap.sessionId);
+						if (filters.knownDriversOnly && !lap.known)
+							continue;
+						if (filters.classes?.length && !filters.classes.includes(lap.car.class))
+							continue;
+						if (session) {
+							if (filters.sessions?.length) {
+								if (session.sessionType.startsWith('PRACTICE') && !filters.sessions.includes('Practice'))
+									continue;
+								else if (session.sessionType.startsWith('QUALIFY') && !filters.sessions.includes('Qualifying'))
+									continue;
+								else if (session.sessionType.startsWith('RACE') && !filters.sessions.includes('Race'))
+									continue;
+							}
+							if (filters.network && session.isOnline != (filters.network == 'online'))
+								continue;
+						}
+						if (since && lap.timestamp && new Date(lap.timestamp) < since)
+							continue;
+						if (lap.totalTime >= 0 && (!bestLap.lap || lap.totalTime < bestLap.lap.totalTime))
+							bestLap.lap = lap;
+						if (lap.sector1 >= 0 && (!bestLap.sector1 || lap.sector1 < bestLap.sector1.sector1))
+							bestLap.sector1 = lap;
+						if (lap.sector2 >= 0 && (!bestLap.sector2 || lap.sector2 < bestLap.sector2.sector2))
+							bestLap.sector2 = lap;
+						if (lap.sector3 >= 0 && (!bestLap.sector3 || lap.sector3 < bestLap.sector3.sector3))
+							bestLap.sector3 = lap;
+					}
+					if (bestLap.lap)
+						vm.laps.push(bestLap);
+				}
+			}
+		}
+		vm.laps.sort((a, b) => a.lap.totalTime - b.lap.totalTime);
+		//vm.laps = this.repo.getLaps().map(x => { return {} as BestLap; });
+		return new Promise(resolve => resolve(vm));
 	}
 
 	getAbout(): Observable<AboutOptions> {
@@ -345,10 +396,13 @@ export class StaticServerApiService implements ServerApiService {
 
 class Repository {
 	private sessions!: Session[];
+	private laps = new Map<string, Map<string, Map<string, Lap[]>>>();
+	private cars = new Map<number, Car>();
 
 	constructor() {
 		if (db) {
 			this.loadSessions(db);
+			this.loadLaps(db);
 		} else {
 			this.sessions = [];
 		}
@@ -418,23 +472,62 @@ class Repository {
 			}
 			car.lastState = this.mapColumns<CarState>(stateQuery.getAsObject({ $sessionId: sessionId, $carId: Number(car.carId) }));
 			cars.push(car);
+			this.cars.set(Number(car.carId), car);
 		}
 		return cars;
 	}
 
+	private loadLaps(db: Database) {
+		let sessions = new Map<string, Session>();
+		this.sessions.forEach(x => sessions.set(x.sessionId, x));
+		const lapQuery = db.prepare('SELECT * FROM Laps');
+		const knownQuery = db.prepare('SELECT Name FROM KnownDrivers WHERE Name = $name');
+		while (lapQuery.step()) {
+			let lap = this.mapColumns<Lap>(lapQuery.getAsObject());
+			let car = this.cars.get(Number(lap.carId));
+			let session = sessions.get(lap.sessionId);
+			if (!lap.isValid || lap.totalTime < 0)
+				continue;
+			if (session && car) {
+				lap.car = car;
+				knownQuery.reset();
+				knownQuery.bind({ $name: lap.driver });
+				lap.known = knownQuery.step();
+				let trackMap = this.laps.get(session.trackName);
+				if (!trackMap) {
+					trackMap = new Map<string, Map<string, Lap[]>>();
+					this.laps.set(session.trackName, trackMap);
+				}
+				let vehMap = trackMap.get(lap.car.veh);
+				if (!vehMap) {
+					vehMap = new Map<string, Lap[]>();
+					trackMap.set(lap.car.veh, vehMap);
+				}
+				let driverLaps = vehMap.get(lap.driver);
+				if (!driverLaps) {
+					driverLaps = [];
+					vehMap.set(lap.driver, driverLaps);
+				}
+				driverLaps.push(lap);
+			}
+		}
+	}
+
 	getSessions() {
-		//this.loadSessions();
-		let sessions = this.sessions.slice();// ?? [];
+		let sessions = this.sessions.slice();
 		sessions.reverse();
 		return sessions;
 	}
 
 	getSession(sessionId: string) {
-		//this.loadSessions();
 		return this.sessions.find(x => x.sessionId == sessionId);
 	}
 
 	getCars(sessionId: string) {
 		return this.getSession(sessionId)?.cars ?? [];
+	}
+
+	getLaps() {
+		return this.laps;
 	}
 }
