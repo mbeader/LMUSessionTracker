@@ -61,6 +61,7 @@ export class Results {
 	}
 
 	private calcGaps() {
+		this.gaps.length = 0;
 		let leadInClass = new Map<string, Result>();
 		let prevInClass = new Map<string, Result>();
 		for (let i = 0; i < this.results.length; i++) {
@@ -97,6 +98,7 @@ export class Results {
 	}
 
 	private calcTimedGaps() {
+		this.gaps.length = 0;
 		let classTimes = new Map<string, { leader: number, last: number }>();
 		for (let result of this.results) {
 			let lap = result.bestLap;
