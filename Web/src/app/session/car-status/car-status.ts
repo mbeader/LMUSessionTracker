@@ -3,10 +3,11 @@ import { TimingCarInfo, TimingService } from '../timing.service';
 import { Format } from '../../format';
 import { statusClass } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
+import { BrandBadge } from '../brand-badge/brand-badge';
 
 @Component({
 	selector: 'app-session-car-status',
-	imports: [ClassBadge],
+	imports: [ClassBadge, BrandBadge],
 	templateUrl: './car-status.html',
 	styleUrl: './car-status.css',
 })

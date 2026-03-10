@@ -7,12 +7,13 @@ import { Standing } from '../../lmu';
 import { Format } from '../../format';
 import { classId, statusClass, whenExists } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
+import { BrandBadge } from '../brand-badge/brand-badge';
 import { CarStatus } from '../car-status/car-status';
 import { PitSummary } from '../pit-summary/pit-summary';
 
 @Component({
 	selector: 'app-session-standings',
-	imports: [RouterLink, ClassBadge, CarStatus, PitSummary],
+	imports: [RouterLink, ClassBadge, BrandBadge, CarStatus, PitSummary],
 	providers: [TimingService],
 	templateUrl: './standings.html',
 	styleUrl: './standings.css',

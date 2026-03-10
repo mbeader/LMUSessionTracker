@@ -16,6 +16,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		private readonly Mock<UuidVersion7Provider> uuidProvider;
 		private readonly Mock<PublisherService> publisher;
 		private readonly Mock<TrackMapBuilder> trackMapBuilder;
+		private readonly Mock<VehicleService> vehService;
 		private readonly SessionArbiter arbiter;
 		private string clientId = "t";
 		private string clientI2 = "q";
@@ -31,8 +32,9 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			uuidProvider.Setup(x => x.CreateVersion7(It.IsAny<DateTime>())).Returns(() => Guid.Parse(SessionId(++sessionCount)));
 			publisher = new Mock<PublisherService>();
 			trackMapBuilder = new Mock<TrackMapBuilder>();
+			vehService = new Mock<VehicleService>();
 			arbiter = new SessionArbiter(loggingFixture.LoggerFactory.CreateLogger<SessionArbiter>(), managementRepo.Object, dateTimeProvider.Object, uuidProvider.Object,
-				new SessionLogger(loggingFixture.LoggerFactory.CreateLogger<SessionLogger>()), publisher.Object, trackMapBuilder.Object);
+				new SessionLogger(loggingFixture.LoggerFactory.CreateLogger<SessionLogger>()), publisher.Object, trackMapBuilder.Object, vehService.Object);
 		}
 
 		public static string SessionId(byte sessionId) => $"000000000000000000000000000000{sessionId:x2}";

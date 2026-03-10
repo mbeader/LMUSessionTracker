@@ -1,0 +1,94 @@
+.brand {
+	background-size: contain;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	position: relative;
+	display: inline-block;
+	width: 2em;
+	/*line-height: 1em;*/
+}
+
+.brand:before {
+	content: " ";
+}
+
+.brand.brand-alpine {
+	background-image: url("../../../../public/brands/Brand=Alpine.svg");
+}
+
+.brand.brand-aston-martin {
+	background-image: url("../../../../public/brands/Brand=Aston Martin.svg");
+}
+
+.brand.brand-bmw {
+	background-image: url("../../../../public/brands/Brand=BMW.svg");
+}
+
+.brand.brand-cadillac {
+	background-image: url("../../../../public/brands/Brand=Cadillac.svg");
+}
+
+.brand.brand-corvette {
+	background-image: url("../../../../public/brands/Brand=Corvette.svg");
+}
+
+.brand.brand-ferrari {
+	background-image: url("../../../../public/brands/Brand=Ferrari.svg");
+}
+
+.brand.brand-ford {
+	background-image: url("../../../../public/brands/Brand=Ford.svg");
+}
+
+.brand.brand-ginetta {
+	background-image: url("../../../../public/brands/Brand=Ginetta.svg");
+}
+
+.brand.brand-glickenhaus {
+	background-image: url("../../../../public/brands/Brand=Glickenhaus.svg");
+}
+
+.brand.brand-isotta-fraschini {
+	background-image: url("../../../../public/brands/Brand=Isotta Fraschini.svg");
+}
+
+.brand.brand-lamborghini {
+	background-image: url("../../../../public/brands/Brand=Lamborghini.svg");
+}
+
+.brand.brand-lexus {
+	background-image: url("../../../../public/brands/Brand=Lexus.svg");
+}
+
+.brand.brand-ligier {
+	background-image: url("../../../../public/brands/Brand=Ligier.svg");
+}
+
+.brand.brand-mclaren {
+	background-image: url("../../../../public/brands/Brand=McLaren.svg");
+}
+
+.brand.brand-mercedes-amg {
+	background-image: url("../../../../public/brands/Brand=Mercedes-AMG.svg");
+}
+
+.brand.brand-oreca {
+	background-image: url("../../../../public/brands/Brand=Oreca.svg");
+}
+
+.brand.brand-peugeot {
+	background-image: url("../../../../public/brands/Brand=Peugeot.svg");
+}
+
+.brand.brand-porsche {
+	background-image: url("../../../../public/brands/Brand=Porsche.svg");
+}
+
+.brand.brand-toyota {
+	background-image: url("../../../../public/brands/Brand=Toyota.svg");
+}
+
+.brand.brand-vanwall {
+	background-image: url("../../../../public/brands/Brand=Vanwall.svg");
+}
+

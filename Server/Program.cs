@@ -95,6 +95,7 @@ namespace LMUSessionTracker.Server {
 			builder.Services.AddScoped<SqliteKnownDriversRepository>();
 			builder.Services.AddScoped<SqliteVehicleRepository>();
 			builder.Services.AddSingleton<TrackMapService>();
+			builder.Services.AddSingleton<VehicleService, DefaultVehicleService>();
 			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
 			builder.Services.AddSingleton<ProtocolAuthenticator, DefaultProtocolAuthenticator>();
 			builder.Services.AddHostedService<SessionLoaderService>();
@@ -120,6 +121,8 @@ namespace LMUSessionTracker.Server {
 				knownDriversRepo.Apply().Wait();
 				var vehsRepo = serviceScope.ServiceProvider.GetRequiredService<SqliteVehicleRepository>();
 				vehsRepo.Repair().Wait();
+				var vehService = serviceScope.ServiceProvider.GetRequiredService<VehicleService>();
+				vehService.Init(vehsRepo.GetVehicles().Result);
 			}
 
 			// Configure the HTTP request pipeline.

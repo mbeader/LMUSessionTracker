@@ -1,4 +1,5 @@
 ﻿using LMUSessionTracker.Core.LMU;
+using LMUSessionTracker.Core.Services;
 using System;
 using System.Collections.Generic;
 
@@ -179,6 +180,10 @@ namespace LMUSessionTracker.Core.Tracking {
 				clients.Add(PrimaryClientId);
 			clients.AddRange(SecondaryClientIds);
 			return clients;
+		}
+
+		public void ResolveVehicles(VehicleService vehService) {
+			History.ResolveVehicles(vehService);
 		}
 
 		private bool IsFinished(SessionInfo info) {

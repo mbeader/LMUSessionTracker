@@ -59,5 +59,22 @@ namespace LMUSessionTracker.Server.Models {
 			Series = series;
 			Custom = livery == "Custom";
 		}
+
+		public Core.Tracking.Vehicle To() {
+			return new Core.Tracking.Vehicle() {
+				Id = Id,
+				Name = Name,
+				Number = Number,
+				Team = Team,
+				Livery = Livery,
+				ModelId = Model,
+				Class = Class,
+				Series = Series,
+				Custom = Custom,
+				ModelName = VehicleModel?.Name,
+				Engine = VehicleModel?.Engine,
+				Manufacturer = VehicleModel?.Manufacturer,
+			};
+		}
 	}
 }

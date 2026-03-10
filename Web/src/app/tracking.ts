@@ -66,6 +66,7 @@ export interface Car {
 	class: string;
 	number: string;
 	id: string;
+	vehicle: Vehicle;
 }
 
 export interface CarState {
@@ -204,4 +205,19 @@ export interface SessionSummary {
 	remaining: number;
 	phase: number;
 	bests: Bests;
+}
+
+export interface Vehicle {
+	id: string;
+	name: string;
+	number: string;
+	team: string;
+	livery: string;
+	modelId: string;
+	class: string;
+	series: string;
+	custom: boolean;
+	modelName: string;
+	engine: string;
+	manufacturer: string;
 }

@@ -8,6 +8,7 @@
             <th scope="col" class="text-center">PIC</th>
             <th scope="col" class="text-center">Class</th>
             <th scope="col" class="text-center">#</th>
+            <th scope="col" class="text-center">Manu</th>
             <th scope="col" class="team-col">Team</th>
             <th scope="col" class="driver-col">Driver</th>
             <th scope="col" class="text-end">Laps</th>
@@ -43,6 +44,7 @@
             <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
             <td class="text-center"><app-session-class-badge [carClass]="carClass" /></td>
             <td class="text-center">{{ car?.number ? car.number : standing.carNumber }}</td>
+            <td class="text-center"><app-session-brand-badge [brand]="car?.vehicle?.manufacturer" /></td>
             @let team = car?.teamName ? car.teamName : (!standing.fullTeamName ? standing.vehicleName : standing.fullTeamName);
             <td class="team-col text-truncate" title="{{ team }}">{{ team }}</td>
             <td class="driver-col text-truncate" title="{{ standing.driverName }}">{{ standing.driverName }}</td>

@@ -10,6 +10,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public string Number { get; set; }
 		public string Id { get; set; }
 		public bool HasAllFields { get; private set; }
+		public Vehicle Vehicle { get; set; }
 
 		public Car() { }
 

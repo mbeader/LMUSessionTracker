@@ -210,7 +210,7 @@ export interface TimingFieldValue {
 }
 
 class TimingFields {
-	private static nextId: number = 54;
+	private static nextId: number = 56;
 	fields: TimingField[] = [
 		{
 			id: 1,
@@ -258,6 +258,13 @@ class TimingFields {
 			align: 'center'
 		},
 		{
+			id: 54,
+			name: 'Manu',
+			desc: 'Car manufacturer',
+			value: i => i.car?.vehicle?.manufacturer,
+			align: 'center'
+		},
+		{
 			id: 7,
 			name: 'Team',
 			desc: 'Team',
@@ -271,6 +278,13 @@ class TimingFields {
 			desc: 'Car',
 			value: i => i.car?.vehicleName,
 			classes: () => 'text-truncate',
+			colType: 'team-col'
+		},
+		{
+			id: 55,
+			name: 'Model',
+			desc: 'Car model',
+			value: i => i.car?.vehicle?.modelName,
 			colType: 'team-col'
 		},
 		{

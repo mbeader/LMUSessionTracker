@@ -21,6 +21,10 @@
     <dd class="col-9">{{ car.teamName }}</dd>
     <dt class="col-3">Vehicle</dt>
     <dd class="col-9">{{ car.vehicleName }}</dd>
+    <dt class="col-3">Manufacturer</dt>
+    <dd class="col-9"><app-session-brand-badge [brand]="car?.vehicle?.manufacturer" /></dd>
+    <dt class="col-3">Model</dt>
+    <dd class="col-9">{{ car?.vehicle?.modelName }}</dd>
     }
     <dt class="col-3">Class</dt>
     <dd class="col-9"><app-session-class-badge [carClass]="carClass" /></dd>

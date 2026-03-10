@@ -134,6 +134,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				Class = Car.Class,
 				Number = Car.Number,
 				Id = Car.Id,
+				Vehicle = Car.Vehicle
 			});
 			foreach(Lap lap in Laps) {
 				car.Laps.Add(lap?.Clone());

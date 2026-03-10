@@ -1,4 +1,5 @@
 ﻿using LMUSessionTracker.Core.LMU;
+using LMUSessionTracker.Core.Services;
 using System;
 using System.Collections.Generic;
 
@@ -76,6 +77,13 @@ namespace LMUSessionTracker.Core.Tracking {
 						Id = entry.Id
 					});
 				}
+			}
+		}
+		
+		public void ResolveVehicles(VehicleService vehService) {
+			foreach(CarHistory car in cars.Values) {
+				if(car.Car.Vehicle == null)
+					car.Car.Vehicle = vehService.GetVehicle(car.Car.Veh);
 			}
 		}
 
