@@ -5,6 +5,7 @@ import { ServerApiService, ServerApiServiceToken } from '../server-api.service/s
 import { BestLap, ClassBest, Lap as LapModel } from '../models';
 import { Format } from '../format';
 import { BestLapsFilters } from '../view-models';
+import { whenExists } from '../utils';
 import { ClassBadge } from '../session/class-badge/class-badge';
 import { Lap } from './lap/lap';
 
@@ -62,16 +63,17 @@ export class BestLaps {
 			this.ref.markForCheck();
 			if (this.tracks.length > 0) {
 				let snapshot = this.route.snapshot;
-				new Promise((resolve) => {
-					let fn = (fn: any) => {
-						let form = document.querySelector('#filterModal .modal-body');
-						if (!form)
-							setTimeout(fn, 100);
-						else
-							resolve(true);
-					}
-					fn(fn);
-				}).then(() => {
+				// pray all the filter controls exist
+				let promises = [
+					new Promise((resolve) => whenExists('#filterModal .modal-body', resolve)),
+					new Promise((resolve) => whenExists('input#any-date', resolve)),
+					new Promise((resolve) => whenExists('input#since-date', resolve)),
+					new Promise((resolve) => whenExists('input[name="network"]', resolve)),
+					new Promise((resolve) => whenExists('#classset input', resolve)),
+					new Promise((resolve) => whenExists('#sessionsset input', resolve)),
+					new Promise((resolve) => whenExists('input[name="knownDrivers"]', resolve)),
+				];
+				Promise.all(promises).then(() => {
 					this.init = false;
 					this.setFilters(snapshot.queryParamMap);
 					this.changeTrack(true, true);
@@ -88,8 +90,8 @@ export class BestLaps {
 		}
 	}
 
-	changeTrack(nagivate: boolean, replaceUrl: boolean, skip?: boolean) {
-		this.query(nagivate, replaceUrl);
+	changeTrack(navigate: boolean, replaceUrl: boolean, skip?: boolean) {
+		this.query(navigate, replaceUrl);
 		if (this.track) {
 			let filters = new BestLapsFilters();
 			filters.track = this.track;
@@ -194,8 +196,8 @@ export class BestLaps {
 		}
 	}
 
-	query(nagivate: boolean, replaceUrl: boolean) {
-		if (nagivate)
+	query(navigate: boolean, replaceUrl: boolean) {
+		if (navigate)
 			this.router.navigate(['.'], {
 				relativeTo: this.route,
 				queryParams: {
