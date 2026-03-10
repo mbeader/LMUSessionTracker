@@ -35,12 +35,7 @@ export class Chat {
 				for (let car of result) {
 					if (car?.entry?.members) {
 						for (let member of car.entry.members) {
-							let names = [];
-							let space = member.name.indexOf(' ');
-							while (space > 0) {
-								names.push(`${member.name[0]} ${member.name.substring(space + 1)}`);
-								space = member.name.indexOf(' ', space + 1);
-							}
+							let names = Chat.generatePossibleSenderNames(member.name);
 
 							for (let name of names) {
 								let cars = this.cars.get(name);
@@ -76,6 +71,37 @@ export class Chat {
 
 	coalesce(s: string | null | undefined) {
 		return s ?? '\u00A0';
+	}
+
+	static generatePossibleSenderNames(name: string) {
+		let names: string[] = [];
+		let space = name.indexOf(' ');
+		let initials = `${name[0]} `;
+		if (space > 0) {
+			while (space > 0) {
+				let nameSuffix = name.substring(space + 1);
+				let senderName = `${name[0]} ${nameSuffix}`;
+				this.addName(names, senderName);
+				if (initials.length > 2) {
+					let initialsName = `${initials}${nameSuffix}`;
+					this.addName(names, initialsName);
+				}
+				initials = `${initials}${nameSuffix[0]} `;
+				space = name.indexOf(' ', space + 1);
+			}
+		} else
+			names.push(name);
+		return names;
+	}
+
+	private static addName(names: string[], name: string) {
+		if (!names.includes(name))
+			names.push(name);
+		if (name.length > 15) {
+			let truncated = name.substring(0, 15);
+			if (!names.includes(truncated))
+				names.push(truncated);
+		}
 	}
 }
 
