@@ -75,7 +75,7 @@ export class Chat {
 	}
 
 	coalesce(s: string | null | undefined) {
-		return s ?? '&nbsp';
+		return s ?? '\u00A0';
 	}
 }
 
