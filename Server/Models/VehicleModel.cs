@@ -16,7 +16,7 @@ namespace LMUSessionTracker.Server.Models {
 
 		public VehicleModel() { }
 
-		public VehicleModel(string id, string name, string engine, string manufacturer) {
+		public VehicleModel(string id, string name, string manufacturer, string engine) {
 			Id = id;
 			Name = name;
 			Engine = engine;
