@@ -288,6 +288,7 @@ export class StaticServerApiService implements ServerApiService {
 			vm.sessionState = session.lastState;
 			vm.history = this.histories[sessionId];
 			vm.results = this.results[sessionId];
+			vm.entries = vm.results.reduce((prev, curr) => { if(curr.car) prev[CarKey.fromCar(curr.car).id] = curr.car; return prev; }, {} as { [key: string]: TCar });
 			vm.positionInClass = {};
 			let classes: { [key: string]: number } = {};
 			for (let car of vm.results) {
@@ -331,9 +332,6 @@ export class StaticServerApiService implements ServerApiService {
 	}
 
 	getTracks(): Promise<string[]> {
-		//let tracks = new Set<string>();
-		//for (let session of )
-		//	tracks.add(session.trackName);
 		let sorted = Array.from(this.repo.getLaps().keys());
 		sorted.sort();
 		return new Promise(resolve => resolve(sorted));

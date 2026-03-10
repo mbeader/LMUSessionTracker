@@ -40,11 +40,11 @@ export class StaticServerLiveService implements ServerLiveService {
 	}
 
 	joinLive(sessionId: string, callback: (session: SessionViewModel) => void, transitionCallback: (session: SessionTransitionViewModel) => void) {
-		callback(new SessionViewModel());
+		//callback(new SessionViewModel());
 	}
 
 	joinLaps(sessionId: string, carId: string, callback: (laps: LapsViewModel) => void) {
-		callback(new LapsViewModel());
+		//callback(new LapsViewModel());
 	}
 
 	joinChat(sessionId: string, callback: (chat: ChatViewModel) => void) {
