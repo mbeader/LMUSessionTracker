@@ -20,6 +20,7 @@ export class Chat {
 	private route = inject(ActivatedRoute);
 	private api = inject(ServerApiServiceToken);
 	private live = inject(ServerLiveServiceToken);
+	private sessionId!: string;
 	cars = new Map<string, Car[]>();
 	messages: ChatMessageData[] = [];
 	now: Date = new Date();
@@ -30,8 +31,20 @@ export class Chat {
 		let sessionId = this.route.snapshot.paramMap.get('sessionId');
 		if (!sessionId)
 			return;
-		this.api.getEntryList(sessionId).then(result => {
+		this.sessionId = sessionId;
+		this.updateEntries(sessionId).then(() => {
+			this.api.getChat(sessionId).then(result => {
+				this.updateChat(result ?? new ChatViewModel());
+				this.live.joinChat(sessionId, this.updateChat.bind(this));
+			}, error => { console.log(error); })
+		}, error => { console.log(error); })
+		setInterval(() => this.now = new Date(), 10000);
+	}
+
+	private updateEntries(sessionId: string) {
+		return this.api.getEntryList(sessionId).then(result => {
 			if (result) {
+				this.cars.clear();
 				for (let car of result) {
 					if (car?.entry?.members) {
 						for (let member of car.entry.members) {
@@ -50,23 +63,25 @@ export class Chat {
 					}
 				}
 			}
-			this.api.getChat(sessionId).then(result => {
-				this.updateChat(result ?? new ChatViewModel());
-				this.live.joinChat(sessionId, this.updateChat.bind(this));
-			}, error => { console.log(error); })
 		}, error => { console.log(error); })
-		setInterval(() => this.now = new Date(), 10000);
 	}
 
 	updateChat(chat: ChatViewModel) {
 		if (!chat.append)
 			this.messages.length = 0;
+		let senderMissing = false;
 		for (let message of chat.chat) {
 			let msg = new ChatMessageData(message);
-			msg.findSender(this.cars);
+			senderMissing = senderMissing || msg.findSender(this.cars);
 			this.messages.push(msg);
 		}
 		this.ref.markForCheck();
+		if (senderMissing)
+			this.updateEntries(this.sessionId).then(() => {
+				for (let message of this.messages)
+					message.findSender(this.cars);
+				this.ref.markForCheck();
+			});
 	}
 
 	coalesce(s: string | null | undefined) {
@@ -121,12 +136,14 @@ class ChatMessageData {
 	findSender(carsMap: Map<string, Car[]>) {
 		let parts = this.message.split(':');
 		if (parts.length < 2)
-			return;
+			return false;
 		let cars = carsMap.get(parts[0]);
 		if (cars) {
 			this.sender = parts[0];
 			this.message = this.message.substring(this.sender.length + 1);
 			this.car = cars;
+			return false;
 		}
+		return true;
 	}
 }
