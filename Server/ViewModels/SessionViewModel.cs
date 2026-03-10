@@ -41,9 +41,10 @@ namespace LMUSessionTracker.Server.ViewModels {
 		private void SetPIC<T>(List<T> list, Func<T, string> carClass, Func<T, CarKey> key) {
 			Dictionary<string, List<CarKey>> classes = new Dictionary<string, List<CarKey>>();
 			foreach(T item in list) {
-				if(!classes.TryGetValue(carClass(item), out List<CarKey> cars)) {
+				string classId = carClass(item) ?? string.Empty;
+				if(!classes.TryGetValue(classId, out List<CarKey> cars)) {
 					cars = new List<CarKey>();
-					classes.Add(carClass(item), cars);
+					classes.Add(classId, cars);
 				}
 				cars.Add(key(item));
 			}
