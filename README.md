@@ -13,6 +13,12 @@ This repo contains a [client](#client) and a [server](#server).
 
 ![Live sessions](sessions.png)
 
+### Demo
+
+Visit the [static demo instance](https://mbeader.github.io/LMUSessionTracker). Note that all live (and some other) features are disabled.
+
+While LMUSessionTracker itself does not require WebAssembly, the demo instance does for its static database.
+
 ### Goal
 
 The objective of this project is to achieve a unified and consistent view of live team endurance races.
@@ -147,6 +153,7 @@ Validation can be enabled via appsettings to log violations.
 	* When a client already exists in a session, another client joining the server may not match its state by the time it starts sending data
 	* Entry list similarity checking is currently very lenient and may result in strange behavior when a client leaves and rejoins an online practice session
 	* Sector bests of a lap in which a driver swap occurred may not be attributed to the driver the actually set them
+	* Online practice sessions (not part of a full event) slots are decoupled from the entry list
 
 ## Building from source
 
