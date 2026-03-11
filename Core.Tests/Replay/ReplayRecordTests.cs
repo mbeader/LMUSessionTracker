@@ -1,8 +1,5 @@
 using LMUSessionTracker.Core.Replay;
-using LMUSessionTracker.Core.Tracking;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LMUSessionTracker.Core.Tests.Replay {
 	public class ReplayRecordTests {

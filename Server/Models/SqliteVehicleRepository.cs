@@ -73,7 +73,7 @@ namespace LMUSessionTracker.Server.Models {
 				logger.LogDebug($"Unknown vehs: {string.Join(", ", vehs)}");
 		}
 
-		public async Task<List<Core.Tracking.Vehicle>> GetVehicles() {
+		public async Task<List<CoreServer.Tracking.Vehicle>> GetVehicles() {
 			return (await context.Vehicles.Include(x => x.VehicleModel).ToListAsync()).ConvertAll(x => x.To());
 		}
 	}

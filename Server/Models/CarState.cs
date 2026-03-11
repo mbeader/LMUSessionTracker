@@ -1,4 +1,4 @@
-﻿using LMUSessionTracker.Core.Tracking;
+﻿using LMUSessionTracker.CoreServer.Tracking;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -54,7 +54,7 @@ namespace LMUSessionTracker.Server.Models {
 		[JsonIgnore]
 		public Session Session { get; set; }
 
-		public void From(Core.Tracking.CarState state) {
+		public void From(CoreServer.Tracking.CarState state) {
 			CountLapFlag = state.CountLapFlag;
 			DriverName = state.DriverName;
 			FinishStatus = state.FinishStatus;
@@ -93,8 +93,8 @@ namespace LMUSessionTracker.Server.Models {
 			TotalStops = state.TotalStops;
 		}
 
-		public Core.Tracking.CarState To(CarKey key) {
-			return new Core.Tracking.CarState(key) {
+		public CoreServer.Tracking.CarState To(CarKey key) {
+			return new CoreServer.Tracking.CarState(key) {
 				CountLapFlag = CountLapFlag,
 				DriverName = DriverName,
 				FinishStatus = FinishStatus,

@@ -5,13 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CarKey = LMUSessionTracker.Core.Tracking.CarKey;
+using CarKey = LMUSessionTracker.CoreServer.Tracking.CarKey;
 
 namespace LMUSessionTracker.Server.Models {
 	public interface SessionRepository {
 		public Task<Session> GetSession(string sessionId);
 		public Task<int> GetSessionCount();
-		public Task<List<Core.Tracking.SessionSummary>> GetSessions(int page, int pageSize);
+		public Task<List<CoreServer.Tracking.SessionSummary>> GetSessions(int page, int pageSize);
 		public Task<SessionState> GetSessionState(string sessionId);
 		public Task<List<SessionEntry>> GetEntries(string sessionId);
 		public Task<List<Chat>> GetChat(string sessionId);
@@ -52,7 +52,7 @@ namespace LMUSessionTracker.Server.Models {
 			return await context.Sessions.CountAsync();
 		}
 
-		public async Task<List<Core.Tracking.SessionSummary>> GetSessions(int page, int pageSize) {
+		public async Task<List<CoreServer.Tracking.SessionSummary>> GetSessions(int page, int pageSize) {
 			List<Session> sessions = await context.Sessions.Include(x => x.LastState)
 				.Join(context.Cars.GroupBy(x => x.SessionId).Select(x => x.Key), x => new { x.SessionId }, x => new { SessionId = x }, (x, y) => x)
 				.OrderByDescending(x => x.Timestamp)
@@ -63,9 +63,9 @@ namespace LMUSessionTracker.Server.Models {
 			var cars = await context.Cars.GroupBy(x => new { x.SessionId }).Select(x => new { x.Key.SessionId, Count = x.Count() }).ToListAsync();
 			var entries = await context.Entries.GroupBy(x => new { x.SessionId }).Select(x => new { x.Key.SessionId, Count = x.Count() }).ToListAsync();
 			var laps = await context.Laps.GroupBy(x => new { x.SessionId }).Select(x => new { x.Key.SessionId, Count = x.Count() }).ToListAsync();
-			List<Core.Tracking.SessionSummary> summaries = new List<Core.Tracking.SessionSummary>();
+			List<CoreServer.Tracking.SessionSummary> summaries = new List<CoreServer.Tracking.SessionSummary>();
 			foreach(Session session in sessions) {
-				summaries.Add(new Core.Tracking.SessionSummary() {
+				summaries.Add(new CoreServer.Tracking.SessionSummary() {
 					SessionId = session.SessionId,
 					SecondaryClientIds = new List<string>(),
 					Track = session.TrackName,
@@ -94,7 +94,7 @@ namespace LMUSessionTracker.Server.Models {
 				.Where(x => x.SessionId == sessionId)
 				.OrderBy(x => x.CarId)
 				.ToListAsync();
-			Dictionary<string, Core.Tracking.Vehicle> vehicles = await GetVehicles(cars);
+			Dictionary<string, CoreServer.Tracking.Vehicle> vehicles = await GetVehicles(cars);
 			List<SessionEntry> res = new List<SessionEntry>();
 			foreach(Car car in cars) {
 				res.Add(new SessionEntry() {
@@ -116,7 +116,7 @@ namespace LMUSessionTracker.Server.Models {
 				.ToListAsync();
 			List<Lap> bestLaps = await GetBestLaps(sessionId);
 			List<Lap> lastLaps = await GetLastLaps(sessionId);
-			Dictionary<string, Core.Tracking.Vehicle> vehicles = await GetVehicles(cars);
+			Dictionary<string, CoreServer.Tracking.Vehicle> vehicles = await GetVehicles(cars);
 
 			List<Result> res = new List<Result>();
 			bool allWithoutState = true;
@@ -141,7 +141,7 @@ namespace LMUSessionTracker.Server.Models {
 						.Where(x => x.SlotId == key.SlotId && x.Veh == key.Veh)
 						.Join(lastLaps, x => x.CarId, x => x.CarId, (x, y) => y)
 						.FirstOrDefault()?.To();
-					result.CarState = new Core.Tracking.CarState(key) { LapsCompleted = result.LastLap?.LapNumber ?? 0, FinishStatus = result.LastLap?.FinishStatus };
+					result.CarState = new CoreServer.Tracking.CarState(key) { LapsCompleted = result.LastLap?.LapNumber ?? 0, FinishStatus = result.LastLap?.FinishStatus };
 				}
 				res = res.OrderByDescending(x => x.LastLap?.FinishStatus != "FSTAT_DQ")
 					.ThenByDescending(x => x.LastLap?.LapNumber)
@@ -151,12 +151,12 @@ namespace LMUSessionTracker.Server.Models {
 			return res;
 		}
 
-		private async Task<Dictionary<string, Core.Tracking.Vehicle>> GetVehicles(List<Car> cars) {
+		private async Task<Dictionary<string, CoreServer.Tracking.Vehicle>> GetVehicles(List<Car> cars) {
 			return await GetVehicles(cars.ConvertAll(x => x.Veh));
 		}
 
-		private async Task<Dictionary<string, Core.Tracking.Vehicle>> GetVehicles(List<string> vehs) {
-			Dictionary<string, Core.Tracking.Vehicle> res = new Dictionary<string, Core.Tracking.Vehicle>();
+		private async Task<Dictionary<string, CoreServer.Tracking.Vehicle>> GetVehicles(List<string> vehs) {
+			Dictionary<string, CoreServer.Tracking.Vehicle> res = new Dictionary<string, CoreServer.Tracking.Vehicle>();
 			List<Vehicle> vehicles = await context.Vehicles.Include(x => x.VehicleModel)
 				.Where(x => vehs.Contains(x.Id))
 				.ToListAsync();
@@ -197,7 +197,7 @@ namespace LMUSessionTracker.Server.Models {
 				.OrderBy(x => x.SlotId).ThenBy(x => x.Veh)
 				.ToListAsync();
 			List<Lap> laps = await GetBestLaps(sessionId);
-			Dictionary<string, Core.Tracking.Vehicle> vehicles = await GetVehicles(cars);
+			Dictionary<string, CoreServer.Tracking.Vehicle> vehicles = await GetVehicles(cars);
 
 			List<Result> res = new List<Result>();
 			bool allWithoutState = true;
@@ -237,7 +237,7 @@ namespace LMUSessionTracker.Server.Models {
 				foreach(Result result in res) {
 					CarKey key = new CarKey(result.Car.SlotId, result.Car.Veh);
 					var lapCount = lapCounts.Find(x => x.Car.SlotId == key.SlotId && x.Car.Veh == key.Veh);
-					result.CarState = new Core.Tracking.CarState(key) { LapsCompleted = lapCount?.LapCount ?? 0 };
+					result.CarState = new CoreServer.Tracking.CarState(key) { LapsCompleted = lapCount?.LapCount ?? 0 };
 				}
 			}
 			return res;
@@ -292,7 +292,7 @@ namespace LMUSessionTracker.Server.Models {
 				.OrderBy(x => x.Lap.TotalTime)
 				.Take(1000)
 				.ToListAsync();
-			Dictionary<string, Core.Tracking.Vehicle> vehicles = await GetVehicles(laps.ConvertAll(x => x.Lap.Car));
+			Dictionary<string, CoreServer.Tracking.Vehicle> vehicles = await GetVehicles(laps.ConvertAll(x => x.Lap.Car));
 
 			List<BestLap> res = new List<BestLap>();
 			foreach(var lap in laps) {

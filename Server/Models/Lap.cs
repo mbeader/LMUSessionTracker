@@ -40,7 +40,7 @@ namespace LMUSessionTracker.Server.Models {
 		[NotMapped]
 		public bool Known { get; set; }
 
-		public void From(Core.Tracking.Lap lap) {
+		public void From(CoreServer.Tracking.Lap lap) {
 			if(LapNumber > 0 && LapNumber != lap.LapNumber)
 				throw new InvalidOperationException($"Cannot change lap from L{LapNumber} to L{lap.LapNumber}");
 			LapNumber = lap.LapNumber;
@@ -65,8 +65,8 @@ namespace LMUSessionTracker.Server.Models {
 			Timestamp = lap.Timestamp;
 		}
 
-		public Core.Tracking.Lap To() {
-			return new Core.Tracking.Lap() {
+		public CoreServer.Tracking.Lap To() {
+			return new CoreServer.Tracking.Lap() {
 				LapNumber = LapNumber,
 				TotalTime = TotalTime,
 				Sector1 = Sector1,

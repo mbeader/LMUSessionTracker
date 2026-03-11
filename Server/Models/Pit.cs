@@ -48,7 +48,7 @@ namespace LMUSessionTracker.Server.Models {
 		public Session Session { get; set; }
 		public Car Car { get; set; }
 
-		public void From(Core.Tracking.Pit pit) {
+		public void From(CoreServer.Tracking.Pit pit) {
 			if(Lap > 0 && Lap != pit.Lap)
 				throw new InvalidOperationException($"Cannot change lap from L{Lap} to L{pit.Lap}");
 			Lap = pit.Lap;
@@ -86,8 +86,8 @@ namespace LMUSessionTracker.Server.Models {
 			Time = pit.Time;
 		}
 
-		public Core.Tracking.Pit To() {
-			return new Core.Tracking.Pit() {
+		public CoreServer.Tracking.Pit To() {
+			return new CoreServer.Tracking.Pit() {
 				Lap = Lap,
 				PitTime = PitTime,
 				StopTime = StopTime,

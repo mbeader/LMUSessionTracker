@@ -74,4 +74,8 @@
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CoreServer\CoreServer.csproj" />
+  </ItemGroup>
+
 </Project>

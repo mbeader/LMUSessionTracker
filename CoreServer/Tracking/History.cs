@@ -1,0 +1,126 @@
+﻿using LMUSessionTracker.Core;
+using LMUSessionTracker.Core.LMU;
+using LMUSessionTracker.CoreServer.Services;
+using System;
+using System.Collections.Generic;
+
+namespace LMUSessionTracker.CoreServer.Tracking {
+	public class History {
+		private readonly Dictionary<CarKey, CarHistory> cars = new Dictionary<CarKey, CarHistory>();
+
+		public int Count => cars.Count;
+
+		public History(List<CarHistory> history = null, EntryList entries = null) {
+			if(history != null)
+				foreach(CarHistory car in history)
+					cars[new CarKey() { SlotId = car.Car.SlotId, Veh = car.Car.Veh ?? "" }] = car;
+			if(entries != null)
+				LoadEntryList(entries);
+		}
+
+		private void LoadEntryList(EntryList entries) {
+			foreach(int slotId in entries.Slots.Keys) {
+				Entry entry = entries.Slots[slotId];
+				CarKey key = new CarKey() { SlotId = slotId, Veh = entry.Vehicle };
+				Car car = new Car() {
+					SlotId = slotId,
+					Veh = entry.Vehicle,
+					TeamName = entry.Name,
+					Number = entry.Number,
+					Id = entry.Id,
+				};
+				if(cars.TryGetValue(key, out CarHistory carHistory)) {
+					carHistory.Car.TeamName = car.TeamName;
+					carHistory.Car.Number = car.Number;
+					carHistory.Car.Id = car.Id;
+				} else {
+					carHistory = new CarHistory(key, car);
+					cars.Add(key, carHistory);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Returns the laps completed during this update
+		/// </summary>
+		public List<CarLap> Update(CarStateMonitor carStates, List<Standing> standings, DateTime timestamp) {
+			List<CarLap> laps = new List<CarLap>();
+			foreach(Standing standing in standings) {
+				CarLap lap = Update(carStates, standing, timestamp);
+				if(lap != null)
+					laps.Add(lap);
+			}
+			return laps;
+		}
+
+		private CarLap Update(CarStateMonitor carStates, Standing standing, DateTime timestamp) {
+			CarKey key = new CarKey() { SlotId = standing.slotID, Veh = standing.vehicleFilename };
+			if(!cars.TryGetValue(key, out CarHistory car)) {
+				car = new CarHistory(key, new Car(standing));
+				cars.Add(key, car);
+			}
+			Lap lap = car.Update(carStates.GetState(key), standing, timestamp);
+			if(lap != null)
+				return new CarLap() { Car = car.Car, Lap = lap };
+			return null;
+		}
+
+		public void UpdateCars(EntryList entries) {
+			foreach(int slotId in entries.Slots.Keys) {
+				Entry entry = entries.Slots[slotId];
+				CarKey key = new CarKey() { SlotId = slotId, Veh = entry.Vehicle };
+				if(cars.TryGetValue(key, out CarHistory carHistory) && !carHistory.Car.HasAllFields) {
+					carHistory.Car.Merge(new Car() {
+						VehicleName = carHistory.Car.VehicleName,
+						TeamName = entry.Name,
+						Class = carHistory.Car.Class,
+						Number = entry.Number,
+						Id = entry.Id
+					});
+				}
+			}
+		}
+		
+		public void ResolveVehicles(VehicleService vehService) {
+			foreach(CarHistory car in cars.Values) {
+				if(car.Car.Vehicle == null)
+					car.Car.Vehicle = vehService.GetVehicle(car.Car.Veh);
+			}
+		}
+
+		public List<CarHistory> GetAllHistory() {
+			List<CarHistory> res = new List<CarHistory>(cars.Values);
+			NaturalSortStringComparer comparer = NaturalSortStringComparer.OrdinalIgnoreCase;
+			res.Sort((a, b) =>
+				a.Car.Class != b.Car.Class ? ClassId(a.Car.Class).CompareTo(ClassId(b.Car.Class)) :
+				a.Car.Number != b.Car.Number ? comparer.Compare(a.Car.Number, b.Car.Number) :
+				a.Car.TeamName != b.Car.TeamName ? comparer.Compare(a.Car.TeamName, b.Car.TeamName) :
+				comparer.Compare(a.Car.VehicleName, b.Car.VehicleName)
+			);
+			return res;
+		}
+
+		private int ClassId(string s) {
+			if(s == null)
+				return 8;
+			else if(s.Contains("Hyper", StringComparison.OrdinalIgnoreCase))
+				return 1;
+			else if(s.Contains("LMP2_ELMS", StringComparison.OrdinalIgnoreCase))
+				return 2;
+			else if(s.Contains("LMP2", StringComparison.OrdinalIgnoreCase))
+				return 3;
+			else if(s.Contains("LMP3", StringComparison.OrdinalIgnoreCase))
+				return 4;
+			else if(s.Contains("GTE", StringComparison.OrdinalIgnoreCase))
+				return 5;
+			else if(s.Contains("GT3", StringComparison.OrdinalIgnoreCase))
+				return 6;
+			else
+				return 7;
+		}
+
+		public void Clear() {
+			cars.Clear();
+		}
+	}
+}

@@ -1,5 +1,5 @@
 ﻿using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Tracking;
+using LMUSessionTracker.CoreServer.Tracking;
 using LMUSessionTracker.Server.Services;
 using LMUSessionTracker.Server.ViewModels;
 using Microsoft.Extensions.Logging;
@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 
 namespace LMUSessionTracker.Server.Tracking {
-	public class TrackMapBuilder : Core.Tracking.TrackMapBuilder {
+	public class TrackMapBuilder : CoreServer.Tracking.TrackMapBuilder {
 		private static readonly int minSampleSize = 10;
 		private static readonly int minVotes = 5;
 		private readonly Dictionary<string, Dictionary<CarKey, BuilderState>> state = new Dictionary<string, Dictionary<CarKey, BuilderState>>();

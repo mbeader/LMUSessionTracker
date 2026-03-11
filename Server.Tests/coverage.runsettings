@@ -5,10 +5,10 @@
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <Exclude>[LMUSessionTracker.Core]LMUSessionTracker.*</Exclude> 
+          <Exclude>[LMUSessionTracker.Core]LMUSessionTracker.*,[LMUSessionTracker.CoreServer]LMUSessionTracker.*</Exclude> 
           <Include>[LMUSessionTracker.Server]LMUSessionTracker.*,[LMUSessionTracker.Server.Tests]LMUSessionTracker.*</Include> 
           <ExcludeByAttribute></ExcludeByAttribute>
-          <ExcludeByFile></ExcludeByFile> 
+          <ExcludeByFile>**/Migrations/*.cs</ExcludeByFile> 
           <IncludeDirectory></IncludeDirectory>
           <SingleHit>false</SingleHit>
           <UseSourceLink>false</UseSourceLink>

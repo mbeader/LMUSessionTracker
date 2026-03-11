@@ -28,7 +28,7 @@ namespace LMUSessionTracker.Server.Models {
 		public Car Car { get; set; }
 		public ICollection<Member> Members { get; } = new List<Member>();
 
-		public void From(Core.Tracking.Entry entry) {
+		public void From(CoreServer.Tracking.Entry entry) {
 			SlotId = entry.SlotId;
 			Id = entry.Id;
 			Number = entry.Number;
@@ -36,8 +36,8 @@ namespace LMUSessionTracker.Server.Models {
 			Vehicle = entry.Vehicle;
 		}
 
-		public Core.Tracking.Entry To() {
-			Core.Tracking.Entry entry = new Core.Tracking.Entry() {
+		public CoreServer.Tracking.Entry To() {
+			CoreServer.Tracking.Entry entry = new CoreServer.Tracking.Entry() {
 				SlotId = SlotId,
 				Id = Id,
 				Number = Number,

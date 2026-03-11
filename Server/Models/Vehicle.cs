@@ -60,8 +60,8 @@ namespace LMUSessionTracker.Server.Models {
 			Custom = livery == "Custom";
 		}
 
-		public Core.Tracking.Vehicle To() {
-			return new Core.Tracking.Vehicle() {
+		public CoreServer.Tracking.Vehicle To() {
+			return new CoreServer.Tracking.Vehicle() {
 				Id = Id,
 				Name = Name,
 				Number = Number,

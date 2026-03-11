@@ -1,4 +1,4 @@
-﻿using LMUSessionTracker.Core.Tracking;
+﻿using LMUSessionTracker.CoreServer.Tracking;
 
 namespace LMUSessionTracker.Server.ViewModels {
 	public class LapsViewModel {

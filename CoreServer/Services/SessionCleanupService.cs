@@ -1,0 +1,33 @@
+﻿using LMUSessionTracker.Core.Services;
+using LMUSessionTracker.CoreServer.Tracking;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
+
+namespace LMUSessionTracker.CoreServer.Services {
+	public class SessionCleanupService : PeriodicService<SessionCleanupService> {
+		private SessionArbiter arbiter;
+
+		public SessionCleanupService(ILogger<SessionCleanupService> logger, IServiceProvider serviceProvider, DateTimeProvider dateTime) : base(logger, serviceProvider, dateTime) {
+		}
+
+		public override int GetInterval() {
+			return 60000;
+		}
+
+		public override async Task Start(IServiceScope scope) {
+			arbiter = scope.ServiceProvider.GetRequiredService<SessionArbiter>();
+			await arbiter.Prune(dateTime.UtcNow);
+		}
+
+		public override async Task<bool> Do() {
+			await arbiter.Prune(dateTime.UtcNow);
+			return true;
+		}
+
+		public override Task End() {
+			return Task.CompletedTask;
+		}
+	}
+}

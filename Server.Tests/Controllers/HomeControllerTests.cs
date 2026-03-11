@@ -1,4 +1,4 @@
-using LMUSessionTracker.Core.Tracking;
+using LMUSessionTracker.CoreServer.Tracking;
 using LMUSessionTracker.Server.Controllers;
 using LMUSessionTracker.Server.Models;
 using LMUSessionTracker.Server.Services;
