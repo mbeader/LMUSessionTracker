@@ -48,3 +48,7 @@ export function getFlag(country: string) {
 	}
 	return country;
 }
+
+export function coalesce(s: string | null | undefined) {
+	return s ? s : '\u00A0';
+}

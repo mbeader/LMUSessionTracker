@@ -6,12 +6,14 @@ import { BestClasses } from '../timing.service';
 import { LapsViewModel } from '../../view-models';
 import { Best, Lap } from '../../tracking';
 import { Format } from '../../format';
+import { coalesce } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
+import { BrandBadge } from '../brand-badge/brand-badge';
 import { PitSummary } from '../pit-summary/pit-summary';
 
 @Component({
 	selector: 'app-session-laps',
-	imports: [RouterLink, ClassBadge, PitSummary],
+	imports: [RouterLink, ClassBadge, BrandBadge, PitSummary],
 	templateUrl: './laps.html',
 	styleUrl: './laps.css',
 })
@@ -24,6 +26,7 @@ export class Laps {
 	model: LapsViewModel | null = null;
 	defaultLap = (number: number) => { return { lapNumber: number, totalTime: -1, sector1: -1, sector2: -1, sector3: -1, isValid: false } as Lap };
 	Format = Format;
+	coalesce = coalesce;
 
 	constructor() {
 		let sessionId = this.route.snapshot.paramMap.get('sessionId');

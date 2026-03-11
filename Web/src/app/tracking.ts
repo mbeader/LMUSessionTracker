@@ -66,7 +66,7 @@ export interface Car {
 	class: string;
 	number: string;
 	id: string;
-	vehicle: Vehicle;
+	vehicle?: Vehicle;
 }
 
 export interface CarState {

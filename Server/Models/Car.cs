@@ -44,7 +44,7 @@ namespace LMUSessionTracker.Server.Models {
 			Id = car.Id;
 		}
 
-		public Core.Tracking.Car To() {
+		public Core.Tracking.Car To(Core.Tracking.Vehicle vehicle = null) {
 			return new Core.Tracking.Car() {
 				SlotId = SlotId,
 				Veh = Veh,
@@ -53,6 +53,7 @@ namespace LMUSessionTracker.Server.Models {
 				Class = Class,
 				Number = Number,
 				Id = Id,
+				Vehicle = vehicle
 			};
 		}
 	}

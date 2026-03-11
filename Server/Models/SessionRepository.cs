@@ -1,11 +1,11 @@
-﻿using LMUSessionTracker.Core.Tracking;
-using LMUSessionTracker.Server.ViewModels;
+﻿using LMUSessionTracker.Server.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CarKey = LMUSessionTracker.Core.Tracking.CarKey;
 
 namespace LMUSessionTracker.Server.Models {
 	public interface SessionRepository {
@@ -13,7 +13,7 @@ namespace LMUSessionTracker.Server.Models {
 		public Task<int> GetSessionCount();
 		public Task<List<Core.Tracking.SessionSummary>> GetSessions(int page, int pageSize);
 		public Task<SessionState> GetSessionState(string sessionId);
-		public Task<List<Car>> GetEntries(string sessionId);
+		public Task<List<SessionEntry>> GetEntries(string sessionId);
 		public Task<List<Chat>> GetChat(string sessionId);
 		public Task<List<Result>> GetResults(string sessionId);
 		public Task<List<Result>> GetTimedResults(string sessionId);
@@ -89,8 +89,20 @@ namespace LMUSessionTracker.Server.Models {
 			return await context.SessionStates.SingleOrDefaultAsync(x => x.SessionId == sessionId);
 		}
 
-		public async Task<List<Car>> GetEntries(string sessionId) {
-			return await context.Cars.Include(x => x.Entry).Include(x => x.Entry.Members).Where(x => x.SessionId == sessionId).OrderBy(x => x.CarId).ToListAsync();
+		public async Task<List<SessionEntry>> GetEntries(string sessionId) {
+			List<Car> cars = await context.Cars.Include(x => x.Entry).Include(x => x.Entry.Members)
+				.Where(x => x.SessionId == sessionId)
+				.OrderBy(x => x.CarId)
+				.ToListAsync();
+			Dictionary<string, Core.Tracking.Vehicle> vehicles = await GetVehicles(cars);
+			List<SessionEntry> res = new List<SessionEntry>();
+			foreach(Car car in cars) {
+				res.Add(new SessionEntry() {
+					Car = car.To(vehicles.GetValueOrDefault(car.Veh)),
+					Entry = car.Entry?.To()
+				});
+			}
+			return res;
 		}
 
 		public async Task<List<Chat>> GetChat(string sessionId) {
@@ -104,6 +116,7 @@ namespace LMUSessionTracker.Server.Models {
 				.ToListAsync();
 			List<Lap> bestLaps = await GetBestLaps(sessionId);
 			List<Lap> lastLaps = await GetLastLaps(sessionId);
+			Dictionary<string, Core.Tracking.Vehicle> vehicles = await GetVehicles(cars);
 
 			List<Result> res = new List<Result>();
 			bool allWithoutState = true;
@@ -111,7 +124,7 @@ namespace LMUSessionTracker.Server.Models {
 				CarKey key = new CarKey(car.SlotId, car.Veh);
 				int lastLap = (car.LastState?.LapsCompleted ?? 0) - 1;
 				res.Add(new Result() {
-					Car = car.To(),
+					Car = car.To(vehicles.GetValueOrDefault(car.Veh)),
 					CarState = car.LastState?.To(key),
 					BestLap = bestLaps.Find(x => x.CarId == car.CarId)?.To(),
 					LastLap = lastLaps.Find(x => x.CarId == car.CarId && x.LapNumber == lastLap)?.To(),
@@ -135,6 +148,17 @@ namespace LMUSessionTracker.Server.Models {
 					.ThenBy(x => x.LastLap?.Position)
 					.ToList();
 			}
+			return res;
+		}
+
+		private async Task<Dictionary<string, Core.Tracking.Vehicle>> GetVehicles(List<Car> cars) {
+			Dictionary<string, Core.Tracking.Vehicle> res = new Dictionary<string, Core.Tracking.Vehicle>();
+			List<string> vehs = cars.ConvertAll(x => x.Veh);
+			List<Vehicle> vehicles = await context.Vehicles.Include(x => x.VehicleModel)
+				.Where(x => vehs.Contains(x.Id))
+				.ToListAsync();
+			foreach(Vehicle vehicle in vehicles)
+				res.Add(vehicle.Id, vehicle.To());
 			return res;
 		}
 
@@ -170,6 +194,7 @@ namespace LMUSessionTracker.Server.Models {
 				.OrderBy(x => x.SlotId).ThenBy(x => x.Veh)
 				.ToListAsync();
 			List<Lap> laps = await GetBestLaps(sessionId);
+			Dictionary<string, Core.Tracking.Vehicle> vehicles = await GetVehicles(cars);
 
 			List<Result> res = new List<Result>();
 			bool allWithoutState = true;
@@ -188,7 +213,7 @@ namespace LMUSessionTracker.Server.Models {
 			foreach(Car car in cars) {
 				CarKey key = new CarKey(car.SlotId, car.Veh);
 				res.Add(new Result() {
-					Car = car.To(),
+					Car = car.To(vehicles.GetValueOrDefault(car.Veh)),
 					CarState = car.LastState?.To(key)
 				});
 				if(allWithoutState && car.LastState != null)

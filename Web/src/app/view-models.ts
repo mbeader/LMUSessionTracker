@@ -1,6 +1,6 @@
 import { SessionInfo, Standing } from './lmu';
 import { BestLap, ClassBest, Session, SessionState } from './models';
-import { SessionSummary, CarHistory, Car, Bests, CarState, Lap } from './tracking';
+import { SessionSummary, CarHistory, Car, Bests, CarState, Lap, Entry } from './tracking';
 
 export class AboutOptions {
 	public repoUrl: string | null = null;
@@ -63,6 +63,11 @@ export class Result {
 	public carState?: CarState;
 	public bestLap?: Lap;
 	public lastLap?: Lap;
+}
+
+export class SessionEntry {
+	public car!: Car;
+	public entry!: Entry;
 }
 
 export class SessionViewModel {

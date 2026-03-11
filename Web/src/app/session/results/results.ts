@@ -9,10 +9,11 @@ import { Format } from '../../format';
 import { classId, statusClass, whenExists } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
 import { PitSummary } from '../pit-summary/pit-summary';
+import { BrandBadge } from '../brand-badge/brand-badge';
 
 @Component({
 	selector: 'app-session-results',
-	imports: [RouterLink, ClassBadge, PitSummary],
+	imports: [RouterLink, ClassBadge, BrandBadge, PitSummary],
 	templateUrl: './results.html',
 	styleUrl: './results.css',
 })

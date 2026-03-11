@@ -1,27 +1,33 @@
-@if(cars != null) {
+@if(entries != null) {
 <table class="table table-sm table-striped table-hover">
     <thead>
         <tr>
             <th scope="col">#</th>
-            <th scope="col">Slot</th>
             <th scope="col">Class</th>
             <th scope="col">Number</th>
+            <th scope="col">Make</th>
             <th scope="col">Team</th>
+            <th scope="col">Model</th>
             <th scope="col">Drivers</th>
-            <th scope="col">Vehicle</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
     </thead>
     <tbody>
-        @for (car of cars; track $index; let i = $index) {
+        @for (sessionEntry of entries; track $index; let i = $index) {
+        @let id = CarKey.fromCar(sessionEntry.car).id;
+        @let car = sessionEntry.car;
+        @let entry = sessionEntry.entry;
         <tr>
             <th scope="row">{{ i + 1 }}</th>
-            <td>{{ car.slotId }}</td>
             <td><app-session-class-badge [carClass]="car.class" /></td>
             <td>{{ car.number }}</td>
+            <td><app-session-brand-badge [brand]="car.vehicle?.manufacturer" /></td>
             <td>{{ car.teamName }}</td>
+            <td>{{ car.vehicle?.modelName ? car.vehicle?.modelName : car.vehicleName ? car.vehicleName : car.veh }}</td>
             <td>
-                @if (car.entry) {
-                @for (member of car.entry.members; track $index) {
+                @if (entry) {
+                @for (member of entry.members; track $index) {
                 <span class="sr {{ member.badge }}" title="{{ member.badge }}"></span>&ngsp;
                 <span class="fi fi-{{ Utils.getFlag(member.nationality) }}" title="{{ member.nationality }}"></span>&ngsp;
                 <span>{{ member.name }}</span>&ngsp;
@@ -40,7 +46,55 @@
                 }
                 }
             </td>
-            <td>{{ car.vehicleName ? car.vehicleName : car.veh }}</td>
+            <td>
+                <ng-template #popContent>
+                    <dl class="row mb-0">
+                        <dt class="col-4">Slot</dt>
+                        <dd class="col-8">{{ car.slotId }}</dd>
+                        <dt class="col-4">Veh</dt>
+                        <dd class="col-8">{{ car.veh }}</dd>
+                        <dt class="col-4">Vehicle</dt>
+                        <dd class="col-8">{{ car.vehicleName }}</dd>
+                    </dl>
+                    @if(car.vehicle) {
+                    <hr />
+                    <h5>Livery</h5>
+                    <dl class="row mb-0">
+                        @if(car.vehicle.custom) {
+                        <dt class="col-4">Type</dt>
+                        <dd class="col-8">Custom</dd>
+                        } @else {
+                        <dt class="col-4">Number</dt>
+                        <dd class="col-8">{{ car.vehicle.number }}</dd>
+                        <dt class="col-4">Team</dt>
+                        <dd class="col-8">{{ car.vehicle.team }}</dd>
+                        <dt class="col-4">Livery</dt>
+                        <dd class="col-8">{{ car.vehicle.livery }}</dd>
+                        <dt class="col-4">Series</dt>
+                        <dd class="col-8">{{ car.vehicle.series }}</dd>
+                        }
+                    </dl>
+                    }
+                </ng-template>
+                <button class="btn-icon ms-auto" title="Timing" placement="start" [ngbPopover]="popContent">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
+                    </svg>
+                </button>
+            </td>
+            <td class="">
+                <div class="dropdown">
+                    <button class="btn-icon ms-auto dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                        </svg>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" [routerLink]="['../', 'Laps', `${id}`]">Laps</a></li>
+                    </ul>
+                </div>
+            </td>
         </tr>
         }
     </tbody>

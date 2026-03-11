@@ -77,6 +77,8 @@ namespace LMUSessionTracker.Server.Controllers {
 			vm.Car = session?.History.GetAllHistory().Find(x => x.Key.Matches(carId));
 			if(vm.Car == null)
 				return NotFound();
+			if(vm.Car.Car.Vehicle == null)
+				vm.Car.Car.Vehicle = (await sessionRepo.GetEntries(sessionId)).Find(x => new CarKey(x.Car.SlotId, x.Car.Veh).Matches(carId)).Car.Vehicle;
 			return Ok(vm);
 		}
 

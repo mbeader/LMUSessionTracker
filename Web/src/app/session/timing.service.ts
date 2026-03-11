@@ -259,7 +259,7 @@ class TimingFields {
 		},
 		{
 			id: 54,
-			name: 'Manu',
+			name: 'Make',
 			desc: 'Car manufacturer',
 			value: i => i.car?.vehicle?.manufacturer,
 			align: 'center'

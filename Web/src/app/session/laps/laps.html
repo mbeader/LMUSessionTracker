@@ -1,26 +1,42 @@
 @if(model && model.session && model.car) {
-<dl class="row">
-    <dt class="col-lg-1 col-2">Session</dt>
-    <dd class="col-lg-3 col-3"><a [routerLink]="['/', 'Session', model.session.sessionId]">{{ Format.date(model.session.timestamp) }}</a></dd>
-    <dt class="col-lg-1 col-2">Session</dt>
-    <dd class="col-lg-2 col-5">{{ model.session.type }}</dd>
-    <dt class="col-lg-1 col-2">Track</dt>
-    <dd class="col-lg-4 col-10">{{ model.session.track }}</dd>
-    <dt class="col-lg-1 col-2">Slot ID</dt>
-    <dd class="col-lg-1 col-3">{{ model.car.car.slotId }}</dd>
-    <dt class="col-lg-1 col-2">Veh</dt>
-    <dd class="col-lg-4 col-5">{{ model.car.car.veh }}</dd>
-    <dt class="col-lg-1 col-2">Vehicle</dt>
-    <dd class="col-lg-4 col-10">{{ model.car.car.vehicleName }}</dd>
-    <dt class="col-lg-1 col-2">Number</dt>
-    <dd class="col-lg-1 col-3">{{ model.car.car.number }}</dd>
-    <dt class="col-lg-1 col-2">Class</dt>
-    <dd class="col-lg-1 col-5"><app-session-class-badge [carClass]="model.car.car.class" /></dd>
-    <dt class="col-lg-1 col-2">Team</dt>
-    <dd class="col-lg-3 col-10">{{ model.car.car.teamName }}</dd>
-    <dt class="col-lg-1 col-2">ID</dt>
-    <dd class="col-lg-3 col-10 text-truncate">{{ model.car.car.id }}</dd>
-</dl>
+<div class="row">
+    <div class="col-lg-4">
+        <dl class="row">
+            <dt class="col-3">Session</dt>
+            <dd class="col-9"><a [routerLink]="['/', 'Session', model.session.sessionId]">{{ Format.date(model.session.timestamp) }}</a></dd>
+            <dt class="col-3">Type</dt>
+            <dd class="col-9">{{ model.session.type }}</dd>
+            <dt class="col-3">Track</dt>
+            <dd class="col-9">{{ model.session.track }}</dd>
+        </dl>
+    </div>
+    <div class="col-lg-2 col-md-4">
+        <dl class="row">
+            <dt class="col-md-6 col-3">Slot ID</dt>
+            <dd class="col-md-6 col-9">{{ model.car.car.slotId }}</dd>
+            <dt class="col-md-6 col-3">Number</dt>
+            <dd class="col-md-6 col-9">{{ coalesce(model.car.car.number) }}</dd>
+            <dt class="col-md-6 col-3">Class</dt>
+            <dd class="col-md-6 col-9"><app-session-class-badge [carClass]="model.car.car.class" /></dd>
+            <dt class="col-md-6 col-3">Make</dt>
+            <dd class="col-md-6 col-9"><app-session-brand-badge [brand]="model.car.car.vehicle?.manufacturer" /></dd>
+        </dl>
+    </div>
+    <div class="col-lg-6 col-md-8">
+        <dl class="row">
+            <dt class="col-md-2 col-3">Veh</dt>
+            <dd class="col-md-10 col-9">{{ model.car.car.veh }}</dd>
+            <dt class="col-md-2 col-3">Team</dt>
+            <dd class="col-md-10 col-9">{{ coalesce(model.car.car.teamName) }}</dd>
+            <dt class="col-md-2 col-3">Vehicle</dt>
+            <dd class="col-md-10 col-9">{{ coalesce(model.car.car.vehicleName) }}</dd>
+            <dt class="col-md-2 col-3">Model</dt>
+            <dd class="col-md-10 col-9">{{ coalesce(model.car.car.vehicle?.modelName) }}</dd>
+            <dt class="col-md-2 col-3">ID</dt>
+            <dd class="col-md-10 col-9 text-truncate">{{ coalesce(model.car.car.id) }}</dd>
+        </dl>
+    </div>
+</div>
 
 <div class="d-flex">
     <h3 class="flex-grow-1">Laps</h3>

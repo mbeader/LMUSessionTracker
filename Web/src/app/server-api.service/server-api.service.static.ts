@@ -1,7 +1,7 @@
 import { Injectable, InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel, AboutOptions, TrackMap, ChatViewModel, ChatMessage, Result } from '../view-models';
+import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel, AboutOptions, TrackMap, ChatViewModel, ChatMessage, Result, SessionEntry } from '../view-models';
 import { BestLap, Car, CarState, Chat, Entry, Lap, Member, Pit, Session, SessionState } from '../models';
 import { Car as TCar, CarState as TCarState, CarKey, CarHistory, Lap as TLap, Pit as TPit, SessionSummary } from '../tracking';
 import initSqlJs, { Database } from 'sql.js';
@@ -19,7 +19,7 @@ export interface ServerApiService {
 	getLiveSessions(): Observable<IndexViewModel>;
 	getSession(sessionId: string): Promise<SessionViewModel>;
 	getLaps(sessionId: string, carId: string): Promise<LapsViewModel>;
-	getEntryList(sessionId: string): Promise<Car[]>;
+	getEntryList(sessionId: string): Promise<SessionEntry[]>;
 	getTrackMap(sessionId: string): Promise<TrackMap>;
 	getChat(sessionId: string): Promise<ChatViewModel>;
 	getTracks(): Promise<string[]>;
@@ -43,7 +43,7 @@ export class HttpServerApiService implements ServerApiService {
 	getLaps(sessionId: string, carId: string): Promise<LapsViewModel> {
 		throw new Error('Method not implemented.');
 	}
-	getEntryList(sessionId: string): Promise<Car[]> {
+	getEntryList(sessionId: string): Promise<SessionEntry[]> {
 		throw new Error('Method not implemented.');
 	}
 	getTrackMap(sessionId: string): Promise<TrackMap> {
@@ -288,7 +288,7 @@ export class StaticServerApiService implements ServerApiService {
 			vm.sessionState = session.lastState;
 			vm.history = this.histories[sessionId];
 			vm.results = this.results[sessionId];
-			vm.entries = vm.results.reduce((prev, curr) => { if(curr.car) prev[CarKey.fromCar(curr.car).id] = curr.car; return prev; }, {} as { [key: string]: TCar });
+			vm.entries = vm.results.reduce((prev, curr) => { if (curr.car) prev[CarKey.fromCar(curr.car).id] = curr.car; return prev; }, {} as { [key: string]: TCar });
 			vm.positionInClass = {};
 			let classes: { [key: string]: number } = {};
 			for (let car of vm.results) {
@@ -310,8 +310,20 @@ export class StaticServerApiService implements ServerApiService {
 		return new Promise(resolve => resolve(vm));
 	}
 
-	getEntryList(sessionId: string): Promise<Car[]> {
-		return new Promise(resolve => resolve(this.repo.getCars(sessionId)));
+	getEntryList(sessionId: string): Promise<SessionEntry[]> {
+		return new Promise(resolve => resolve(this.repo.getCars(sessionId).map(x => {
+			let entry = new SessionEntry();
+			entry.car = {
+				slotId: x.slotId,
+				veh: x.veh,
+				vehicleName: x.vehicleName,
+				teamName: x.teamName,
+				class: x.class,
+				number: x.number,
+				id: x.id,
+			} as TCar;
+			return entry;
+		})));
 	}
 
 	getTrackMap(sessionId: string): Promise<TrackMap> {

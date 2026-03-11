@@ -1,8 +1,7 @@
 import { Injectable, InjectionToken, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, Observable } from 'rxjs';
-import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel, AboutOptions, TrackMap, ChatViewModel } from '../view-models';
-import { Car } from '../models';
+import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel, AboutOptions, TrackMap, ChatViewModel, SessionEntry } from '../view-models';
 
 export const ServerApiServiceToken = new InjectionToken<ServerApiService>('server api');
 
@@ -11,7 +10,7 @@ export interface ServerApiService {
 	getLiveSessions(): Observable<IndexViewModel>;
 	getSession(sessionId: string): Promise<SessionViewModel>;
 	getLaps(sessionId: string, carId: string): Promise<LapsViewModel>;
-	getEntryList(sessionId: string): Promise<Car[]>;
+	getEntryList(sessionId: string): Promise<SessionEntry[]>;
 	getTrackMap(sessionId: string): Promise<TrackMap>;
 	getChat(sessionId: string): Promise<ChatViewModel>;
 	getTracks(): Promise<string[]>;
@@ -44,8 +43,8 @@ export class HttpServerApiService implements ServerApiService {
 		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/Laps?sessionId=' + sessionId + '&carId=' + carId)) as Promise<LapsViewModel>;
 	}
 
-	getEntryList(sessionId: string): Promise<Car[]> {
-		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/EntryList?sessionId=' + sessionId)) as Promise<Car[]>;
+	getEntryList(sessionId: string): Promise<SessionEntry[]> {
+		return firstValueFrom(this.httpClient.get(this.baseUrl + '/Home/EntryList?sessionId=' + sessionId)) as Promise<SessionEntry[]>;
 	}
 
 	getTrackMap(sessionId: string): Promise<TrackMap> {
@@ -85,7 +84,7 @@ export class StaticServerApiService implements ServerApiService {
     getLaps(sessionId: string, carId: string): Promise<LapsViewModel> {
         throw new Error('Method not implemented.');
     }
-    getEntryList(sessionId: string): Promise<Car[]> {
+    getEntryList(sessionId: string): Promise<SessionEntry[]> {
         throw new Error('Method not implemented.');
     }
     getTrackMap(sessionId: string): Promise<TrackMap> {

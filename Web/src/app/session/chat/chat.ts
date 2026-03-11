@@ -3,15 +3,15 @@ import { ActivatedRoute } from '@angular/router';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { ServerApiService, ServerApiServiceToken } from '../../server-api.service/server-api.service';
 import { ServerLiveService, ServerLiveServiceToken } from '../../server-live.service/server-live.service';
-import { Car } from '../../models';
-import { ChatMessage, ChatViewModel } from '../../view-models';
+import { ChatMessage, ChatViewModel, SessionEntry } from '../../view-models';
 import { Format } from '../../format';
-import { getFlag } from '../../utils';
+import { coalesce, getFlag } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
+import { BrandBadge } from '../brand-badge/brand-badge';
 
 @Component({
 	selector: 'app-session-chat',
-	imports: [NgbPopover, ClassBadge],
+	imports: [NgbPopover, ClassBadge, BrandBadge],
 	templateUrl: './chat.html',
 	styleUrl: './chat.css',
 })
@@ -21,11 +21,12 @@ export class Chat {
 	private api = inject(ServerApiServiceToken);
 	private live = inject(ServerLiveServiceToken);
 	private sessionId!: string;
-	cars = new Map<string, Car[]>();
+	cars = new Map<string, SessionEntry[]>();
 	messages: ChatMessageData[] = [];
 	now: Date = new Date();
 	Format = Format;
 	Utils = { getFlag };
+	coalesce = coalesce;
 
 	constructor() {
 		let sessionId = this.route.snapshot.paramMap.get('sessionId');
@@ -84,10 +85,6 @@ export class Chat {
 			});
 	}
 
-	coalesce(s: string | null | undefined) {
-		return s ?? '\u00A0';
-	}
-
 	static generatePossibleSenderNames(name: string) {
 		let names: string[] = [];
 		let space = name.indexOf(' ');
@@ -125,7 +122,7 @@ class ChatMessageData {
 	date: Date;
 	message: string;
 	sender?: string;
-	car?: Car[];
+	car?: SessionEntry[];
 
 	constructor(chat: ChatMessage) {
 		this.chat = chat;
@@ -133,7 +130,7 @@ class ChatMessageData {
 		this.message = chat.message;
 	}
 
-	findSender(carsMap: Map<string, Car[]>) {
+	findSender(carsMap: Map<string, SessionEntry[]>) {
 		let parts = this.message.split(':');
 		if (parts.length < 2)
 			return false;
