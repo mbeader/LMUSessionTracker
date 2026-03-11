@@ -241,6 +241,10 @@ button.btn-icon.dropdown-toggle::after {
 	content: " ";
 }
 
+.sr.none {
+	background-image: url(../public/sr-none.svg);
+}
+
 .sr.early-access {
 	background-image: url(../public/early-access.svg);
 }
