@@ -152,8 +152,11 @@ namespace LMUSessionTracker.Server.Models {
 		}
 
 		private async Task<Dictionary<string, Core.Tracking.Vehicle>> GetVehicles(List<Car> cars) {
+			return await GetVehicles(cars.ConvertAll(x => x.Veh));
+		}
+
+		private async Task<Dictionary<string, Core.Tracking.Vehicle>> GetVehicles(List<string> vehs) {
 			Dictionary<string, Core.Tracking.Vehicle> res = new Dictionary<string, Core.Tracking.Vehicle>();
-			List<string> vehs = cars.ConvertAll(x => x.Veh);
 			List<Vehicle> vehicles = await context.Vehicles.Include(x => x.VehicleModel)
 				.Where(x => vehs.Contains(x.Id))
 				.ToListAsync();
@@ -289,10 +292,11 @@ namespace LMUSessionTracker.Server.Models {
 				.OrderBy(x => x.Lap.TotalTime)
 				.Take(1000)
 				.ToListAsync();
+			Dictionary<string, Core.Tracking.Vehicle> vehicles = await GetVehicles(laps.ConvertAll(x => x.Lap.Car));
 
 			List<BestLap> res = new List<BestLap>();
 			foreach(var lap in laps) {
-				BestLap best = new BestLap() { Lap = lap.Lap, Sector1 = lap.S1, Sector2 = lap.S2, Sector3 = lap.S3 };
+				BestLap best = new BestLap() { Lap = lap.Lap, Sector1 = lap.S1, Sector2 = lap.S2, Sector3 = lap.S3, Vehicle = vehicles.GetValueOrDefault(lap.Lap.Car.Veh) };
 				res.Add(best);
 				best.Lap.Known = knownDrivers.Contains(best.Lap.Driver);
 			}

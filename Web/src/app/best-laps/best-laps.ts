@@ -1,18 +1,20 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { ServerApiService, ServerApiServiceToken } from '../server-api.service/server-api.service';
-import { BestLap, ClassBest, Lap as LapModel } from '../models';
+import { Lap as LapModel } from '../models';
 import { Format } from '../format';
-import { BestLapsFilters } from '../view-models';
-import { whenExists } from '../utils';
+import { BestLap, BestLapsFilters, ClassBest } from '../view-models';
+import { coalesce, whenExists } from '../utils';
 import { ClassBadge } from '../session/class-badge/class-badge';
+import { BrandBadge } from '../session/brand-badge/brand-badge';
 import { Lap } from './lap/lap';
 
 declare var bootstrap: any;
 @Component({
 	selector: 'app-best-laps',
-	imports: [FormsModule, ClassBadge, Lap],
+	imports: [FormsModule, ClassBadge, BrandBadge, Lap, NgbPopover],
 	templateUrl: './best-laps.html',
 	styleUrl: './best-laps.css',
 })
@@ -49,6 +51,7 @@ export class BestLaps {
 	selectedLap: LapModel | null = null;
 	selectedLapType: number = 0;
 	Format = Format;
+	coalesce = coalesce;
 
 	constructor() {
 		this.route.queryParamMap.subscribe(queryParamMap => {

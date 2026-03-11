@@ -1,8 +1,8 @@
 import { Injectable, InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel, AboutOptions, TrackMap, ChatViewModel, ChatMessage, Result, SessionEntry } from '../view-models';
-import { BestLap, Car, CarState, Chat, Entry, Lap, Member, Pit, Session, SessionState } from '../models';
+import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel, AboutOptions, TrackMap, ChatViewModel, ChatMessage, Result, SessionEntry, BestLap } from '../view-models';
+import { Car, CarState, Chat, Entry, Lap, Member, Pit, Session, SessionState } from '../models';
 import { Car as TCar, CarState as TCarState, CarKey, CarHistory, Lap as TLap, Pit as TPit, SessionSummary, Vehicle } from '../tracking';
 import initSqlJs, { Database } from 'sql.js';
 
@@ -307,6 +307,7 @@ export class StaticServerApiService implements ServerApiService {
 		let vm = new LapsViewModel();
 		vm.session = this.summaries.find(x => x.sessionId == sessionId) ?? null;
 		vm.car = this.histories[sessionId].find(x => x.key == carId) ?? null;
+		vm.entry = this.repo.getCars(sessionId).find(x => new CarKey(x.slotId, x.veh).matches(carId))?.entry as Entry;
 		vm.currentET = vm.session?.currentET ?? 0;
 		return new Promise(resolve => resolve(vm));
 	}
@@ -363,6 +364,7 @@ export class StaticServerApiService implements ServerApiService {
 			for (let [veh, vehMap] of trackMap.entries()) {
 				for (let [driver, driverLaps] of vehMap.entries()) {
 					let bestLap = {} as BestLap;
+					bestLap.vehicle = this.repo.getVehicle(veh);
 					for (let lap of driverLaps) {
 						let session = sessions.get(lap.sessionId);
 						if (filters.knownDriversOnly && !lap.known)

@@ -94,23 +94,25 @@
     <thead>
         <tr>
             <th scope="col">Rank</th>
-            <th scope="col">Class</th>
-            <th scope="col" title="Known driver">&#x2605;</th>
+            <th scope="col" class="text-center">Class</th>
+            <th scope="col" class="text-center">Make</th>
+            <th scope="col" class="text-center" title="Known driver">&#x2605;</th>
             <th scope="col">Driver</th>
             <th scope="col">Vehicle</th>
-            <th class="text-end">Time</th>
-            <th class="text-end">S1</th>
-            <th class="text-end">S2</th>
-            <th class="text-end">S3</th>
-            <th class="text-end">Possible</th>
-            <th class="text-end">BS1</th>
-            <th class="text-end">BS2</th>
-            <th class="text-end">BS3</th>
-            <th class="text-end"></th>
+            <th scope="col" class="text-end">Time</th>
+            <th scope="col" class="text-end">S1</th>
+            <th scope="col" class="text-end">S2</th>
+            <th scope="col" class="text-end">S3</th>
+            <th scope="col" class="text-end">Possible</th>
+            <th scope="col" class="text-end">BS1</th>
+            <th scope="col" class="text-end">BS2</th>
+            <th scope="col" class="text-end">BS3</th>
+            <th scope="col" class="text-end"></th>
         </tr>
     </thead>
     <tbody>
         @for (bestlap of laps ?? []; track bestlap.lap.lapId; let i = $index) {
+        @let vehicle = bestlap.vehicle;
         @let lap = bestlap.lap;
         @let tt = bests ? bests[lap.car.class]?.totalTime == lap.totalTime : false;
         @let s1 = bests ? bests[lap.car.class]?.sector1 == lap.sector1 : false;
@@ -125,14 +127,53 @@
         @let possible = bestlap.sector1 && bestlap.sector2 && bestlap.sector3 ? bestlap.sector1.sector1 + bestlap.sector2.sector2 + bestlap.sector3.sector3 : -1;
         <tr>
             <th scope="row">{{ i + 1 }}</th>
-            <td><app-session-class-badge [carClass]="lap.car.class" /></td>
+            <td class="text-center"><app-session-class-badge [carClass]="lap.car.class" /></td>
+            <td class="text-center"><app-session-brand-badge [brand]="vehicle?.manufacturer" /></td>
             @if(lap.known) {
-            <td class="text-warning" title="Known driver">&#x2605;</td>
+            <td class="text-center text-warning" title="Known driver">&#x2605;</td>
             } @else {
             <td></td>
             }
             <td>{{ lap.driver }}</td>
-            <td>{{ lap.car.vehicleName ? lap.car.vehicleName : lap.car.veh }}</td>
+            <td>
+                <ng-template #popContent>
+                    <dl class="row mb-0">
+                        <dt class="col-6 order-1">Class</dt>
+                        <dd class="col-6 order-2 fs-6"><app-session-class-badge [carClass]="lap.car.class" /></dd>
+                        <dt class="col-6 order-1">Make</dt>
+                        <dd class="col-6 order-2 fs-6"><app-session-brand-badge [brand]="vehicle?.manufacturer" /></dd>
+                        @if(vehicle) {
+                        <dt class="order-3">Model</dt>
+                        <dd class="order-3">{{ coalesce(vehicle.modelName) }}</dd>
+                        }
+                        <dt class="order-3">Vehicle</dt>
+                        <dd class="order-3">{{ coalesce(lap.car.vehicleName) }}</dd>
+                        <dt class="order-3">Veh</dt>
+                        <dd class="order-3">{{ coalesce(lap.car.veh) }}</dd>
+                    </dl>
+                    @if(vehicle) {
+                    <hr />
+                    <h5>Livery</h5>
+                    <dl class="row mb-0">
+                        @if(vehicle.custom) {
+                        <dt class="col-4">Type</dt>
+                        <dd class="col-8">Custom</dd>
+                        } @else {
+                        <dt class="col-4">Number</dt>
+                        <dd class="col-8">{{ vehicle.number }}</dd>
+                        <dt class="col-4">Team</dt>
+                        <dd class="col-8">{{ vehicle.team }}</dd>
+                        <dt class="col-4">Livery</dt>
+                        <dd class="col-8">{{ vehicle.livery }}</dd>
+                        <dt class="col-4">Series</dt>
+                        <dd class="col-8">{{ vehicle.series }}</dd>
+                        }
+                    </dl>
+                    }
+                </ng-template>
+                <button class="btn-icon ms-auto ci car" title="Show car info" placement="end" [ngbPopover]="popContent"></button>&ngsp;
+                {{ lap.car.vehicleName ? lap.car.vehicleName : lap.car.veh }}
+            </td>
             <td class="text-end {{ tt ? 'best-class' : null }}">{{ Format.lapTime(lap.totalTime) }}</td>
             <td class="text-end {{ s1 ? 'best-class' : dbs1 ? 'best-driver' : null }}">{{ Format.lapTime(lap.sector1) }}</td>
             <td class="text-end {{ s2 ? 'best-class' : dbs2 ? 'best-driver' : null }}">{{ Format.lapTime(lap.sector2) }}</td>

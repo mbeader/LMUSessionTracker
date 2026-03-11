@@ -1,6 +1,6 @@
 import { SessionInfo, Standing } from './lmu';
-import { BestLap, ClassBest, Session, SessionState } from './models';
-import { SessionSummary, CarHistory, Car, Bests, CarState, Lap, Entry } from './tracking';
+import { Lap as LapModel, Session, SessionState } from './models';
+import { SessionSummary, CarHistory, Car, Bests, CarState, Lap, Entry, Vehicle } from './tracking';
 
 export class AboutOptions {
 	public repoUrl: string | null = null;
@@ -14,6 +14,14 @@ export class AboutOptions {
 	static hasAnyUrl(options: AboutOptions) {
 		return this.hasUrl(options.repoUrl) || this.hasUrl(options.releasesUrl) || this.hasUrl(options.binaryUrl);
 	}
+}
+
+export class BestLap {
+	public lap!: LapModel;
+	public sector1?: LapModel;
+	public sector2?: LapModel;
+	public sector3?: LapModel;
+	public vehicle?: Vehicle;
 }
 
 export class BestLapsFilters {
@@ -38,6 +46,13 @@ export class ChatMessage {
 export class ChatViewModel {
 	public chat: ChatMessage[] = [];
 	public append: boolean = false;
+}
+
+export class ClassBest {
+	public totalTime!: number;
+	public sector1!: number;
+	public sector2!: number;
+	public sector3!: number;
 }
 
 export class IndexViewModel {

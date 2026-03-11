@@ -1,5 +1,4 @@
 import { Standing } from "./lmu";
-import { Car as CarModel } from "./models";
 
 export interface Best {
 	total: number;

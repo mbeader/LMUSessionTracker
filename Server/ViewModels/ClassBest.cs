@@ -1,4 +1,4 @@
-﻿namespace LMUSessionTracker.Server.Models {
+﻿namespace LMUSessionTracker.Server.ViewModels {
 	/// <summary>
 	/// Values of -3 indicate invalid sector (to distinguish from actual invalid sector -1)
 	/// </summary>
