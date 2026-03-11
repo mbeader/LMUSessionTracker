@@ -8,6 +8,7 @@ import { Component, Input } from '@angular/core';
 })
 export class BrandBadge {
 	@Input() brand?: string;
+	@Input() center: boolean = true;
 
 	getId() {
 		if (this.brand)

@@ -47,6 +47,7 @@ export class IndexViewModel {
 
 export class LapsViewModel {
 	public car: CarHistory | null = null;
+	public entry: Entry | null = null;
 	public session: SessionSummary | null = null;
 	public bests: Bests | null = null;
 	public currentET: number | null = null;

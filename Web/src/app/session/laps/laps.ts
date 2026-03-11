@@ -4,9 +4,9 @@ import { ServerApiService, ServerApiServiceToken } from '../../server-api.servic
 import { ServerLiveService, ServerLiveServiceToken } from '../../server-live.service/server-live.service';
 import { BestClasses } from '../timing.service';
 import { LapsViewModel } from '../../view-models';
-import { Best, Lap } from '../../tracking';
+import { Best, Entry, Lap, Member } from '../../tracking';
 import { Format } from '../../format';
-import { coalesce } from '../../utils';
+import { coalesce, getFlag } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
 import { BrandBadge } from '../brand-badge/brand-badge';
 import { PitSummary } from '../pit-summary/pit-summary';
@@ -26,6 +26,7 @@ export class Laps {
 	model: LapsViewModel | null = null;
 	defaultLap = (number: number) => { return { lapNumber: number, totalTime: -1, sector1: -1, sector2: -1, sector3: -1, isValid: false } as Lap };
 	Format = Format;
+	Utils = { getFlag };
 	coalesce = coalesce;
 
 	constructor() {
@@ -35,6 +36,12 @@ export class Laps {
 			return;
 		this.api.getLaps(sessionId, carId).then(result => {
 			this.model = result;
+			if (this.model.car && !this.model.entry) {
+				this.model.entry = { members: [] as Member[] } as Entry;
+				for (let lap of this.model.car.laps)
+					if (lap?.driver && !this.model.entry.members.some(x => x.name == lap.driver))
+						this.model.entry.members.push({ name: lap.driver } as Member);
+			}
 			this.pitSummary()?.setLaps(this.model);
 			this.ref.markForCheck();
 			if (this.route.snapshot.url[2].path != 'History' && this.model.session?.sessionId && this.model.car?.key)

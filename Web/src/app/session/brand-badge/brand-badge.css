@@ -5,7 +5,10 @@
 	position: relative;
 	display: inline-block;
 	width: 2em;
-	/*line-height: 1em;*/
+}
+
+.brand.no-center {
+	background-position-x: 0%;
 }
 
 .brand:before {
