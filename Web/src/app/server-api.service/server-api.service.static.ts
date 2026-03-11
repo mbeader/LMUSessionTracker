@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { IndexViewModel, SessionViewModel, LapsViewModel, BestLapsFilters, BestLapsViewModel, AboutOptions, TrackMap, ChatViewModel, ChatMessage, Result, SessionEntry } from '../view-models';
 import { BestLap, Car, CarState, Chat, Entry, Lap, Member, Pit, Session, SessionState } from '../models';
-import { Car as TCar, CarState as TCarState, CarKey, CarHistory, Lap as TLap, Pit as TPit, SessionSummary } from '../tracking';
+import { Car as TCar, CarState as TCarState, CarKey, CarHistory, Lap as TLap, Pit as TPit, SessionSummary, Vehicle } from '../tracking';
 import initSqlJs, { Database } from 'sql.js';
 
 const sqlPromise = initSqlJs({ locateFile: file => `./${file}` });
@@ -123,6 +123,7 @@ export class StaticServerApiService implements ServerApiService {
 						class: car.class,
 						number: car.number,
 						id: car.id,
+						vehicle: this.repo.getVehicle(car.veh)
 					} as TCar;
 					ch.key = CarKey.fromCar(ch.car).id;
 					ch.laps = car.laps.map(x => {
@@ -321,7 +322,9 @@ export class StaticServerApiService implements ServerApiService {
 				class: x.class,
 				number: x.number,
 				id: x.id,
+				vehicle: this.repo.getVehicle(x.veh)
 			} as TCar;
+			entry.entry = x.entry;
 			return entry;
 		})));
 	}
@@ -408,11 +411,13 @@ class Repository {
 	private sessions!: Session[];
 	private laps = new Map<string, Map<string, Map<string, Lap[]>>>();
 	private cars = new Map<number, Car>();
+	private vehicles = new Map<string, Vehicle>();
 
 	constructor() {
 		if (db) {
 			this.loadSessions(db);
 			this.loadLaps(db);
+			this.loadVehicles(db);
 		} else {
 			this.sessions = [];
 		}
@@ -523,6 +528,14 @@ class Repository {
 		}
 	}
 
+	private loadVehicles(db: Database) {
+		const vehQuery = db.prepare('SELECT v.*, m.Id as ModelId, m.Name as ModelName, m.Engine, m.Manufacturer FROM Vehicles v INNER JOIN VehicleModels m on v.Model = m.Id');
+		while (vehQuery.step()) {
+			let vehicle = this.mapColumns<Vehicle>(vehQuery.getAsObject());
+			this.vehicles.set(vehicle.id, vehicle);
+		}
+	}
+
 	getSessions() {
 		let sessions = this.sessions.slice();
 		sessions.reverse();
@@ -539,5 +552,9 @@ class Repository {
 
 	getLaps() {
 		return this.laps;
+	}
+
+	getVehicle(veh: string) {
+		return this.vehicles.get(veh);
 	}
 }
