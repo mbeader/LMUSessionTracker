@@ -49,6 +49,10 @@ export function getFlag(country: string) {
 	return country;
 }
 
+export function getBadge(badge: string) {
+	return badge ? badge : 'none';
+}
+
 export function coalesce(s: string | null | undefined) {
 	return s ? s : '\u00A0';
 }

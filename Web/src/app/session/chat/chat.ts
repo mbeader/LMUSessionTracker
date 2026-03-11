@@ -5,7 +5,7 @@ import { ServerApiService, ServerApiServiceToken } from '../../server-api.servic
 import { ServerLiveService, ServerLiveServiceToken } from '../../server-live.service/server-live.service';
 import { ChatMessage, ChatViewModel, SessionEntry } from '../../view-models';
 import { Format } from '../../format';
-import { coalesce, getFlag } from '../../utils';
+import { coalesce, getBadge, getFlag } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
 import { BrandBadge } from '../brand-badge/brand-badge';
 
@@ -25,7 +25,7 @@ export class Chat {
 	messages: ChatMessageData[] = [];
 	now: Date = new Date();
 	Format = Format;
-	Utils = { getFlag };
+	Utils = { getFlag, getBadge };
 	coalesce = coalesce;
 
 	constructor() {

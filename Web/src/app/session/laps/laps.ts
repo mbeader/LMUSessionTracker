@@ -6,7 +6,7 @@ import { BestClasses } from '../timing.service';
 import { LapsViewModel } from '../../view-models';
 import { Best, Entry, Lap, Member } from '../../tracking';
 import { Format } from '../../format';
-import { coalesce, getFlag } from '../../utils';
+import { coalesce, getBadge, getFlag } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
 import { BrandBadge } from '../brand-badge/brand-badge';
 import { PitSummary } from '../pit-summary/pit-summary';
@@ -26,7 +26,7 @@ export class Laps {
 	model: LapsViewModel | null = null;
 	defaultLap = (number: number) => { return { lapNumber: number, totalTime: -1, sector1: -1, sector2: -1, sector3: -1, isValid: false } as Lap };
 	Format = Format;
-	Utils = { getFlag };
+	Utils = { getFlag, getBadge };
 	coalesce = coalesce;
 
 	constructor() {

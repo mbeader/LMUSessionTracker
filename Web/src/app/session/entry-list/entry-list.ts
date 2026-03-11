@@ -4,7 +4,7 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { ServerApiService, ServerApiServiceToken } from '../../server-api.service/server-api.service';
 import { SessionEntry } from '../../view-models';
 import { CarKey } from '../../tracking';
-import { getFlag } from '../../utils';
+import { getBadge, getFlag } from '../../utils';
 import { ClassBadge } from '../class-badge/class-badge';
 import { BrandBadge } from '../brand-badge/brand-badge';
 
@@ -19,7 +19,7 @@ export class EntryList {
 	private route = inject(ActivatedRoute);
 	private api = inject(ServerApiServiceToken);
 	entries: SessionEntry[] | null = null;
-	Utils = { getFlag };
+	Utils = { getFlag, getBadge };
 	CarKey = CarKey;
 
 	constructor() {
