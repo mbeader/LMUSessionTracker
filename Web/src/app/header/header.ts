@@ -27,10 +27,6 @@ export class Header {
 					path: [(x: string) => x == 'Session', null, (x: string) => x == 'Timing']
 				},
 				{
-					id: 'history',
-					path: [(x: string) => x == 'Session', null, (x: string) => x == 'History']
-				},
-				{
 					id: 'entry-list',
 					path: [(x: string) => x == 'Session', null, (x: string) => x == 'EntryList']
 				},

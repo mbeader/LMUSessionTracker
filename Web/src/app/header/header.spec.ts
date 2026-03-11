@@ -48,26 +48,8 @@ describe('Header', () => {
 			])).toEqual({ navLink: 'session', navSubLink: 'live' });
 		});
 
-		test('session-history should be session-history', () => {
-			expect(Header.findCurrentNavLink([
-				new UrlSegment('Session', {}),
-				new UrlSegment('id', {}),
-				new UrlSegment('History', {})
-			])).toEqual({ navLink: 'session', navSubLink: 'history' });
-		});
-
-		test('session-history-laps should be session-history', () => {
-			expect(Header.findCurrentNavLink([
-				new UrlSegment('Session', {}),
-				new UrlSegment('id', {}),
-				new UrlSegment('History', {}),
-				new UrlSegment('Laps', {}),
-				new UrlSegment('id', {}),
-			])).toEqual({ navLink: 'session', navSubLink: 'history' });
-		});
-
 		test('anything else should be empty', () => {
-		});
 			expect(Header.findCurrentNavLink([new UrlSegment('foo', {})])).toEqual({ navLink: '', navSubLink: '' });
+		});
 	});
 });

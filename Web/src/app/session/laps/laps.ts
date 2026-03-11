@@ -44,7 +44,7 @@ export class Laps {
 			}
 			this.pitSummary()?.setLaps(this.model);
 			this.ref.markForCheck();
-			if (this.route.snapshot.url[2].path != 'History' && this.model.session?.sessionId && this.model.car?.key)
+			if ((this.model.session?.active || !this.model.session?.finished) && this.model.session?.sessionId && this.model.car?.key)
 				this.live.joinLaps(this.model.session.sessionId, this.model.car.key, this.updateLaps.bind(this));
 		}, error => { console.log(error); })
 	}

@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { Sessions } from './sessions/sessions';
 import { Session } from './session/session';
 import { Timing } from './session/timing/timing';
-import { History } from './session/history/history';
 import { Laps } from './session/laps/laps';
 import { EntryList } from './session/entry-list/entry-list';
 import { TrackMap } from './session/track-map/track-map';
@@ -31,17 +30,7 @@ export const routes: Routes = [
 		title: title('Timing')
 	},
 	{
-		path: 'Session/:sessionId/History',
-		component: History,
-		title: title('History')
-	},
-	{
 		path: 'Session/:sessionId/Laps/:carId',
-		component: Laps,
-		title: title('Laps')
-	},
-	{
-		path: 'Session/:sessionId/History/Laps/:carId',
 		component: Laps,
 		title: title('Laps')
 	},
