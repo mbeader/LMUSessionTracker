@@ -1,15 +1,15 @@
 import { Routes } from '@angular/router';
-import { Sessions } from './sessions/sessions';
-import { Session } from './session/session';
-import { Timing } from './session/timing/timing';
-import { Laps } from './session/laps/laps';
-import { EntryList } from './session/entry-list/entry-list';
-import { TrackMap } from './session/track-map/track-map';
-import { Chat } from './session/chat/chat';
-import { BestLaps } from './best-laps/best-laps';
-import { Settings } from './settings/settings';
-import { About } from './about/about';
-import { NotFound } from './not-found/not-found';
+import { Sessions } from './sessions/sessions/sessions.component';
+import { Session } from './sessions/session/session.component';
+import { Timing } from './sessions/timing/timing.component';
+import { Laps } from './sessions/car-laps/car-laps.component';
+import { EntryList } from './sessions/entry-list/entry-list.component';
+import { TrackMap } from './sessions/track-map/track-map.component';
+import { Chat } from './sessions/chat/chat.component';
+import { BestLaps } from './best-laps/best-laps/best-laps.component';
+import { Settings } from './settings/settings/settings.component';
+import { About } from './about/about.component';
+import { NotFound } from './not-found/not-found.component';
 
 const title = function(t: string) { return `${t} - LMUSessionTracker`; };
 

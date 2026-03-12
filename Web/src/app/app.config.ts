@@ -3,8 +3,8 @@ import { provideRouter } from '@angular/router';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { GlobalErrorHandler } from './global-error-handler';
-import { HttpServerApiService, ServerApiServiceToken, StaticServerApiService } from './server-api.service/server-api.service';
-import { HttpServerLiveService, ServerLiveServiceToken, StaticServerLiveService } from './server-live.service/server-live.service';
+import { HttpServerApiService, ServerApiServiceToken, StaticServerApiService } from './data/server-api/server-api.service';
+import { HttpServerLiveService, ServerLiveServiceToken, StaticServerLiveService } from './data/server-live/server-live.service';
 
 export const appConfig: ApplicationConfig = {
 	providers: [

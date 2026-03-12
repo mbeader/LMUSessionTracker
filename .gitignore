@@ -1,5 +1,6 @@
 # custom changes
 data/
+!Web/src/app/data
 out/
 reports/
 misc/
