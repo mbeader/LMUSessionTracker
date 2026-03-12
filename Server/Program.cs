@@ -2,6 +2,7 @@ using LMUSessionTracker.Common;
 using LMUSessionTracker.Common.Client;
 using LMUSessionTracker.Common.Json;
 using LMUSessionTracker.Common.Services;
+using LMUSessionTracker.Core;
 using LMUSessionTracker.Core.Json;
 using LMUSessionTracker.Core.Protocol;
 using LMUSessionTracker.Core.Services;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -172,6 +174,7 @@ namespace LMUSessionTracker.Server {
 				.CreateBootstrapLogger();
 			Serilog.Context.LogContext.PushProperty("SourceContext", typeof(Program).FullName, false);
 			Log.Logger = logger;
+			Logger.Instance = new SerilogLoggerFactory(logger).CreateLogger<Logger>();
 			return logger;
 		}
 	}
