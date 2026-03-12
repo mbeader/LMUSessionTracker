@@ -1,4 +1,4 @@
-﻿using LMUSessionTracker.Core.LMU;
+﻿using LMUSessionTracker.Common.LMU;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -90,9 +90,9 @@ namespace LMUSessionTracker.Server.Models {
 						carStates.Add(car.LastState.To(key));
 				}
 			}
-			List<Core.LMU.Chat> chats = null;
+			List<Common.LMU.Chat> chats = null;
 			if(Chats != null && Chats.Count > 0) {
-				chats = new List<Core.LMU.Chat>();
+				chats = new List<Common.LMU.Chat>();
 				foreach(Chat chat in Chats)
 					chats.Add(chat.To());
 			}

@@ -137,7 +137,7 @@ Contains assets created by Studio 397.
 ### LMU REST API
 
 Since the client uses the REST API, LMU updates are likely to break things.
-The expected JSON schema is found in `Core/Json/Schema`.
+The expected JSON schema is found in `Common/Json/Schema`.
 Validation can be enabled via appsettings to log violations.
 
 ### Known issues

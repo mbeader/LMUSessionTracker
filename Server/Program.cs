@@ -1,7 +1,7 @@
-using LMUSessionTracker.Core;
-using LMUSessionTracker.Core.Client;
-using LMUSessionTracker.Core.Json;
-using LMUSessionTracker.Core.Services;
+using LMUSessionTracker.Common;
+using LMUSessionTracker.Common.Client;
+using LMUSessionTracker.Common.Json;
+using LMUSessionTracker.Common.Services;
 using LMUSessionTracker.CoreServer.Json;
 using LMUSessionTracker.CoreServer.Protocol;
 using LMUSessionTracker.CoreServer.Services;

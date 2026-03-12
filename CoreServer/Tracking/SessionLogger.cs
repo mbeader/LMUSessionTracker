@@ -1,5 +1,5 @@
-﻿using LMUSessionTracker.Core.Json;
-using LMUSessionTracker.Core.Protocol;
+﻿using LMUSessionTracker.Common.Json;
+using LMUSessionTracker.Common.Protocol;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;

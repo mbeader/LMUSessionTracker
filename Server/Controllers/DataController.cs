@@ -1,4 +1,4 @@
-using LMUSessionTracker.Core.Protocol;
+using LMUSessionTracker.Common.Protocol;
 using LMUSessionTracker.CoreServer.Protocol;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

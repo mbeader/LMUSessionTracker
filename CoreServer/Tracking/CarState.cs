@@ -1,7 +1,7 @@
-﻿using LMUSessionTracker.Core.LMU;
+﻿using LMUSessionTracker.Common.LMU;
 using System;
 using System.Collections.Generic;
-using static LMUSessionTracker.Core.LMU.PitState;
+using static LMUSessionTracker.Common.LMU.PitState;
 
 namespace LMUSessionTracker.CoreServer.Tracking {
 	public class CarState {

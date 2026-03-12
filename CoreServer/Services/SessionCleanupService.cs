@@ -1,4 +1,4 @@
-﻿using LMUSessionTracker.Core.Services;
+﻿using LMUSessionTracker.Common.Services;
 using LMUSessionTracker.CoreServer.Tracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

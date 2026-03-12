@@ -69,7 +69,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
     <TrimmerRootAssembly Include="Serilog.AspNetCore" />
     <TrimmerRootAssembly Include="Serilog.Sinks.Console" />
     <TrimmerRootAssembly Include="Serilog.Sinks.File" />

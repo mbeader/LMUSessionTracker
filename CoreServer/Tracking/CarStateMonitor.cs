@@ -1,4 +1,4 @@
-﻿using LMUSessionTracker.Core.LMU;
+﻿using LMUSessionTracker.Common.LMU;
 using System.Collections.Generic;
 
 namespace LMUSessionTracker.CoreServer.Tracking {

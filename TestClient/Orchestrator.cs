@@ -1,10 +1,10 @@
-﻿using LMUSessionTracker.Core;
-using LMUSessionTracker.Core.Client;
-using LMUSessionTracker.Core.Http;
-using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Protocol;
-using LMUSessionTracker.Core.Replay;
-using LMUSessionTracker.Core.Services;
+﻿using LMUSessionTracker.Common;
+using LMUSessionTracker.Common.Client;
+using LMUSessionTracker.Common.Http;
+using LMUSessionTracker.Common.LMU;
+using LMUSessionTracker.Common.Protocol;
+using LMUSessionTracker.Common.Replay;
+using LMUSessionTracker.Common.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

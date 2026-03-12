@@ -1,6 +1,6 @@
 ﻿using LMUSessionTracker.Server.Models;
 using System.Collections.Generic;
-using CoreChat = LMUSessionTracker.Core.LMU.Chat;
+using CoreChat = LMUSessionTracker.Common.LMU.Chat;
 
 namespace LMUSessionTracker.Server.ViewModels {
 	public class ChatViewModel {

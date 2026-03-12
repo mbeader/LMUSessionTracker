@@ -1,4 +1,4 @@
-﻿using LMUSessionTracker.Core.LMU;
+﻿using LMUSessionTracker.Common.LMU;
 using LMUSessionTracker.CoreServer.Tracking;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -76,12 +76,12 @@ namespace LMUSessionTracker.Server.Models {
 			}
 		}
 
-		public async Task UpdateChat(string sessionId, List<Core.LMU.Chat> chat) {
+		public async Task UpdateChat(string sessionId, List<Common.LMU.Chat> chat) {
 			if(chat.Count == 0)
 				return;
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			using(var transaction = await context.Database.BeginTransactionAsync()) {
-				foreach(Core.LMU.Chat coreChat in chat) {
+				foreach(Common.LMU.Chat coreChat in chat) {
 					Chat dbChat = new Chat() { SessionId = sessionId };
 					dbChat.From(coreChat);
 					context.Chats.Add(dbChat);

@@ -1,0 +1,39 @@
+﻿using System.Collections.Generic;
+
+namespace LMUSessionTracker.Common.LMU {
+	public class SessionInfo {
+		public double ambientTemp { get; set; }
+		public double averagePathWetness { get; set; }
+		public double currentEventTime { get; set; }
+		public double darkCloud { get; set; }
+		public double endEventTime { get; set; }
+		public string gameMode { get; set; }
+		public int gamePhase { get; set; }
+		public bool inRealtime { get; set; }
+		public double lapDistance { get; set; }
+		public double maxPathWetness { get; set; }
+		public int maxPlayers { get; set; }
+		public double maxTime { get; set; }
+		public uint maximumLaps { get; set; }
+		public double minPathWetness { get; set; }
+		public int numRedLights { get; set; }
+		public int numberOfPlayers { get; set; }
+		public int numberOfVehicles { get; set; }
+		public bool passwordProtected { get; set; }
+		public string playerFileName { get; set; }
+		public string playerName { get; set; }
+		public Completion raceCompletion { get; set; }
+		public double raining { get; set; }
+		public List<string> sectorFlag { get; set; }
+		public string serverName { get; set; }
+		public int serverPort { get; set; }
+		public string session { get; set; }
+		public double startEventTime { get; set; }
+		public int startLightFrame { get; set; }
+		public double timeRemainingInGamePhase { get; set; }
+		public string trackName { get; set; }
+		public double trackTemp { get; set; }
+		public Velocity windSpeed { get; set; }
+		public string yellowFlagState { get; set; }
+	}
+}

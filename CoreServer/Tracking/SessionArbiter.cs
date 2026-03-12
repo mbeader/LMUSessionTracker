@@ -1,5 +1,5 @@
-﻿using LMUSessionTracker.Core.Protocol;
-using LMUSessionTracker.Core.Services;
+﻿using LMUSessionTracker.Common.Protocol;
+using LMUSessionTracker.Common.Services;
 using LMUSessionTracker.CoreServer.Protocol;
 using LMUSessionTracker.CoreServer.Services;
 using Microsoft.Extensions.Logging;
@@ -224,7 +224,7 @@ namespace LMUSessionTracker.CoreServer.Tracking {
 				await publisher.Transition(session, data.SessionId);
 			}
 			int? phase = data.SessionInfo?.gamePhase;
-			logger.LogDebug($"Client {client.ClientId} created new session in phase [{(phase.HasValue ? phase >= 0 && phase <= 9 ? Enum.GetName((Core.LMU.GamePhase)phase.Value) : phase.Value : "")} {data.GameState?.gamePhase}]");
+			logger.LogDebug($"Client {client.ClientId} created new session in phase [{(phase.HasValue ? phase >= 0 && phase <= 9 ? Enum.GetName((Common.LMU.GamePhase)phase.Value) : phase.Value : "")} {data.GameState?.gamePhase}]");
 			await sessionLogger.NewSession(session.SessionId, data);
 			await publisher.Sessions(SummarizeSessionsNoLock());
 			return session;

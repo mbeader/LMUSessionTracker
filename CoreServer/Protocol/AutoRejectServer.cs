@@ -1,4 +1,4 @@
-﻿using LMUSessionTracker.Core.Protocol;
+﻿using LMUSessionTracker.Common.Protocol;
 using System.Threading.Tasks;
 
 namespace LMUSessionTracker.CoreServer.Protocol {

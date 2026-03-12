@@ -1,4 +1,4 @@
-﻿using LMUSessionTracker.Core.Services;
+﻿using LMUSessionTracker.Common.Services;
 using LMUSessionTracker.Server.Services;
 using LMUSessionTracker.Server.ViewModels;
 using Microsoft.AspNetCore.SignalR;

@@ -33,14 +33,14 @@ namespace LMUSessionTracker.Server.Models {
 		public long UnixMilliseconds => Timestamp * K + Nanoseconds / NanosecondsPerMillisecond;
 		public DateTime DateTime => new DateTime(Timestamp * K + Nanoseconds / NanosecondsPerTick);
 
-		public void From(Core.LMU.Chat chat) {
+		public void From(Common.LMU.Chat chat) {
 			Message = chat.message;
 			Timestamp = (long)(chat.timestamp / TicksPerSecond);
 			Nanoseconds = ((long)chat.timestamp - Timestamp * TicksPerSecond)*NanosecondsPerTick;
 		}
 
-		public Core.LMU.Chat To() {
-			return new Core.LMU.Chat() {
+		public Common.LMU.Chat To() {
+			return new Common.LMU.Chat() {
 				message = Message,
 				timestamp = (ulong)(Timestamp * TicksPerSecond + Nanoseconds)
 			};

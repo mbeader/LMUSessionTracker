@@ -1,6 +1,6 @@
-using LMUSessionTracker.Core.LMU;
-using LMUSessionTracker.Core.Protocol;
-using LMUSessionTracker.Core.Services;
+using LMUSessionTracker.Common.LMU;
+using LMUSessionTracker.Common.Protocol;
+using LMUSessionTracker.Common.Services;
 using LMUSessionTracker.CoreServer.Services;
 using LMUSessionTracker.CoreServer.Tracking;
 using Microsoft.Extensions.Logging;

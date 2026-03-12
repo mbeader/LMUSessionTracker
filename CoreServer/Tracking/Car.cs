@@ -1,4 +1,4 @@
-﻿using LMUSessionTracker.Core.LMU;
+﻿using LMUSessionTracker.Common.LMU;
 
 namespace LMUSessionTracker.CoreServer.Tracking {
 	public class Car {
