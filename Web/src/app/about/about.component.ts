@@ -12,7 +12,7 @@ import packageJson from '../../../package.json';
 	templateUrl: './about.component.html',
 	styleUrl: './about.component.css',
 })
-export class About {
+export class AboutComponent {
 	private _aboutOptions = new BehaviorSubject<AboutOptions>(new AboutOptions());
 	private api = inject(ServerApiServiceToken);
 	static: boolean = environment.static;

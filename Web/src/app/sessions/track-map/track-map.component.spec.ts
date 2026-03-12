@@ -3,15 +3,15 @@ import { ActivatedRoute } from '@angular/router';
 import { ServerApiServiceToken } from '../../data/server-api/server-api.service';
 import { ServerLiveServiceToken } from '../../data/server-live/server-live.service';
 
-import { TrackMap } from './track-map.component';
+import { TrackMapComponent } from './track-map.component';
 
-describe('TrackMap', () => {
-	let component: TrackMap;
-	let fixture: ComponentFixture<TrackMap>;
+describe('TrackMapComponent', () => {
+	let component: TrackMapComponent;
+	let fixture: ComponentFixture<TrackMapComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [TrackMap],
+			imports: [TrackMapComponent],
 			providers: [
 				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } },
 				{ provide: ServerApiServiceToken, useValue: { } },
@@ -20,7 +20,7 @@ describe('TrackMap', () => {
 		})
 			.compileComponents();
 
-		fixture = TestBed.createComponent(TrackMap);
+		fixture = TestBed.createComponent(TrackMapComponent);
 		component = fixture.componentInstance;
 		await fixture.whenStable();
 	});

@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet, UrlSegment } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
-import { Header } from './header/header.component';
+import { HeaderComponent } from './header/header.component';
 
 type PathMatcher = (x: string) => boolean;
 type NullablePathMatcher = PathMatcher | null;
@@ -9,11 +9,11 @@ type RouteMatcher = { path: NullablePathMatcher[] };
 
 @Component({
 	selector: 'app-root',
-	imports: [RouterOutlet, Header],
+	imports: [RouterOutlet, HeaderComponent],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.css',
 })
-export class App {
+export class AppComponent {
 	private static readonly fluidRoutes: RouteMatcher[] = [
 		{ path: [(x: string) => x == 'Session', null, (x: string) => x == 'Timing'] }
 	];
@@ -28,7 +28,7 @@ export class App {
 			filter((route: ActivatedRoute) => route.outlet === 'primary'),
 		).subscribe((route: ActivatedRoute) => {
 			let isFluid = this.container() == 'container-fluid';
-			if(isFluid != App.isFluid(route.snapshot.url))
+			if(isFluid != AppComponent.isFluid(route.snapshot.url))
 				this.container.set(isFluid ? 'container' : 'container-fluid');
 		});
 	}

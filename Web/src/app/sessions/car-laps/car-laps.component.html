@@ -39,9 +39,9 @@
             <dt class="col-md-6 col-3">Number</dt>
             <dd class="col-md-6 col-9">{{ coalesce(model.car.car.number) }}</dd>
             <dt class="col-md-6 col-3">Class</dt>
-            <dd class="col-md-6 col-9"><app-session-class-badge [carClass]="model.car.car.class" /></dd>
+            <dd class="col-md-6 col-9"><app-cars-class-badge [carClass]="model.car.car.class" /></dd>
             <dt class="col-md-6 col-3">Make</dt>
-            <dd class="col-md-6 col-9"><app-session-brand-badge [brand]="model.car.car.vehicle?.manufacturer" [center]="false" /></dd>
+            <dd class="col-md-6 col-9"><app-cars-brand-badge [brand]="model.car.car.vehicle?.manufacturer" [center]="false" /></dd>
         </dl>
     </div>
     <div class="col-lg-6 col-md-8">
@@ -109,7 +109,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <app-session-pit-summary [laps]="model" />
+                <app-sessions-pit-summary [laps]="model" />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -11,11 +11,11 @@
             <ng-template #popContent>
                 <dl class="row mb-0">
                     <dt class="col-4 order-1">Class</dt>
-                    <dd class="col-4 order-2 fs-6"><app-session-class-badge [carClass]="car.class" /></dd>
+                    <dd class="col-4 order-2 fs-6"><app-cars-class-badge [carClass]="car.class" /></dd>
                     <dt class="col-4 order-1">Number</dt>
                     <dd class="col-4 order-2">{{ coalesce(car.number) }}</dd>
                     <dt class="col-4 order-1">Make</dt>
-                    <dd class="col-4 order-2 fs-6"><app-session-brand-badge [brand]="car?.vehicle?.manufacturer" /></dd>
+                    <dd class="col-4 order-2 fs-6"><app-cars-brand-badge [brand]="car?.vehicle?.manufacturer" /></dd>
                     <dt class="order-3">Team</dt>
                     <dd class="order-3">{{ coalesce(car.teamName) }}</dd>
                     <dt class="order-3">Vehicle</dt>

@@ -7,15 +7,15 @@ import { ServerLiveService, ServerLiveServiceToken } from '../../data/server-liv
 import { whenExists } from '../../utils';
 import { SessionSummary } from '../../tracking';
 import { IndexViewModel } from '../../view-models';
-import { SessionsTable } from '../sessions-table/sessions-table.component';
+import { SessionsTableComponent } from '../sessions-table/sessions-table.component';
 
 @Component({
 	selector: 'app-sessions',
-	imports: [NgbPagination, AsyncPipe, SessionsTable],
+	imports: [NgbPagination, AsyncPipe, SessionsTableComponent],
 	templateUrl: './sessions.component.html',
 	styleUrl: './sessions.component.css',
 })
-export class Sessions {
+export class SessionsComponent {
 	private initCount: number = 0;
 	private _liveSessions = new BehaviorSubject<SessionSummary[]>([]);
 	private api = inject(ServerApiServiceToken);

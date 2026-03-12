@@ -46,9 +46,9 @@
             @let classId = Utils.classId(carClass);
             <td class="text-center {{ positionInClass.get(id ?? '') == 1 ? `pic-${classId}` : null }}">{{ i + 1 }}</td>
             <td class="text-center pic-{{ classId }}">{{ positionInClass.get(id ?? '') }}</td>
-            <td class="text-center"><app-session-class-badge [carClass]="carClass" /></td>
+            <td class="text-center"><app-cars-class-badge [carClass]="carClass" /></td>
             <td class="text-center">{{ car?.number ? car.number : '' }}</td>
-            <td class="text-center"><app-session-brand-badge [brand]="car?.vehicle?.manufacturer" /></td>
+            <td class="text-center"><app-cars-brand-badge [brand]="car?.vehicle?.manufacturer" /></td>
             <td class="team-col text-truncate" title="{{ car?.teamName }}">{{ car?.teamName ? car.teamName : '' }}</td>
             <td class="driver-col text-truncate" title="{{ lap?.driver }}">{{ lap?.driver }}</td>
             <td class="text-end">{{ result.carState?.lapsCompleted }}</td>
@@ -90,14 +90,14 @@
                     Pit summary
                     @if(carStatusDesc) {
                     -
-                    <span class="fs-6"><app-session-class-badge [carClass]="carStatusDesc.carClass" /></span>
+                    <span class="fs-6"><app-cars-class-badge [carClass]="carStatusDesc.carClass" /></span>
                     <span> #{{ carStatusDesc.number }} {{ carStatusDesc.team }}</span>
                     }
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <app-session-pit-summary [id]="carId" [session]="session" />
+                <app-sessions-pit-summary [id]="carId" [session]="session" />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

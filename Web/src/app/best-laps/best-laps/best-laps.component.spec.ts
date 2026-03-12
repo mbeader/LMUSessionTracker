@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ServerApiServiceToken } from '../data/server-api/server-api.service';
-import { ServerLiveServiceToken } from '../data/server-live/server-live.service';
+import { ServerApiServiceToken } from '../../data/server-api/server-api.service';
+import { ServerLiveServiceToken } from '../../data/server-live/server-live.service';
 
-import { BestLaps } from './best-laps.component';
+import { BestLapsComponent } from './best-laps.component';
 
-describe('BestLaps', () => {
-	let component: BestLaps;
-	let fixture: ComponentFixture<BestLaps>;
+describe('BestLapsComponent', () => {
+	let component: BestLapsComponent;
+	let fixture: ComponentFixture<BestLapsComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [BestLaps],
+			imports: [BestLapsComponent],
 			providers: [
 				{ provide: ChangeDetectorRef, useValue: {} },
 				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() }, queryParamMap: { subscribe: vi.fn() } } },
@@ -22,7 +22,7 @@ describe('BestLaps', () => {
 		})
 			.compileComponents();
 
-		fixture = TestBed.createComponent(BestLaps);
+		fixture = TestBed.createComponent(BestLapsComponent);
 		component = fixture.componentInstance;
 		await fixture.whenStable();
 	});

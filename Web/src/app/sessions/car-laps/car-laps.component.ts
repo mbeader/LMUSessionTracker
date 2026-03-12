@@ -7,22 +7,22 @@ import { LapsViewModel } from '../../view-models';
 import { Best, Entry, Lap, Member } from '../../tracking';
 import { Format } from '../../format';
 import { coalesce, getBadge, getFlag } from '../../utils';
-import { ClassBadge } from '../../cars/class-badge/class-badge.component';
-import { BrandBadge } from '../../cars/brand-badge/brand-badge.component';
-import { PitSummary } from '../pit-summary/pit-summary.component';
+import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
+import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
+import { PitSummaryComponent } from '../pit-summary/pit-summary.component';
 
 @Component({
-	selector: 'app-session-laps',
-	imports: [RouterLink, ClassBadge, BrandBadge, PitSummary],
+	selector: 'app-sessions-car-laps',
+	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, PitSummaryComponent],
 	templateUrl: './car-laps.component.html',
 	styleUrl: './car-laps.component.css',
 })
-export class Laps {
+export class CarLapsComponent {
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
 	private api = inject(ServerApiServiceToken);
 	private live = inject(ServerLiveServiceToken);
-	private pitSummary = viewChild(PitSummary);
+	private pitSummary = viewChild(PitSummaryComponent);
 	model: LapsViewModel | null = null;
 	defaultLap = (number: number) => { return { lapNumber: number, totalTime: -1, sector1: -1, sector2: -1, sector3: -1, isValid: false } as Lap };
 	Format = Format;

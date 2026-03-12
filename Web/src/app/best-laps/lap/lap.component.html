@@ -3,7 +3,7 @@
     <dt class="col-12">Timestamp</dt>
     <dd class="col-12"><a [routerLink]="['/', 'Session', lap.sessionId]" (click)="removeBackdrop()">{{ Format.date(lap.timestamp) }}</a></dd>
     <dt class="col-12">Class</dt>
-    <dd class="col-12"><app-session-class-badge [carClass]="lap.car.class" /></dd>
+    <dd class="col-12"><app-cars-class-badge [carClass]="lap.car.class" /></dd>
     <dt class="col-12">Driver</dt>
     <dd class="col-12">
         @if(lap.known) {

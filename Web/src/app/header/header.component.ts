@@ -8,7 +8,7 @@ import { filter, map } from 'rxjs/operators';
 	templateUrl: './header.component.html',
 	styleUrl: './header.component.css',
 })
-export class Header {
+export class HeaderComponent {
 	private static readonly navLinks = [
 		{
 			id: 'home',
@@ -59,7 +59,7 @@ export class Header {
 			filter((route: ActivatedRoute) => route.outlet === 'primary'),
 		).subscribe((route: ActivatedRoute) => {
 			let newSessionId = route.snapshot.paramMap.get('sessionId');
-			let newNavLink = Header.findCurrentNavLink(route.snapshot.url);
+			let newNavLink = HeaderComponent.findCurrentNavLink(route.snapshot.url);
 			let navChanged = this.navLink != newNavLink.navLink || this.navSubLink != newNavLink.navSubLink;
 			if (this.sessionId != newSessionId || navChanged) {
 				this.sessionId = newSessionId;

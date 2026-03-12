@@ -3,19 +3,19 @@ import { RouterLink } from '@angular/router';
 import { SessionService } from '../session.service';
 import { Format } from '../../format';
 import { SessionViewModel } from '../../view-models';
-import { Standings } from '../standings/standings.component';
-import { Results } from '../results/results.component';
+import { StandingsComponent } from '../standings/standings.component';
+import { ResultsComponent } from '../results/results.component';
 
 @Component({
-	selector: 'app-session',
-	imports: [RouterLink, Standings, Results],
+	selector: 'app-sessions-session',
+	imports: [RouterLink, StandingsComponent, ResultsComponent],
 	providers: [SessionService],
 	templateUrl: './session.component.html',
 	styleUrl: './session.component.css',
 })
-export class Session {
+export class SessionComponent {
 	private service = inject(SessionService);
-	private standings = viewChild(Standings);
+	private standings = viewChild(StandingsComponent);
 	Format = Format;
 	flagClass = SessionViewModel.flagClass;
 

@@ -56,11 +56,11 @@
             <tr [attr.car-id]="car.id">
                 @for (col of columns; track col.id) {
                 @if(col.id == 5) {
-                <td class="text-center"><app-session-class-badge [carClass]="car.carClass" [compact]="true" /></td>
+                <td class="text-center"><app-cars-class-badge [carClass]="car.carClass" [compact]="true" /></td>
                 } @else if(col.id == 40) {
                 <td class="text-center"><span class="border bg-secondary-subtle" title="{{ col.value(car) }}"><span class="{{ col.classes ? col.classes(car) : null }}"></span></span></td>
                 } @else if(col.id == 54) {
-                <td class="text-center"><app-session-brand-badge [brand]="car.car?.vehicle?.manufacturer" /></td>
+                <td class="text-center"><app-cars-brand-badge [brand]="car.car?.vehicle?.manufacturer" /></td>
                 } @else {
                 @let eval = col.eval ? col.eval(car) : null;
                 @let truncate = col.colType == 'team-col' || col.colType == 'driver-col';
@@ -97,14 +97,14 @@
                     Status
                     @if(carStatusDesc) {
                     -
-                    <span class="fs-6"><app-session-class-badge [carClass]="carStatusDesc.carClass" /></span>
+                    <span class="fs-6"><app-cars-class-badge [carClass]="carStatusDesc.carClass" /></span>
                     <span> #{{ carStatusDesc.number }} {{ carStatusDesc.team }}</span>
                     }
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <app-session-car-status />
+                <app-sessions-car-status />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -121,14 +121,14 @@
                     Pit summary
                     @if(carStatusDesc) {
                     -
-                    <span class="fs-6"><app-session-class-badge [carClass]="carStatusDesc.carClass" /></span>
+                    <span class="fs-6"><app-cars-class-badge [carClass]="carStatusDesc.carClass" /></span>
                     <span> #{{ carStatusDesc.number }} {{ carStatusDesc.team }}</span>
                     }
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <app-session-pit-summary [id]="carId" [session]="session" />
+                <app-sessions-pit-summary [id]="carId" [session]="session" />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

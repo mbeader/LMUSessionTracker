@@ -5,7 +5,7 @@ import { ServerLiveService, ServerLiveServiceToken } from '../data/server-live/s
 import { SettingsService } from '../settings/settings.service';
 import { Anonymizer } from '../anonymizer.service';
 import { SessionTransitionViewModel, SessionViewModel } from '../view-models';
-import { Session as SessionModel } from '../models';
+import { Session } from '../models';
 
 @Injectable()
 export class SessionService {
@@ -81,7 +81,7 @@ export class SessionService {
 					return;
 				}
 			}
-			this.session.nextSession = new Object() as SessionModel;
+			this.session.nextSession = new Object() as Session;
 			this.session.nextSession.sessionId = session.sessionId;
 			this.session.nextSession.sessionType = session.info?.session;
 			this.ref.markForCheck();

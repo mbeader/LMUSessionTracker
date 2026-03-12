@@ -20,9 +20,9 @@
         @let entry = sessionEntry.entry;
         <tr>
             <th scope="row">{{ i + 1 }}</th>
-            <td><app-session-class-badge [carClass]="car.class" /></td>
+            <td><app-cars-class-badge [carClass]="car.class" /></td>
             <td>{{ car.number }}</td>
-            <td><app-session-brand-badge [brand]="car.vehicle?.manufacturer" /></td>
+            <td><app-cars-brand-badge [brand]="car.vehicle?.manufacturer" /></td>
             <td>{{ car.teamName }}</td>
             <td>{{ car.vehicle?.modelName ? car.vehicle?.modelName : car.vehicleName ? car.vehicleName : car.veh }}</td>
             <td>

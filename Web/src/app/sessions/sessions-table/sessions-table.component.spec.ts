@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SessionsTable } from './sessions-table.component';
+import { SessionsTableComponent } from './sessions-table.component';
 
-describe('SessionsTable', () => {
-	let component: SessionsTable;
-	let fixture: ComponentFixture<SessionsTable>;
+describe('SessionsTableComponent', () => {
+	let component: SessionsTableComponent;
+	let fixture: ComponentFixture<SessionsTableComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [SessionsTable]
+			imports: [SessionsTableComponent]
 		})
 			.compileComponents();
 
-		fixture = TestBed.createComponent(SessionsTable);
+		fixture = TestBed.createComponent(SessionsTableComponent);
 		component = fixture.componentInstance;
 		await fixture.whenStable();
 	});

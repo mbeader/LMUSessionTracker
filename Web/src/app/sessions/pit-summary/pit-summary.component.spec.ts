@@ -1,22 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChangeDetectorRef } from '@angular/core';
 
-import { PitSummary } from './pit-summary.component';
+import { PitSummaryComponent } from './pit-summary.component';
 
-describe('PitSummary', () => {
-	let component: PitSummary;
-	let fixture: ComponentFixture<PitSummary>;
+describe('PitSummaryComponent', () => {
+	let component: PitSummaryComponent;
+	let fixture: ComponentFixture<PitSummaryComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [PitSummary],
+			imports: [PitSummaryComponent],
 			providers: [
 				{ provide: ChangeDetectorRef, useValue: {} }
 			]
 		})
 			.compileComponents();
 
-		fixture = TestBed.createComponent(PitSummary);
+		fixture = TestBed.createComponent(PitSummaryComponent);
 		component = fixture.componentInstance;
 		await fixture.whenStable();
 	});

@@ -4,15 +4,15 @@ import { ActivatedRoute } from '@angular/router';
 import { ServerApiServiceToken } from '../../data/server-api/server-api.service';
 import { ServerLiveServiceToken } from '../../data/server-live/server-live.service';
 
-import { EntryList } from './entry-list.component';
+import { EntryListComponent } from './entry-list.component';
 
-describe('EntryList', () => {
-	let component: EntryList;
-	let fixture: ComponentFixture<EntryList>;
+describe('EntryListComponent', () => {
+	let component: EntryListComponent;
+	let fixture: ComponentFixture<EntryListComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [EntryList],
+			imports: [EntryListComponent],
 			providers: [
 				{ provide: ChangeDetectorRef, useValue: {} },
 				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } },
@@ -21,7 +21,7 @@ describe('EntryList', () => {
 			]
 		}).compileComponents();
 
-		fixture = TestBed.createComponent(EntryList);
+		fixture = TestBed.createComponent(EntryListComponent);
 		component = fixture.componentInstance;
 		await fixture.whenStable();
 	});

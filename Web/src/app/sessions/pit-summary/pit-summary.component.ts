@@ -5,12 +5,12 @@ import { CarHistory, Pit } from '../../tracking';
 import { Format } from '../../format';
 
 @Component({
-	selector: 'app-session-pit-summary',
+	selector: 'app-sessions-pit-summary',
 	imports: [NgbPopover],
 	templateUrl: './pit-summary.component.html',
 	styleUrl: './pit-summary.component.css',
 })
-export class PitSummary {
+export class PitSummaryComponent {
 	private ref = inject(ChangeDetectorRef);
 	@Input() laps: LapsViewModel | null = null;
 	@Input() session: SessionViewModel | null = null;

@@ -11,7 +11,7 @@ import { Format } from '../../format';
 	templateUrl: './sessions-table.component.html',
 	styleUrl: './sessions-table.component.css',
 })
-export class SessionsTable {
+export class SessionsTableComponent {
 	@Input() sessions: Observable<SessionSummary[]> = new Observable();
 	@Input() init: boolean = true;
 	@Input() noSessionsContent: string = 'No sessions found';

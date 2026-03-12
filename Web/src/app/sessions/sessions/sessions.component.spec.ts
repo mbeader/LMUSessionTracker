@@ -2,15 +2,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ServerApiServiceToken } from '../../data/server-api/server-api.service';
 import { ServerLiveServiceToken } from '../../data/server-live/server-live.service';
 
-import { Sessions, SessionsService } from './sessions.component';
+import { SessionsComponent, SessionsService } from './sessions.component';
 
-describe('Sessions', () => {
-	let component: Sessions;
-	let fixture: ComponentFixture<Sessions>;
+describe('SessionsComponent', () => {
+	let component: SessionsComponent;
+	let fixture: ComponentFixture<SessionsComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [Sessions],
+			imports: [SessionsComponent],
 			providers: [
 				{ provide: ServerApiServiceToken, useValue: { getLiveSessions: vi.fn().mockReturnValueOnce({ subscribe: vi.fn() }) } },
 				{ provide: ServerLiveServiceToken, useValue: { join: vi.fn() } },
@@ -18,7 +18,7 @@ describe('Sessions', () => {
 			]
 		}).compileComponents();
 
-		fixture = TestBed.createComponent(Sessions);
+		fixture = TestBed.createComponent(SessionsComponent);
 		component = fixture.componentInstance;
 		await fixture.whenStable();
 	});

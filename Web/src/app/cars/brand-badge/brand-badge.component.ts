@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-	selector: 'app-session-brand-badge',
+	selector: 'app-cars-brand-badge',
 	imports: [],
 	templateUrl: './brand-badge.component.html',
 	styleUrl: './brand-badge.component.css',
 })
-export class BrandBadge {
+export class BrandBadgeComponent {
 	@Input() brand?: string;
 	@Input() center: boolean = true;
 

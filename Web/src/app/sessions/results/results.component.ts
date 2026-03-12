@@ -7,20 +7,20 @@ import { Best, Car, CarKey, Lap } from '../../tracking';
 import { Standing } from '../../lmu';
 import { Format } from '../../format';
 import { classId, statusClass, whenExists } from '../../utils';
-import { ClassBadge } from '../../cars/class-badge/class-badge.component';
-import { BrandBadge } from '../../cars/brand-badge/brand-badge.component';
-import { PitSummary } from '../pit-summary/pit-summary.component';
+import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
+import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
+import { PitSummaryComponent } from '../pit-summary/pit-summary.component';
 
 @Component({
-	selector: 'app-session-results',
-	imports: [RouterLink, ClassBadge, BrandBadge, PitSummary],
+	selector: 'app-sessions-results',
+	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, PitSummaryComponent],
 	templateUrl: './results.component.html',
 	styleUrl: './results.component.css',
 })
-export class Results {
+export class ResultsComponent {
 	private ref = inject(ChangeDetectorRef);
 	private api = inject(ServerApiServiceToken);
-	private pitSummary = viewChild(PitSummary);
+	private pitSummary = viewChild(PitSummaryComponent);
 	@Input() session: SessionViewModel | null = null;
 	positionInClass: Map<string, number> = new Map();
 	entries: Map<string, Car> = new Map();

@@ -2,15 +2,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, UrlSegment } from '@angular/router';
 
-import { Header } from './header.component';
+import { HeaderComponent } from './header.component';
 
-describe('Header', () => {
-	let component: Header;
-	let fixture: ComponentFixture<Header>;
+describe('HeaderComponent', () => {
+	let component: HeaderComponent;
+	let fixture: ComponentFixture<HeaderComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [Header],
+			imports: [HeaderComponent],
 			providers: [
 				{ provide: ChangeDetectorRef, useValue: {} },
 				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } },
@@ -18,7 +18,7 @@ describe('Header', () => {
 		})
 			.compileComponents();
 
-		fixture = TestBed.createComponent(Header);
+		fixture = TestBed.createComponent(HeaderComponent);
 		component = fixture.componentInstance;
 		await fixture.whenStable();
 	});
@@ -29,18 +29,18 @@ describe('Header', () => {
 
 	describe('findCurrentNavLink', () => {
 		test('root should be home', () => {
-			expect(Header.findCurrentNavLink([])).toEqual({ navLink: 'home', navSubLink: '' });
+			expect(HeaderComponent.findCurrentNavLink([])).toEqual({ navLink: 'home', navSubLink: '' });
 		});
 
 		test('session should be session-live', () => {
-			expect(Header.findCurrentNavLink([
+			expect(HeaderComponent.findCurrentNavLink([
 				new UrlSegment('Session', {}),
 				new UrlSegment('id', {})
 			])).toEqual({ navLink: 'session', navSubLink: 'live' });
 		});
 
 		test('session-laps should be session-live', () => {
-			expect(Header.findCurrentNavLink([
+			expect(HeaderComponent.findCurrentNavLink([
 				new UrlSegment('Session', {}),
 				new UrlSegment('id', {}),
 				new UrlSegment('Laps', {}),
@@ -49,7 +49,7 @@ describe('Header', () => {
 		});
 
 		test('anything else should be empty', () => {
-			expect(Header.findCurrentNavLink([new UrlSegment('foo', {})])).toEqual({ navLink: '', navSubLink: '' });
+			expect(HeaderComponent.findCurrentNavLink([new UrlSegment('foo', {})])).toEqual({ navLink: '', navSubLink: '' });
 		});
 	});
 });

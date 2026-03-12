@@ -3,22 +3,22 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { ServerApiService, ServerApiServiceToken } from '../../data/server-api/server-api.service';
-import { Lap as LapModel } from '../../models';
+import { Lap } from '../../models';
 import { Format } from '../../format';
 import { BestLap, BestLapsFilters, ClassBest } from '../../view-models';
 import { coalesce, whenExists } from '../../utils';
-import { ClassBadge } from '../../cars/class-badge/class-badge.component';
-import { BrandBadge } from '../../cars/brand-badge/brand-badge.component';
-import { Lap } from '../lap/lap.component';
+import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
+import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
+import { LapComponent } from '../lap/lap.component';
 
 declare var bootstrap: any;
 @Component({
 	selector: 'app-best-laps',
-	imports: [FormsModule, ClassBadge, BrandBadge, Lap, NgbPopover],
+	imports: [FormsModule, ClassBadgeComponent, BrandBadgeComponent, LapComponent, NgbPopover],
 	templateUrl: './best-laps.component.html',
 	styleUrl: './best-laps.component.css',
 })
-export class BestLaps {
+export class BestLapsComponent {
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
 	private ref = inject(ChangeDetectorRef);
@@ -48,7 +48,7 @@ export class BestLaps {
 	anytime: boolean = true;
 	knownDriversOnly: boolean = false;
 	init: boolean = true;
-	selectedLap: LapModel | null = null;
+	selectedLap: Lap | null = null;
 	selectedLapType: number = 0;
 	Format = Format;
 	coalesce = coalesce;

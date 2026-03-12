@@ -7,19 +7,19 @@ import { SessionViewModel } from '../../view-models';
 import { Standing } from '../../lmu';
 import { CarKey } from '../../tracking';
 import { classId, statusClass, whenExists } from '../../utils';
-import { ClassBadge } from '../../cars/class-badge/class-badge.component';
-import { BrandBadge } from '../../cars/brand-badge/brand-badge.component';
-import { CarStatus } from '../car-status/car-status.component';
-import { PitSummary } from '../pit-summary/pit-summary.component';
+import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
+import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
+import { CarStatusComponent } from '../car-status/car-status.component';
+import { PitSummaryComponent } from '../pit-summary/pit-summary.component';
 
 @Component({
-	selector: 'app-session-timing',
-	imports: [RouterLink, ClassBadge, BrandBadge, CarStatus, PitSummary],
+	selector: 'app-sessions-timing',
+	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, CarStatusComponent, PitSummaryComponent],
 	providers: [SessionService, TimingService],
 	templateUrl: './timing.component.html',
 	styleUrl: './timing.component.css',
 })
-export class Timing {
+export class TimingComponent {
 	private defaultColumns = [
 		1, 2, 3, 5, 6, 54, 7, 9, 10, 11,
 		12, 13, 14, 15, 16, 17, 18, 19, 20, 22,
@@ -27,8 +27,8 @@ export class Timing {
 	];
 	private service = inject(SessionService);
 	private timingService = inject(TimingService);
-	private carStatus = viewChild(CarStatus);
-	private pitSummary = viewChild(PitSummary);
+	private carStatus = viewChild(CarStatusComponent);
+	private pitSummary = viewChild(PitSummaryComponent);
 	columns: TimingField[] = [];
 	carId?: string;
 	carStatusDesc?: CarStatusDescription;

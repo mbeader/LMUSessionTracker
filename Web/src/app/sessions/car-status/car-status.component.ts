@@ -2,16 +2,16 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { TimingCarInfo, TimingService } from '../timing.service';
 import { Format } from '../../format';
 import { statusClass } from '../../utils';
-import { ClassBadge } from '../../cars/class-badge/class-badge.component';
-import { BrandBadge } from '../../cars/brand-badge/brand-badge.component';
+import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
+import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
 
 @Component({
-	selector: 'app-session-car-status',
-	imports: [ClassBadge, BrandBadge],
+	selector: 'app-sessions-car-status',
+	imports: [ClassBadgeComponent, BrandBadgeComponent],
 	templateUrl: './car-status.component.html',
 	styleUrl: './car-status.component.css',
 })
-export class CarStatus {
+export class CarStatusComponent {
 	private ref = inject(ChangeDetectorRef);
 	private timingService?: TimingService;
 	id?: string;

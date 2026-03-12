@@ -6,22 +6,22 @@ import { CarKey } from '../../tracking';
 import { Standing } from '../../lmu';
 import { Format } from '../../format';
 import { classId, statusClass, whenExists } from '../../utils';
-import { ClassBadge } from '../../cars/class-badge/class-badge.component';
-import { BrandBadge } from '../../cars/brand-badge/brand-badge.component';
-import { CarStatus } from '../car-status/car-status.component';
-import { PitSummary } from '../pit-summary/pit-summary.component';
+import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
+import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
+import { CarStatusComponent } from '../car-status/car-status.component';
+import { PitSummaryComponent } from '../pit-summary/pit-summary.component';
 
 @Component({
-	selector: 'app-session-standings',
-	imports: [RouterLink, ClassBadge, BrandBadge, CarStatus, PitSummary],
+	selector: 'app-sessions-standings',
+	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, CarStatusComponent, PitSummaryComponent],
 	providers: [TimingService],
 	templateUrl: './standings.component.html',
 	styleUrl: './standings.component.css',
 })
-export class Standings {
+export class StandingsComponent {
 	private timingService = inject(TimingService);
-	private carStatus = viewChild(CarStatus);
-	private pitSummary = viewChild(PitSummary);
+	private carStatus = viewChild(CarStatusComponent);
+	private pitSummary = viewChild(PitSummaryComponent);
 	@Input() session: SessionViewModel | null = null;
 	carId?: string;
 	carStatusDesc?: CarStatusDescription;

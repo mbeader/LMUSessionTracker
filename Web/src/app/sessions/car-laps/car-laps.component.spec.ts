@@ -4,15 +4,15 @@ import { ActivatedRoute } from '@angular/router';
 import { ServerApiServiceToken } from '../../data/server-api/server-api.service';
 import { ServerLiveServiceToken } from '../../data/server-live/server-live.service';
 
-import { Laps } from './car-laps.component';
+import { CarLapsComponent } from './car-laps.component';
 
-describe('Laps', () => {
-	let component: Laps;
-	let fixture: ComponentFixture<Laps>;
+describe('CarLapsComponent', () => {
+	let component: CarLapsComponent;
+	let fixture: ComponentFixture<CarLapsComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [Laps],
+			imports: [CarLapsComponent],
 			providers: [
 				{ provide: ChangeDetectorRef, useValue: {} },
 				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } },
@@ -21,7 +21,7 @@ describe('Laps', () => {
 			]
 		}).compileComponents();
 
-		fixture = TestBed.createComponent(Laps);
+		fixture = TestBed.createComponent(CarLapsComponent);
 		component = fixture.componentInstance;
 		await fixture.whenStable();
 	});

@@ -6,16 +6,16 @@ import { ServerLiveService, ServerLiveServiceToken } from '../../data/server-liv
 import { ChatMessage, ChatViewModel, SessionEntry } from '../../view-models';
 import { Format } from '../../format';
 import { coalesce, getBadge, getFlag } from '../../utils';
-import { ClassBadge } from '../../cars/class-badge/class-badge.component';
-import { BrandBadge } from '../../cars/brand-badge/brand-badge.component';
+import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
+import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
 
 @Component({
-	selector: 'app-session-chat',
-	imports: [NgbPopover, ClassBadge, BrandBadge],
+	selector: 'app-sessions-chat',
+	imports: [NgbPopover, ClassBadgeComponent, BrandBadgeComponent],
 	templateUrl: './chat.component.html',
 	styleUrl: './chat.component.css',
 })
-export class Chat {
+export class ChatComponent {
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
 	private api = inject(ServerApiServiceToken);
@@ -49,7 +49,7 @@ export class Chat {
 				for (let car of result) {
 					if (car?.entry?.members) {
 						for (let member of car.entry.members) {
-							let names = Chat.generatePossibleSenderNames(member.name);
+							let names = ChatComponent.generatePossibleSenderNames(member.name);
 
 							for (let name of names) {
 								let cars = this.cars.get(name);

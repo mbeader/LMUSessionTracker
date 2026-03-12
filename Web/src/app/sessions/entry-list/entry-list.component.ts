@@ -5,16 +5,16 @@ import { ServerApiService, ServerApiServiceToken } from '../../data/server-api/s
 import { SessionEntry } from '../../view-models';
 import { CarKey } from '../../tracking';
 import { getBadge, getFlag } from '../../utils';
-import { ClassBadge } from '../../cars/class-badge/class-badge.component';
-import { BrandBadge } from '../../cars/brand-badge/brand-badge.component';
+import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
+import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
 
 @Component({
-	selector: 'app-session-entry-list',
-	imports: [ClassBadge, BrandBadge, NgbPopover, RouterLink],
+	selector: 'app-sessions-entry-list',
+	imports: [ClassBadgeComponent, BrandBadgeComponent, NgbPopover, RouterLink],
 	templateUrl: './entry-list.component.html',
 	styleUrl: './entry-list.component.css',
 })
-export class EntryList {
+export class EntryListComponent {
 	private ref = inject(ChangeDetectorRef);
 	private route = inject(ActivatedRoute);
 	private api = inject(ServerApiServiceToken);

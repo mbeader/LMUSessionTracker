@@ -1,17 +1,17 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Lap as LapModel } from '../../models';
+import { Lap } from '../../models';
 import { Format } from '../../format';
-import { ClassBadge } from '../../cars/class-badge/class-badge.component';
+import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
 
 @Component({
 	selector: 'app-best-laps-lap',
-	imports: [RouterLink, ClassBadge],
+	imports: [RouterLink, ClassBadgeComponent],
 	templateUrl: './lap.component.html',
 	styleUrl: './lap.component.css',
 })
-export class Lap {
-	@Input() lap: LapModel | null = null;
+export class LapComponent {
+	@Input() lap: Lap | null = null;
 	Format = Format;
 
 	removeBackdrop() {

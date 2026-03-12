@@ -4,15 +4,15 @@ import { ActivatedRoute } from '@angular/router';
 import { ServerApiServiceToken } from '../../data/server-api/server-api.service';
 import { ServerLiveServiceToken } from '../../data/server-live/server-live.service';
 
-import { Timing } from './timing.component';
+import { TimingComponent } from './timing.component';
 
-describe('Timing', () => {
-	let component: Timing;
-	let fixture: ComponentFixture<Timing>;
+describe('TimingComponent', () => {
+	let component: TimingComponent;
+	let fixture: ComponentFixture<TimingComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [Timing],
+			imports: [TimingComponent],
 			providers: [
 				{ provide: ChangeDetectorRef, useValue: {} },
 				{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } },
@@ -22,7 +22,7 @@ describe('Timing', () => {
 		})
 			.compileComponents();
 
-		fixture = TestBed.createComponent(Timing);
+		fixture = TestBed.createComponent(TimingComponent);
 		component = fixture.componentInstance;
 		await fixture.whenStable();
 	});

@@ -5,23 +5,23 @@ import { ServerApiService, ServerApiServiceToken } from '../../data/server-api/s
 import { SessionService } from '../session.service';
 import { classId, whenExists } from '../../utils';
 import { Format } from '../../format';
-import { Point2D, SessionViewModel, TrackMap as Track } from '../../view-models';
+import { Point2D, SessionViewModel, TrackMap } from '../../view-models';
 import { Car, CarKey } from '../../tracking';
 
 @Component({
-	selector: 'app-session-track-map',
+	selector: 'app-sessions-track-map',
 	imports: [RouterLink],
 	providers: [SessionService],
 	templateUrl: './track-map.component.html',
 	styleUrl: './track-map.component.css',
 })
-export class TrackMap {
+export class TrackMapComponent {
 	private api = inject(ServerApiServiceToken);
 	private service = inject(SessionService);
 	private resize = new Subject();
 	private mousemove = new Subject<MousePosition>();
 	private map: TrackMapService | null = null
-	private trackMap: Track = new Track();
+	private trackMap: TrackMap = new TrackMap();
 	Format = Format;
 	flagClass = SessionViewModel.flagClass;
 
@@ -45,7 +45,7 @@ export class TrackMap {
 
 	private getTrackMap(sessionId: string) {
 		this.api.getTrackMap(sessionId).then(result => {
-			this.trackMap = result ?? new Track();
+			this.trackMap = result ?? new TrackMap();
 			this.service.getSession(sessionId, this.onUpdateSession.bind(this), () => whenExists('#map-wrapper', this.initMap.bind(this)));
 		}, error => { console.log(error); })
 	}
@@ -117,7 +117,7 @@ class TrackMapService {
 	private wrapper: HTMLDivElement;
 	private canvas: HTMLCanvasElement;
 	private context: CanvasRenderingContext2D;
-	private track?: Track;
+	private track?: TrackMap;
 	private dy = 0;
 	private dx = 0;
 	private cy = 0;
@@ -235,8 +235,8 @@ class TrackMapService {
 		this.lastVehs = vehs;
 	}
 
-	map(map: Track) {
-		this.track = new Track(map);
+	map(map: TrackMap) {
+		this.track = new TrackMap(map);
 		this.dx = this.track.maxx - this.track.minx;
 		this.dy = this.track.maxy - this.track.miny;
 		this.cx = (this.track.maxx + this.track.minx) / 2;
@@ -255,7 +255,7 @@ class TrackMapService {
 		this.staticcanvas.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 
-	private processTrack(track: Track) {
+	private processTrack(track: TrackMap) {
 		let sectors = track.hasSectors() ? [track.s1, track.s2, track.s3] : [track.points];
 		for (let i = 0; i < sectors.length; i++) {
 			this.processPoints(sectors[i]);
@@ -280,7 +280,7 @@ class TrackMapService {
 		point.y += this.cy;
 	}
 
-	private recalcSectorLimits(track: Track, sector: Point2D[]) {
+	private recalcSectorLimits(track: TrackMap, sector: Point2D[]) {
 		for (let i = 0; i < sector.length; i++) {
 			if (sector[i].x > track.maxx)
 				track.maxx = sector[i].x;

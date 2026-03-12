@@ -35,7 +35,7 @@
                             <div class="col-4">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="class-{{c.value}}" value="{{ c.value }}" checked>
-                                    <label class="form-check-label" for="class-{{c.value}}"><app-session-class-badge [carClass]="c.value" /></label>
+                                    <label class="form-check-label" for="class-{{c.value}}"><app-cars-class-badge [carClass]="c.value" /></label>
                                 </div>
                             </div>
                             }
@@ -127,8 +127,8 @@
         @let possible = bestlap.sector1 && bestlap.sector2 && bestlap.sector3 ? bestlap.sector1.sector1 + bestlap.sector2.sector2 + bestlap.sector3.sector3 : -1;
         <tr>
             <th scope="row">{{ i + 1 }}</th>
-            <td class="text-center"><app-session-class-badge [carClass]="lap.car.class" /></td>
-            <td class="text-center"><app-session-brand-badge [brand]="vehicle?.manufacturer" /></td>
+            <td class="text-center"><app-cars-class-badge [carClass]="lap.car.class" /></td>
+            <td class="text-center"><app-cars-brand-badge [brand]="vehicle?.manufacturer" /></td>
             @if(lap.known) {
             <td class="text-center text-warning" title="Known driver">&#x2605;</td>
             } @else {
@@ -139,9 +139,9 @@
                 <ng-template #popContent>
                     <dl class="row mb-0">
                         <dt class="col-6 order-1">Class</dt>
-                        <dd class="col-6 order-2 fs-6"><app-session-class-badge [carClass]="lap.car.class" /></dd>
+                        <dd class="col-6 order-2 fs-6"><app-cars-class-badge [carClass]="lap.car.class" /></dd>
                         <dt class="col-6 order-1">Make</dt>
-                        <dd class="col-6 order-2 fs-6"><app-session-brand-badge [brand]="vehicle?.manufacturer" /></dd>
+                        <dd class="col-6 order-2 fs-6"><app-cars-brand-badge [brand]="vehicle?.manufacturer" /></dd>
                         @if(vehicle) {
                         <dt class="order-3">Model</dt>
                         <dd class="order-3">{{ coalesce(vehicle.modelName) }}</dd>

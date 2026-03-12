@@ -8,7 +8,7 @@ import { SettingsService } from '../settings.service';
 	templateUrl: './settings.component.html',
 	styleUrl: './settings.component.css',
 })
-export class Settings {
+export class SettingsComponent {
 	private settingsService = inject(SettingsService);
 	settings: any;
 
