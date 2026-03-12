@@ -1,5 +1,5 @@
 using LMUSessionTracker.Common.Protocol;
-using LMUSessionTracker.CoreServer.Protocol;
+using LMUSessionTracker.Core.Protocol;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;

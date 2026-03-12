@@ -1,4 +1,4 @@
-using LMUSessionTracker.CoreServer.Tracking;
+using LMUSessionTracker.Core.Tracking;
 using LMUSessionTracker.Server.Models;
 using LMUSessionTracker.Server.Services;
 using LMUSessionTracker.Server.ViewModels;
@@ -56,7 +56,7 @@ namespace LMUSessionTracker.Server.Controllers {
 			vm.Session = await sessionRepo.GetSession(sessionId);
 			if(vm.Session == null)
 				return NotFound();
-			CoreServer.Tracking.Session session = await sessionObserver.GetSession(sessionId);
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId);
 			if(session == null) {
 				vm.Results = vm.Session.SessionType.StartsWith("RACE") ? await sessionRepo.GetResults(sessionId) : await sessionRepo.GetTimedResults(sessionId);
 			}
@@ -70,7 +70,7 @@ namespace LMUSessionTracker.Server.Controllers {
 			if(!ModelState.IsValid)
 				return BadRequest();
 			LapsViewModel vm = new LapsViewModel();
-			CoreServer.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
 			if(session == null)
 				return NotFound();
 			vm.Session = session.Summarize(false);
@@ -89,7 +89,7 @@ namespace LMUSessionTracker.Server.Controllers {
 		public async Task<IActionResult> EntryList([Required] string sessionId) {
 			if(!ModelState.IsValid)
 				return BadRequest();
-			CoreServer.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
 			if(session == null)
 				return NotFound();
 			return Ok(await sessionRepo.GetEntries(sessionId));
@@ -98,7 +98,7 @@ namespace LMUSessionTracker.Server.Controllers {
 		public async Task<IActionResult> TrackMap([Required] string sessionId) {
 			if(!ModelState.IsValid)
 				return BadRequest();
-			CoreServer.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
 			if(session == null)
 				return NotFound();
 			return Ok(trackMapService.GetTrack(session.Track));
@@ -107,7 +107,7 @@ namespace LMUSessionTracker.Server.Controllers {
 		public async Task<IActionResult> Chat([Required] string sessionId) {
 			if(!ModelState.IsValid)
 				return BadRequest();
-			CoreServer.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
+			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId) ?? (await sessionRepo.GetSession(sessionId))?.To();
 			if(session == null)
 				return NotFound();
 			return Ok(new ChatViewModel(await sessionRepo.GetChat(sessionId)));

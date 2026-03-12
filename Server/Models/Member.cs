@@ -23,7 +23,7 @@ namespace LMUSessionTracker.Server.Models {
 		[JsonIgnore]
 		public Session Session { get; set; }
 
-		public void From(CoreServer.Tracking.Member member) {
+		public void From(Core.Tracking.Member member) {
 			Name = member.Name;
 			Badge = member.Badge;
 			Nationality = member.Nationality;
@@ -32,8 +32,8 @@ namespace LMUSessionTracker.Server.Models {
 			IsAdmin = member.IsAdmin;
 		}
 
-		public CoreServer.Tracking.Member To() {
-			return new CoreServer.Tracking.Member() {
+		public Core.Tracking.Member To() {
+			return new Core.Tracking.Member() {
 				Name = Name,
 				Badge = Badge,
 				Nationality = Nationality,

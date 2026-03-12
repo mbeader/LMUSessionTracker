@@ -1,5 +1,5 @@
 ﻿using LMUSessionTracker.Common.LMU;
-using LMUSessionTracker.CoreServer.Tracking;
+using LMUSessionTracker.Core.Tracking;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -52,7 +52,7 @@ namespace LMUSessionTracker.Server.Models {
 			}
 		}
 
-		public async Task UpdateCarStates(string sessionId, List<CoreServer.Tracking.CarState> cars) {
+		public async Task UpdateCarStates(string sessionId, List<Core.Tracking.CarState> cars) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			using(var transaction = await context.Database.BeginTransactionAsync()) {
 				Dictionary<CarKey, Car> dbCars = new Dictionary<CarKey, Car>();
@@ -60,7 +60,7 @@ namespace LMUSessionTracker.Server.Models {
 					CarKey key = new CarKey() { SlotId = dbCar.SlotId, Veh = dbCar.Veh };
 					dbCars.Add(key, dbCar);
 				}
-				foreach(CoreServer.Tracking.CarState car in cars) {
+				foreach(Core.Tracking.CarState car in cars) {
 					if(dbCars.TryGetValue(car.Key, out Car dbCar)) {
 						if(dbCar.LastState == null) {
 							dbCar.LastState = new CarState();
@@ -118,7 +118,7 @@ namespace LMUSessionTracker.Server.Models {
 						dbLaps = new Dictionary<int, Lap>();
 						allDbLaps.Add(car.Key, dbLaps);
 					}
-					foreach(CoreServer.Tracking.Lap lap in car.Laps) {
+					foreach(Core.Tracking.Lap lap in car.Laps) {
 						if(lap == null)
 							continue;
 						if(!dbLaps.TryGetValue(lap.LapNumber, out Lap dbLap)) {
@@ -173,7 +173,7 @@ namespace LMUSessionTracker.Server.Models {
 				foreach(int slotId in slots) {
 					Entry entry = new Entry() { SessionId = sessionId };
 					entry.From(entries.Slots[slotId]);
-					foreach(CoreServer.Tracking.Member coreMember in entries.Slots[slotId].Members) {
+					foreach(Core.Tracking.Member coreMember in entries.Slots[slotId].Members) {
 						Member member = new Member() { SessionId = sessionId };
 						member.From(coreMember);
 						entry.Members.Add(member);
@@ -206,16 +206,16 @@ namespace LMUSessionTracker.Server.Models {
 			}
 		}
 
-		public async Task<List<CoreServer.Tracking.Session>> GetSessions() {
+		public async Task<List<Core.Tracking.Session>> GetSessions() {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
-			List<CoreServer.Tracking.Session> sessions = new List<CoreServer.Tracking.Session>();
+			List<Core.Tracking.Session> sessions = new List<Core.Tracking.Session>();
 			foreach(Session session in await context.Sessions.Include(x => x.LastState).ToListAsync()) {
 				sessions.Add(session.To());
 			}
 			return sessions;
 		}
 
-		public async Task<CoreServer.Tracking.Session> GetSession(string sessionId) {
+		public async Task<Core.Tracking.Session> GetSession(string sessionId) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			Session session = await context.Sessions
 				.Include(x => x.LastState)

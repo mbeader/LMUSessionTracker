@@ -119,6 +119,11 @@ It receives data from the LMUSessionTracker client, provides a web interface, an
 
 See [HOSTING.md](HOSTING.md) for more information.
 
+## Common/Core
+
+Common contains everything shared between Client and Server (including most of the client).
+Core is the heart of the tracking system, separated from the API and database.
+
 ## Notes
 
 Contains assets created by Studio 397.

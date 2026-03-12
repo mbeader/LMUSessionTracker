@@ -62,30 +62,30 @@ namespace LMUSessionTracker.Server.Models {
 			TrackName = info.trackName;
 		}
 
-		public CoreServer.Tracking.Session To() {
+		public Core.Tracking.Session To() {
 			SessionInfo info = AsSessionInfo();
-			CoreServer.Tracking.EntryList entries = null;
+			Core.Tracking.EntryList entries = null;
 			if(Entries != null && Entries.Count > 0) {
-				List<CoreServer.Tracking.Entry> coreEntries = new List<CoreServer.Tracking.Entry>();
+				List<Core.Tracking.Entry> coreEntries = new List<Core.Tracking.Entry>();
 				foreach(Entry entry in Entries)
 					coreEntries.Add(entry.To());
-				entries = new CoreServer.Tracking.EntryList(coreEntries);
+				entries = new Core.Tracking.EntryList(coreEntries);
 			} else if(IsOnline)
-				entries = new CoreServer.Tracking.EntryList();
-			List<CoreServer.Tracking.CarHistory> carHistories = null;
-			List<CoreServer.Tracking.CarState> carStates = null;
+				entries = new Core.Tracking.EntryList();
+			List<Core.Tracking.CarHistory> carHistories = null;
+			List<Core.Tracking.CarState> carStates = null;
 			if(Cars != null) {
-				carHistories = new List<CoreServer.Tracking.CarHistory>();
-				carStates = new List<CoreServer.Tracking.CarState>();
+				carHistories = new List<Core.Tracking.CarHistory>();
+				carStates = new List<Core.Tracking.CarState>();
 				foreach(Car car in Cars) {
-					CoreServer.Tracking.CarKey key = new CoreServer.Tracking.CarKey() { SlotId = car.SlotId, Veh = car.Veh };
-					List<CoreServer.Tracking.Lap> laps = new List<CoreServer.Tracking.Lap>();
+					Core.Tracking.CarKey key = new Core.Tracking.CarKey() { SlotId = car.SlotId, Veh = car.Veh };
+					List<Core.Tracking.Lap> laps = new List<Core.Tracking.Lap>();
 					foreach(Lap lap in car.Laps)
 						laps.Add(lap.To());
-					List<CoreServer.Tracking.Pit> pits = new List<CoreServer.Tracking.Pit>();
+					List<Core.Tracking.Pit> pits = new List<Core.Tracking.Pit>();
 					foreach(Pit pit in car.Pits)
 						pits.Add(pit.To());
-					carHistories.Add(new CoreServer.Tracking.CarHistory(key, car.To(), laps, pits));
+					carHistories.Add(new Core.Tracking.CarHistory(key, car.To(), laps, pits));
 					if(car.LastState != null)
 						carStates.Add(car.LastState.To(key));
 				}
@@ -96,7 +96,7 @@ namespace LMUSessionTracker.Server.Models {
 				foreach(Chat chat in Chats)
 					chats.Add(chat.To());
 			}
-			CoreServer.Tracking.Session session = CoreServer.Tracking.Session.Create(SessionId, info, Timestamp, entries, carHistories, carStates, chats);
+			Core.Tracking.Session session = Core.Tracking.Session.Create(SessionId, info, Timestamp, entries, carHistories, carStates, chats);
 			if(IsClosed)
 				session.Close();
 			return session;

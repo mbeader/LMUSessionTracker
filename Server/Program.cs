@@ -2,10 +2,10 @@ using LMUSessionTracker.Common;
 using LMUSessionTracker.Common.Client;
 using LMUSessionTracker.Common.Json;
 using LMUSessionTracker.Common.Services;
-using LMUSessionTracker.CoreServer.Json;
-using LMUSessionTracker.CoreServer.Protocol;
-using LMUSessionTracker.CoreServer.Services;
-using LMUSessionTracker.CoreServer.Tracking;
+using LMUSessionTracker.Core.Json;
+using LMUSessionTracker.Core.Protocol;
+using LMUSessionTracker.Core.Services;
+using LMUSessionTracker.Core.Tracking;
 using LMUSessionTracker.Server.Hubs;
 using LMUSessionTracker.Server.Models;
 using LMUSessionTracker.Server.Services;
@@ -40,12 +40,12 @@ namespace LMUSessionTracker.Server {
 			static void configureJsonSerializer(JsonSerializerOptions options) {
 				options.Converters.Add(new CarKeyConverter());
 				options.Converters.Add(new CarKeyDictionaryConverter<int>());
-				options.Converters.Add(new CarKeyDictionaryConverter<CoreServer.Tracking.Car>());
+				options.Converters.Add(new CarKeyDictionaryConverter<Core.Tracking.Car>());
 				options.Converters.Add(new CarKeyDictionaryConverter<Best>());
 				options.Converters.Add(new CarKeyDictionaryConverter<Dictionary<string, Best>>());
-				options.Converters.Add(new AntiConverter<CoreServer.Tracking.Session>() { ThrowOnRead = true, ThrowOnWrite = true });
-				options.Converters.Add(new AntiConverter<CoreServer.Tracking.History>() { ThrowOnRead = true, ThrowOnWrite = true });
-				options.Converters.Add(new AntiConverter<CoreServer.Tracking.CarStateMonitor>() { ThrowOnRead = true, ThrowOnWrite = true });
+				options.Converters.Add(new AntiConverter<Core.Tracking.Session>() { ThrowOnRead = true, ThrowOnWrite = true });
+				options.Converters.Add(new AntiConverter<Core.Tracking.History>() { ThrowOnRead = true, ThrowOnWrite = true });
+				options.Converters.Add(new AntiConverter<Core.Tracking.CarStateMonitor>() { ThrowOnRead = true, ThrowOnWrite = true });
 			}
 			builder.Services.AddControllers()
 				.AddJsonOptions(options => configureJsonSerializer(options.JsonSerializerOptions));

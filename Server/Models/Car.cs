@@ -32,7 +32,7 @@ namespace LMUSessionTracker.Server.Models {
 		[JsonIgnore]
 		public ICollection<Pit> Pits { get; } = new List<Pit>();
 
-		public void From(CoreServer.Tracking.Car car) {
+		public void From(Core.Tracking.Car car) {
 			if(Veh != null && (SlotId != car.SlotId || Veh != car.Veh))
 				throw new InvalidOperationException($"Cannot change lap from {SlotId}-{Veh} to {car.SlotId}-{car.Veh}");
 			SlotId = car.SlotId;
@@ -44,8 +44,8 @@ namespace LMUSessionTracker.Server.Models {
 			Id = car.Id;
 		}
 
-		public CoreServer.Tracking.Car To(CoreServer.Tracking.Vehicle vehicle = null) {
-			return new CoreServer.Tracking.Car() {
+		public Core.Tracking.Car To(Core.Tracking.Vehicle vehicle = null) {
+			return new Core.Tracking.Car() {
 				SlotId = SlotId,
 				Veh = Veh,
 				VehicleName = VehicleName,
