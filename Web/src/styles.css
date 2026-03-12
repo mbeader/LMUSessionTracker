@@ -261,6 +261,10 @@ button.btn-icon.dropdown-toggle::after {
 	background-image: url(../public/test-driver.svg);
 }
 
+.sr.s397 {
+	background-image: url(../public/s397.svg);
+}
+
 .sr.sr-clean {
 	background-image: url(../public/sr-clean.svg);
 }
