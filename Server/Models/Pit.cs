@@ -44,6 +44,7 @@ namespace LMUSessionTracker.Server.Models {
 		public double RRUsage { get; set; }
 		public double PreviousStintDuration { get; set; }
 		public double Time { get; set; }
+		public bool Resolved { get; set; }
 
 		public Session Session { get; set; }
 		public Car Car { get; set; }
@@ -84,6 +85,7 @@ namespace LMUSessionTracker.Server.Models {
 			RRUsage = pit.RRUsage;
 			PreviousStintDuration = pit.PreviousStintDuration;
 			Time = pit.Time;
+			Resolved = pit.Resolved;
 		}
 
 		public Core.Tracking.Pit To() {
@@ -121,6 +123,7 @@ namespace LMUSessionTracker.Server.Models {
 				RRUsage = RRUsage,
 				PreviousStintDuration = PreviousStintDuration,
 				Time = Time,
+				Resolved = Resolved
 			};
 		}
 	}

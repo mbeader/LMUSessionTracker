@@ -135,7 +135,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public bool IsSecondary(string clientId) => SecondaryClientIds.Contains(clientId);
 
-		public SessionUpdateResult Update(SessionInfo info, List<Standing> standings, MultiplayerTeams teams, List<Chat> chat, DateTime timestamp) {
+		public SessionUpdateResult Update(SessionInfo info, List<Standing> standings, MultiplayerTeams teams, List<Chat> chat, List<TeamStrategy> strategies, DateTime timestamp) {
 			LastInfo = info ?? LastInfo;
 			LastStandings = standings ?? LastStandings;
 			bool bestsChanged = false;
@@ -153,7 +153,7 @@ namespace LMUSessionTracker.Core.Tracking {
 						standing.slotID += minSlot;
 				}
 				carStateChanges = CarState.Update(info.currentEventTime, standings);
-				List<CarLap> laps = History.Update(CarState, standings, timestamp);
+				List<CarLap> laps = History.Update(CarState, standings, strategies, timestamp);
 				foreach(CarLap lap in laps) {
 					if(Bests.Update(lap))
 						bestsChanged = true;
@@ -269,7 +269,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public Session Clone() {
 			Session session = Create(SessionId, LastInfo, Timestamp, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()), CarState.GetAllStates().ConvertAll(x => x.Clone()));
-			session.Update(LastInfo, LastStandings, null, null, LastUpdate);
+			session.Update(LastInfo, LastStandings, null, null, null, LastUpdate);
 			return session;
 		}
 

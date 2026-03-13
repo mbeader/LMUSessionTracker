@@ -23,6 +23,9 @@
             <th class="text-center">Type</th>
             <th class="text-center">Swap</th>
             <th class="text-center" title="Penalty">Pen</th>
+            <th class="text-center">Tires</th>
+            <th class="text-end">Fuel</th>
+            <th class="text-end">VE</th>
             <th class="text-end">Stop time</th>
             <th class="text-end">Total time</th>
             <th class="text-end" title="Stop location (swap location)">SLoc</th>
@@ -40,6 +43,19 @@
             <td class="text-center">{{ type ?? '&nbsp;' }}</td>
             <td class="text-center">{{ pit.swap ? 'Swap' : '&nbsp;' }}</td>
             <td class="text-center">{{ pit.penalty ? 'True' : '' }}</td>
+            <td class="text-center">
+                <!--@if(pit.lfCompound) {
+                LF: {{ pit.lfChanged ? '!' : null }} {{ pit.lfNew ? 'New' : 'Used' }} {{ pit.lfCompound ? pit.lfCompound[0] : null }}<br />
+                RF: {{ pit.rfChanged ? '!' : null }} {{ pit.rfNew ? 'New' : 'Used' }} {{ pit.rfCompound ? pit.rfCompound[0] : null }}<br />
+                LR: {{ pit.lrChanged ? '!' : null }} {{ pit.lrNew ? 'New' : 'Used' }} {{ pit.lrCompound ? pit.lrCompound[0] : null }}<br />
+                RR: {{ pit.rrChanged ? '!' : null }} {{ pit.rrNew ? 'New' : 'Used' }} {{ pit.rrCompound ? pit.rrCompound[0] : null }}
+                } @else {
+                &nbsp;
+                }-->
+                <app-cars-tire-badge [pit]="pit" />
+            </td>
+            <td class="text-end">{{ pit.fuel < 0 ? '&nbsp;' : Format.percent(pit.fuel) }}</td>
+            <td class="text-end">{{ pit.virtualEnergy < 0 ? '&nbsp;' : Format.percent(pit.virtualEnergy) }}</td>
             <td class="text-end">{{ Format.lapTime(getStopTime(pit) ?? -1) }}</td>
             <td class="text-end">{{ Format.lapTime(getTotalTime(pit, car.pits.length - 1 == i) ?? -1) }}</td>
             <td class="text-end">{{ pit.stopLocation < 0 ? '-' : pit.stopLocation == 0 ? 'Gar' : `S${pit.stopLocation}` }} ({{ pit.swapLocation < 0 ? '-' : pit.swapLocation == 0 ? 'Gar' : `S${pit.swapLocation}` }})</td>

@@ -1,5 +1,6 @@
 {
 	"$id": "/LMUSessionTracker/Schema/TeamStrategy[]",
+	"description": "Only present for race sessions.",
 	"type": "array",
 	"items": {
 		"$ref": "/LMUSessionTracker/Schema/TeamStrategy"

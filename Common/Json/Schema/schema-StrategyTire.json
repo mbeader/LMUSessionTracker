@@ -12,7 +12,7 @@
 			"type": "boolean"
 		},
 		"usage": {
-			"description": "Only present on player car.",
+			"description": "Only present on player car. Updates for 3 sectors beginning with the end of sector 1.",
 			"type": "number",
 			"maximum": 100,
 			"minimum": 0

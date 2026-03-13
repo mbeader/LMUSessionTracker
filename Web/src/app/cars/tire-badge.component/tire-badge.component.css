@@ -1,0 +1,80 @@
+:host {
+	--clr-tyre-soft: #f3f4f8;
+	--clr-tyre-medium: #ffe500;
+	--clr-tyre-hard: #f80010;
+	--clr-tyre-wet: #4ed1ef;
+}
+
+.tire {
+	background-size: contain;
+	background-position-x: 0%;
+	background-position-y: center;
+	background-repeat: no-repeat;
+	position: relative;
+	display: inline-block;
+	width: 1em;
+}
+
+.tire-sm {
+	line-height: .5;
+}
+
+.tire-sm > .tire {
+	width: .5em;
+}
+
+.tire:before {
+	content: " ";
+}
+
+.tire-soft-new {
+	background-image: url("../../../../public/tires/soft-new.svg");
+}
+
+.tire-soft-used {
+	background-image: url("../../../../public/tires/soft-used.svg");
+}
+
+.tire-soft-unchanged {
+	background-image: url("../../../../public/tires/soft-unchanged.svg");
+}
+
+.tire-medium-new {
+	background-image: url("../../../../public/tires/medium-new.svg");
+}
+
+.tire-medium-used {
+	background-image: url("../../../../public/tires/medium-used.svg");
+}
+
+.tire-medium-unchanged {
+	background-image: url("../../../../public/tires/medium-unchanged.svg");
+}
+
+.tire-hard-new {
+	background-image: url("../../../../public/tires/hard-new.svg");
+}
+
+.tire-hard-used {
+	background-image: url("../../../../public/tires/hard-used.svg");
+}
+
+.tire-hard-unchanged {
+	background-image: url("../../../../public/tires/hard-unchanged.svg");
+}
+
+.tire-wet-new {
+	background-image: url("../../../../public/tires/wet-new.svg");
+}
+
+.tire-wet-used {
+	background-image: url("../../../../public/tires/wet-used.svg");
+}
+
+.tire-wet-unchanged {
+	background-image: url("../../../../public/tires/wet-unchanged.svg");
+}
+
+.tire-unknown {
+	background-image: url("../../../../public/tires/unknown.svg");
+}

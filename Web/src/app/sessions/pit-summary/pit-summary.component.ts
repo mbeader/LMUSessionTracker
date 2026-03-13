@@ -3,10 +3,11 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { LapsViewModel, SessionViewModel } from '../../view-models';
 import { CarHistory, Pit } from '../../tracking';
 import { Format } from '../../format';
+import { TireBadgeComponent } from '../../cars/tire-badge.component/tire-badge.component';
 
 @Component({
 	selector: 'app-sessions-pit-summary',
-	imports: [NgbPopover],
+	imports: [NgbPopover, TireBadgeComponent],
 	templateUrl: './pit-summary.component.html',
 	styleUrl: './pit-summary.component.css',
 })

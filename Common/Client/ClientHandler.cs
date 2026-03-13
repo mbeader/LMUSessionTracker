@@ -121,6 +121,7 @@ namespace LMUSessionTracker.Common.Client {
 			};
 			if(majorInterval) {
 				tasks.Add(Task.Run(async () => { message.Chat = FindNew(await lmuClient.GetChat()); }));
+				tasks.Add(Task.Run(async () => { message.TeamStrategy = await lmuClient.GetStrategy(); }));
 			}
 			await Task.WhenAll(tasks);
 		}
@@ -128,13 +129,13 @@ namespace LMUSessionTracker.Common.Client {
 		private async Task GetAllData(ProtocolMessage message, bool majorInterval = false) {
 			List<Task> tasks = new List<Task>() {
 				GetSecondaryData(message, majorInterval),
-				Task.Run(async () => { await lmuClient.GetStrategy(); }),
 				Task.Run(async () => { await lmuClient.GetStrategyUsage(); }),
 				Task.Run(async () => { await lmuClient.GetStandingsHistory(); }),
 				Task.Run(async () => { await lmuClient.GetSessionsInfoForEvent(); }),
 			};
 			if(!majorInterval) {
 				tasks.Add(Task.Run(async () => { await lmuClient.GetChat(); }));
+				tasks.Add(Task.Run(async () => { await lmuClient.GetStrategy(); }));
 			}
 			await Task.WhenAll(tasks);
 		}

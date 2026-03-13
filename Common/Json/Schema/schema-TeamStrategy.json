@@ -3,6 +3,7 @@
 	"type": "array",
 	"prefixItems": [
 		{
+			"description": "Team name. Not convinved these are actually unique.",
 			"type": "string"
 		},
 		{

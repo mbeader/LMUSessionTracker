@@ -130,7 +130,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 
 			await managementRepo.UpdateSession(session.SessionId, data.SessionInfo, now);
-			SessionUpdateResult updateResult = session.Update(data.SessionInfo, data.Standings, data.MultiplayerTeams, data.Chat, now);
+			SessionUpdateResult updateResult = session.Update(data.SessionInfo, data.Standings, data.MultiplayerTeams, data.Chat, data.TeamStrategy, now);
 			session.ResolveVehicles(vehService);
 			if(updateResult.EntrySlotsChanged)
 				await managementRepo.UpdateEntries(session.SessionId, session.Entries);

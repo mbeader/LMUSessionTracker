@@ -36,6 +36,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public double RRUsage { get; set; } = -1;
 		public double PreviousStintDuration { get; set; } = -1;
 		public double Time { get; set; } = -1;
+		public bool Resolved { get; set; }
 
 		private bool IsGarage => GarageInTime >= 0 || GarageOutTime >= 0;
 
@@ -90,6 +91,59 @@ namespace LMUSessionTracker.Core.Tracking {
 			StopAfterLine = state.StartedLapInPit && (state.ThisLapStartPitState == PitState.STOPPED || state.LastLapEndPitState != PitState.STOPPED);
 		}
 
+		public void Resolve(Strategy strategy) {
+			if(Resolved || IsDefaultStrategy(strategy))
+				return;
+			Penalty = strategy.penalty;
+			Fuel = strategy.fuel ?? Fuel;
+			VirtualEnergy = strategy.ve;
+			if(strategy.tyres?.fl != null) {
+				LFChanged = strategy.tyres.fl.changed;
+				LFCompound = strategy.tyres.fl.compound;
+				LFNew = strategy.tyres.fl.New;
+				LFUsage = strategy.tyres.fl.usage ?? LFUsage;
+			}
+			if(strategy.tyres?.fr != null) {
+				RFChanged = strategy.tyres.fr.changed;
+				RFCompound = strategy.tyres.fr.compound;
+				RFNew = strategy.tyres.fr.New;
+				RFUsage = strategy.tyres.fr.usage ?? RFUsage;
+			}
+			if(strategy.tyres?.rl != null) {
+				LRChanged = strategy.tyres.rl.changed;
+				LRCompound = strategy.tyres.rl.compound;
+				LRNew = strategy.tyres.rl.New;
+				LRUsage = strategy.tyres.rl.usage ?? LRUsage;
+			}
+			if(strategy.tyres?.rr != null) {
+				RRChanged = strategy.tyres.rr.changed;
+				RRCompound = strategy.tyres.rr.compound;
+				RRNew = strategy.tyres.rr.New;
+				RRUsage = strategy.tyres.rr.usage ?? RRUsage;
+			}
+			PreviousStintDuration = strategy.previousStintDuration;
+			Time = strategy.time;
+			Resolved = true;
+		}
+
+		public static bool IsDefaultStrategy(Strategy strategy) {
+			StrategyTire tire = strategy?.tyres?.fl;
+			return tire?.compound == null || tire.compound == "N/A";
+			//return !strategy.driverSwap &&
+			//	!strategy.penalty &&
+			//	strategy.previousStintDuration == 0.0 &&
+			//	strategy.time == 0.0 &&
+			//	strategy.ve == 1.0 &&
+			//	IsDefaultTire(strategy.tyres?.fl) &&
+			//	IsDefaultTire(strategy.tyres?.fr) &&
+			//	IsDefaultTire(strategy.tyres?.rl) &&
+			//	IsDefaultTire(strategy.tyres?.rr);
+		}
+
+		private static bool IsDefaultTire(StrategyTire tire) {
+			return tire == null || (!tire.changed && tire.New && (tire.compound == null || tire.compound == "N/A"));
+		}
+
 		public Pit Clone() {
 			return new Pit() {
 				Lap = Lap,
@@ -125,6 +179,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				RRUsage = RRUsage,
 				PreviousStintDuration = PreviousStintDuration,
 				Time = Time,
+				Resolved = Resolved
 			};
 		}
 	}
