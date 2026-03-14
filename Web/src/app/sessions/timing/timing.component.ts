@@ -9,12 +9,13 @@ import { CarKey } from '../../tracking';
 import { classId, statusClass, whenExists } from '../../utils';
 import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
 import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
+import { TireBadgeComponent } from '../../cars/tire-badge.component/tire-badge.component';
 import { CarStatusComponent } from '../car-status/car-status.component';
 import { PitSummaryComponent } from '../pit-summary/pit-summary.component';
 
 @Component({
 	selector: 'app-sessions-timing',
-	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, CarStatusComponent, PitSummaryComponent],
+	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, TireBadgeComponent, CarStatusComponent, PitSummaryComponent],
 	providers: [SessionService, TimingService],
 	templateUrl: './timing.component.html',
 	styleUrl: './timing.component.css',

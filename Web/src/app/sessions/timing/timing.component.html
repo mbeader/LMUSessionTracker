@@ -61,6 +61,8 @@
                 <td class="text-center"><span class="border bg-secondary-subtle" title="{{ col.value(car) }}"><span class="{{ col.classes ? col.classes(car) : null }}"></span></span></td>
                 } @else if(col.id == 54) {
                 <td class="text-center"><app-cars-brand-badge [brand]="car.car?.vehicle?.manufacturer" /></td>
+                } @else if(col.id == 56) {
+                <td class="text-center"><app-cars-tire-badge [pit]="car.lastStop" /></td>
                 } @else {
                 @let eval = col.eval ? col.eval(car) : null;
                 @let truncate = col.colType == 'team-col' || col.colType == 'driver-col';

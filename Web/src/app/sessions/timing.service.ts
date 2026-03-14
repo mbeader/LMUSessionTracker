@@ -210,7 +210,7 @@ export interface TimingFieldValue {
 }
 
 class TimingFields {
-	private static nextId: number = 56;
+	private static nextId: number = 57;
 	fields: TimingField[] = [
 		{
 			id: 1,
@@ -380,13 +380,20 @@ class TimingFields {
 			colType: 'char5-col'
 		},
 		{
+			id: 56,
+			name: 'Tires',
+			desc: 'Current tires',
+			value: () => undefined,
+			align: 'center'
+		},
+		{
 			id: 20,
 			name: 'Fuel',
 			desc: 'Current fuel',
 			value: i => typeof i.standing === 'undefined' ? '-' : Format.percent(i.standing.fuelFraction),
 			classes: i => typeof i.standing === 'undefined' || i.standing.fuelFraction > .1 ? '' : i.standing.fuelFraction > .05 ? 'text-warning' : 'text-danger',
 			align: 'end',
-			colType: 'char7-col'
+			colType: 'char5-col'
 		},
 		{
 			id: 21,
