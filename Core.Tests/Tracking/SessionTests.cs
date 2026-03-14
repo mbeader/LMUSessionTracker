@@ -8,8 +8,14 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		private static readonly string id1 = "00000000000000000000000000000001";
 		private static readonly string id2 = "00000000000000000000000000000002";
 		private static readonly DateTime baseTimestamp = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+		private readonly UpdateContextFactory contextFactory;
 
-		public SessionTests() {
+		public SessionTests(LoggingFixture loggingFixture) {
+			contextFactory = new UpdateContextFactory(loggingFixture.LoggerFactory);
+		}
+
+		private UpdateContext<Session> Context(DateTime timestamp, double currentET = 0) {
+			return contextFactory.Create<Session>(timestamp, currentET);
 		}
 
 		[Fact]
@@ -105,7 +111,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		public void IsSameSession_OfflineValidPhaseTransition_ReturnsTrue(string prev, string inter, string next) {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }, baseTimestamp);
 			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }).Difference);
-			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, null, null, null, baseTimestamp);
+			session.Update(Context(baseTimestamp), new() { Info = new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) } });
 			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }).Difference);
 		}
 
@@ -116,7 +122,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		public void IsSameSession_OfflineInvalidPhaseTransition_ReturnsFalse(string prev, string inter, string next) {
 			Session session = Session.Create(id1, new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(prev) }, baseTimestamp);
 			Assert.Equal(SessionDifference.None, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }).Difference);
-			session.Update(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) }, null, null, null, null, baseTimestamp);
+			session.Update(Context(baseTimestamp), new() { Info = new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(inter) } });
 			Assert.Equal(SessionDifference.PhaseTransition, session.IsSameSession(new() { trackName = "Sebring", session = "RACE1", gamePhase = (int)Enum.Parse<GamePhase>(next) }).Difference);
 		}
 

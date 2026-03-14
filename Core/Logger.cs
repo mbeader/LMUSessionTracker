@@ -3,6 +3,7 @@
 namespace LMUSessionTracker.Core {
 	public class Logger {
 		public static ILogger<Logger> Instance { get; set; }
+		public static ILoggerFactory FactoryInstance { get; set; }
 
 		private Logger() { }
 	}

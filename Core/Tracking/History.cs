@@ -44,27 +44,28 @@ namespace LMUSessionTracker.Core.Tracking {
 		/// <summary>
 		/// Returns the laps completed during this update
 		/// </summary>
-		public List<CarLap> Update(CarStateMonitor carStates, List<Standing> standings, List<TeamStrategy> strategies, DateTime timestamp) {
+		public List<CarLap> Update(UpdateContext<History> context, CarStateMonitor carStates, List<Standing> standings, List<TeamStrategy> strategies) {
 			Dictionary<string, List<Strategy>> teamStrategies = new Dictionary<string, List<Strategy>>();
 			if(strategies != null)
 				foreach(TeamStrategy strategy in strategies)
 					teamStrategies.TryAdd(strategy.Name, strategy.Strategy);
+			UpdateContext<CarHistory> carContext = context.Create<CarHistory>();
 			List<CarLap> laps = new List<CarLap>();
 			foreach(Standing standing in standings) {
-				CarLap lap = Update(carStates, standing, teamStrategies, timestamp);
+				CarLap lap = Update(carContext, carStates, standing, teamStrategies);
 				if(lap != null)
 					laps.Add(lap);
 			}
 			return laps;
 		}
 
-		private CarLap Update(CarStateMonitor carStates, Standing standing, Dictionary<string, List<Strategy>> strategies, DateTime timestamp) {
+		private CarLap Update(UpdateContext<CarHistory> context, CarStateMonitor carStates, Standing standing, Dictionary<string, List<Strategy>> strategies) {
 			CarKey key = new CarKey() { SlotId = standing.slotID, Veh = standing.vehicleFilename };
 			if(!cars.TryGetValue(key, out CarHistory car)) {
 				car = new CarHistory(key, new Car(standing));
 				cars.Add(key, car);
 			}
-			Lap lap = car.Update(carStates.GetState(key), standing, strategies.GetValueOrDefault(car.Car.TeamName), timestamp);
+			Lap lap = car.Update(context, carStates.GetState(key), standing, strategies.GetValueOrDefault(car.Car.TeamName));
 			if(lap != null)
 				return new CarLap() { Car = car.Car, Lap = lap };
 			return null;

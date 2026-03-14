@@ -99,6 +99,7 @@ namespace LMUSessionTracker.Server {
 			builder.Services.AddScoped<SqliteKnownDriversRepository>();
 			builder.Services.AddScoped<SqliteVehicleRepository>();
 			builder.Services.AddSingleton<TrackMapService>();
+			builder.Services.AddSingleton<UpdateContextFactory>();
 			builder.Services.AddSingleton<VehicleService, DefaultVehicleService>();
 			builder.Services.AddSingleton<ManagementRespository, SqliteManagementRepository>();
 			builder.Services.AddSingleton<ProtocolAuthenticator, DefaultProtocolAuthenticator>();
@@ -174,7 +175,8 @@ namespace LMUSessionTracker.Server {
 				.CreateBootstrapLogger();
 			Serilog.Context.LogContext.PushProperty("SourceContext", typeof(Program).FullName, false);
 			Log.Logger = logger;
-			Logger.Instance = new SerilogLoggerFactory(logger).CreateLogger<Logger>();
+			Logger.FactoryInstance = new SerilogLoggerFactory(logger);
+			Logger.Instance = Logger.FactoryInstance.CreateLogger<Logger>();
 			return logger;
 		}
 	}

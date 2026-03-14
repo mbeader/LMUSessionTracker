@@ -20,13 +20,14 @@ namespace LMUSessionTracker.Core.Tracking {
 		private readonly PublisherService publisher;
 		private readonly TrackMapBuilder trackMapBuilder;
 		private readonly VehicleService vehService;
+		private readonly UpdateContextFactory updateContextFactory;
 		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private readonly SortedDictionary<string, Session> activeSessions = new SortedDictionary<string, Session>();
 		private readonly SortedDictionary<string, Session> inactiveSessions = new SortedDictionary<string, Session>();
 		private readonly Dictionary<string, Client> clients = new Dictionary<string, Client>();
 
 		public SessionArbiter(ILogger<SessionArbiter> logger, ManagementRespository managementRepo, DateTimeProvider dateTimeProvider, UuidVersion7Provider uuidProvider,
-			SessionLogger sessionLogger, PublisherService publisher, TrackMapBuilder trackMapBuilder, VehicleService vehService) {
+			SessionLogger sessionLogger, PublisherService publisher, TrackMapBuilder trackMapBuilder, VehicleService vehService, UpdateContextFactory updateContextFactory) {
 			this.logger = logger;
 			this.managementRepo = managementRepo;
 			this.dateTimeProvider = dateTimeProvider;
@@ -35,6 +36,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			this.publisher = publisher;
 			this.trackMapBuilder = trackMapBuilder;
 			this.vehService = vehService;
+			this.updateContextFactory = updateContextFactory;
 		}
 
 		public async Task<ProtocolStatus> Receive(ProtocolMessage data) {
@@ -130,7 +132,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 
 			await managementRepo.UpdateSession(session.SessionId, data.SessionInfo, now);
-			SessionUpdateResult updateResult = session.Update(data.SessionInfo, data.Standings, data.MultiplayerTeams, data.Chat, data.TeamStrategy, now);
+			SessionUpdateResult updateResult = session.Update(updateContextFactory.Create<Session>(now, data.SessionInfo.currentEventTime), new SessionUpdate(data));
 			session.ResolveVehicles(vehService);
 			if(updateResult.EntrySlotsChanged)
 				await managementRepo.UpdateEntries(session.SessionId, session.Entries);

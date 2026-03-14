@@ -35,7 +35,8 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			trackMapBuilder = new Mock<TrackMapBuilder>();
 			vehService = new Mock<VehicleService>();
 			arbiter = new SessionArbiter(loggingFixture.LoggerFactory.CreateLogger<SessionArbiter>(), managementRepo.Object, dateTimeProvider.Object, uuidProvider.Object,
-				new SessionLogger(loggingFixture.LoggerFactory.CreateLogger<SessionLogger>()), publisher.Object, trackMapBuilder.Object, vehService.Object);
+				new SessionLogger(loggingFixture.LoggerFactory.CreateLogger<SessionLogger>()), publisher.Object, trackMapBuilder.Object, vehService.Object,
+				new UpdateContextFactory(loggingFixture.LoggerFactory));
 		}
 
 		public static string SessionId(byte sessionId) => $"000000000000000000000000000000{sessionId:x2}";

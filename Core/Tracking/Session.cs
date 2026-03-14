@@ -135,37 +135,38 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public bool IsSecondary(string clientId) => SecondaryClientIds.Contains(clientId);
 
-		public SessionUpdateResult Update(SessionInfo info, List<Standing> standings, MultiplayerTeams teams, List<Chat> chat, List<TeamStrategy> strategies, DateTime timestamp) {
-			LastInfo = info ?? LastInfo;
-			LastStandings = standings ?? LastStandings;
+		//public SessionUpdateResult Update(SessionInfo info, List<Standing> standings, MultiplayerTeams teams, List<Chat> chat, List<TeamStrategy> strategies, DateTime timestamp) {
+		public SessionUpdateResult Update(UpdateContext<Session> context, SessionUpdate data) {
+			LastInfo = data.Info ?? LastInfo;
+			LastStandings = data.Standings ?? LastStandings;
 			bool bestsChanged = false;
 			List<string> carStateChanges = null;
-			if(standings != null) {
-				standings.Sort((a, b) => a.position.CompareTo(b.position));
-				if(Online && teams != null && teams.teams.Count == standings.Count && Entries.Slots.Count == standings.Count && IsHosted(Entries, standings)) {
+			if(data.Standings != null) {
+				data.Standings.Sort((a, b) => a.position.CompareTo(b.position));
+				if(Online && data.Teams != null && data.Teams.teams.Count == data.Standings.Count && Entries.Slots.Count == data.Standings.Count && IsHosted(Entries, data.Standings)) {
 					// for entry list hosted sessions, assume invariant content
 					int minSlot = int.MaxValue;
 					foreach(int slotId in Entries.Slots.Keys)
 						if(slotId < minSlot)
 							minSlot = slotId;
 					// shift slots to match entry list
-					foreach(Standing standing in standings)
+					foreach(Standing standing in data.Standings)
 						standing.slotID += minSlot;
 				}
-				carStateChanges = CarState.Update(info.currentEventTime, standings);
-				List<CarLap> laps = History.Update(CarState, standings, strategies, timestamp);
+				carStateChanges = CarState.Update(context.Create<CarStateMonitor>(), data.Standings);
+				List<CarLap> laps = History.Update(context.Create<History>(), CarState, data.Standings, data.Strategies);
 				foreach(CarLap lap in laps) {
 					if(Bests.Update(lap))
 						bestsChanged = true;
 				}
 			}
-			Chat.Update(chat);
-			LastUpdate = timestamp;
-			Finished = IsFinished(info);
+			Chat.Update(data.Chat);
+			LastUpdate = context.Timestamp;
+			Finished = IsFinished(data.Info);
 			FirstUpdate = false;
 			bool entrySlotsChanged = false;
-			if(teams != null) {
-				EntryList entries = new EntryList(teams);
+			if(data.Teams != null) {
+				EntryList entries = new EntryList(data.Teams);
 				History.UpdateCars(entries);
 				entrySlotsChanged = Entries.Merge(entries);
 			}
@@ -269,7 +270,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public Session Clone() {
 			Session session = Create(SessionId, LastInfo, Timestamp, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()), CarState.GetAllStates().ConvertAll(x => x.Clone()));
-			session.Update(LastInfo, LastStandings, null, null, null, LastUpdate);
+			session.Update(UpdateContext<Session>.Create(LastUpdate, LastInfo.currentEventTime), new SessionUpdate() { Info = LastInfo, Standings = LastStandings });
 			return session;
 		}
 

@@ -19,10 +19,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			}
 		}
 
-		public List<string> Update(double currentET, List<Standing> standings) {
+		public List<string> Update(UpdateContext<CarStateMonitor> context, List<Standing> standings) {
 			List<string> changes = new List<string>();
 			foreach(Standing standing in standings) {
-				string change = Update(currentET, standing);
+				string change = Update(context.CurrentET, standing);
 				if(change != null)
 					changes.Add(change);
 			}

@@ -25,7 +25,8 @@ namespace LMUSessionTracker.Core.Tests {
 				.CreateBootstrapLogger();
 			Serilog.Context.LogContext.PushProperty("SourceContext", typeof(LoggingFixture).FullName, false);
 			Log.Logger = logger;
-			Logger.Instance = new SerilogLoggerFactory(logger).CreateLogger<Logger>();
+			Logger.FactoryInstance = new SerilogLoggerFactory(logger);
+			Logger.Instance = Logger.FactoryInstance.CreateLogger<Logger>();
 			return logger;
 		}
 

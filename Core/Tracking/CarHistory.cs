@@ -46,17 +46,17 @@ namespace LMUSessionTracker.Core.Tracking {
 			return Laps[lapNumber - 1] ?? Lap.Default(lapNumber);
 		}
 
-		public Lap Update(CarStateChange state, Standing standing, List<Strategy> strategy, DateTime timestamp) {
+		public Lap Update(UpdateContext<CarHistory> context, CarStateChange state, Standing standing, List<Strategy> strategy) {
 			Lap newLap = null;
 			if(standing.lapsCompleted > 0)
-				newLap = AddLap(new Lap(standing, state.Previous), timestamp);
+				newLap = AddLap(new Lap(standing, state.Previous), context.Timestamp);
 			//if(lastSector != standing.sector) {
 			//	if(lastSector != null)
-			//		Logger.Instance.LogInformation($"{Key.Id()} {standing.sector}");
+			//		context.Logger.LogInformation($"{Key.Id()} {standing.sector}");
 			//	lastSector = standing.sector;
 			//}
 			AddPit(state, newLap);
-			AddStrategy(strategy);
+			AddStrategy(context, strategy);
 			if(!Car.HasAllFields)
 				Car.Merge(new Car(standing));
 			return newLap;
@@ -84,10 +84,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			return true;
 		}
 
-		private void AddStrategy(List<Strategy> strategy) {
+		private void AddStrategy(UpdateContext<CarHistory> context, List<Strategy> strategy) {
 			if(strategy != null && strategy.Count > 0) {
 				if(strategy.Count < strats.Count) {
-					Logger.Instance.LogInformation($"{Key.Id()} reset [{strats.Count} to {strategy.Count}]");
+					context.Logger.LogInformation($"{Key.Id()} reset [{strats.Count} to {strategy.Count}]");
 					strats.Clear();
 				}
 				for(int i = 0; i < strategy.Count; i++) {
@@ -97,7 +97,7 @@ namespace LMUSessionTracker.Core.Tracking {
 					else {
 						List<string> diff = Diff(strats[i], s);
 						if(diff.Count > 0)
-							Logger.Instance.LogInformation($"{Key.Id()} ({i}) changed {string.Join(", ", diff)}");
+							context.Logger.LogInformation($"{Key.Id()} ({i}) changed {string.Join(", ", diff)}");
 						strats[i] = s;
 					}
 				}
@@ -111,22 +111,22 @@ namespace LMUSessionTracker.Core.Tracking {
 						Pit match = null;
 						foreach(Pit pit in Pits) {
 							if(strat.lap == 0 && pit.Lap == 1 && pit.GarageInTime >= 0) {
-								Logger.Instance.LogInformation($"{Key.Id()} initial {strat.lap} {pit.Lap}");
+								context.Logger.LogInformation($"{Key.Id()} initial {strat.lap} {pit.Lap}");
 								match = pit;
 								break;
 							} else if((strat.lap == pit.Lap && !pit.StopAfterLine) || (strat.lap == pit.Lap + 1 && pit.StopAfterLine)) {
-								Logger.Instance.LogInformation($"{Key.Id()} matched pit {strat.lap} {pit.Lap}");
+								context.Logger.LogInformation($"{Key.Id()} matched pit {strat.lap} {pit.Lap}");
 								match = pit;
 								break;
 							}
 						}
 						if(match == null && strat.lap != 0) {
-							Logger.Instance.LogInformation($"{Key.Id()} unmatched strat {strat.lap}");
+							context.Logger.LogInformation($"{Key.Id()} unmatched strat {strat.lap}");
 							match = new Pit();
 							match.Lap = strat.lap;
 							Pits.Add(match);
 						} else if(match == null && strat.lap == 0) {
-							Logger.Instance.LogInformation($"{Key.Id()} unmatched initial {strat.lap}");
+							context.Logger.LogInformation($"{Key.Id()} unmatched initial {strat.lap}");
 							match = new Pit();
 							match.Lap = 0;
 							match.GarageOutTime = 0;
