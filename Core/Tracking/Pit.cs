@@ -129,19 +129,6 @@ namespace LMUSessionTracker.Core.Tracking {
 		public static bool IsDefaultStrategy(Strategy strategy) {
 			StrategyTire tire = strategy?.tyres?.fl;
 			return tire?.compound == null || tire.compound == "N/A";
-			//return !strategy.driverSwap &&
-			//	!strategy.penalty &&
-			//	strategy.previousStintDuration == 0.0 &&
-			//	strategy.time == 0.0 &&
-			//	strategy.ve == 1.0 &&
-			//	IsDefaultTire(strategy.tyres?.fl) &&
-			//	IsDefaultTire(strategy.tyres?.fr) &&
-			//	IsDefaultTire(strategy.tyres?.rl) &&
-			//	IsDefaultTire(strategy.tyres?.rr);
-		}
-
-		private static bool IsDefaultTire(StrategyTire tire) {
-			return tire == null || (!tire.changed && tire.New && (tire.compound == null || tire.compound == "N/A"));
 		}
 
 		public Pit Clone() {

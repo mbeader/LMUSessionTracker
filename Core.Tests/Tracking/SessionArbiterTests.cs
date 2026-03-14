@@ -155,6 +155,34 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public async Task Receive_SuccessiveSameSessionOnlineData_AcceptsWithChatState() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams() }));
+			ProtocolStatus ac = await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams(),
+				Chat = new() { new() { timestamp = 1, message = "a" } } });
+			Assert.Equivalent(new Chat() { timestamp = 1, message = "a" }, ac.State.Chat);
+		}
+
+		[Fact]
+		public async Task Receive_SuccessiveSameSessionOnlineData_AcceptsWithStrategyState() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams() }));
+			ProtocolStatus ac = await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams(),
+				Standings = new () { new() { slotID = 0, vehicleFilename = "someveh", driverName ="driver1" } },
+				TeamStrategy = new() { new() { Name = "team1", Strategy = new() { new() { lap = 1, driver = "driver1", tyres = new() { fl = new() { compound = "Medium" } } } } } } });
+			AssertHelpers.Equivalent(new() { new() { SlotId = 0, Veh = "someveh", Team = "team1", Driver = "driver1", LastResolvedPitLap = 1 } }, ac.State.Cars);
+		}
+
+		[Fact]
+		public async Task Receive_SuccessiveSameSessionOnlineData_AcceptsWithStrategyStopAfterLineState() {
+			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams() }));
+			await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams(),
+				Standings = new () { new() { slotID = 0, vehicleFilename = "someveh", driverName ="driver1", lapsCompleted = 1, pitState = "ENTERING" } } });
+			ProtocolStatus ac = await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { session = "RACE1" }, MultiplayerTeams = MultiplayerTeams(),
+				Standings = new () { new() { slotID = 0, vehicleFilename = "someveh", driverName ="driver1", lapsCompleted = 2, pitState = "STOPPED" } },
+				TeamStrategy = new() { new() { Name = "team1", Strategy = new() { new() { lap = 3, driver = "driver1", tyres = new() { fl = new() { compound = "Medium" } } } } } } });
+			AssertHelpers.Equivalent(new() { new() { SlotId = 0, Veh = "someveh", Team = "team1", Driver = "driver1", LastResolvedPitLap = 3 } }, ac.State.Cars);
+		}
+
+		[Fact]
 		public async Task Receive_SuccessiveSameSessionPausedOnlineData_Accepts() {
 			Assert.Equivalent(Status.ChangedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
 			Assert.Equivalent(Status.AcceptedPrimary(1), await arbiter.Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new() { gamePhase = 9 }, MultiplayerTeams = MultiplayerTeams() }));

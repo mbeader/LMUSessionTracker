@@ -135,7 +135,6 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public bool IsSecondary(string clientId) => SecondaryClientIds.Contains(clientId);
 
-		//public SessionUpdateResult Update(SessionInfo info, List<Standing> standings, MultiplayerTeams teams, List<Chat> chat, List<TeamStrategy> strategies, DateTime timestamp) {
 		public SessionUpdateResult Update(UpdateContext<Session> context, SessionUpdate data) {
 			LastInfo = data.Info ?? LastInfo;
 			LastStandings = data.Standings ?? LastStandings;

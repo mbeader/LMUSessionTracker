@@ -567,5 +567,77 @@ namespace LMUSessionTracker.Common.Tests.Client {
 		public async Task Handle_OnlineSessionChatRemoteStateAhead_IsWorking() {
 			await Assert_Handle_OnlineSessionChatWithoutInitialState(new() { Chat = new() { timestamp = 2, message = "b" } }, null, new() { Chat = new() { timestamp = 2, message = "b" } });
 		}
+
+		private void Setup_Handle_OnlineSessionStrategy(List<TeamStrategy> strategies = null) {
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
+			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
+			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
+			lmuClient.Setup(x => x.GetStrategy()).ReturnsAsync(strategies ?? new List<TeamStrategy>() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" } } } });
+		}
+
+		private async Task Assert_Handle_OnlineSessionStrategy(ProtocolState remoteState1, List<TeamStrategy> strategies2, ProtocolState remoteState2, List<TeamStrategy> ex) {
+			Setup_Handle_OnlineSessionStrategy();
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1", State = remoteState1 });
+			AssertState(TestState.Idle());
+			await handler.Handle(baseTimestamp);
+			AssertState(TestState.OnlineWorking("s1"), remoteState1);
+			if(strategies2 != null)
+				lmuClient.Setup(x => x.GetStrategy()).ReturnsAsync(strategies2);
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = "s1", State = remoteState2 });
+			await handler.Handle(baseTimestamp + new TimeSpan(0, 0, 1));
+			AssertState(TestState.OnlineWorking("s1"), remoteState2);
+			AssertHelpers.Equivalent(((ProtocolMessage)protocolClient.Invocations[1].Arguments[0]).TeamStrategy, ex);
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionStrategyWithoutInitialState_IsWorking() {
+			await Assert_Handle_OnlineSessionStrategy(null, null, new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
+				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" } } } });
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionStrategyWithoutInitialStateChat_IsWorking() {
+			await Assert_Handle_OnlineSessionStrategy(new(), null, new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
+				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" } } } });
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionStrategyUnchanged_IsWorking() {
+			await Assert_Handle_OnlineSessionStrategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } }, null,
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
+				new());
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionStrategyChanged_IsWorking() {
+			await Assert_Handle_OnlineSessionStrategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 0 } } },
+				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" }, new() { lap = 1, driver = "d1", tyres = new() { fl = new() { compound = "Medium" } } } } } },
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 1 } } },
+				new() { new() { Name = "t1", Strategy = new() { new() { lap = 1, driver = "d1", tyres = new() { fl = new() { compound = "Medium" } } } } } });
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionStrategyRemoteStateAhead_IsWorking() {
+			await Assert_Handle_OnlineSessionStrategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 1 } } }, null,
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 1 } } },
+				new());
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionStrategyTeamNotFound_IsWorking() {
+			await Assert_Handle_OnlineSessionStrategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
+				new() { new() { Name = "t2", Strategy = new() { new() { lap = 0, driver = "d1" }, new() { lap = 1, driver = "d1", tyres = new() { fl = new() { compound = "Medium" } } } } } },
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 }, new() { Team = "t2", Driver = "d1", LastResolvedPitLap = 0 } } },
+				new());
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionStrategyDriverNotFound_IsWorking() {
+			await Assert_Handle_OnlineSessionStrategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
+				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0 }, new() { lap = 1, driver = "d2", tyres = new() { fl = new() { compound = "Medium" } } } } } },
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 }, new() { Team = "t2", Driver = "d1", LastResolvedPitLap = 0 } } },
+				new());
+		}
 	}
 }

@@ -45,10 +45,15 @@ namespace LMUSessionTracker.Core.Tracking {
 		/// Returns the laps completed during this update
 		/// </summary>
 		public List<CarLap> Update(UpdateContext<History> context, CarStateMonitor carStates, List<Standing> standings, List<TeamStrategy> strategies) {
-			Dictionary<string, List<Strategy>> teamStrategies = new Dictionary<string, List<Strategy>>();
+			Dictionary<string, List<List<Strategy>>> teamStrategies = new Dictionary<string, List<List<Strategy>>>();
 			if(strategies != null)
-				foreach(TeamStrategy strategy in strategies)
-					teamStrategies.TryAdd(strategy.Name, strategy.Strategy);
+				foreach(TeamStrategy strategy in strategies) {
+					if(!teamStrategies.TryGetValue(strategy.Name, out List<List<Strategy>> teamStrategy)) {
+						teamStrategy = new List<List<Strategy>>();
+						teamStrategies.Add(strategy.Name, teamStrategy);
+					}
+					teamStrategy.Add(strategy.Strategy);
+				}
 			UpdateContext<CarHistory> carContext = context.Create<CarHistory>();
 			List<CarLap> laps = new List<CarLap>();
 			foreach(Standing standing in standings) {
@@ -59,13 +64,22 @@ namespace LMUSessionTracker.Core.Tracking {
 			return laps;
 		}
 
-		private CarLap Update(UpdateContext<CarHistory> context, CarStateMonitor carStates, Standing standing, Dictionary<string, List<Strategy>> strategies) {
+		private CarLap Update(UpdateContext<CarHistory> context, CarStateMonitor carStates, Standing standing, Dictionary<string, List<List<Strategy>>> strategies) {
 			CarKey key = new CarKey() { SlotId = standing.slotID, Veh = standing.vehicleFilename };
 			if(!cars.TryGetValue(key, out CarHistory car)) {
 				car = new CarHistory(key, new Car(standing));
 				cars.Add(key, car);
 			}
-			Lap lap = car.Update(context, carStates.GetState(key), standing, strategies.GetValueOrDefault(car.Car.TeamName));
+			List<List<Strategy>> possibleStrategies = strategies.GetValueOrDefault(car.Car.TeamName);
+			List<Strategy> strategy = null;
+			if(possibleStrategies != null)
+			foreach(List<Strategy> possibleStrategy in possibleStrategies) {
+				if(possibleStrategy.Exists(x => x.driver == standing.driverName)) {
+					strategy = possibleStrategy;
+					break;
+				}
+			}
+			Lap lap = car.Update(context, carStates.GetState(key), standing, strategy);
 			if(lap != null)
 				return new CarLap() { Car = car.Car, Lap = lap };
 			return null;

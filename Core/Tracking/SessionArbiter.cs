@@ -94,7 +94,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 			if(data.SessionInfo.gamePhase == 9) {
 				logger.LogInformation($"Client {client.ClientId} observed paused session {session.SessionId}");
-				return Accept(data.SessionId, true, new ProtocolState() { Chat = session.Chat.LastChat });
+				return Accept(data.SessionId, true, PrepareState(session));
 			}
 
 			if(!session.IsSameSession(data.SessionInfo, data.MultiplayerTeams).IsSame) {
@@ -149,7 +149,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(updateResult.CarStateChanges != null)
 				foreach(string carStateChange in updateResult.CarStateChanges)
 					logger.LogTrace(carStateChange);
-			return Accept(data.SessionId, true, new ProtocolState() { Chat = session.Chat.LastChat });
+			return Accept(data.SessionId, true, PrepareState(session));
 		}
 
 		private ProtocolStatus HandleInvalid(Client client, ProtocolMessage data, DateTime now) {
@@ -259,6 +259,31 @@ namespace LMUSessionTracker.Core.Tracking {
 				Role = isPrimary ? ProtocolRole.Primary : ProtocolRole.Secondary,
 				State = state
 			};
+		}
+
+		private ProtocolState PrepareState(Session session) {
+			List<ProtocolCarState> carStates = null;
+			if(session.Type != null && session.Type.StartsWith("RACE")) {
+				carStates = new List<ProtocolCarState>();
+				foreach(CarHistory car in session.History.GetAllHistory()) {
+					ProtocolCarState carState = new ProtocolCarState() {
+						SlotId = car.Key.SlotId,
+						Veh = car.Key.Veh,
+						Team = car.Car.TeamName,
+						Driver = session.CarState.GetCurrentState(car.Key)?.DriverName,
+						LastResolvedPitLap = -1
+					};
+					for(int i = car.Pits.Count - 1; i >= 0; i--) {
+						Pit pit = car.Pits[i];
+						if(pit.Resolved) {
+							carState.LastResolvedPitLap = pit.StopAfterLine ? pit.Lap + 1 : pit.Lap;
+							break;
+						}
+					}
+					carStates.Add(carState);
+				}
+			}
+			return new ProtocolState() { Chat = session.Chat.LastChat, Cars = carStates };
 		}
 
 		public async Task Prune(DateTime now) {

@@ -121,7 +121,7 @@ namespace LMUSessionTracker.Common.Client {
 			};
 			if(majorInterval) {
 				tasks.Add(Task.Run(async () => { message.Chat = FindNew(await lmuClient.GetChat()); }));
-				tasks.Add(Task.Run(async () => { message.TeamStrategy = await lmuClient.GetStrategy(); }));
+				tasks.Add(Task.Run(async () => { message.TeamStrategy = FindNew(await lmuClient.GetStrategy()); }));
 			}
 			await Task.WhenAll(tasks);
 		}
@@ -260,6 +260,52 @@ namespace LMUSessionTracker.Common.Client {
 			if(startIndex < 0)
 				return null;
 			return chats.GetRange(startIndex, chats.Count - startIndex);
+		}
+
+		private List<TeamStrategy> FindNew(List<TeamStrategy> strategies) {
+			if(strategies != null && strategies.Count > 0 && remoteState != null && remoteState.Cars != null) {
+				// matching team names like this is not good
+				Dictionary<string, List<ProtocolCarState>> carStates = new Dictionary<string, List<ProtocolCarState>>();
+				foreach(ProtocolCarState carState in remoteState.Cars) {
+					if(!carStates.TryGetValue(carState.Team, out List<ProtocolCarState> possibleStates)) {
+						possibleStates = new List<ProtocolCarState>();
+						carStates.Add(carState.Team, possibleStates);
+					}
+					possibleStates.Add(carState);
+				}
+				for(int i = 0; i < strategies.Count; i++) {
+					TeamStrategy strategy = strategies[i];
+					if(!carStates.TryGetValue(strategy.Name, out List<ProtocolCarState> possibleCarStates)) {
+						strategies.RemoveAt(i--);
+						continue;
+					}
+					ProtocolCarState carState = null;
+					foreach(ProtocolCarState possibleCarState in possibleCarStates) {
+						if(strategy.Strategy.Exists(x => x.driver == possibleCarState.Driver)) {
+							carState = possibleCarState;
+							break;
+						}
+					}
+					if(carState == null) {
+						strategies.RemoveAt(i--);
+						continue;
+					}
+					for(int j = 0; j < strategy.Strategy.Count; j++) {
+						Strategy strat = strategy.Strategy[j];
+						string compound = strat.tyres?.fl?.compound;
+						if((compound == null || compound == "N/A") || strat.lap <= carState.LastResolvedPitLap) {
+							strategy.Strategy.RemoveAt(j--);
+							continue;
+						} else
+							break;
+					}
+					if(strategy.Strategy.Count == 0)
+						strategies.RemoveAt(i--);
+				}
+			}
+			if(client.TraceLogging && strategies != null && strategies.Count > 0)
+				logger.LogTrace($"Strategies: {System.Linq.Enumerable.Sum(strategies, x => x.Strategy == null ? 0 : x.Strategy.Count)}");
+			return strategies;
 		}
 	}
 }
