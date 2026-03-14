@@ -396,10 +396,10 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 
 		[Fact]
 		public void Update_NoPitsInitialStrategy_OnePit() {
-			history.Update(Context(dt), state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 },
+			history.Update(Context(dt, 10), state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 },
 				new() { Tires(new() { lap = 0 }, new() { compound = "Medium", New = true }) });
 			AssertHelpers.Equivalent(new() {
-				Tires(new() { Lap = 0, GarageOutTime = 0, VirtualEnergy = 0, PreviousStintDuration = 0, Time = 0, Resolved = true}, "Medium", false, true)
+				Tires(new() { Lap = 0, GarageOutTime = 10, VirtualEnergy = 0, PreviousStintDuration = 0, Time = 0, Resolved = true}, "Medium", false, true)
 			}, history.Pits);
 		}
 
@@ -436,11 +436,11 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		[Fact]
 		public void Update_OnePitUnmatchedStrategy_TwoPits() {
 			history.Pits.Add(new Pit() { Lap = 2, GarageOutTime = 0 });
-			history.Update(Context(dt), state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 },
-				new() { Tires(new() { lap = 3 }, new() { compound = "Medium", New = true }) });
+			history.Update(Context(dt, 10), state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 },
+				new() { Tires(new() { lap = 3, time = 1 }, new() { compound = "Medium", New = true }) });
 			AssertHelpers.Equivalent(new() {
 				new() { Lap = 2, GarageOutTime = 0 },
-				Tires(new() { Lap = 3, VirtualEnergy = 0, PreviousStintDuration = 0, Time = 0, Resolved = true }, "Medium", false, true)
+				Tires(new() { Lap = 3, StopTime = 9, ReleaseTime = 10, VirtualEnergy = 0, PreviousStintDuration = 0, Time = 1, Resolved = true }, "Medium", false, true)
 			}, history.Pits);
 		}
 	}

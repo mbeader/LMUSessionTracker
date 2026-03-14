@@ -120,16 +120,16 @@ namespace LMUSessionTracker.Core.Tracking {
 								break;
 							}
 						}
-						if(match == null && strat.lap != 0) {
-							context.Logger.LogInformation($"{Key.Id()} unmatched strat {strat.lap}");
-							match = new Pit();
-							match.Lap = strat.lap;
-							Pits.Add(match);
-						} else if(match == null && strat.lap == 0) {
-							context.Logger.LogInformation($"{Key.Id()} unmatched initial {strat.lap}");
-							match = new Pit();
-							match.Lap = 0;
-							match.GarageOutTime = 0;
+						if(match == null) {
+							match = new Pit() { Lap = strat.lap, Swap = strat.driverSwap };
+							if(strat.lap != 0) {
+								context.Logger.LogInformation($"{Key.Id()} unmatched strat {strat.lap}");
+								match.StopTime = context.CurrentET - strat.time;
+								match.ReleaseTime = context.CurrentET;
+							} else {
+								context.Logger.LogInformation($"{Key.Id()} unmatched initial {strat.lap}");
+								match.GarageOutTime = context.CurrentET;
+							}
 							Pits.Add(match);
 						}
 						if(match != null)
