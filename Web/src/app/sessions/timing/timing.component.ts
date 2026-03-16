@@ -23,8 +23,8 @@ import { PitSummaryComponent } from '../pit-summary/pit-summary.component';
 export class TimingComponent {
 	private defaultColumns = [
 		1, 2, 3, 5, 6, 54, 7, 9, 10, 11,
-		12, 13, 14, 15, 16, 17, 18, 19, 20, 22,
-		44, 45, 46, 47, 36, 38, 40
+		12, 13, 14, 15, 16, 17, 18, 19, 56, 20,
+		22, 44, 45, 46, 47, 36, 38, 40
 	];
 	private service = inject(SessionService);
 	private timingService = inject(TimingService);
