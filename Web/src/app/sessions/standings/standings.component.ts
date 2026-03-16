@@ -8,12 +8,13 @@ import { Format } from '../../format';
 import { classId, statusClass, whenExists } from '../../utils';
 import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
 import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
+import { TireBadgeComponent } from '../../cars/tire-badge.component/tire-badge.component';
 import { CarStatusComponent } from '../car-status/car-status.component';
 import { PitSummaryComponent } from '../pit-summary/pit-summary.component';
 
 @Component({
 	selector: 'app-sessions-standings',
-	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, CarStatusComponent, PitSummaryComponent],
+	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, TireBadgeComponent, CarStatusComponent, PitSummaryComponent],
 	providers: [TimingService],
 	templateUrl: './standings.component.html',
 	styleUrl: './standings.component.css',
@@ -57,6 +58,7 @@ export class StandingsComponent {
 
 	getLastClasses(standing: Standing, carClass: string) { return this.timingService.getLastClasses(standing, carClass); }
 	getBestClasses(standing: Standing, carClass: string) { return this.timingService.getBestClasses(standing, carClass); }
+	getCar(id: string) { return this.timingService.getCar(id); }
 
 	updateCarStatusModal(e: any) {
 		if (e && e.relatedTarget && e.relatedTarget instanceof HTMLButtonElement) {

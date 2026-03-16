@@ -23,6 +23,7 @@
             <th scope="col" class="text-end time-col">S1</th>
             <th scope="col" class="text-end time-col">S2</th>
             <th scope="col" class="text-end time-col">S3</th>
+            <th scope="col" class="text-center time-col">Tires</th>
             <th scope="col" class="text-end time-col">Fuel</th>
             <th scope="col" class="text-center">Lap%</th>
             <th scope="col" class="text-center"></th>
@@ -56,6 +57,7 @@
             <td class="text-end time-col {{ bestClasses.sector1 }}">{{ Format.sectorTime(0.0, standing.sector == "SECTOR1" ? standing.lastSectorTime1 : standing.currentSectorTime1) }}</td>
             <td class="text-end time-col {{ bestClasses.sector2 }}">{{ standing.sector == "SECTOR2" ? "" : standing.sector == "SECTOR1" ? Format.sectorTime(standing.lastSectorTime1, standing.lastSectorTime2) : Format.sectorTime(standing.currentSectorTime1, standing.currentSectorTime2) }}</td>
             <td class="text-end time-col {{ bestClasses.sector3 }}">{{ standing.sector != "SECTOR1" ? "" : Format.sectorTime(standing.lastSectorTime2, standing.lastLapTime) }}</td>
+            <td class="text-center"><app-cars-tire-badge [pit]="getCar(id).lastStop" /></td>
             @let fuelClass = standing.fuelFraction > .1 ? '' : standing.fuelFraction > .05 ? 'text-warning' : 'text-danger';
             <td class="text-end time-col {{ fuelClass }}">{{ Format.percent(standing.fuelFraction) }}</td>
             <td class="text-center"><span class="border bg-secondary-subtle" title="{{ Format.distance(standing.lapDistance, session.session.lapDistance) }}"><span class="lap-prog-{{ Format.lapProgress(standing.lapDistance, session.session.lapDistance) }}"></span></span></td>
