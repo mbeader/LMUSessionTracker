@@ -24,6 +24,7 @@ namespace LMUSessionTracker.Common {
 				if(options.SendReplay) {
 					services.AddScoped<LMUClient>(provider => provider.GetRequiredService<ReplayLMUClient>());
 					services.AddScoped<ProtocolClient, HttpProtocolClient>();
+					services.AddScoped<ClientSessionState, DefaultClientSessionState>();
 					services.AddScoped<ClientHandlerFactory, DefaultClientHandlerFactory>();
 					services.AddSingleton<ClientIntervalProvider, ReplayClientIntervalProvider>();
 					services.AddSingleton<IntervalProvider>(provider => provider.GetRequiredService<ClientIntervalProvider>());
@@ -36,6 +37,7 @@ namespace LMUSessionTracker.Common {
 			} else {
 				services.AddScoped<LMUClient, HttpLMUClient>();
 				services.AddScoped<ProtocolClient, HttpProtocolClient>();
+				services.AddScoped<ClientSessionState, DefaultClientSessionState>();
 				services.AddScoped<ClientHandlerFactory, DefaultClientHandlerFactory>();
 				services.AddSingleton<ClientIntervalProvider, DefaultClientIntervalProvider>();
 				if(options.LMULoggingOnly)

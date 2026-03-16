@@ -10,13 +10,7 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Common.Tests.Client {
 	public class ClientHandlerTests {
 		private static readonly DateTime baseTimestamp = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-		private static readonly string publicKey = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0NCk1Db3dCUVlESzJWd0F5RUFTZkR4YUxxV1IxUmMzaVY4ZGxUQVRONW80UmhISTN5YUxhT2RBOGk3OUpjPQ0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tDQo=";
-		private static readonly string privateKey = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNQzRDQVFBd0JRWURLMlZ3QkNJRUlMNTZOVk5Sa2dFdGxUbS9sY0lmK1FsaWM3YlAySEc2dVVSQUNsekZPdnQ4DQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tDQo=";
-		private static readonly ClientId clientId;
-
-		static ClientHandlerTests() {
-			clientId = ClientId.Import(Convert.FromBase64String(privateKey));
-		}
+		private static readonly ClientId clientId = TestClientId.ClientId;
 
 		private readonly LoggingFixture loggingFixture;
 		private readonly Mock<LMUClient> lmuClient;
@@ -31,7 +25,7 @@ namespace LMUSessionTracker.Common.Tests.Client {
 			lmuClient.Setup(x => x.GetStandings()).ReturnsAsync(new List<Standing>() { new() { } });
 			protocolClient = new Mock<ProtocolClient>();
 			handler = new DefaultClientHandler(loggingFixture.LoggerFactory.CreateLogger<DefaultClientHandler>(), lmuClient.Object, protocolClient.Object, clientInfo,
-				Mock.Of<ClientIntervalProvider>());
+				Mock.Of<ClientIntervalProvider>(), Mock.Of<ClientSessionState>());
 		}
 
 		private class TestState {
@@ -516,129 +510,6 @@ namespace LMUSessionTracker.Common.Tests.Client {
 			AssertState(TestState.OnlineWorking("s1"));
 			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Promoted, Role = ProtocolRole.Primary, SessionId = "s1" });
 			await Assert.ThrowsAsync<Exception>(() => handler.Handle(baseTimestamp));
-		}
-
-		private void Setup_Handle_OnlineSessionChatWithoutInitialState(List<Chat> chat = null) {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
-			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			lmuClient.Setup(x => x.GetChat()).ReturnsAsync(chat ?? new List<Chat>() { new() { timestamp = 1, message = "a" } });
-		}
-
-		private async Task Assert_Handle_OnlineSessionChatWithoutInitialState(ProtocolState remoteState1, List<Chat> chat2, ProtocolState remoteState2) {
-			Setup_Handle_OnlineSessionChatWithoutInitialState();
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1", State = remoteState1 });
-			AssertState(TestState.Idle());
-			await handler.Handle(baseTimestamp);
-			AssertState(TestState.OnlineWorking("s1"), remoteState1);
-			if(chat2 != null)
-				lmuClient.Setup(x => x.GetChat()).ReturnsAsync(chat2);
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = "s1", State = remoteState2 });
-			await handler.Handle(baseTimestamp + new TimeSpan(0, 0, 1));
-			AssertState(TestState.OnlineWorking("s1"), remoteState2);
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionChatWithoutInitialState_IsWorking() {
-			await Assert_Handle_OnlineSessionChatWithoutInitialState(null, null, new() { Chat = new() { timestamp = 1, message = "a" } });
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionChatWithoutInitialStateChat_IsWorking() {
-			await Assert_Handle_OnlineSessionChatWithoutInitialState(new(), null, new() { Chat = new() { timestamp = 1, message = "a" } });
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionChatUnchanged_IsWorking() {
-			await Assert_Handle_OnlineSessionChatWithoutInitialState(new() { Chat = new() { timestamp = 1, message = "a" } }, null, new() { Chat = new() { timestamp = 1, message = "a" } });
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionChatChanged_IsWorking() {
-			await Assert_Handle_OnlineSessionChatWithoutInitialState(new() { Chat = new() { timestamp = 1, message = "a" } }, new List<Chat>() { new() { timestamp = 1, message = "a" }, new() { timestamp = 2, message = "b" }, new() { timestamp = 3, message = "c" } }, new() { Chat = new() { timestamp = 3, message = "c" } });
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionChatChangedSameTimestamp_IsWorking() {
-			await Assert_Handle_OnlineSessionChatWithoutInitialState(new() { Chat = new() { timestamp = 1, message = "a" } }, new List<Chat>() { new() { timestamp = 1, message = "a" }, new() { timestamp = 1, message = "b" } }, new() { Chat = new() { timestamp = 1, message = "b" } });
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionChatRemoteStateAhead_IsWorking() {
-			await Assert_Handle_OnlineSessionChatWithoutInitialState(new() { Chat = new() { timestamp = 2, message = "b" } }, null, new() { Chat = new() { timestamp = 2, message = "b" } });
-		}
-
-		private void Setup_Handle_OnlineSessionStrategy(List<TeamStrategy> strategies = null) {
-			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo());
-			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
-			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
-			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
-			lmuClient.Setup(x => x.GetStrategy()).ReturnsAsync(strategies ?? new List<TeamStrategy>() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" } } } });
-		}
-
-		private async Task Assert_Handle_OnlineSessionStrategy(ProtocolState remoteState1, List<TeamStrategy> strategies2, ProtocolState remoteState2, List<TeamStrategy> ex) {
-			Setup_Handle_OnlineSessionStrategy();
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1", State = remoteState1 });
-			AssertState(TestState.Idle());
-			await handler.Handle(baseTimestamp);
-			AssertState(TestState.OnlineWorking("s1"), remoteState1);
-			if(strategies2 != null)
-				lmuClient.Setup(x => x.GetStrategy()).ReturnsAsync(strategies2);
-			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = "s1", State = remoteState2 });
-			await handler.Handle(baseTimestamp + new TimeSpan(0, 0, 1));
-			AssertState(TestState.OnlineWorking("s1"), remoteState2);
-			AssertHelpers.Equivalent(((ProtocolMessage)protocolClient.Invocations[1].Arguments[0]).TeamStrategy, ex);
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionStrategyWithoutInitialState_IsWorking() {
-			await Assert_Handle_OnlineSessionStrategy(null, null, new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
-				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" } } } });
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionStrategyWithoutInitialStateChat_IsWorking() {
-			await Assert_Handle_OnlineSessionStrategy(new(), null, new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
-				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" } } } });
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionStrategyUnchanged_IsWorking() {
-			await Assert_Handle_OnlineSessionStrategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } }, null,
-				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
-				new());
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionStrategyChanged_IsWorking() {
-			await Assert_Handle_OnlineSessionStrategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 0 } } },
-				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" }, new() { lap = 1, driver = "d1", tyres = new() { fl = new() { compound = "Medium" } } } } } },
-				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 1 } } },
-				new() { new() { Name = "t1", Strategy = new() { new() { lap = 1, driver = "d1", tyres = new() { fl = new() { compound = "Medium" } } } } } });
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionStrategyRemoteStateAhead_IsWorking() {
-			await Assert_Handle_OnlineSessionStrategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 1 } } }, null,
-				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 1 } } },
-				new());
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionStrategyTeamNotFound_IsWorking() {
-			await Assert_Handle_OnlineSessionStrategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
-				new() { new() { Name = "t2", Strategy = new() { new() { lap = 0, driver = "d1" }, new() { lap = 1, driver = "d1", tyres = new() { fl = new() { compound = "Medium" } } } } } },
-				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 }, new() { Team = "t2", Driver = "d1", LastResolvedPitLap = 0 } } },
-				new());
-		}
-
-		[Fact]
-		public async Task Handle_OnlineSessionStrategyDriverNotFound_IsWorking() {
-			await Assert_Handle_OnlineSessionStrategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
-				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0 }, new() { lap = 1, driver = "d2", tyres = new() { fl = new() { compound = "Medium" } } } } } },
-				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 }, new() { Team = "t2", Driver = "d1", LastResolvedPitLap = 0 } } },
-				new());
 		}
 	}
 }

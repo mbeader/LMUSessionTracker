@@ -1,6 +1,5 @@
 ﻿using LMUSessionTracker.Common.LMU;
 using LMUSessionTracker.Common.Protocol;
-using LMUSessionTracker.Common.Services;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -24,11 +23,11 @@ namespace LMUSessionTracker.Common.Client {
 		private readonly ILogger<DefaultClientHandler> logger;
 		private readonly ClientInfo client;
 		private readonly ClientIntervalProvider interval;
+		private readonly ClientSessionState sessionState;
 		private readonly LMUClient lmuClient;
 		private readonly ProtocolClient protocolClient;
 		private ClientState state = ClientState.Idle;
 		private ProtocolRole role = ProtocolRole.None;
-		private ProtocolState remoteState;
 		private string sessionId;
 		private string lastMultiplayerJoinState;
 		private string lastMultiStintState;
@@ -41,16 +40,18 @@ namespace LMUSessionTracker.Common.Client {
 
 		public ClientState State => state;
 		public ProtocolRole Role => role;
-		public ProtocolState RemoteState => remoteState;
+		public ProtocolState RemoteState => sessionState.State;
 		public string SessionId => sessionId;
 		public string ClientId => client.ClientId.Hash;
 
-		public DefaultClientHandler(ILogger<DefaultClientHandler> logger, LMUClient lmuClient, ProtocolClient protocolClient, ClientInfo client, ClientIntervalProvider interval) {
+		public DefaultClientHandler(ILogger<DefaultClientHandler> logger, LMUClient lmuClient, ProtocolClient protocolClient, ClientInfo client, ClientIntervalProvider interval,
+			ClientSessionState sessionState) {
 			this.logger = logger;
 			this.lmuClient = lmuClient;
 			this.protocolClient = protocolClient;
 			this.client = client;
 			this.interval = interval;
+			this.sessionState = sessionState;
 		}
 
 		public async Task Handle(DateTime timestamp) {
@@ -123,9 +124,9 @@ namespace LMUSessionTracker.Common.Client {
 				Task.Run(async () => { message.MultiplayerTeams = await lmuClient.GetMultiplayerTeams(); }),
 				Task.Run(async () => { message.Standings = await lmuClient.GetStandings(); }),
 			};
-			if(majorInterval) {
-				tasks.Add(Task.Run(async () => { message.Chat = FindNew(await lmuClient.GetChat()); }));
-				tasks.Add(Task.Run(async () => { message.TeamStrategy = FindNew(await lmuClient.GetStrategy()); }));
+			if(majorInterval && role == ProtocolRole.Primary) {
+				tasks.Add(Task.Run(async () => { message.Chat = sessionState.Filter(await lmuClient.GetChat()); }));
+				tasks.Add(Task.Run(async () => { message.TeamStrategy = sessionState.Filter(await lmuClient.GetStrategy()); }));
 			}
 			await Task.WhenAll(tasks);
 		}
@@ -137,7 +138,7 @@ namespace LMUSessionTracker.Common.Client {
 				Task.Run(async () => { await lmuClient.GetStandingsHistory(); }),
 				Task.Run(async () => { await lmuClient.GetSessionsInfoForEvent(); }),
 			};
-			if(!majorInterval) {
+			if(!(majorInterval && role == ProtocolRole.Primary)) {
 				tasks.Add(Task.Run(async () => { await lmuClient.GetChat(); }));
 				tasks.Add(Task.Run(async () => { await lmuClient.GetStrategy(); }));
 			}
@@ -183,7 +184,7 @@ namespace LMUSessionTracker.Common.Client {
 				state = ClientState.Disconnected;
 				return;
 			}
-			remoteState = result.State;
+			sessionState.SetState(message, result.State);
 			bool online = message.MultiplayerTeams != null;
 			switch((state, result.Result, online)) {
 				case (ClientState.Working, ProtocolResult.Accepted, true):
@@ -201,6 +202,7 @@ namespace LMUSessionTracker.Common.Client {
 					else
 						state = ClientState.Connected;
 					sessionId = result.SessionId;
+					sessionState.Reset();
 					break;
 				case (ClientState.Working, ProtocolResult.Demoted, true):
 					role = result.Role;
@@ -218,6 +220,7 @@ namespace LMUSessionTracker.Common.Client {
 					role = result.Role;
 					state = ClientState.Idle;
 					sessionId = null;
+					sessionState.Reset();
 					break;
 				case (ClientState.Disconnected, ProtocolResult.Accepted, true):
 				case (ClientState.Disconnected, ProtocolResult.Changed, true):
@@ -231,6 +234,8 @@ namespace LMUSessionTracker.Common.Client {
 				case (ClientState.Disconnected, ProtocolResult.Rejected, false):
 					role = result.Role;
 					state = role == ProtocolRole.Primary ? ClientState.Working : ClientState.Connected;
+					if(sessionId != result.SessionId)
+						sessionState.Reset();
 					sessionId = result.SessionId;
 					break;
 				default:
@@ -243,74 +248,7 @@ namespace LMUSessionTracker.Common.Client {
 			role = ProtocolRole.None;
 			state = ClientState.Idle;
 			sessionId = null;
-		}
-
-		private List<Chat> FindNew(List<Chat> chats) {
-			if(chats == null || chats.Count == 0)
-				return null;
-			if(remoteState == null || remoteState.Chat == null)
-				return chats;
-			Chat last = chats[^1];
-			if(last.timestamp == remoteState.Chat.timestamp && last.message == remoteState.Chat.message)
-				return null;
-			int startIndex = -1;
-			for(int i = chats.Count - 1; i >= 0; i--) {
-				if(chats[i].timestamp > remoteState.Chat.timestamp)
-					startIndex = i;
-				else if(chats[i].timestamp == remoteState.Chat.timestamp && chats[i].message != remoteState.Chat.message)
-					startIndex = i;
-				else
-					break;
-			}
-			if(startIndex < 0)
-				return null;
-			return chats.GetRange(startIndex, chats.Count - startIndex);
-		}
-
-		private List<TeamStrategy> FindNew(List<TeamStrategy> strategies) {
-			if(strategies != null && strategies.Count > 0 && remoteState != null && remoteState.Cars != null) {
-				// matching team names like this is not good
-				Dictionary<string, List<ProtocolCarState>> carStates = new Dictionary<string, List<ProtocolCarState>>();
-				foreach(ProtocolCarState carState in remoteState.Cars) {
-					if(!carStates.TryGetValue(carState.Team, out List<ProtocolCarState> possibleStates)) {
-						possibleStates = new List<ProtocolCarState>();
-						carStates.Add(carState.Team, possibleStates);
-					}
-					possibleStates.Add(carState);
-				}
-				for(int i = 0; i < strategies.Count; i++) {
-					TeamStrategy strategy = strategies[i];
-					if(!carStates.TryGetValue(strategy.Name, out List<ProtocolCarState> possibleCarStates)) {
-						strategies.RemoveAt(i--);
-						continue;
-					}
-					ProtocolCarState carState = null;
-					foreach(ProtocolCarState possibleCarState in possibleCarStates) {
-						if(strategy.Strategy.Exists(x => x.driver == possibleCarState.Driver)) {
-							carState = possibleCarState;
-							break;
-						}
-					}
-					if(carState == null) {
-						strategies.RemoveAt(i--);
-						continue;
-					}
-					for(int j = 0; j < strategy.Strategy.Count; j++) {
-						Strategy strat = strategy.Strategy[j];
-						string compound = strat.tyres?.fl?.compound;
-						if((compound == null || compound == "N/A") || strat.lap <= carState.LastResolvedPitLap) {
-							strategy.Strategy.RemoveAt(j--);
-							continue;
-						} else
-							break;
-					}
-					if(strategy.Strategy.Count == 0)
-						strategies.RemoveAt(i--);
-				}
-			}
-			if(client.TraceLogging && strategies != null && strategies.Count > 0)
-				logger.LogTrace($"Strategies: {System.Linq.Enumerable.Sum(strategies, x => x.Strategy == null ? 0 : x.Strategy.Count)}");
-			return strategies;
+			sessionState.Reset();
 		}
 	}
 }

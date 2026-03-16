@@ -13,6 +13,7 @@ namespace LMUSessionTracker.Common.Services {
 		private LMUClient lmuClient;
 		private ProtocolClient protocolClient;
 		private ClientIntervalProvider clientInterval;
+		private ClientSessionState sessionState;
 		private ContinueProvider<ClientService> continueProvider;
 		private ClientHandler handler;
 
@@ -36,8 +37,9 @@ namespace LMUSessionTracker.Common.Services {
 			lmuClient = scope.ServiceProvider.GetRequiredService<LMUClient>();
 			protocolClient = scope.ServiceProvider.GetRequiredService<ProtocolClient>();
 			clientInterval = scope.ServiceProvider.GetRequiredService<ClientIntervalProvider>();
+			sessionState = scope.ServiceProvider.GetRequiredService<ClientSessionState>();
 			continueProvider = scope.ServiceProvider.GetService<ContinueProvider<ClientService>>();
-			handler = handlerFactory.Create(lmuClient, protocolClient, client, clientInterval);
+			handler = handlerFactory.Create(lmuClient, protocolClient, client, clientInterval, sessionState);
 			logger.LogInformation($"Starting client as {handler.ClientId}");
 			return Task.CompletedTask;
 		}
