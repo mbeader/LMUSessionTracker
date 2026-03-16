@@ -414,6 +414,18 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public void Update_TwoPitsInitialStrategy_TwoPits() {
+			history.Pits.Add(new Pit() { Lap = 1, GarageInTime = 0 });
+			history.Pits.Add(new Pit() { Lap = 1, GarageInTime = 10 });
+			history.Update(Context(dt), state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 },
+				new() { Tires(new() { lap = 0 }, new() { compound = "Medium", New = true }) });
+			AssertHelpers.Equivalent(new() {
+				new() { Lap = 1, GarageInTime = 0 },
+				Tires(new() { Lap = 1, GarageInTime = 10, VirtualEnergy = 0, PreviousStintDuration = 0, Time = 0, Resolved = true }, "Medium", false, true)
+			}, history.Pits);
+		}
+
+		[Fact]
 		public void Update_OnePitMatchedStrategy_OnePit() {
 			history.Pits.Add(new Pit() { Lap = 2, StopTime = 10 });
 			history.Update(Context(dt), state, new() { lapsCompleted = 1, lastSectorTime1 = -1, lastSectorTime2 = -1, lastLapTime = -1 },

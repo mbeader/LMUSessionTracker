@@ -82,13 +82,14 @@ namespace LMUSessionTracker.Core.Tracking {
 					if(Pit.IsDefaultStrategy(strat))
 						continue;
 					Pit match = null;
-					foreach(Pit pit in Pits) {
+					for(int i = Pits.Count - 1; i >= 0; i--) {
+						Pit pit = Pits[i];
 						if(strat.lap == 0 && pit.Lap == 1 && pit.GarageInTime >= 0) {
-							context.Logger.LogInformation($"{Key.Id()} initial {strat.lap} {pit.Lap}");
+							context.Logger.LogDebug($"{Key.Id()} initial {strat.lap} {pit.Lap}");
 							match = pit;
 							break;
 						} else if((strat.lap == pit.Lap && !pit.StopAfterLine) || (strat.lap == pit.Lap + 1 && pit.StopAfterLine)) {
-							context.Logger.LogInformation($"{Key.Id()} matched pit {strat.lap} {pit.Lap}");
+							context.Logger.LogDebug($"{Key.Id()} matched pit {strat.lap} {pit.Lap}");
 							match = pit;
 							break;
 						}
@@ -96,15 +97,15 @@ namespace LMUSessionTracker.Core.Tracking {
 					if(match == null) {
 						match = new Pit() { Lap = strat.lap, Swap = strat.driverSwap };
 						if(strat.lap != 0) {
-							context.Logger.LogInformation($"{Key.Id()} unmatched strat {strat.lap}");
+							context.Logger.LogDebug($"{Key.Id()} unmatched strat {strat.lap}");
 							match.StopTime = context.CurrentET - strat.time;
 							match.ReleaseTime = context.CurrentET;
 						} else {
-							context.Logger.LogInformation($"{Key.Id()} unmatched initial {strat.lap}");
+							context.Logger.LogDebug($"{Key.Id()} unmatched initial {strat.lap}");
 							match.GarageOutTime = context.CurrentET;
 						}
 						if(Pits.Count > 0 && match.Lap < Pits[^1].Lap)
-							context.Logger.LogInformation($"{Key.Id()} violation {strat.lap} < {Pits[^1].Lap}");
+							context.Logger.LogDebug($"{Key.Id()} violation {strat.lap} < {Pits[^1].Lap}");
 						else
 							Pits.Add(match);
 					}
