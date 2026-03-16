@@ -152,6 +152,7 @@ Validation can be enabled via appsettings to log violations.
 	* Some fields may not be updated in realtime, unclear when they actually do
 		* Fuel updates after a completed sector
 		* Car pit status may be stuck on `EXITING` until next pit
+		* Strategy may not exist/contain tire compounds until first sector 1 completion
 	* Sectors may have no time despite the lap still being valid
 * Session tracking
 	* During session transitions, the phase changing before the session type may cause an empty new session to be created
@@ -159,6 +160,8 @@ Validation can be enabled via appsettings to log violations.
 	* Entry list similarity checking is currently very lenient and may result in strange behavior when a client leaves and rejoins an online practice session
 	* Sector bests of a lap in which a driver swap occurred may not be attributed to the driver the actually set them
 	* Online practice sessions (not part of a full event) slots are decoupled from the entry list
+	* Tires display as unknown for practice/qualifying sessions (no strategy data available)
+	* Offline race sessions always display tires as unknown
 
 ## Building from source
 
