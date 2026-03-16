@@ -25,6 +25,8 @@ namespace LMUSessionTracker.Common {
 					services.AddScoped<LMUClient>(provider => provider.GetRequiredService<ReplayLMUClient>());
 					services.AddScoped<ProtocolClient, HttpProtocolClient>();
 					services.AddScoped<ClientHandlerFactory, DefaultClientHandlerFactory>();
+					services.AddSingleton<ClientIntervalProvider, ReplayClientIntervalProvider>();
+					services.AddSingleton<IntervalProvider>(provider => provider.GetRequiredService<ClientIntervalProvider>());
 					services.AddSingleton<SimpleContinueProvider<ClientService>>();
 					services.AddSingleton<ContinueProvider<ClientService>>(provider => provider.GetRequiredService<SimpleContinueProvider<ClientService>>());
 					services.AddSingleton<ContinueProviderSource>(provider => provider.GetRequiredService<SimpleContinueProvider<ClientService>>());
@@ -35,10 +37,13 @@ namespace LMUSessionTracker.Common {
 				services.AddScoped<LMUClient, HttpLMUClient>();
 				services.AddScoped<ProtocolClient, HttpProtocolClient>();
 				services.AddScoped<ClientHandlerFactory, DefaultClientHandlerFactory>();
+				services.AddSingleton<ClientIntervalProvider, DefaultClientIntervalProvider>();
 				if(options.LMULoggingOnly)
 					services.AddHostedService<ResponseLoggerService>();
-				else
+				else {
+					services.AddSingleton<IntervalProvider>(provider => provider.GetRequiredService<ClientIntervalProvider>());
 					services.AddHostedService<ClientService>();
+				}
 			}
 			return services;
 		}

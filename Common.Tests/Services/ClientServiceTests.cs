@@ -22,6 +22,7 @@ namespace LMUSessionTracker.Common.Tests.Services {
 		private readonly LoggingFixture loggingFixture;
 		private readonly Mock<LMUClient> lmuClient;
 		private readonly Mock<ProtocolClient> protocolClient;
+		private readonly Mock<ClientIntervalProvider> interval;
 		private readonly Mock<ClientHandler> handler;
 		private readonly Mock<ClientHandlerFactory> handlerFactory;
 		private readonly Mock<DateTimeProvider> dateTime;
@@ -33,15 +34,17 @@ namespace LMUSessionTracker.Common.Tests.Services {
 			ClientInfo clientInfo = new ClientInfo() { ClientId = clientId };
 			lmuClient = new Mock<LMUClient>();
 			protocolClient = new Mock<ProtocolClient>();
+			interval = new Mock<ClientIntervalProvider>();
 			handler = new Mock<ClientHandler>();
 			handler.Setup(x => x.ClientId).Returns(clientInfo.ClientId.Hash);
 			handlerFactory = new Mock<ClientHandlerFactory>();
-			handlerFactory.Setup(x => x.Create(It.IsAny<LMUClient>(), It.IsAny<ProtocolClient>(), It.IsAny<ClientInfo>())).Returns(handler.Object);
+			handlerFactory.Setup(x => x.Create(It.IsAny<LMUClient>(), It.IsAny<ProtocolClient>(), It.IsAny<ClientInfo>(), It.IsAny<ClientIntervalProvider>())).Returns(handler.Object);
 			dateTime = new Mock<DateTimeProvider>();
 			dateTime.Setup(x => x.UtcNow).Returns(baseTimestamp);
 			scope = new Mock<IServiceScope>();
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(LMUClient))).Returns(lmuClient.Object);
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(ProtocolClient))).Returns(protocolClient.Object);
+			scope.Setup(x => x.ServiceProvider.GetService(typeof(ClientIntervalProvider))).Returns(interval.Object);
 			scope.Setup(x => x.ServiceProvider.GetService(typeof(ClientHandlerFactory))).Returns(handlerFactory.Object);
 			service = CreateService(clientInfo);
 		}
@@ -51,7 +54,8 @@ namespace LMUSessionTracker.Common.Tests.Services {
 			scopeFactory.Setup(x => x.CreateScope()).Returns(scope.Object);
 			Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
 			serviceProvider.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(scopeFactory.Object);
-			return new ClientService(loggingFixture.LoggerFactory.CreateLogger<ClientService>(), serviceProvider.Object, dateTime.Object, client);
+			return new ClientService(loggingFixture.LoggerFactory.CreateLogger<ClientService>(), serviceProvider.Object, dateTime.Object, client,
+				Mock.Of<IntervalProvider>());
 		}
 
 		private class TestState {

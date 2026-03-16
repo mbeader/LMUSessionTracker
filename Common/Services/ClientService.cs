@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Common.Services {
 	public class ClientService : PeriodicService<ClientService> {
 		private readonly ClientInfo client;
-		private readonly int interval;
+		private readonly IntervalProvider interval;
 		private LMUClient lmuClient;
 		private ProtocolClient protocolClient;
+		private ClientIntervalProvider clientInterval;
 		private ContinueProvider<ClientService> continueProvider;
 		private ClientHandler handler;
 
@@ -20,21 +21,23 @@ namespace LMUSessionTracker.Common.Services {
 		public string SessionId => handler.SessionId;
 		public string ClientId => handler.ClientId;
 
-		public ClientService(ILogger<ClientService> logger, IServiceProvider serviceProvider, DateTimeProvider dateTime, ClientInfo client) : base(logger, serviceProvider, dateTime) {
+		public ClientService(ILogger<ClientService> logger, IServiceProvider serviceProvider, DateTimeProvider dateTime, ClientInfo client,
+			IntervalProvider interval) : base(logger, serviceProvider, dateTime) {
 			this.client = client;
-			interval = client.OverrideInterval && client.Interval.HasValue ? client.Interval.Value : 1000;
+			this.interval = interval;
 		}
 
 		public override int GetInterval() {
-			return interval;
+			return interval.GetInterval();
 		}
 
 		public override Task Start(IServiceScope scope) {
 			ClientHandlerFactory handlerFactory = scope.ServiceProvider.GetRequiredService<ClientHandlerFactory>();
 			lmuClient = scope.ServiceProvider.GetRequiredService<LMUClient>();
 			protocolClient = scope.ServiceProvider.GetRequiredService<ProtocolClient>();
+			clientInterval = scope.ServiceProvider.GetRequiredService<ClientIntervalProvider>();
 			continueProvider = scope.ServiceProvider.GetService<ContinueProvider<ClientService>>();
-			handler = handlerFactory.Create(lmuClient, protocolClient, client);
+			handler = handlerFactory.Create(lmuClient, protocolClient, client, clientInterval);
 			logger.LogInformation($"Starting client as {handler.ClientId}");
 			return Task.CompletedTask;
 		}

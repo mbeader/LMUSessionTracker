@@ -1,5 +1,6 @@
 ﻿using LMUSessionTracker.Common.LMU;
 using LMUSessionTracker.Common.Protocol;
+using LMUSessionTracker.Common.Services;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ namespace LMUSessionTracker.Common.Client {
 	public interface ClientHandler {
 		public ClientState State { get; }
 		public ProtocolRole Role { get; }
+		public ProtocolState RemoteState { get; }
 		public string SessionId { get; }
 		public string ClientId { get; }
 
@@ -21,6 +23,7 @@ namespace LMUSessionTracker.Common.Client {
 		private static readonly int majorIntervalCount = 5;
 		private readonly ILogger<DefaultClientHandler> logger;
 		private readonly ClientInfo client;
+		private readonly ClientIntervalProvider interval;
 		private readonly LMUClient lmuClient;
 		private readonly ProtocolClient protocolClient;
 		private ClientState state = ClientState.Idle;
@@ -42,11 +45,12 @@ namespace LMUSessionTracker.Common.Client {
 		public string SessionId => sessionId;
 		public string ClientId => client.ClientId.Hash;
 
-		public DefaultClientHandler(ILogger<DefaultClientHandler> logger, LMUClient lmuClient, ProtocolClient protocolClient, ClientInfo client) {
+		public DefaultClientHandler(ILogger<DefaultClientHandler> logger, LMUClient lmuClient, ProtocolClient protocolClient, ClientInfo client, ClientIntervalProvider interval) {
 			this.logger = logger;
 			this.lmuClient = lmuClient;
 			this.protocolClient = protocolClient;
 			this.client = client;
+			this.interval = interval;
 		}
 
 		public async Task Handle(DateTime timestamp) {
@@ -232,6 +236,7 @@ namespace LMUSessionTracker.Common.Client {
 				default:
 					throw new Exception($"Invalid state. Online: {online}, Client: {state}, Result: {result.Result}");
 			}
+			interval.SetInterval(this, message);
 		}
 
 		public void Reset() {

@@ -30,7 +30,8 @@ namespace LMUSessionTracker.Common.Tests.Client {
 			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_IDLE");
 			lmuClient.Setup(x => x.GetStandings()).ReturnsAsync(new List<Standing>() { new() { } });
 			protocolClient = new Mock<ProtocolClient>();
-			handler = new DefaultClientHandler(loggingFixture.LoggerFactory.CreateLogger<DefaultClientHandler>(), lmuClient.Object, protocolClient.Object, clientInfo);
+			handler = new DefaultClientHandler(loggingFixture.LoggerFactory.CreateLogger<DefaultClientHandler>(), lmuClient.Object, protocolClient.Object, clientInfo,
+				Mock.Of<ClientIntervalProvider>());
 		}
 
 		private class TestState {
