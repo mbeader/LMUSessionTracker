@@ -132,12 +132,13 @@ export interface Lap {
 	pit: boolean;
 	fuel: number;
 	virtualEnergy: number;
-	lFTire: number;
-	rFTire: number;
-	lRTire: number;
-	rRTire: number;
+	lfUsage: number;
+	rfUsage: number;
+	lrUsage: number;
+	rrUsage: number;
 	finishStatus: string;
 	startTime: number;
+	resolved: boolean;
 	timestamp: Date | null;
 }
 
@@ -184,6 +185,7 @@ export interface Pit {
 	rrUsage: number;
 	previousStintDuration: number;
 	time: number;
+	resolved: boolean;
 }
 
 export interface SessionSummary {

@@ -62,7 +62,7 @@
                 } @else if(col.id == 54) {
                 <td class="text-center"><app-cars-brand-badge [brand]="car.car?.vehicle?.manufacturer" /></td>
                 } @else if(col.id == 56) {
-                <td class="text-center"><app-cars-tire-badge [pit]="car.lastStop" /></td>
+                <td class="text-center"><app-cars-tire-badge [pit]="car.lastStop" [lap]="car.lastLap" /></td>
                 } @else {
                 @let eval = col.eval ? col.eval(car) : null;
                 @let truncate = col.colType == 'team-col' || col.colType == 'driver-col';

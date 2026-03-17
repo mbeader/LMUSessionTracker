@@ -1,27 +1,28 @@
 <ng-template #popContent>
     <div class="row mb-0">
-        @if(pit) {
-        @let anyUsage = !(pit.lfUsage < 0 && pit.rfUsage < 0 && pit.lrUsage < 0 && pit.rrUsage < 0);
+        @let usage = getUsage();
+        @if(usage) {
+        @let anyUsage = !(usage.lfUsage < 0 && usage.rfUsage < 0 && usage.lrUsage < 0 && usage.rrUsage < 0);
         @if(anyUsage) {
-        <div class="col-5 order-1 text-end">{{ pit.lfUsage < 0 ? '\u00A0' : Format.percent(pit.lfUsage / 100) }}</div>
+        <div class="col-5 order-1 text-end">{{ usage.lfUsage < 0 ? '\u00A0' : Format.percent(usage.lfUsage / 100) }}</div>
         }
         <div class="col-5 order-2 text-end">{{ tires.lf.compound && tires.lf.type ? tires.lf.type : 'Unknown' }}</div>
         <div class="col-1 order-2 text-end ps-0 pe-1"><span class="tire tire-{{ tires.lf.compound ? `${tires.lf.compound.toLowerCase()}-new` : 'unknown' }}" title="{{ tires.lf.compound ? tires.lf.compound : 'Unknown' }}"></span></div>
 
         @if(anyUsage) {
-        <div class="col-5 order-1 text-start offset-2">{{ pit.rfUsage < 0 ? '\u00A0' : Format.percent(pit.rfUsage / 100) }}</div>
+        <div class="col-5 order-1 text-start offset-2">{{ usage.rfUsage < 0 ? '\u00A0' : Format.percent(usage.rfUsage / 100) }}</div>
         }
         <div class="col-5 order-3 text-start">{{ tires.rf.compound && tires.rf.type ? tires.rf.type : 'Unknown' }}</div>
         <div class="col-1 order-2 text-start ps-1 pe-0"><span class="tire tire-{{ tires.rf.compound ? `${tires.rf.compound.toLowerCase()}-new` : 'unknown' }}" title="{{ tires.rf.compound ? tires.rf.compound : 'Unknown' }}"></span></div>
 
         @if(anyUsage) {
-        <div class="col-5 order-5 text-end">{{ pit.lrUsage < 0 ? '\u00A0' : Format.percent(pit.lrUsage / 100) }}</div>
+        <div class="col-5 order-5 text-end">{{ usage.lrUsage < 0 ? '\u00A0' : Format.percent(usage.lrUsage / 100) }}</div>
         }
         <div class="col-5 order-3 text-end">{{ tires.lr.compound && tires.lr.type ? tires.lr.type : 'Unknown' }}</div>
         <div class="col-1 order-3 text-end ps-0 pe-1"><span class="tire tire-{{ tires.lr.compound ? `${tires.lr.compound.toLowerCase()}-new` : 'unknown' }}" title="{{ tires.lr.compound ? tires.lr.compound : 'Unknown' }}"></span></div>
 
         @if(anyUsage) {
-        <div class="col-5 order-5 text-start offset-2">{{ pit.rrUsage < 0 ? '\u00A0' : Format.percent(pit.rrUsage / 100) }}</div>
+        <div class="col-5 order-5 text-start offset-2">{{ usage.rrUsage < 0 ? '\u00A0' : Format.percent(usage.rrUsage / 100) }}</div>
         }
         <div class="col-5 order-4 text-start">{{ tires.rr.compound && tires.rr.type ? tires.rr.type : 'Unknown' }}</div>
         <div class="col-1 order-3 text-start ps-1 pe-0"><span class="tire tire-{{ tires.rr.compound ? `${tires.rr.compound.toLowerCase()}-new` : 'unknown' }}" title="{{ tires.rr.compound ? tires.rr.compound : 'Unknown' }}"></span></div>

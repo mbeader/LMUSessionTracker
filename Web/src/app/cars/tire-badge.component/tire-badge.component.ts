@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { Pit } from '../../tracking';
+import { Lap, Pit } from '../../tracking';
 import { Format } from '../../format';
 
 @Component({
@@ -11,6 +11,7 @@ import { Format } from '../../format';
 })
 export class TireBadgeComponent {
 	@Input() pit?: Pit;
+	@Input() lap?: Lap;
 	protected tires: Tires = new Tires();
 	protected Format = Format;
 
@@ -21,7 +22,23 @@ export class TireBadgeComponent {
 	private getTires() {
 		return new Tires(this.pit);
 	}
+
+	getUsage() {
+		if (this.lap && (!this.pit || this.pit.lap < this.lap.lapNumber))
+			return this.lap as TireUsage;
+		else if (this.pit)
+			return this.pit as TireUsage;
+		else
+			return undefined;
+	}
 }
+
+type TireUsage = {
+	lfUsage: number;
+	rfUsage: number;
+	lrUsage: number;
+	rrUsage: number;
+};
 
 export class Tires {
 	public readonly lf: Tire;

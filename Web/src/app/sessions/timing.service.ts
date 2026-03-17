@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Best, Bests, Car, CarKey, CarState, Pit } from '../tracking';
+import { Best, Bests, Car, CarKey, CarState, Lap, Pit } from '../tracking';
 import { SessionViewModel } from '../view-models';
 import { Standing } from '../lmu';
 import { Format } from '../format';
@@ -210,7 +210,7 @@ export interface TimingFieldValue {
 }
 
 class TimingFields {
-	private static nextId: number = 57;
+	private static nextId: number = 59;
 	fields: TimingField[] = [
 		{
 			id: 1,
@@ -387,11 +387,61 @@ class TimingFields {
 			align: 'center'
 		},
 		{
+			id: 57,
+			name: 'VE/F',
+			desc: 'Current virtual energy (HY/GT3), otherwise fuel',
+			value: i => {
+				let value;
+				if (i.carClass == 'Hyper' || i.carClass == 'GT3')
+					value = !i.lastLap || i.lastLap.virtualEnergy <= 0 ? -1 : i.lastLap.virtualEnergy;
+				else if (i.standing?.player)
+					value = !i.lastLap || i.lastLap.fuel <= 0 ? -1 : i.lastLap.fuel;
+				else
+					value = typeof i.standing === 'undefined' ? -1 : i.standing.fuelFraction;
+				return value < 0 ? '-' : Format.percent(value);
+			},
+			classes: i => {
+				let value;
+				if (i.carClass == 'Hyper' || i.carClass == 'GT3')
+					value = !i.lastLap || i.lastLap.virtualEnergy <= 0 ? -1 : i.lastLap.virtualEnergy;
+				else if (i.standing?.player)
+					value = !i.lastLap || i.lastLap.fuel <= 0 ? -1 : i.lastLap.fuel;
+				else
+					value = typeof i.standing === 'undefined' ? -1 : i.standing.fuelFraction;
+				return value < 0 || value > .1 ? '' : value > .05 ? 'text-warning' : 'text-danger';
+			},
+			align: 'end',
+			colType: 'char5-col'
+		},
+		{
+			id: 58,
+			name: 'VE',
+			desc: 'Current virtual energy',
+			value: i => !i.lastLap || i.lastLap.virtualEnergy <= 0 ? '-' : Format.percent(i.lastLap.virtualEnergy),
+			classes: i => !i.lastLap || i.lastLap.virtualEnergy <= 0 || i.lastLap.virtualEnergy > .1 ? '' : i.lastLap.virtualEnergy > .05 ? 'text-warning' : 'text-danger',
+			align: 'end',
+			colType: 'char5-col'
+		},
+		{
 			id: 20,
 			name: 'Fuel',
 			desc: 'Current fuel',
-			value: i => typeof i.standing === 'undefined' ? '-' : Format.percent(i.standing.fuelFraction),
-			classes: i => typeof i.standing === 'undefined' || i.standing.fuelFraction > .1 ? '' : i.standing.fuelFraction > .05 ? 'text-warning' : 'text-danger',
+			value: i => {
+				let value;
+				if (i.standing?.player)
+					value = !i.lastLap || i.lastLap.fuel <= 0 ? -1 : i.lastLap.fuel;
+				else
+					value = typeof i.standing === 'undefined' ? -1 : i.standing.fuelFraction;
+				return value < 0 ? '-' : Format.percent(value);
+			},
+			classes: i => {
+				let value;
+				if (i.standing?.player)
+					value = !i.lastLap || i.lastLap.fuel <= 0 ? -1 : i.lastLap.fuel;
+				else
+					value = typeof i.standing === 'undefined' ? -1 : i.standing.fuelFraction;
+				return value < 0 || value > .1 ? '' : value > .05 ? 'text-warning' : 'text-danger';
+			},
 			align: 'end',
 			colType: 'char5-col'
 		},
@@ -722,6 +772,7 @@ export class TimingCarInfo {
 	lastClasses: BestClasses = this.defaultBestClasses();
 	bestClasses: BestClasses = this.defaultBestClasses();
 	positionInClass: number = 0;
+	lastLap?: Lap;
 	lastStop?: Pit;
 	lastSwap?: Pit;
 	isRace: boolean = false;
@@ -737,6 +788,7 @@ export class TimingCarInfo {
 		this.isRace = timingService.isRace;
 		this.currentET = this.session?.info?.currentEventTime ?? this.session?.sessionState?.currentEventTime ?? 0;
 		this.speed = timingService.speed;
+		this.lastLap = undefined;
 		this.lastStop = undefined;
 		this.lastSwap = undefined;
 		if (this.id) {
@@ -754,7 +806,13 @@ export class TimingCarInfo {
 					this.lastClasses = this.defaultBestClasses();
 					this.bestClasses = this.defaultBestClasses();
 				}
-				let pits = this.session?.history?.find(x => x.key == this.id)?.pits;
+				let history = this.session?.history?.find(x => x.key == this.id);
+				if (history && (history?.laps?.length ?? 0) > 0) {
+					let lap = history.laps[history.laps.length - 1];
+					if (lap)
+						this.lastLap = lap;
+				}
+				let pits = history?.pits;
 				if (pits) {
 					for (let pit of pits) {
 						if (pit.stopTime >= 0 || pit.garageInTime >= 0 || pit.garageOutTime >= 0)

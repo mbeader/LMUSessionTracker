@@ -141,10 +141,10 @@ export class StaticServerApiService implements ServerApiService {
 						lap.pit = x.pit;
 						lap.fuel = x.fuel;
 						lap.virtualEnergy = x.virtualEnergy;
-						lap.lFTire = x.lFTire;
-						lap.rFTire = x.rFTire;
-						lap.lRTire = x.lRTire;
-						lap.rRTire = x.rRTire;
+						lap.lfUsage = x.lfUsage;
+						lap.rfUsage = x.rfUsage;
+						lap.lrUsage = x.lrUsage;
+						lap.rrUsage = x.rrUsage;
 						lap.finishStatus = x.finishStatus;
 						lap.startTime = x.startTime;
 						lap.timestamp = x.timestamp;

@@ -4,16 +4,17 @@ import { ServerApiService, ServerApiServiceToken } from '../../data/server-api/s
 import { ServerLiveService, ServerLiveServiceToken } from '../../data/server-live/server-live.service';
 import { BestClasses } from '../timing.service';
 import { LapsViewModel } from '../../view-models';
-import { Best, Entry, Lap, Member } from '../../tracking';
+import { Best, Entry, Lap, Member, Pit } from '../../tracking';
 import { Format } from '../../format';
 import { coalesce, getBadge, getFlag } from '../../utils';
 import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
 import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
+import { TireBadgeComponent } from '../../cars/tire-badge.component/tire-badge.component';
 import { PitSummaryComponent } from '../pit-summary/pit-summary.component';
 
 @Component({
 	selector: 'app-sessions-car-laps',
-	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, PitSummaryComponent],
+	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, TireBadgeComponent, PitSummaryComponent],
 	templateUrl: './car-laps.component.html',
 	styleUrl: './car-laps.component.css',
 })
@@ -84,5 +85,21 @@ export class CarLapsComponent {
 
 	private defaultBest() {
 		return { total: -1, sector1: -1, sector2: -1, sector3: -1 } as Best;
+	}
+
+	getLastPit(lap: number) {
+		if(this.model?.car?.pits) {
+			let lastBefore;
+			for(let i = 0; i < this.model.car.pits.length; i++) {
+				let pit = this.model.car.pits[i];
+				if(lap < pit.lap || (lap == pit.lap && pit.stopAfterLine))
+					break;
+				else
+					lastBefore = pit;
+			}
+			if(lastBefore)
+				return lastBefore;
+		}
+		return;
 	}
 }
