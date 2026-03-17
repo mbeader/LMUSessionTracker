@@ -285,6 +285,7 @@ class TimingFields {
 			name: 'Model',
 			desc: 'Car model',
 			value: i => i.car?.vehicle?.modelName,
+			classes: () => 'text-truncate',
 			colType: 'team-col'
 		},
 		{
