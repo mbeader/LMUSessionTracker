@@ -27,10 +27,11 @@ namespace LMUSessionTracker.Server.Models {
 		public bool Pit { get; set; }
 		public double Fuel { get; set; }
 		public double VirtualEnergy { get; set; }
-		public double LFTire { get; set; }
-		public double RFTire { get; set; }
-		public double LRTire { get; set; }
-		public double RRTire { get; set; }
+		public double LFUsage { get; set; }
+		public double RFUsage { get; set; }
+		public double LRUsage { get; set; }
+		public double RRUsage { get; set; }
+		public bool Resolved { get; set; }
 
 		public DateTime? Timestamp { get; set; }
 
@@ -58,10 +59,11 @@ namespace LMUSessionTracker.Server.Models {
 			Pit = lap.Pit;
 			Fuel = lap.Fuel;
 			VirtualEnergy = lap.VirtualEnergy;
-			LFTire = lap.LFTire;
-			RFTire = lap.RFTire;
-			LRTire = lap.LRTire;
-			RRTire = lap.RRTire;
+			LFUsage = lap.LFUsage;
+			RFUsage = lap.RFUsage;
+			LRUsage = lap.LRUsage;
+			RRUsage = lap.RRUsage;
+			Resolved = lap.Resolved;
 			Timestamp = lap.Timestamp;
 		}
 
@@ -79,12 +81,13 @@ namespace LMUSessionTracker.Server.Models {
 				Pit = Pit,
 				Fuel = Fuel,
 				VirtualEnergy = VirtualEnergy,
-				LFTire = LFTire,
-				RFTire = RFTire,
-				LRTire = LRTire,
-				RRTire = RRTire,
+				LFUsage = LFUsage,
+				RFUsage = RFUsage,
+				LRUsage = LRUsage,
+				RRUsage = RRUsage,
 				FinishStatus = FinishStatus,
 				StartTime = StartTime,
+				Resolved = Resolved,
 				Timestamp = Timestamp,
 			};
 		}

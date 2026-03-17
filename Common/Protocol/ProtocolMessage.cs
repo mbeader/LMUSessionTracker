@@ -18,6 +18,7 @@ namespace LMUSessionTracker.Common.Protocol {
 		public MultiplayerTeams MultiplayerTeams { get; set; }
 		public List<Standing> Standings { get; set; }
 		public List<TeamStrategy> TeamStrategy { get; set; }
+		public StrategyUsage StrategyUsage { get; set; }
 		public List<Chat> Chat { get; set; }
 	}
 }

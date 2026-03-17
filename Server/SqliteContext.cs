@@ -94,6 +94,12 @@ namespace LMUSessionTracker.Server {
 			modelBuilder.Entity<Pit>().Property(x => x.RRUsage).HasDefaultValue(-1);
 			modelBuilder.Entity<Pit>().Property(x => x.PreviousStintDuration).HasDefaultValue(-1);
 			modelBuilder.Entity<Pit>().Property(x => x.Time).HasDefaultValue(-1);
+			modelBuilder.Entity<Lap>().Property(x => x.Fuel).HasDefaultValue(-1);
+			modelBuilder.Entity<Lap>().Property(x => x.VirtualEnergy).HasDefaultValue(-1);
+			modelBuilder.Entity<Lap>().Property(x => x.LFUsage).HasDefaultValue(-1);
+			modelBuilder.Entity<Lap>().Property(x => x.RFUsage).HasDefaultValue(-1);
+			modelBuilder.Entity<Lap>().Property(x => x.LRUsage).HasDefaultValue(-1);
+			modelBuilder.Entity<Lap>().Property(x => x.RRUsage).HasDefaultValue(-1);
 
 			var vehicleData = VehicleSeedData.GetData();
 			modelBuilder.Entity<VehicleModel>()

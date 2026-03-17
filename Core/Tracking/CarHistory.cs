@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace LMUSessionTracker.Core.Tracking {
 	public class CarHistory {
+		private List<StrategyDriverUsage> sdu = new List<StrategyDriverUsage>();
 
 		public CarKey Key { get; private set; }
 		public Car Car { get; private set; }
@@ -43,14 +44,17 @@ namespace LMUSessionTracker.Core.Tracking {
 			return Laps[lapNumber - 1] ?? Lap.Default(lapNumber);
 		}
 
-		public Lap Update(UpdateContext<CarHistory> context, CarStateChange state, Standing standing, List<Strategy> strategy) {
+		public Lap Update(UpdateContext<CarHistory> context, CarStateChange state, Standing standing, List<Strategy> strategy, List<StrategyDriverUsage> usage) {
 			Lap newLap = null;
 			if(standing.lapsCompleted > 0)
 				newLap = AddLap(new Lap(standing, state.Previous), context.Timestamp);
 			AddPit(state, newLap);
 			AddStrategy(context, strategy);
+			AddUsage(context, usage);
 			if(!Car.HasAllFields)
 				Car.Merge(new Car(standing));
+			if(newLap != null && !newLap.Resolved)
+				context.Logger.LogInformation($"{Key.Id()} unresolved [{newLap.LapNumber}]");
 			return newLap;
 		}
 
@@ -113,6 +117,22 @@ namespace LMUSessionTracker.Core.Tracking {
 						match.Resolve(strat);
 				}
 			}
+		}
+
+		private void AddUsage(UpdateContext<CarHistory> context, List<StrategyDriverUsage> usage) {
+			if(usage != null)
+				foreach(StrategyDriverUsage lapUsage in usage) {
+					if(lapUsage.lap > 0 && lapUsage.lap <= Laps.Count) {
+						Lap lap = Laps[lapUsage.lap - 1];
+						if(lap == null)
+							continue;
+						if(lap.LapNumber != lapUsage.lap) {
+							context.Logger.LogWarning($"{Key.Id()} mismatch [{lap.LapNumber} to {lapUsage.lap}]");
+							continue;
+						}
+						lap.Resolve(lapUsage);
+					}
+				}
 		}
 
 		public void FixLaps() {

@@ -5,12 +5,13 @@ using System.Collections.Generic;
 
 namespace LMUSessionTracker.Common.Client {
 	public interface ClientSessionState {
-		ProtocolState State { get; }
+		public ProtocolState State { get; }
 
 		public void Reset();
 		public void SetState(ProtocolMessage message, ProtocolState state);
 		public List<Chat> Filter(List<Chat> chats);
 		public List<TeamStrategy> Filter(List<TeamStrategy> strategies);
+		public StrategyUsage Filter(StrategyUsage usage);
 	}
 
 	public class DefaultClientSessionState : ClientSessionState {
@@ -152,9 +153,8 @@ namespace LMUSessionTracker.Common.Client {
 			return res;
 		}
 
-		private readonly struct Key {
-			public int SlotId { get; init; }
-			public string Veh { get; init; }
+		public StrategyUsage Filter(StrategyUsage usage) {
+			return usage;
 		}
 	}
 }

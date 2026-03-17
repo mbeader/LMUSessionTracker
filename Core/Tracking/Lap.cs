@@ -14,14 +14,15 @@ namespace LMUSessionTracker.Core.Tracking {
 		public bool Penalty { get; set; }
 		public bool Garage { get; set; }
 		public bool Pit { get; set; }
-		public double Fuel { get; set; }
-		public double VirtualEnergy { get; set; }
-		public double LFTire { get; set; }
-		public double RFTire { get; set; }
-		public double LRTire { get; set; }
-		public double RRTire { get; set; }
+		public double Fuel { get; set; } = -1;
+		public double VirtualEnergy { get; set; } = -1;
+		public double LFUsage { get; set; } = -1;
+		public double RFUsage { get; set; } = -1;
+		public double LRUsage { get; set; } = -1;
+		public double RRUsage { get; set; } = -1;
 		public string FinishStatus { get; set; }
 		public double StartTime { get; set; }
+		public bool Resolved { get; set; }
 		public DateTime? Timestamp { get; set; }
 
 		public Lap() { }
@@ -34,12 +35,31 @@ namespace LMUSessionTracker.Core.Tracking {
 			Sector3 = standing.lastLapTime > 0 && standing.lastSectorTime2 > 0 ? standing.lastLapTime - standing.lastSectorTime2 : -1.0;
 			Driver = standing.driverName;
 			Position = standing.position;
-			Fuel = standing.fuelFraction;
+			if(!standing.player)
+				Fuel = standing.fuelFraction;
 			FinishStatus = standing.finishStatus;
 			StartTime = state?.LapStartET ?? -1;
 			Penalty = state?.PenaltyThisLap ?? false;
 			Garage = state?.GarageThisLap ?? false;
 			Pit = state?.PitThisLap ?? false;
+		}
+
+		public void Resolve(StrategyDriverUsage lapUsage) {
+			if(Resolved)
+				return;
+			if(lapUsage.fuel > 0)
+				Fuel = lapUsage.fuel;
+			if(lapUsage.ve > 0)
+				VirtualEnergy = lapUsage.ve;
+			if(lapUsage.tyres != null && lapUsage.tyres.Count > 0)
+				LFUsage = lapUsage.tyres[0];
+			if(lapUsage.tyres != null && lapUsage.tyres.Count > 1)
+				RFUsage = lapUsage.tyres[1];
+			if(lapUsage.tyres != null && lapUsage.tyres.Count > 2)
+				LRUsage = lapUsage.tyres[2];
+			if(lapUsage.tyres != null && lapUsage.tyres.Count > 3)
+				RRUsage = lapUsage.tyres[3];
+			Resolved = true;
 		}
 
 		public Lap Clone() {
@@ -56,12 +76,13 @@ namespace LMUSessionTracker.Core.Tracking {
 				Pit = Pit,
 				Fuel = Fuel,
 				VirtualEnergy = VirtualEnergy,
-				LFTire = LFTire,
-				RFTire = RFTire,
-				LRTire = LRTire,
-				RRTire = RRTire,
+				LFUsage = LFUsage,
+				RFUsage = RFUsage,
+				LRUsage = LRUsage,
+				RRUsage = RRUsage,
 				FinishStatus = FinishStatus,
 				StartTime = StartTime,
+				Resolved = Resolved,
 				Timestamp = Timestamp,
 			};
 		}

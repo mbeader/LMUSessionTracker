@@ -9,6 +9,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public MultiplayerTeams Teams { get; set; }
 		public List<Chat> Chat { get; set; }
 		public List<TeamStrategy> Strategies { get; set; }
+		public StrategyUsage Usage { get; set; }
 
 		public SessionUpdate(ProtocolMessage data = null) {
 			if(data != null) {
@@ -17,6 +18,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				Teams = data.MultiplayerTeams;
 				Chat = data.Chat;
 				Strategies = data.TeamStrategy;
+				Usage = data.StrategyUsage;
 			}
 		}
 	}
