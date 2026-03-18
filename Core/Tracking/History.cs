@@ -74,9 +74,15 @@ namespace LMUSessionTracker.Core.Tracking {
 			List<Strategy> strategy = null;
 			if(possibleStrategies != null)
 				foreach(List<Strategy> possibleStrategy in possibleStrategies) {
-					if(possibleStrategy.Exists(x => x.driver == standing.driverName)) {
-						strategy = possibleStrategy;
-						break;
+					foreach(Strategy strat in possibleStrategy) {
+						int currLap = strat.lap;
+						Lap curr = car.Laps.Count >= currLap && currLap > 0 ? car.Laps[currLap - 1] : null;
+						int prevLap = strat.lap - 1;
+						Lap prev = car.Laps.Count >= prevLap && prevLap > 0 ? car.Laps[prevLap - 1] : null;
+						if(strat.driver == standing.driverName || (curr != null && curr.Driver == strat.driver) || (prev != null && prev.Driver == strat.driver)) {
+							strategy = possibleStrategy;
+							break;
+						}
 					}
 				}
 			Lap lap = car.Update(context, carStates.GetState(key), standing, strategy, usage?.GetValueOrDefault(standing.driverName));
