@@ -69,7 +69,7 @@ as long as one exists, data will continue to be collected uninterrupted.
 
 * Session tracking
 	* Data
-		* Tires/fuel/VE from history
+		* Additional live info from websocket
 * Accept data from rF2 plugin
 
 ## Client
@@ -152,7 +152,7 @@ Validation can be enabled via appsettings to log violations.
 	* Some fields may not be updated in realtime, unclear when they actually do
 		* Fuel updates after a completed sector
 		* Car pit status may be stuck on `EXITING` until next pit
-		* Strategy may not exist/contain tire compounds until first sector 1 completion
+		* Strategy may not exist/contain tire compounds until first sector 1 completion or end of outlap
 	* Sectors may have no time despite the lap still being valid
 * Session tracking
 	* During session transitions, the phase changing before the session type may cause an empty new session to be created
