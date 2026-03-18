@@ -12,6 +12,7 @@ namespace LMUSessionTracker.Common.Protocol {
 		public string Veh { get; set; }
 		public string Team { get; set; }
 		public string Driver { get; set; }
-		public int LastResolvedPitLap { get; set; }
+		public int LastResolvedPitLap { get; set; } = -1;
+		public int LastResolvedLapLap { get; set; } = -1;
 	}
 }

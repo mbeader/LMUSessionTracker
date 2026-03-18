@@ -89,7 +89,7 @@ namespace LMUSessionTracker.Common.Tests.Client {
 		}
 
 		[Fact]
-		public void Filter_StrategyWithoutInitialStateChat_ReturnsAllStrategy() {
+		public void Filter_StrategyWithoutInitialStateCars_ReturnsAllStrategy() {
 			Assert_Filter_Strategy(new(), null, new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
 				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" } } } });
 		}
@@ -170,6 +170,121 @@ namespace LMUSessionTracker.Common.Tests.Client {
 				new() { new() { Name = "t2", Strategy = new() { new() { lap = 2, driver = "d2", tyres = new() { fl = new() { compound = "Medium" } } } } } },
 				rs,
 				new() { new() { Name = "t2", Strategy = new() { new() { lap = 2, driver = "d2", tyres = new() { fl = new() { compound = "Medium" } } } } } });
+		}
+
+		private void Assert_Filter_Usage(ProtocolState remoteState1, StrategyUsage strategies2, ProtocolState remoteState2, StrategyUsage ex) {
+			StrategyUsage strategies1 = new StrategyUsage() { { "d1", new() { new() { lap = 0, ve = .5 } } } };
+			Assert_Filter_Usage(strategies1, remoteState1, strategies2, remoteState2, ex);
+		}
+
+		private void Assert_Filter_Usage(StrategyUsage strategies1, ProtocolState remoteState1, StrategyUsage strategies2, ProtocolState remoteState2, StrategyUsage ex) {
+			Assert_Filter_Usage(new(), strategies1, remoteState1, strategies2, remoteState2, ex);
+		}
+
+		private void Assert_Filter_Usage(ProtocolMessage message, StrategyUsage strategies1, ProtocolState remoteState1, StrategyUsage strategies2, ProtocolState remoteState2, StrategyUsage ex) {
+			state.SetState(message, remoteState1);
+			Assert.Equivalent(remoteState1, state.State);
+			Assert_Filter_Usage(strategies2 ?? strategies1, remoteState2, ex);
+		}
+
+		private void Assert_Filter_Usage(StrategyUsage strategies2, ProtocolState remoteState2, StrategyUsage ex) {
+			StrategyUsage ac = state.Filter(strategies2);
+			if(ex == null)
+				Assert.Null(ac);
+			else
+				AssertHelpers.Equivalent(ex, ac);
+			state.SetState(new(), remoteState2);
+			Assert.Equivalent(remoteState2, state.State);
+		}
+
+		[Fact]
+		public void Filter_UsageWithoutInitialState_ReturnsAllUsage() {
+			Assert_Filter_Usage(null, null, new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new() { { "d1", new() { new() { lap = 0, ve = .5 } } } });
+		}
+
+		[Fact]
+		public void Filter_UsageWithoutInitialStateCars_ReturnsAllUsage() {
+			Assert_Filter_Usage(new(), null, new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new() { { "d1", new() { new() { lap = 0, ve = .5 } } } });
+		}
+
+		[Fact]
+		public void Filter_UsageUnchanged_ReturnsEmpty() {
+			Assert_Filter_Usage(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedLapLap = -1 } } }, null,
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new());
+		}
+
+		[Fact]
+		public void Filter_UsageChanged_ReturnsNewUsage() {
+			Assert_Filter_Usage(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } },
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedLapLap = 1 } } },
+				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } });
+		}
+
+		[Fact]
+		public void Filter_UsageRemoteStateAheadLap0_ReturnsEmpty() {
+			Assert_Filter_Usage(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedLapLap = 1 } } }, null,
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedLapLap = 1 } } },
+				new());
+		}
+
+		[Fact]
+		public void Filter_UsageRemoteStateAheadLap1_ReturnsEmpty() {
+			Assert_Filter_Usage(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedLapLap = 1 } } },
+				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } },
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedLapLap = 1 } } },
+				new());
+		}
+
+		[Fact]
+		public void Filter_UsageDriverNotFound_ReturnsEmpty() {
+			Assert_Filter_Usage(new() { Cars = new() { new() { Team = "t1", Driver = "d2", LastResolvedLapLap = -1 } } },
+				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } },
+				new() { Cars = new() { new() { Team = "t1", Driver = "d2", LastResolvedLapLap = -1 } } },
+				new());
+		}
+
+		[Fact]
+		public void Filter_UsageDuplicateDriverNoSlots_ReturnsEmpty() {
+			Assert_Filter_Usage(new(),
+				new() { { "d1", new() { new() { lap = 0, ve = .5 } } } },
+				new() { Cars = new() { new() { SlotId = 0, Team = "t1", Driver = "d1", LastResolvedLapLap = -1 }, new() { SlotId = 1, Team = "t2", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } },
+				new() { Cars = new() { new() { SlotId = 0, Team = "t1", Driver = "d1", LastResolvedLapLap = -1 }, new() { SlotId = 1, Team = "t2", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new());
+		}
+
+		[Fact]
+		public void Filter_UsageDuplicateSingleSlot_ReturnsNewUsage() {
+			Assert_Filter_Usage(new() { Standings = new() { new() { slotID = 0, driverName = "d1" } } },
+				new() { { "d1", new() { new() { lap = 0, ve = .5 } } } },
+				new() { Cars = new() { new() { SlotId = 0, Team = "t1", Driver = "d1", LastResolvedLapLap = -1 }, new() { SlotId = 1, Team = "t2", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } },
+				new() { Cars = new() { new() { SlotId = 0, Team = "t1", Driver = "d1", LastResolvedLapLap = 1 }, new() { SlotId = 1, Team = "t2", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } });
+		}
+
+		[Fact]
+		public void Filter_UsageDuplicateDriverSlots_ReturnsEmpty() {
+			Assert_Filter_Usage(new() { Standings = new() { new() { slotID = 0, driverName = "d1" }, new() { slotID = 1, driverName = "d1" } } },
+				new() { { "d1", new() { new() { lap = 0, ve = .5 } } } },
+				new() { Cars = new() { new() { SlotId = 0, Team = "t1", Driver = "d1", LastResolvedLapLap = -1 }, new() { SlotId = 1, Team = "t2", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } },
+				new() { Cars = new() { new() { SlotId = 0, Team = "t1", Driver = "d1", LastResolvedLapLap = -1 }, new() { SlotId = 1, Team = "t2", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new());
+		}
+
+		[Fact]
+		public void Filter_UsageSlotMismatch_ReturnsNewUsage() {
+			Assert_Filter_Usage(new() { Standings = new() { new() { slotID = 1, driverName = "d1" } } },
+				new() { { "d1", new() { new() { lap = 0, ve = .5 } } } },
+				new() { Cars = new() { new() { SlotId = 0, Team = "t1", Driver = "d1", LastResolvedLapLap = -1 } } },
+				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } },
+				new() { Cars = new() { new() { SlotId = 0, Team = "t1", Driver = "d1", LastResolvedLapLap = 1 } } },
+				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } });
 		}
 	}
 }

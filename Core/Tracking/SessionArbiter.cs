@@ -263,16 +263,16 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		private ProtocolState PrepareState(Session session) {
 			List<ProtocolCarState> carStates = null;
-			if(session.Type != null && session.Type.StartsWith("RACE")) {
-				carStates = new List<ProtocolCarState>();
-				foreach(CarHistory car in session.History.GetAllHistory()) {
-					ProtocolCarState carState = new ProtocolCarState() {
-						SlotId = car.Key.SlotId,
-						Veh = car.Key.Veh,
-						Team = car.Car.TeamName,
-						Driver = session.CarState.GetCurrentState(car.Key)?.DriverName,
-						LastResolvedPitLap = -1
-					};
+			carStates = new List<ProtocolCarState>();
+			foreach(CarHistory car in session.History.GetAllHistory()) {
+				ProtocolCarState carState = new ProtocolCarState() {
+					SlotId = car.Key.SlotId,
+					Veh = car.Key.Veh,
+					Team = car.Car.TeamName,
+					Driver = session.CarState.GetCurrentState(car.Key)?.DriverName,
+				};
+
+				if(session.Type != null && session.Type.StartsWith("RACE")) {
 					for(int i = car.Pits.Count - 1; i >= 0; i--) {
 						Pit pit = car.Pits[i];
 						if(pit.Resolved) {
@@ -280,8 +280,16 @@ namespace LMUSessionTracker.Core.Tracking {
 							break;
 						}
 					}
-					carStates.Add(carState);
 				}
+
+				for(int i = car.Laps.Count - 1; i >= 0; i--) {
+					Lap lap = car.Laps[i];
+					if(lap != null && lap.Resolved) {
+						carState.LastResolvedLapLap = lap.LapNumber;
+						break;
+					}
+				}
+				carStates.Add(carState);
 			}
 			return new ProtocolState() { Chat = session.Chat.LastChat, Cars = carStates };
 		}
