@@ -9,11 +9,12 @@ import { Format } from '../../format';
 import { classId, statusClass, whenExists } from '../../utils';
 import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
 import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
+import { TireBadgeComponent } from '../../cars/tire-badge.component/tire-badge.component';
 import { PitSummaryComponent } from '../pit-summary/pit-summary.component';
 
 @Component({
 	selector: 'app-sessions-results',
-	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, PitSummaryComponent],
+	imports: [RouterLink, ClassBadgeComponent, BrandBadgeComponent, TireBadgeComponent, PitSummaryComponent],
 	templateUrl: './results.component.html',
 	styleUrl: './results.component.css',
 })
@@ -162,5 +163,24 @@ export class ResultsComponent {
 
 	private defaultBest() {
 		return { total: -1, sector1: -1, sector2: -1, sector3: -1 } as Best;
+	}
+
+	getPreviousPit(key: string, lap: number) {
+		if (this.session?.history && lap > 0) {
+			let history = this.session.history.find(x => x.key == key);
+			if (history) {
+				let lastBefore;
+				for (let i = 0; i < history.pits.length; i++) {
+					let pit = history.pits[i];
+					if (lap < pit.lap || (lap == pit.lap && pit.stopAfterLine))
+						break;
+					else
+						lastBefore = pit;
+				}
+				if (lastBefore)
+					return lastBefore;
+			}
+		}
+		return;
 	}
 }

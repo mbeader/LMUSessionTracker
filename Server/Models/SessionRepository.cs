@@ -122,7 +122,7 @@ namespace LMUSessionTracker.Server.Models {
 			bool allWithoutState = true;
 			foreach(Car car in cars) {
 				CarKey key = new CarKey(car.SlotId, car.Veh);
-				int lastLap = (car.LastState?.LapsCompleted ?? 0) - 1;
+				int lastLap = car.LastState?.LapsCompleted ?? 0;
 				res.Add(new Result() {
 					Car = car.To(vehicles.GetValueOrDefault(car.Veh)),
 					CarState = car.LastState?.To(key),
@@ -205,7 +205,7 @@ namespace LMUSessionTracker.Server.Models {
 				Car car = cars.Find(x => x.CarId == lap.CarId);
 				CarKey key = new CarKey(car.SlotId, car.Veh);
 				res.Add(new Result() {
-					Car = car.To(),
+					Car = car.To(vehicles.GetValueOrDefault(car.Veh)),
 					CarState = car.LastState?.To(key),
 					BestLap = lap.To()
 				});

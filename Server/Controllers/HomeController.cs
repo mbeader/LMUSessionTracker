@@ -57,6 +57,10 @@ namespace LMUSessionTracker.Server.Controllers {
 			if(vm.Session == null)
 				return NotFound();
 			Core.Tracking.Session session = await sessionObserver.GetSession(sessionId);
+			if(session != null && session.LastStandings == null && session.PrimaryClientId == null) {
+				// reloaded inactive session
+				session = null;
+			}
 			if(session == null) {
 				vm.Results = vm.Session.SessionType.StartsWith("RACE") ? await sessionRepo.GetResults(sessionId) : await sessionRepo.GetTimedResults(sessionId);
 			}
