@@ -29,7 +29,8 @@
         }
     </div>
 </ng-template>
-<button class="btn-icon mx-auto" title="{{ tires.getDescription() }}" placement="start" [ngbPopover]="popContent">
+@let placement = align == 'start' ? 'end' : 'start';
+<button class="btn-icon {{ align == 'start' ? null : 'mx-auto' }}" title="{{ tires.getDescription() }}" placement="{{ placement }}" [ngbPopover]="popContent">
     @if(tires.all) {
     <span class="tire tire-{{ (tires.all.compound ? `${tires.all.compound}-${tires.all.type}` : 'unknown').toLowerCase() }}"></span>
     } @else {

@@ -297,6 +297,10 @@ namespace LMUSessionTracker.Server.Models {
 			List<BestLap> res = new List<BestLap>();
 			foreach(var lap in laps) {
 				BestLap best = new BestLap() { Lap = lap.Lap, Sector1 = lap.S1, Sector2 = lap.S2, Sector3 = lap.S3, Vehicle = vehicles.GetValueOrDefault(lap.Lap.Car.Veh) };
+				best.LapPit = await GetLastPit(best.Lap);
+				best.Sector1Pit = await GetLastPit(best.Sector1);
+				best.Sector2Pit = await GetLastPit(best.Sector2);
+				best.Sector3Pit = await GetLastPit(best.Sector3);
 				res.Add(best);
 				best.Lap.Known = knownDrivers.Contains(best.Lap.Driver);
 			}
@@ -332,6 +336,18 @@ namespace LMUSessionTracker.Server.Models {
 					(!filters.KnownDriversOnly || knownDrivers.Contains(x.Driver))
 				)
 				.OrderBy(x => x.TotalTime);
+		}
+
+		private async Task<Pit> GetLastPit(Lap lap) {
+			Pit lastBefore = null;
+			if(lap != null)
+				foreach(Pit pit in await context.Pits.Where(x => x.SessionId == lap.SessionId && x.CarId == x.CarId).ToListAsync()) {
+					if(lap.LapNumber < pit.Lap || (lap.LapNumber == pit.Lap && pit.StopAfterLine))
+						break;
+					else
+						lastBefore = pit;
+				}
+			return lastBefore;
 		}
 
 		public async Task<Dictionary<string, ClassBest>> GetClassBests(BestLapsFilters filters) {

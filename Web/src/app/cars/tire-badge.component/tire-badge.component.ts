@@ -12,6 +12,7 @@ import { Format } from '../../format';
 export class TireBadgeComponent {
 	@Input() pit?: Pit;
 	@Input() lap?: Lap;
+	@Input() align?: string;
 	protected tires: Tires = new Tires();
 	protected Format = Format;
 

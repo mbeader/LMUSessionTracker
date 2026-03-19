@@ -2,30 +2,38 @@
 <dl class="row">
     <dt class="col-12">Timestamp</dt>
     <dd class="col-12"><a [routerLink]="['/', 'Session', lap.sessionId]" (click)="removeBackdrop()">{{ Format.date(lap.timestamp) }}</a></dd>
-    <dt class="col-12">Class</dt>
-    <dd class="col-12"><app-cars-class-badge [carClass]="lap.car.class" /></dd>
-    <dt class="col-12">Driver</dt>
-    <dd class="col-12">
+    <dt class="col-4">Class</dt>
+    <dd class="col-4 order-1"><app-cars-class-badge [carClass]="lap.car.class" /></dd>
+    <dt class="col-8">Driver</dt>
+    <dd class="col-8 order-1">
         @if(lap.known) {
         <span class="text-warning" title="Known driver">&#x2605;</span>
         }
         {{ lap.driver }}
     </dd>
-    <dt class="col-12">Team</dt>
-    <dd class="col-12">{{ lap.car.teamName ? lap.car.teamName : '&nbsp;' }}</dd>
-    <dt class="col-12">Vehicle</dt>
-    <dd class="col-12">{{ lap.car.vehicleName ? lap.car.vehicleName : '&nbsp;' }}</dd>
-    <dt class="col-12">Veh</dt>
-    <dd class="col-12">{{ lap.car.veh ? lap.car.veh : '&nbsp;' }}</dd>
-    <dt class="col-12">Time</dt>
-    <dd class="col-12">{{ Format.lapTime(lap.totalTime) }}</dd>
-    <dt class="col-4 order-1">S1</dt>
-    <dd class="col-4 order-2">{{ Format.lapTime(lap.sector1) }}</dd>
-    <dt class="col-4 order-1">S2</dt>
-    <dd class="col-4 order-2">{{ Format.lapTime(lap.sector2) }}</dd>
-    <dt class="col-4 order-1">S3</dt>
-    <dd class="col-4 order-2">{{ Format.lapTime(lap.sector3) }}</dd>
-    <dt class="col-12 order-3">Fuel</dt>
-    <dd class="col-12 order-3">{{ Format.percent(lap.fuel) }}</dd>
+    <dt class="col-4 order-1">Make</dt>
+    <dd class="col-4 order-2"><app-cars-brand-badge [brand]="vehicle?.manufacturer" [center]="false" /></dd>
+    <dt class="col-8 order-1">Model</dt>
+    <dd class="col-8 order-2">{{ vehicle && vehicle.modelName ? vehicle.modelName : '&nbsp;' }}</dd>
+    <dt class="col-12 order-2">Time</dt>
+    <dd class="col-12 order-2">{{ Format.lapTime(lap.totalTime) }}</dd>
+    <dt class="col-4 order-2">S1</dt>
+    <dd class="col-4 order-3">{{ Format.lapTime(lap.sector1) }}</dd>
+    <dt class="col-4 order-2">S2</dt>
+    <dd class="col-4 order-3">{{ Format.lapTime(lap.sector2) }}</dd>
+    <dt class="col-4 order-2">S3</dt>
+    <dd class="col-4 order-3">{{ Format.lapTime(lap.sector3) }}</dd>
+    <dt class="col-4 order-4">Tires</dt>
+    <dd class="col-4 order-5"><app-cars-tire-badge [pit]="pit" [lap]="lap" [align]="'start'" /></dd>
+    <dt class="col-4 order-4">VE</dt>
+    <dd class="col-4 order-5">{{ lap.virtualEnergy < 0 ? '-' : Format.percent(lap.virtualEnergy) }}</dd>
+    <dt class="col-4 order-4">Fuel</dt>
+    <dd class="col-4 order-5">{{ lap.fuel < 0 ? '-' : Format.percent(lap.fuel) }}</dd>
+    <dt class="col-12 order-5">Team</dt>
+    <dd class="col-12 order-5">{{ lap.car.teamName ? lap.car.teamName : '&nbsp;' }}</dd>
+    <dt class="col-12 order-5">Vehicle</dt>
+    <dd class="col-12 order-5">{{ lap.car.vehicleName ? lap.car.vehicleName : '&nbsp;' }}</dd>
+    <dt class="col-12 order-5">Veh</dt>
+    <dd class="col-12 order-5">{{ lap.car.veh ? lap.car.veh : '&nbsp;' }}</dd>
 </dl>
 }

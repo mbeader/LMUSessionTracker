@@ -3,13 +3,14 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { ServerApiService, ServerApiServiceToken } from '../../data/server-api/server-api.service';
-import { Lap } from '../../models';
+import { Lap, Pit } from '../../models';
 import { Format } from '../../format';
 import { BestLap, BestLapsFilters, ClassBest } from '../../view-models';
 import { coalesce, whenExists } from '../../utils';
 import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
 import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
 import { LapComponent } from '../lap/lap.component';
+import { Vehicle } from '../../tracking';
 
 declare var bootstrap: any;
 @Component({
@@ -48,8 +49,10 @@ export class BestLapsComponent {
 	anytime: boolean = true;
 	knownDriversOnly: boolean = false;
 	init: boolean = true;
-	selectedLap: Lap | null = null;
+	selectedLap?: Lap;
 	selectedLapType: number = 0;
+	selectedPit?: Pit;
+	selectedVehicle?: Vehicle;
 	Format = Format;
 	coalesce = coalesce;
 
@@ -236,9 +239,34 @@ export class BestLapsComponent {
 				return;
 			let th = button.closest('tr')?.querySelector('th');
 			if (th) {
-				let i = parseInt(th.textContent) - 1;
-				this.selectedLap = this.laps ? this.laps[i]?.lap : null;
-				this.selectedLapType = Array.from(button.parentElement?.children ?? []).indexOf(button);
+				let li = button.parentElement;
+				let i = parseInt(th.textContent) - 1
+				let selected = this.laps ? this.laps[i] : null;
+				this.selectedLapType = li ? Array.from(li?.parentElement?.children ?? []).indexOf(li) : -1;
+				this.selectedLap = undefined;
+				this.selectedPit = undefined;
+				if (selected) {
+					switch (this.selectedLapType) {
+						case 0:
+							this.selectedLap = selected.lap;
+							this.selectedPit = selected.lapPit;
+							break;
+						case 1:
+							this.selectedLap = selected.sector1;
+							this.selectedPit = selected.sector1Pit;
+							break;
+						case 2:
+							this.selectedLap = selected.sector2;
+							this.selectedPit = selected.sector2Pit;
+							break;
+						case 3:
+							this.selectedLap = selected.sector3;
+							this.selectedPit = selected.sector3Pit;
+							break;
+						default:
+					}
+				}
+				this.selectedVehicle = selected?.vehicle;
 				this.ref.markForCheck();
 			}
 		}

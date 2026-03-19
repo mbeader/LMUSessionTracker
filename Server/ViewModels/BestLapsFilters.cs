@@ -31,9 +31,4 @@ namespace LMUSessionTracker.Server.ViewModels {
 			return sessions;
 		}
 	}
-
-	public class BestLapsViewModel {
-		public List<BestLap> Laps { get; set; }
-		public Dictionary<string, ClassBest> ClassBests { get; set; }
-	}
 }

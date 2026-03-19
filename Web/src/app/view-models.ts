@@ -1,5 +1,5 @@
 import { SessionInfo, Standing } from './lmu';
-import { Lap as LapModel, Session, SessionState } from './models';
+import { Lap as LapModel, Pit as PitModel, Session, SessionState } from './models';
 import { SessionSummary, CarHistory, Car, Bests, CarState, Lap, Entry, Vehicle } from './tracking';
 
 export class AboutOptions {
@@ -21,6 +21,10 @@ export class BestLap {
 	public sector1?: LapModel;
 	public sector2?: LapModel;
 	public sector3?: LapModel;
+	public lapPit?: PitModel;
+	public sector1Pit?: PitModel;
+	public sector2Pit?: PitModel;
+	public sector3Pit?: PitModel;
 	public vehicle?: Vehicle;
 }
 

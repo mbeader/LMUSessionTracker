@@ -201,9 +201,9 @@
         } @empty {
         <tr>
             @if(init) {
-            <td colspan="14" class="text-center">Loading laps...</td>
+            <td colspan="15" class="text-center">Loading laps...</td>
             } @else {
-            <td colspan="14" class="text-center">No laps found</td>
+            <td colspan="15" class="text-center">No laps found</td>
             }
         </tr>
         }
@@ -218,7 +218,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <app-best-laps-lap [lap]="selectedLap" />
+                <app-best-laps-lap [lap]="selectedLap" [pit]="selectedPit" [vehicle]="selectedVehicle" />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
