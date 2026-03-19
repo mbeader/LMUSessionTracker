@@ -17,6 +17,8 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(chat != null) {
 				foreach(Chat c in chat) {
 					if(!Chat.Exists(x => IsSameChat(c, x))) {
+						if(LastChat != null && LastChat.timestamp > c.timestamp)
+							continue;
 						Chat.Add(c);
 						NewMessages.Add(c);
 					}

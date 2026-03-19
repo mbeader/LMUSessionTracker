@@ -9,9 +9,9 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			chat = new ChatCollection();
 		}
 
-		private Chat A() => new() { timestamp = 1, message = "a" };
-		private Chat B() => new() { timestamp = 2, message = "b" };
-		private Chat C() => new() { timestamp = 3, message = "c" };
+		private Chat A(ulong? t = null) => new() { timestamp = t ?? 1, message = "a" };
+		private Chat B(ulong? t = null) => new() { timestamp = t ?? 2, message = "b" };
+		private Chat C(ulong? t = null) => new() { timestamp = t ?? 3, message = "c" };
 
 		[Fact]
 		public void Construct_Empty_NoMessages() {
@@ -87,6 +87,15 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			AssertHelpers.Equivalent(new() { A(), B() }, chat.Chat);
 			Assert.Empty(chat.NewMessages);
 			Assert.Equivalent(B(), chat.LastChat);
+		}
+
+		[Fact]
+		public void Update_TwoMessagesThenEarlier_TwoMessages() {
+			chat.Update(new() { A(1001), B(1002) });
+			chat.Update(new() { A(), B() });
+			AssertHelpers.Equivalent(new() { A(1001), B(1002) }, chat.Chat);
+			Assert.Empty(chat.NewMessages);
+			Assert.Equivalent(B(1002), chat.LastChat);
 		}
 	}
 }
