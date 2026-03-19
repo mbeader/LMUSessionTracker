@@ -26,7 +26,14 @@ export function classId(carClass: string) {
 }
 
 export function statusClass(status: string) {
-	return status == 'Run' ? 'text-success' : status == 'Req' ? 'text-info' : status == 'Out' ? 'text-warning' : status == 'In' || status == 'Pit' ? 'text-danger' : 'text-secondary';
+	switch (status) {
+		case 'Run': return 'text-success';
+		case 'Req': return 'text-info';
+		case 'Out': return 'text-warning';
+		case 'In': case 'Pit': return 'text-danger';
+		case 'Fin': case 'Chk': return '';
+		default: return 'text-secondary';
+	}
 }
 
 /**
