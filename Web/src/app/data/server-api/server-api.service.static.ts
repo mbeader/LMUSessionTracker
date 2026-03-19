@@ -428,7 +428,11 @@ class Repository {
 	private mapColumns<T>(row: initSqlJs.ParamsObject) {
 		let obj: any = {};
 		for (let col in row) {
-			let colName = col[0].toLowerCase() + col.substring(1);
+			let colName;
+			if (col.match(/^[LR][FR]/))
+				colName = col[0].toLowerCase() + col[1].toLowerCase() + col.substring(2);
+			else
+				colName = col[0].toLowerCase() + col.substring(1);
 			obj[colName] = row[col];
 		}
 		return obj as T;
@@ -442,6 +446,9 @@ class Repository {
 			this.sessions = [];
 			while (query.step()) {
 				let session = this.mapColumns<Session>(query.getAsObject());
+				session.isOnline = !!session.isOnline;
+				session.isClosed = !!session.isClosed;
+				session.passwordProtected = !!session.passwordProtected;
 				let sessionState = this.mapColumns<SessionState>(stateQuery.getAsObject({ $sessionId: session.sessionId }));
 				session.lastState = sessionState;
 				session.chats = [];
@@ -473,21 +480,47 @@ class Repository {
 			memberQuery.bind({ $sessionId: sessionId, $entryId: Number(car.entryId) });
 			while (memberQuery.step()) {
 				let member = this.mapColumns<Member>(memberQuery.getAsObject());
+				member.isDriver = !!member.isDriver;
+				member.isEngineer = !!member.isEngineer;
+				member.isAdmin = !!member.isAdmin;
 				entry.members.push(member);
 			}
 			car.laps = [];
 			lapsQuery.bind({ $sessionId: sessionId, $carId: Number(car.carId) });
 			while (lapsQuery.step()) {
 				let lap = this.mapColumns<Lap>(lapsQuery.getAsObject());
+				lap.isValid = !!lap.isValid;
+				lap.penalty = !!lap.penalty;
+				lap.garage = !!lap.garage;
+				lap.pit = !!lap.pit;
 				car.laps.push(lap);
 			}
 			car.pits = [];
 			pitsQuery.bind({ $sessionId: sessionId, $carId: Number(car.carId) });
 			while (pitsQuery.step()) {
 				let pit = this.mapColumns<Pit>(pitsQuery.getAsObject());
+				pit.stopAfterLine = !!pit.stopAfterLine;
+				pit.swap = !!pit.swap;
+				pit.penalty = !!pit.penalty;
+				pit.lfChanged = !!pit.lfChanged;
+				pit.lfNew = !!pit.lfNew;
+				pit.rfChanged = !!pit.rfChanged;
+				pit.rfNew = !!pit.rfNew;
+				pit.lrChanged = !!pit.lrChanged;
+				pit.lrNew = !!pit.lrNew;
+				pit.rrChanged = !!pit.rrChanged;
+				pit.rrNew = !!pit.rrNew;
 				car.pits.push(pit);
 			}
 			car.lastState = this.mapColumns<CarState>(stateQuery.getAsObject({ $sessionId: sessionId, $carId: Number(car.carId) }));
+			car.lastState.inGarageStall = !!car.lastState.inGarageStall;
+			car.lastState.pitting = !!car.lastState.pitting;
+			car.lastState.serverScored = !!car.lastState.serverScored;
+			car.lastState.pitThisLap = !!car.lastState.pitThisLap;
+			car.lastState.stopThisLap = !!car.lastState.stopThisLap;
+			car.lastState.garageThisLap = !!car.lastState.garageThisLap;
+			car.lastState.swapThisLap = !!car.lastState.swapThisLap;
+			car.lastState.penaltyThisLap = !!car.lastState.penaltyThisLap;
 			cars.push(car);
 			this.cars.set(Number(car.carId), car);
 		}
@@ -501,6 +534,10 @@ class Repository {
 		const knownQuery = db.prepare('SELECT Name FROM KnownDrivers WHERE Name = $name');
 		while (lapQuery.step()) {
 			let lap = this.mapColumns<Lap>(lapQuery.getAsObject());
+			lap.isValid = !!lap.isValid;
+			lap.penalty = !!lap.penalty;
+			lap.garage = !!lap.garage;
+			lap.pit = !!lap.pit;
 			let car = this.cars.get(Number(lap.carId));
 			let session = sessions.get(lap.sessionId);
 			if (!lap.isValid || lap.totalTime < 0)
@@ -534,6 +571,7 @@ class Repository {
 		const vehQuery = db.prepare('SELECT v.*, m.Id as ModelId, m.Name as ModelName, m.Engine, m.Manufacturer FROM Vehicles v INNER JOIN VehicleModels m on v.Model = m.Id');
 		while (vehQuery.step()) {
 			let vehicle = this.mapColumns<Vehicle>(vehQuery.getAsObject());
+			vehicle.custom = !!vehicle.custom;
 			this.vehicles.set(vehicle.id, vehicle);
 		}
 	}

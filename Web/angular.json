@@ -89,12 +89,12 @@
 									"with": "src/environments/environment.static.ts"
 								},
 								{
-									"replace": "src/app/server-api.service/server-api.service.ts",
-									"with": "src/app/server-api.service/server-api.service.static.ts"
+									"replace": "src/app/data/server-api/server-api.service.ts",
+									"with": "src/app/data/server-api/server-api.service.static.ts"
 								},
 								{
-									"replace": "src/app/server-live.service/server-live.service.ts",
-									"with": "src/app/server-live.service/server-live.service.static.ts"
+									"replace": "src/app/data/server-live/server-live.service.ts",
+									"with": "src/app/data/server-live/server-live.service.static.ts"
 								}
 							]
 						}
