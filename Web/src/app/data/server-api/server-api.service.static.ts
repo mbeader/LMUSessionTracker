@@ -400,8 +400,32 @@ export class StaticServerApiService implements ServerApiService {
 			}
 		}
 		vm.laps.sort((a, b) => a.lap.totalTime - b.lap.totalTime);
-		//vm.laps = this.repo.getLaps().map(x => { return {} as BestLap; });
+		for (let lap of vm.laps) {
+			lap.lapPit = this.getLastPit(lap.lap);
+			lap.sector1Pit = this.getLastPit(lap.sector1);
+			lap.sector2Pit = this.getLastPit(lap.sector2);
+			lap.sector3Pit = this.getLastPit(lap.sector3);
+		}
 		return new Promise(resolve => resolve(vm));
+	}
+
+	private getLastPit(lap?: Lap) {
+		if (lap && lap.lapNumber > 0) {
+			let history = this.histories[lap.sessionId]?.find(x => new CarKey(lap.car.slotId, lap.car.veh).matches(x.key));
+			if (history) {
+				let lastBefore;
+				for (let i = 0; i < history.pits.length; i++) {
+					let pit = history.pits[i];
+					if (lap.lapNumber < pit.lap || (lap.lapNumber == pit.lap && pit.stopAfterLine))
+						break;
+					else
+						lastBefore = pit;
+				}
+				if (lastBefore)
+					return lastBefore as Pit;
+			}
+		}
+		return;
 	}
 
 	getAbout(): Observable<AboutOptions> {
