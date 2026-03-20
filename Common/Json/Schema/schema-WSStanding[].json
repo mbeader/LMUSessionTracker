@@ -1,0 +1,12 @@
+{
+	"$id": "/LMUSessionTracker/Schema/WSStanding[]",
+	"$defs": {
+		"WSStanding": {
+			"$ref": "/LMUSessionTracker/Schema/WSStanding"
+		}
+	},
+	"type": "array",
+	"items": {
+		"$ref": "#/$defs/WSStanding"
+	}
+}

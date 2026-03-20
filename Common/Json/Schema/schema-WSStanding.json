@@ -1,0 +1,243 @@
+{
+	"$id": "/LMUSessionTracker/Schema/WSStanding",
+	"$defs": {
+		"WSPenalties": {
+			"$ref": "/LMUSessionTracker/Schema/WSPenalties"
+		}
+	},
+	"description": "Significantly different from standard Standing.",
+	"type": "object",
+	"properties": {
+		"bestIndividualTimeSector1": {
+			"type": "number"
+		},
+		"bestIndividualTimeSector2": {
+			"type": "number"
+		},
+		"bestLapTime": {
+			"type": "number"
+		},
+		"bestLapTimeS1": {
+			"type": "number"
+		},
+		"bestLapTimeS2": {
+			"type": "number"
+		},
+		"compoundNames": {
+			"type": "array",
+			"items": {
+				"enum": [ "Soft", "Medium", "Hard", "Wet" ]
+			},
+			"minItems": 4,
+			"maxItems": 4
+		},
+		"countLapFlag": {
+			"enum": [ "CLF_LAP_AND_TIME", "CLF_LAP_ONLY", "CLF_NONE" ]
+		},
+		"currentLapTimeS1": {
+			"type": "number"
+		},
+		"currentLapTimeS2": {
+			"type": "number"
+		},
+		"currentLapsCompleted": {
+			"type": "integer"
+		},
+		"currentSector": {
+			"type": "integer",
+			"maximum": 2,
+			"minimum": 0
+		},
+		"dlcAppID": {
+			"type": "integer"
+		},
+		"driverName": {
+			"type": "string"
+		},
+		"finishStatus": {
+			"enum": [ "FSTAT_NONE", "FSTAT_FINISHED", "FSTAT_CHECKERED", "FSTAT_DNF", "FSTAT_DQ" ]
+		},
+		"gapToClassLeader": {
+			"type": "string"
+		},
+		"gapToRelativeTxt": {
+			"type": "string"
+		},
+		"inGarage": {
+			"type": "boolean"
+		},
+		"inPits": {
+			"type": "boolean"
+		},
+		"lapDist": {
+			"type": "number"
+		},
+		"lapsBehindLeader": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"lapsBehindNext": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"lastLapTime": {
+			"type": "number"
+		},
+		"lastLapTimeS1": {
+			"type": "number"
+		},
+		"lastLapTimeS2": {
+			"type": "number"
+		},
+		"localVelX": {
+			"type": "number"
+		},
+		"localVelY": {
+			"type": "number"
+		},
+		"localVelZ": {
+			"type": "number"
+		},
+		"numPitstops": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"penalties": {
+			"$ref": "#/$defs/WSPenalties"
+		},
+		"pitState": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 5
+		},
+		"player": {
+			"type": "boolean"
+		},
+		"posX": {
+			"type": "number"
+		},
+		"posY": {
+			"type": "number"
+		},
+		"posZ": {
+			"type": "number"
+		},
+		"position": {
+			"type": "integer",
+			"minimum": 1
+		},
+		"qualiPosition": {
+			"description": "May be -1.",
+			"type": "integer"
+		},
+		"slotHasFocus": {
+			"type": "boolean"
+		},
+		"slotID": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"steamID": {
+			"type": "string",
+			"pattern": "^[0-9]+$"
+		},
+		"teamName": {
+			"type": "string"
+		},
+		"timeBehindLeader": {
+			"type": "number"
+		},
+		"timeBehindNext": {
+			"type": "number"
+		},
+		"timeIntoLap": {
+			"type": "number"
+		},
+		"tireCompoundNameFront": {
+			"enum": [ "Soft", "Medium", "Hard", "Wet" ]
+		},
+		"tireCompoundNameRear": {
+			"enum": [ "Soft", "Medium", "Hard", "Wet" ]
+		},
+		"totalRaceTime": {
+			"type": "number",
+			"minimum": 0
+		},
+		"vehFilename": {
+			"type": "string"
+		},
+		"vehOwned": {
+			"type": "boolean"
+		},
+		"vehicleClass": {
+			"enum": [ "Hyper", "LMP2_ELMS", "LMP2", "LMP3", "GTE", "GT3" ]
+		},
+		"vehicleName": {
+			"type": "string"
+		},
+		"vehicleNumber": {
+			"type": "string",
+			"pattern": "^[0-9]{1,3}$"
+		},
+		"virtualEnergy": {
+			"type": "number",
+			"minimum": 0,
+			"maximum": 100
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"bestIndividualTimeSector1",
+		"bestIndividualTimeSector2",
+		"bestLapTime",
+		"bestLapTimeS1",
+		"bestLapTimeS2",
+		"compoundNames",
+		"countLapFlag",
+		"currentLapTimeS1",
+		"currentLapTimeS2",
+		"currentLapsCompleted",
+		"currentSector",
+		"dlcAppID",
+		"driverName",
+		"finishStatus",
+		"gapToClassLeader",
+		"gapToRelativeTxt",
+		"inGarage",
+		"inPits",
+		"lapDist",
+		"lapsBehindLeader",
+		"lapsBehindNext",
+		"lastLapTime",
+		"lastLapTimeS1",
+		"lastLapTimeS2",
+		"localVelX",
+		"localVelY",
+		"localVelZ",
+		"numPitstops",
+		"penalties",
+		"pitState",
+		"player",
+		"posX",
+		"posY",
+		"posZ",
+		"position",
+		"qualiPosition",
+		"slotHasFocus",
+		"slotID",
+		"steamID",
+		"teamName",
+		"timeBehindLeader",
+		"timeBehindNext",
+		"timeIntoLap",
+		"tireCompoundNameFront",
+		"tireCompoundNameRear",
+		"totalRaceTime",
+		"vehFilename",
+		"vehOwned",
+		"vehicleClass",
+		"vehicleName",
+		"vehicleNumber",
+		"virtualEnergy"
+	]
+}

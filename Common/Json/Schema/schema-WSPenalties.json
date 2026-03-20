@@ -1,0 +1,24 @@
+{
+	"$id": "/LMUSessionTracker/Schema/WSPenalties",
+	"type": "object",
+	"properties": {
+		"DT": {
+			"type": "number",
+			"minimum": 0
+		},
+		"SG": {
+			"type": "number",
+			"minimum": 0
+		},
+		"TIME": {
+			"type": "number",
+			"minimum": 0
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"DT",
+		"SG",
+		"TIME"
+	]
+}

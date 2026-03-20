@@ -31,6 +31,8 @@ namespace LMUSessionTracker.Common.Json {
 			typeof(ProfileInfo),
 			typeof(SessionsInfoForEvent),
 			typeof(GameState),
+			typeof(WSMessageLiveStandings),
+			typeof(WSMessageSessionInfo),
 		};
 		private static readonly Dictionary<string, JsonSchema> schemas = new Dictionary<string, JsonSchema>();
 		private static readonly Dictionary<string, JsonSchema> listSchemas = new Dictionary<string, JsonSchema>();

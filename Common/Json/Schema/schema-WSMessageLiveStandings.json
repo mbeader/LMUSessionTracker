@@ -1,0 +1,21 @@
+{
+	"$id": "/LMUSessionTracker/Schema/WSMessageLiveStandings",
+	"type": "object",
+	"properties": {
+		"messageType": {
+			"enum": [ "UPDATE" ]
+		},
+		"topic": {
+			"enum": [ "LiveStandings" ]
+		},
+		"body": {
+			"$ref": "/LMUSessionTracker/Schema/WSStanding[]"
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"messageType",
+		"topic",
+		"body"
+	]
+}
