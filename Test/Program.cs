@@ -1,15 +1,54 @@
-﻿using System;
+﻿using LMUSessionTracker.Common.Http;
+using LMUSessionTracker.Common.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
+using Websocket.Client;
 
 namespace Test {
 	internal class Program {
 		static void Main(string[] args) {
-			string baseurl = "http://localhost:6397";
-			HttpClient client = new HttpClient();
-			Run(baseurl, client).Wait();
+			//string baseurl = "http://localhost:6397";
+			//HttpClient client = new HttpClient();
+			//Run(baseurl, client).Wait();
+			string baseurl = "ws://localhost:8080";
+			RunWS(baseurl);
+		}
+
+		private static void RunWS(string url) {
+			using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
+			DefaultServiceProviderFactory spFactory = new DefaultServiceProviderFactory();
+			WebSocketLMUClient client = new WebSocketLMUClient(
+				factory.CreateLogger<WebSocketLMUClient>(),
+				spFactory.CreateServiceProvider(new ServiceCollection()),
+				new DefaultDateTimeProvider(),
+				Options.Create(new LMUClientOptions() { WebSocketBaseUri = url, LogResponses = true }));
+			client.StartAsync(CancellationToken.None).Wait();
+			client.StopAsync(CancellationToken.None).Wait();
+		}
+
+		private static void RunWS2(string url) {
+			var exitEvent = new ManualResetEvent(false);
+			var uri = new Uri($"{url}/websocket/ui");
+
+			using(var client = new WebsocketClient(uri)) {
+				client.ReconnectTimeout = TimeSpan.FromSeconds(30);
+				client.ReconnectionHappened.Subscribe(info =>
+					Console.WriteLine($"Reconnection happened, type: {info.Type}"));
+
+				client.MessageReceived.Subscribe(msg => Console.WriteLine($"Message received: {msg}"));
+				client.Start();
+
+				Task.Run(() => client.Send("{\"messageType\": \"SUB\", \"topic\": \"LiveStandings\"}"));
+
+				exitEvent.WaitOne();
+			}
 		}
 
 		private static async Task Run(string baseurl, HttpClient client) {

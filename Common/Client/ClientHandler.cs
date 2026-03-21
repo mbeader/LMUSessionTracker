@@ -137,6 +137,8 @@ namespace LMUSessionTracker.Common.Client {
 				GetSecondaryData(message, majorInterval),
 				Task.Run(async () => { await lmuClient.GetStandingsHistory(); }),
 				Task.Run(async () => { await lmuClient.GetSessionsInfoForEvent(); }),
+				Task.Run(async () => { await lmuClient.GetWSLiveStandings(message.Timestamp); }),
+				Task.Run(async () => { await lmuClient.GetWSSessionInfo(message.Timestamp); }),
 			};
 			if(!(majorInterval && role == ProtocolRole.Primary)) {
 				tasks.Add(Task.Run(async () => { await lmuClient.GetChat(); }));

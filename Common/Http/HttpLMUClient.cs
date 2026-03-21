@@ -17,6 +17,7 @@ namespace LMUSessionTracker.Common.Http {
 		private readonly HttpClient httpClient;
 		private readonly ILogger<HttpLMUClient> logger;
 		private readonly DateTimeProvider dateTime;
+		private readonly WebSocketLMUClient websocketClient;
 		private readonly SchemaValidator schemaValidator;
 		private readonly LMUClientOptions options;
 		private readonly JsonSerializerOptions serializerOptions;
@@ -25,9 +26,10 @@ namespace LMUSessionTracker.Common.Http {
 		//private readonly ConcurrentDictionary<string, object> objContext = new ConcurrentDictionary<string, object>();
 		private readonly ConcurrentDictionary<string, string> rawContext = new ConcurrentDictionary<string, string>();
 
-		public HttpLMUClient(ILogger<HttpLMUClient> logger, DateTimeProvider dateTime, SchemaValidator schemaValidator = null, IOptions<LMUClientOptions> options = null) {
+		public HttpLMUClient(ILogger<HttpLMUClient> logger, DateTimeProvider dateTime, WebSocketLMUClient websocketClient, SchemaValidator schemaValidator = null, IOptions<LMUClientOptions> options = null) {
 			this.logger = logger;
 			this.dateTime = dateTime;
+			this.websocketClient = websocketClient;
 			this.schemaValidator = schemaValidator;
 			this.options = options?.Value ?? new LMUClientOptions();
 			httpClient = new HttpClient() {
@@ -67,6 +69,39 @@ namespace LMUSessionTracker.Common.Http {
 					logger.LogDebug("Connection timeout");
 				else
 					logger.LogError(e, $"Request failed for endpoint: {path}");
+				return default;
+			}
+		}
+
+		private async Task<T> GetWebSocket<T>(DateTime now, string topic) {
+			try {
+				string body;
+				switch(topic) {
+					case "/websocket/ui?LiveStandings":
+						body = await websocketClient.GetLiveStandings(now);
+						break;
+					case "/websocket/ui?SessionInfo":
+						body = await websocketClient.GetSessionInfo(now);
+						break;
+					default:
+						body = null;
+						break;
+				}
+				if(body != null) {
+					if(options.LogResponses)
+						rawContext.TryAdd(topic, body);
+					if(!string.IsNullOrEmpty(body)) {
+						T result = (T)JsonSerializer.Deserialize(body, serializerOptions.GetTypeInfo(typeof(T)));
+						if(result != null && options.ValidateResponses && schemaValidator != null)
+							schemaValidator.Validate(body, typeof(T));
+						//if(options.LogResponses)
+						//	objContext.Add(topic, result);
+						return result;
+					}
+				}
+				return default;
+			} catch(Exception e) {
+				logger.LogError(e, $"Request failed for topic: {topic}");
 				return default;
 			}
 		}
@@ -164,6 +199,14 @@ namespace LMUSessionTracker.Common.Http {
 
 		public Task<List<TrackMapPoint>> GetTrackMap() {
 			return Get<List<TrackMapPoint>>("/rest/watch/trackmap");
+		}
+
+		public Task<WSMessageLiveStandings> GetWSLiveStandings(DateTime now) {
+			return GetWebSocket<WSMessageLiveStandings>(now, "/websocket/ui?LiveStandings");
+		}
+
+		public Task<WSMessageSessionInfo> GetWSSessionInfo(DateTime now) {
+			return GetWebSocket<WSMessageSessionInfo>(now, "/websocket/ui?SessionInfo");
 		}
 	}
 }

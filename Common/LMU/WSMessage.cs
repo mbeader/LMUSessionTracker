@@ -7,6 +7,12 @@ namespace LMUSessionTracker.Common.LMU {
 		public T body { get; set; }
 	}
 
+	public class WSMessage : WSMessage<object> {
+		public string messageType { get; set; }
+		public string topic { get; set; }
+		public object body { get; set; }
+	}
+
 	public class WSMessageLiveStandings : WSMessage<List<WSStanding>> {
 		public string messageType { get; set; }
 		public string topic { get; set; }

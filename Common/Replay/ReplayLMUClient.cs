@@ -166,5 +166,13 @@ namespace LMUSessionTracker.Common.Replay {
 		public Task<List<TrackMapPoint>> GetTrackMap() {
 			return Get<List<TrackMapPoint>>("/rest/watch/trackmap");
 		}
+
+		public Task<WSMessageLiveStandings> GetWSLiveStandings(DateTime now) {
+			return Get<WSMessageLiveStandings>("/websocket/ui?LiveStandings");
+		}
+
+		public Task<WSMessageSessionInfo> GetWSSessionInfo(DateTime now) {
+			return Get<WSMessageSessionInfo>("/websocket/ui?SessionInfo");
+		}
 	}
 }

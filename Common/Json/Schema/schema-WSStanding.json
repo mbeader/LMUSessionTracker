@@ -73,12 +73,10 @@
 			"type": "number"
 		},
 		"lapsBehindLeader": {
-			"type": "integer",
-			"minimum": 0
+			"type": "integer"
 		},
 		"lapsBehindNext": {
-			"type": "integer",
-			"minimum": 0
+			"type": "integer"
 		},
 		"lastLapTime": {
 			"type": "number"

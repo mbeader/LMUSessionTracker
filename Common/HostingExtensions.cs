@@ -40,6 +40,8 @@ namespace LMUSessionTracker.Common {
 				services.AddScoped<ClientSessionState, DefaultClientSessionState>();
 				services.AddScoped<ClientHandlerFactory, DefaultClientHandlerFactory>();
 				services.AddSingleton<ClientIntervalProvider, DefaultClientIntervalProvider>();
+				services.AddSingleton<WebSocketLMUClient>();
+				services.AddHostedService(provider => provider.GetRequiredService<WebSocketLMUClient>());
 				if(options.LMULoggingOnly)
 					services.AddHostedService<ResponseLoggerService>();
 				else {

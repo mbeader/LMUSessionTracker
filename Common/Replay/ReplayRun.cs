@@ -15,5 +15,7 @@ namespace LMUSessionTracker.Common.Replay {
 		public List<Standing> Standings { get; set; }
 		public StandingsHistory StandingsHistory { get; set; }
 		public List<TrackMapPoint> TrackMap { get; set; }
+		public List<WSStanding> WSLiveStandings { get; set; }
+		public WSSessionInfo WSSessionInfo { get; set; }
 	}
 }

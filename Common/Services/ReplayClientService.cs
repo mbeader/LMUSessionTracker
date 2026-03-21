@@ -77,6 +77,8 @@ namespace LMUSessionTracker.Common.Services {
 			run.GameState = await lmuClient.GetGameState();
 			run.SessionsInfoForEvent = await lmuClient.GetSessionsInfoForEvent();
 			//run.TrackMap = await lmuClient.GetTrackMap();
+			run.WSLiveStandings = (await lmuClient.GetWSLiveStandings(last))?.body;
+			run.WSSessionInfo = (await lmuClient.GetWSSessionInfo(last))?.body;
 			collection.Add(run);
 		}
 

@@ -41,6 +41,12 @@ namespace LMUSessionTracker.Common.Json {
 	[JsonSerializable(typeof(TrackMapPoint))]
 	[JsonSerializable(typeof(Velocity))]
 	[JsonSerializable(typeof(WeatherNode))]
+	[JsonSerializable(typeof(WSMessage))]
+	[JsonSerializable(typeof(WSMessageLiveStandings))]
+	[JsonSerializable(typeof(WSMessageSessionInfo))]
+	[JsonSerializable(typeof(WSPenalties))]
+	[JsonSerializable(typeof(WSSessionInfo))]
+	[JsonSerializable(typeof(WSStanding))]
 	// LMUSessionTracker.Common.Protocol
 	[JsonSerializable(typeof(ProtocolCredential))]
 	[JsonSerializable(typeof(ProtocolMessage))]

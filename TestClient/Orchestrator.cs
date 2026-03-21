@@ -70,7 +70,8 @@ namespace LMUSessionTracker.TestClient {
 					lmuClients.Add((ReplayLMUClient)lmuClient);
 				}
 			} else {
-				lmuClient = new HttpLMUClient(loggerFactory.CreateLogger<HttpLMUClient>(), dateTime, null, lmuClientOptions);
+				WebSocketLMUClient websocketClient = new WebSocketLMUClient(loggerFactory.CreateLogger<WebSocketLMUClient>(), null, dateTime, lmuClientOptions);
+				lmuClient = new HttpLMUClient(loggerFactory.CreateLogger<HttpLMUClient>(), dateTime, websocketClient, null, lmuClientOptions);
 			}
 			HttpProtocolClient protocolClient = new HttpProtocolClient(loggerFactory.CreateLogger<HttpProtocolClient>(), signingKey, protocolClientOptions);
 			DefaultClientIntervalProvider interval = new DefaultClientIntervalProvider(clientInfo);
