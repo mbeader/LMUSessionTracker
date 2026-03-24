@@ -117,6 +117,22 @@ namespace LMUSessionTracker.Common.Tests.Client {
 		}
 
 		[Fact]
+		public void Filter_StrategyUnchangedInitial_ReturnsEmpty() {
+			Assert_Filter_Strategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 1 } } },
+				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" } } } },
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 1 } } },
+				new());
+		}
+
+		[Fact]
+		public void Filter_StrategyChangedLap1Pit_ReturnsNewStrategy() {
+			Assert_Filter_Strategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 1 } } },
+				new() { new() { Name = "t1", Strategy = new() { new() { lap = 0, driver = "d1" }, new() { lap = 1, driver = "d1", tyres = new() { fl = new() { compound = "Medium" } } } } } },
+				new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = 1 } } },
+				new() { new() { Name = "t1", Strategy = new() { new() { lap = 1, driver = "d1", tyres = new() { fl = new() { compound = "Medium" } } } } } });
+		}
+
+		[Fact]
 		public void Filter_StrategyTeamNotFound_ReturnsEmpty() {
 			Assert_Filter_Strategy(new() { Cars = new() { new() { Team = "t1", Driver = "d1", LastResolvedPitLap = -1 } } },
 				new() { new() { Name = "t2", Strategy = new() { new() { lap = 0, driver = "d1" }, new() { lap = 1, driver = "d1", tyres = new() { fl = new() { compound = "Medium" } } } } } },

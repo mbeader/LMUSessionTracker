@@ -253,6 +253,20 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public void Next_ExitingPitsDriveThrough_SetsPitExitStatus() {
+			CarState ex = CarState(BasicStanding(s => { s.lapsCompleted++; s.lapStartET += 60; s.timeIntoLap = 0; s.sector = "SECTOR1"; }), s => {
+				s.LastPitLap = 2; s.LastPitTime = 157; s.PitThisLap = false; s.LastExitTime = 190;
+				s.LastLapEndPitState = ENTERING; s.ThisLapStartPitState = ENTERING; s.TotalPits = 1;
+;			});
+			AssertCarState(ex, new List<Standing>() {
+				BasicStanding(),
+				EnteringStanding(),
+				EnteringStanding(s => { s.lapsCompleted++; s.lapStartET += 60; s.timeIntoLap = 0; s.sector = "SECTOR1"; }),
+				BasicStanding(s => { s.lapsCompleted++; s.lapStartET += 60; s.timeIntoLap = 30; s.sector = "SECTOR1"; })
+			});
+		}
+
+		[Fact]
 		public void Next_OnTrackToStopped_SetsStopStatus() {
 			CarState ex = Apply(From(StoppedStanding()), s => {
 				s.LastStopLap = 2; s.LastStopTime = 157; s.StopThisLap = true; s.StopLocation = 3; s.TotalStops = 1;

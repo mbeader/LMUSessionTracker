@@ -222,6 +222,9 @@ namespace LMUSessionTracker.Core.Tracking {
 
 			if((PitThisLap || StartedLapInPit || ThisLapStartPitState == EXITING) && PitState == EXITING && newState.PitState != EXITING) {
 				newState.LastExitTime = currentET;
+			} else if((PitThisLap || StartedLapInPit) && PitState == ENTERING && newState.PitState == NONE) {
+				// drive-through
+				newState.LastExitTime = currentET;
 			}
 
 			// probably will miss consecutive drive-through penalties

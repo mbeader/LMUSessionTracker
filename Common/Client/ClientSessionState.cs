@@ -142,7 +142,8 @@ namespace LMUSessionTracker.Common.Client {
 					for(int j = 0; j < strategy.Strategy.Count; j++) {
 						Strategy strat = strategy.Strategy[j];
 						string compound = strat.tyres?.fl?.compound;
-						if((compound == null || compound == "N/A") || strat.lap <= carState.LastResolvedPitLap) {
+						// disallow same lap pits except if strat is actually lap 1
+						if((compound == null || compound == "N/A") || (strat.lap <= carState.LastResolvedPitLap && !(strat.lap == 1 && carState.LastResolvedPitLap == 1))) {
 							strategy.Strategy.RemoveAt(j--);
 							continue;
 						} else
