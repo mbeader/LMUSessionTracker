@@ -32,7 +32,7 @@ as long as one exists, data will continue to be collected uninterrupted.
 	* Live data provided using websockets 
 		* Session conditions
 		* [Standings](standings.webm)
-			* Including standard timing information, fuel, lap progess, and car status
+			* Including standard timing information, VE/fuel/tires, lap progess, and car status
 		* Extended timing with customizable columns
 		* Lap time tracking
 		* Track map
@@ -67,9 +67,6 @@ as long as one exists, data will continue to be collected uninterrupted.
 
 ### Planned features
 
-* Session tracking
-	* Data
-		* Additional live info from websocket
 * Accept data from rF2 plugin
 
 ## Client
@@ -154,14 +151,16 @@ Validation can be enabled via appsettings to log violations.
 		* Car pit status may be stuck on `EXITING` until next pit
 		* Strategy may not exist/contain tire compounds until first sector 1 completion or end of outlap
 	* Sectors may have no time despite the lap still being valid
+	* Strategy tire info (new, changed) may be incorrect
 * Session tracking
 	* During session transitions, the phase changing before the session type may cause an empty new session to be created
 	* When a client already exists in a session, another client joining the server may not match its state by the time it starts sending data
 	* Entry list similarity checking is currently very lenient and may result in strange behavior when a client leaves and rejoins an online practice session
 	* Sector bests of a lap in which a driver swap occurred may not be attributed to the driver the actually set them
 	* Online practice sessions (not part of a full event) slots are decoupled from the entry list
-	* Tires display as unknown for practice/qualifying sessions (no strategy data available)
-	* Offline race sessions always display tires as unknown
+	* Tire state (new, changed) is unknown
+		* Practice/qualifying sessions (no strategy data available)
+		* Offline race sessions (teams not mapped)
 
 ## Building from source
 
