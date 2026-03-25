@@ -4,5 +4,6 @@
 		public bool RejectAllClients { get; set; } = false;
 		public bool RecreateDatabaseOnStartup { get; set; } = false;
 		public bool UseHttpsRedirection { get; set; } = true;
+		public bool TraceLogging { get; set; } = false;
 	}
 }

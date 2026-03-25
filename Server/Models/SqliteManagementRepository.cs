@@ -2,6 +2,7 @@
 using LMUSessionTracker.Core.Tracking;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,12 @@ namespace LMUSessionTracker.Server.Models {
 	public class SqliteManagementRepository : ManagementRespository {
 		private readonly ILogger<SqliteSessionRepository> logger;
 		private readonly IDbContextFactory<SqliteContext> contextFactory;
+		private readonly TrackingOptions options;
 
-		public SqliteManagementRepository(ILogger<SqliteSessionRepository> logger, IDbContextFactory<SqliteContext> contextFactory) {
+		public SqliteManagementRepository(ILogger<SqliteSessionRepository> logger, IDbContextFactory<SqliteContext> contextFactory, IOptions<TrackingOptions> options) {
 			this.logger = logger;
 			this.contextFactory = contextFactory;
+			this.options = options.Value ?? new();
 		}
 
 		public async Task CreateSession(string sessionId, SessionInfo info, DateTime timestamp, bool online) {
@@ -144,7 +147,7 @@ namespace LMUSessionTracker.Server.Models {
 						dbPit.From(car.Pits[i]);
 					}
 				}
-				if(c > 0)
+				if(options.TraceLogging && c > 0)
 					logger.LogDebug($"Added {c} cars");
 				await context.SaveChangesAsync();
 				await transaction.CommitAsync();
@@ -189,7 +192,7 @@ namespace LMUSessionTracker.Server.Models {
 						c++;
 					}
 				}
-				if(c > 0)
+				if(options.TraceLogging && c > 0)
 					logger.LogDebug($"Added {c} cars");
 				await context.SaveChangesAsync();
 				await transaction.CommitAsync();

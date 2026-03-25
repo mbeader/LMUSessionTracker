@@ -64,6 +64,7 @@ namespace LMUSessionTracker.Server {
 			builder.Services.Configure<AboutOptions>(builder.Configuration.GetSection("About"));
 			builder.Services.Configure<AuthenticationOptions>(builder.Configuration.GetSection("Authentication"));
 			builder.Services.Configure<SchemaValidatorOptions>(builder.Configuration.GetSection("SchemaValidation"));
+			builder.Services.Configure<TrackingOptions>(options => { options.TraceLogging = serverOptions.TraceLogging; });
 
 			builder.Services.AddDbContextFactory<SqliteContext>(options => options.UseSqlite(builder.Configuration["ConnectionStrings:Sqlite"]));
 

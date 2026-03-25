@@ -3,6 +3,7 @@ using LMUSessionTracker.Common.Services;
 using LMUSessionTracker.Core.Protocol;
 using LMUSessionTracker.Core.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -21,13 +22,15 @@ namespace LMUSessionTracker.Core.Tracking {
 		private readonly TrackMapBuilder trackMapBuilder;
 		private readonly VehicleService vehService;
 		private readonly UpdateContextFactory updateContextFactory;
+		private readonly TrackingOptions options;
 		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private readonly SortedDictionary<string, Session> activeSessions = new SortedDictionary<string, Session>();
 		private readonly SortedDictionary<string, Session> inactiveSessions = new SortedDictionary<string, Session>();
 		private readonly Dictionary<string, Client> clients = new Dictionary<string, Client>();
 
 		public SessionArbiter(ILogger<SessionArbiter> logger, ManagementRespository managementRepo, DateTimeProvider dateTimeProvider, UuidVersion7Provider uuidProvider,
-			SessionLogger sessionLogger, PublisherService publisher, TrackMapBuilder trackMapBuilder, VehicleService vehService, UpdateContextFactory updateContextFactory) {
+			SessionLogger sessionLogger, PublisherService publisher, TrackMapBuilder trackMapBuilder, VehicleService vehService, UpdateContextFactory updateContextFactory,
+			IOptions<TrackingOptions> options) {
 			this.logger = logger;
 			this.managementRepo = managementRepo;
 			this.dateTimeProvider = dateTimeProvider;
@@ -37,6 +40,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			this.trackMapBuilder = trackMapBuilder;
 			this.vehService = vehService;
 			this.updateContextFactory = updateContextFactory;
+			this.options = options?.Value ?? new();
 		}
 
 		public async Task<ProtocolStatus> Receive(ProtocolMessage data) {
@@ -146,7 +150,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				await managementRepo.CloseSession(session.SessionId);
 				logger.LogInformation($"Session {session.SessionId} is pending closure");
 			}
-			if(updateResult.CarStateChanges != null)
+			if(options.TraceLogging && updateResult.CarStateChanges != null)
 				foreach(string carStateChange in updateResult.CarStateChanges)
 					logger.LogTrace(carStateChange);
 			return Accept(data.SessionId, true, PrepareState(session));

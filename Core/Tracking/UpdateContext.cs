@@ -6,6 +6,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		private readonly UpdateContextFactory factory;
 
 		public ILogger<T> Logger { get; init; }
+		public TrackingOptions Options { get; init; }
 		public DateTime Timestamp { get; init; }
 		public double CurrentET { get; init; }
 
@@ -15,6 +16,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		private UpdateContext() {
 			Logger = Core.Logger.FactoryInstance.CreateLogger<T>();
+			Options = new TrackingOptions();
 		}
 
 		public UpdateContext<TNew> Create<TNew>() {

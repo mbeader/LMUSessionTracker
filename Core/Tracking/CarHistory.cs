@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 namespace LMUSessionTracker.Core.Tracking {
 	public class CarHistory {
-		private List<StrategyDriverUsage> sdu = new List<StrategyDriverUsage>();
-
 		public CarKey Key { get; private set; }
 		public Car Car { get; private set; }
 		public List<Lap> Laps { get; } = new List<Lap>();
@@ -53,7 +51,7 @@ namespace LMUSessionTracker.Core.Tracking {
 			AddUsage(context, usage);
 			if(!Car.HasAllFields)
 				Car.Merge(new Car(standing));
-			if(newLap != null && !newLap.Resolved)
+			if(context.Options.TraceLogging && newLap != null && !newLap.Resolved)
 				context.Logger.LogInformation($"{Key.Id()} unresolved [{newLap.LapNumber}]");
 			return newLap;
 		}
@@ -89,11 +87,13 @@ namespace LMUSessionTracker.Core.Tracking {
 					for(int i = Pits.Count - 1; i >= 0; i--) {
 						Pit pit = Pits[i];
 						if(strat.lap == 0 && pit.Lap == 1 && pit.GarageInTime >= 0) {
-							context.Logger.LogDebug($"{Key.Id()} initial {strat.lap} {pit.Lap}");
+							if(context.Options.TraceLogging)
+								context.Logger.LogDebug($"{Key.Id()} initial {strat.lap} {pit.Lap}");
 							match = pit;
 							break;
 						} else if((strat.lap == pit.Lap && !pit.StopAfterLine) || (strat.lap == pit.Lap + 1 && pit.StopAfterLine)) {
-							context.Logger.LogDebug($"{Key.Id()} matched pit {strat.lap} {pit.Lap}");
+							if(context.Options.TraceLogging)
+								context.Logger.LogTrace($"{Key.Id()} matched pit {strat.lap} {pit.Lap}");
 							match = pit;
 							break;
 						}
@@ -101,16 +101,19 @@ namespace LMUSessionTracker.Core.Tracking {
 					if(match == null) {
 						match = new Pit() { Lap = strat.lap, Swap = strat.driverSwap };
 						if(strat.lap != 0) {
-							context.Logger.LogDebug($"{Key.Id()} unmatched strat {strat.lap}");
+							if(context.Options.TraceLogging)
+								context.Logger.LogDebug($"{Key.Id()} unmatched strat {strat.lap}");
 							match.StopTime = context.CurrentET - strat.time;
 							match.ReleaseTime = context.CurrentET;
 						} else {
-							context.Logger.LogDebug($"{Key.Id()} unmatched initial {strat.lap}");
+							if(context.Options.TraceLogging)
+								context.Logger.LogDebug($"{Key.Id()} unmatched initial {strat.lap}");
 							match.GarageOutTime = context.CurrentET;
 						}
-						if(Pits.Count > 0 && match.Lap < Pits[^1].Lap)
-							context.Logger.LogDebug($"{Key.Id()} violation {strat.lap} < {Pits[^1].Lap}");
-						else
+						if(Pits.Count > 0 && match.Lap < Pits[^1].Lap) {
+							if(context.Options.TraceLogging)
+								context.Logger.LogInformation($"{Key.Id()} violation {strat.lap} < {Pits[^1].Lap}");
+						} else
 							Pits.Add(match);
 					}
 					if(match != null)
@@ -127,7 +130,8 @@ namespace LMUSessionTracker.Core.Tracking {
 						if(lap == null)
 							continue;
 						if(lap.LapNumber != lapUsage.lap) {
-							context.Logger.LogWarning($"{Key.Id()} mismatch [{lap.LapNumber} to {lapUsage.lap}]");
+							if(context.Options.TraceLogging)
+								context.Logger.LogWarning($"{Key.Id()} mismatch [{lap.LapNumber} to {lapUsage.lap}]");
 							continue;
 						}
 						lap.Resolve(lapUsage);

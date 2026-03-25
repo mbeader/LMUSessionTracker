@@ -1,5 +1,7 @@
 using LMUSessionTracker.Common.LMU;
 using LMUSessionTracker.Core.Tracking;
+using Microsoft.Extensions.Options;
+using Moq;
 using System;
 using static LMUSessionTracker.Common.LMU.PitState;
 
@@ -12,7 +14,9 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		private readonly CarStateChange state;
 
 		public CarHistoryTests(LoggingFixture loggingFixture) {
-			contextFactory = new UpdateContextFactory(loggingFixture.LoggerFactory);
+			Mock<IOptions<TrackingOptions>> options = new Mock<IOptions<TrackingOptions>>();
+			options.Setup(x => x.Value).Returns(new TrackingOptions() { TraceLogging = true });
+			contextFactory = new UpdateContextFactory(loggingFixture.LoggerFactory, options.Object);
 			history = new CarHistory(key, new Car() { SlotId = 0, Veh = "someveh" });
 			state = new CarStateChange(new CarState(key));
 			state.Next(new CarState(key));

@@ -4,6 +4,7 @@ using LMUSessionTracker.Common.Services;
 using LMUSessionTracker.Core.Services;
 using LMUSessionTracker.Core.Tracking;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,8 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		private DateTime lastTimestamp = baseTimestamp;
 
 		public SessionArbiterTests(LoggingFixture loggingFixture) {
+			Mock<IOptions<TrackingOptions>> options = new Mock<IOptions<TrackingOptions>>();
+			options.Setup(x => x.Value).Returns(new TrackingOptions() { TraceLogging = true });
 			managementRepo = new Mock<ManagementRespository>();
 			dateTimeProvider = new Mock<DateTimeProvider>();
 			dateTimeProvider.Setup(x => x.UtcNow).Returns(() => lastTimestamp).Callback(() => { lastTimestamp += new TimeSpan(0, 0, 1); });
@@ -36,7 +39,7 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 			vehService = new Mock<VehicleService>();
 			arbiter = new SessionArbiter(loggingFixture.LoggerFactory.CreateLogger<SessionArbiter>(), managementRepo.Object, dateTimeProvider.Object, uuidProvider.Object,
 				new SessionLogger(loggingFixture.LoggerFactory.CreateLogger<SessionLogger>()), publisher.Object, trackMapBuilder.Object, vehService.Object,
-				new UpdateContextFactory(loggingFixture.LoggerFactory));
+				new UpdateContextFactory(loggingFixture.LoggerFactory, options.Object), options.Object);
 		}
 
 		public static string SessionId(byte sessionId) => $"000000000000000000000000000000{sessionId:x2}";
