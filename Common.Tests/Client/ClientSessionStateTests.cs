@@ -302,5 +302,25 @@ namespace LMUSessionTracker.Common.Tests.Client {
 				new() { Cars = new() { new() { SlotId = 0, Team = "t1", Driver = "d1", LastResolvedLapLap = 1 } } },
 				new() { { "d1", new() { new() { lap = 1, ve = .5 } } } });
 		}
+
+		[Fact]
+		public void Filter_WSStandingsNull_ReturnsNull() {
+			Assert.Null(state.Filter((WSMessageLiveStandings)null));
+		}
+
+		[Fact]
+		public void Filter_WSStandingsNullBody_ReturnsNull() {
+			Assert.Null(state.Filter(new WSMessageLiveStandings()));
+		}
+
+		[Fact]
+		public void Filter_WSStandingsEmpty_ReturnsNull() {
+			Assert.Null(state.Filter(new WSMessageLiveStandings() { body = new() { } }));
+		}
+
+		[Fact]
+		public void Filter_WSStandings_ReturnsAll() {
+			AssertHelpers.Equivalent(new() { new() { slotID = 0 } }, state.Filter(new WSMessageLiveStandings() { body = new() { new() { slotID = 0 } } }));
+		}
 	}
 }

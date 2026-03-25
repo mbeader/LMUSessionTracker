@@ -1,4 +1,4 @@
-import { SessionInfo, Standing } from './lmu';
+import { SessionInfo, Standing, WSStandingSubset } from './lmu';
 import { Lap as LapModel, Pit as PitModel, Session, SessionState } from './models';
 import { SessionSummary, CarHistory, Car, Bests, CarState, Lap, Entry, Vehicle } from './tracking';
 
@@ -93,6 +93,7 @@ export class SessionEntry {
 export class SessionViewModel {
 	public info: SessionInfo | null = null;
 	public standings: Array<Standing> | null = null;
+	public wsStandings: Array<WSStandingSubset> | null = null;
 	public history: Array<CarHistory> | null = null;
 	public carState: Array<CarState> | null = null;
 	public positionInClass: { [key: string]: number } | null = null;
@@ -107,6 +108,7 @@ export class SessionViewModel {
 	static merge(vm: SessionViewModel, other: SessionViewModel) {
 		vm.info = other.info;
 		vm.standings = other.standings;
+		vm.wsStandings = other.wsStandings;
 		vm.history = other.history;
 		vm.carState = other.carState;
 		vm.positionInClass = other.positionInClass;

@@ -128,6 +128,7 @@ namespace LMUSessionTracker.Common.Client {
 				tasks.Add(Task.Run(async () => { message.Chat = sessionState.Filter(await lmuClient.GetChat()); }));
 				tasks.Add(Task.Run(async () => { message.TeamStrategy = sessionState.Filter(await lmuClient.GetStrategy()); }));
 				tasks.Add(Task.Run(async () => { message.StrategyUsage = sessionState.Filter(await lmuClient.GetStrategyUsage()); }));
+				tasks.Add(Task.Run(async () => { message.WSStandings = sessionState.Filter(await lmuClient.GetWSLiveStandings(message.Timestamp)); }));
 			}
 			await Task.WhenAll(tasks);
 		}
@@ -137,13 +138,13 @@ namespace LMUSessionTracker.Common.Client {
 				GetSecondaryData(message, majorInterval),
 				Task.Run(async () => { await lmuClient.GetStandingsHistory(); }),
 				Task.Run(async () => { await lmuClient.GetSessionsInfoForEvent(); }),
-				Task.Run(async () => { await lmuClient.GetWSLiveStandings(message.Timestamp); }),
 				Task.Run(async () => { await lmuClient.GetWSSessionInfo(message.Timestamp); }),
 			};
 			if(!(majorInterval && role == ProtocolRole.Primary)) {
 				tasks.Add(Task.Run(async () => { await lmuClient.GetChat(); }));
 				tasks.Add(Task.Run(async () => { await lmuClient.GetStrategy(); }));
 				tasks.Add(Task.Run(async () => { await lmuClient.GetStrategyUsage(); }));
+				tasks.Add(Task.Run(async () => { await lmuClient.GetWSLiveStandings(message.Timestamp); }));
 			}
 			await Task.WhenAll(tasks);
 		}

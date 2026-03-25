@@ -13,6 +13,7 @@ namespace LMUSessionTracker.Common.Client {
 		public List<Chat> Filter(List<Chat> chats);
 		public List<TeamStrategy> Filter(List<TeamStrategy> strategies);
 		public StrategyUsage Filter(StrategyUsage usage);
+		public List<WSStandingSubset> Filter(WSMessageLiveStandings standings);
 	}
 
 	public class DefaultClientSessionState : ClientSessionState {
@@ -219,6 +220,19 @@ namespace LMUSessionTracker.Common.Client {
 			//if(client.TraceLogging && usage != null && usage.Count > 0)
 			//	logger.LogTrace($"Usages: {System.Linq.Enumerable.Sum(usage, x => x.Value == null ? 0 : x.Value.Count)}");
 			return usage;
+		}
+
+		public List<WSStandingSubset> Filter(WSMessageLiveStandings standings) {
+			if(standings?.body != null && standings.body.Count > 0) {
+				return standings.body.ConvertAll(x => new WSStandingSubset() {
+					compoundNames = x.compoundNames,
+					penalties = x.penalties,
+					slotID = x.slotID,
+					vehFilename = x.vehFilename,
+					virtualEnergy = x.virtualEnergy
+				});
+			}
+			return null;
 		}
 	}
 }

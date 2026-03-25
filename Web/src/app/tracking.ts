@@ -1,4 +1,4 @@
-import { Standing } from "./lmu";
+import { Standing, WSStandingSubset } from "./lmu";
 
 export interface Best {
 	total: number;
@@ -54,6 +54,10 @@ export class CarKey {
 
 	static fromCar(car: Car) {
 		return new CarKey(car.slotId, car.veh);
+	}
+
+	static fromWSStanding(standing: WSStandingSubset) {
+		return new CarKey(standing.slotID, standing.vehFilename);
 	}
 }
 

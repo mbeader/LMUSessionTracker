@@ -293,3 +293,17 @@ export interface WeatherNode {
 	WindDirection: number;
 	WindSpeed: number;
 }
+
+export interface WSPenalties {
+	dt: number;
+	sg: number;
+	time: number;
+}
+
+export interface WSStandingSubset {
+	compoundNames: string[];
+	penalties: WSPenalties;
+	slotID: number;
+	vehFilename: string;
+	virtualEnergy: number;
+}

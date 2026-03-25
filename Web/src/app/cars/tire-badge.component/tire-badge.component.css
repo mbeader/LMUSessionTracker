@@ -39,6 +39,10 @@
 	background-image: url("../../../../public/tires/soft-unchanged.svg");
 }
 
+.tire-soft-unknown {
+	background-image: url("../../../../public/tires/soft-unknown.svg");
+}
+
 .tire-medium-new {
 	background-image: url("../../../../public/tires/medium-new.svg");
 }
@@ -49,6 +53,10 @@
 
 .tire-medium-unchanged {
 	background-image: url("../../../../public/tires/medium-unchanged.svg");
+}
+
+.tire-medium-unknown {
+	background-image: url("../../../../public/tires/medium-unknown.svg");
 }
 
 .tire-hard-new {
@@ -63,6 +71,10 @@
 	background-image: url("../../../../public/tires/hard-unchanged.svg");
 }
 
+.tire-hard-unknown {
+	background-image: url("../../../../public/tires/hard-unknown.svg");
+}
+
 .tire-wet-new {
 	background-image: url("../../../../public/tires/wet-new.svg");
 }
@@ -73,6 +85,10 @@
 
 .tire-wet-unchanged {
 	background-image: url("../../../../public/tires/wet-unchanged.svg");
+}
+
+.tire-wet-unknown {
+	background-image: url("../../../../public/tires/wet-unknown.svg");
 }
 
 .tire-unknown {

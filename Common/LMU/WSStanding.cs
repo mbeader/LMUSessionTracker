@@ -55,4 +55,15 @@ namespace LMUSessionTracker.Common.LMU {
 		public string vehicleNumber { get; set; }
 		public double virtualEnergy { get; set; }
 	}
+
+	/// <summary>
+	/// Does not correspond to a model returned by the LMU API
+	/// </summary>
+	public class WSStandingSubset {
+		public List<string> compoundNames { get; set; }
+		public WSPenalties penalties { get; set; }
+		public int slotID { get; set; }
+		public string vehFilename { get; set; }
+		public double virtualEnergy { get; set; }
+	}
 }

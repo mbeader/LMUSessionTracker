@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Best, Bests, Car, CarKey, CarState, Lap, Pit } from '../tracking';
 import { SessionViewModel } from '../view-models';
-import { Standing } from '../lmu';
+import { Standing, WSStandingSubset } from '../lmu';
 import { Format } from '../format';
 import { classId, statusClass } from '../utils';
 import { SettingsService } from '../settings/settings.service';
@@ -391,26 +391,8 @@ class TimingFields {
 			id: 57,
 			name: 'VE/F',
 			desc: 'Current virtual energy (HY/GT3), otherwise fuel',
-			value: i => {
-				let value;
-				if (i.carClass == 'Hyper' || i.carClass == 'GT3')
-					value = !i.lastLap || i.lastLap.virtualEnergy <= 0 ? -1 : i.lastLap.virtualEnergy;
-				else if (i.standing?.player)
-					value = !i.lastLap || i.lastLap.fuel <= 0 ? -1 : i.lastLap.fuel;
-				else
-					value = typeof i.standing === 'undefined' ? -1 : i.standing.fuelFraction;
-				return value < 0 ? '-' : Format.percent(value);
-			},
-			classes: i => {
-				let value;
-				if (i.carClass == 'Hyper' || i.carClass == 'GT3')
-					value = !i.lastLap || i.lastLap.virtualEnergy <= 0 ? -1 : i.lastLap.virtualEnergy;
-				else if (i.standing?.player)
-					value = !i.lastLap || i.lastLap.fuel <= 0 ? -1 : i.lastLap.fuel;
-				else
-					value = typeof i.standing === 'undefined' ? -1 : i.standing.fuelFraction;
-				return value < 0 || value > .1 ? '' : value > .05 ? 'text-warning' : 'text-danger';
-			},
+			value: i => TimingFields.getVirtualEnergyOrFuelFormatted(TimingFields.getVirtualEnergyOrFuel(i)),
+			classes: i => TimingFields.getVirtualEnergyOrFuelClass(TimingFields.getVirtualEnergyOrFuel(i)),
 			align: 'end',
 			colType: 'char5-col'
 		},
@@ -418,8 +400,8 @@ class TimingFields {
 			id: 58,
 			name: 'VE',
 			desc: 'Current virtual energy',
-			value: i => !i.lastLap || i.lastLap.virtualEnergy <= 0 ? '-' : Format.percent(i.lastLap.virtualEnergy),
-			classes: i => !i.lastLap || i.lastLap.virtualEnergy <= 0 || i.lastLap.virtualEnergy > .1 ? '' : i.lastLap.virtualEnergy > .05 ? 'text-warning' : 'text-danger',
+			value: i => TimingFields.getVirtualEnergyOrFuelFormatted(TimingFields.getVirtualEnergy(i)),
+			classes: i => TimingFields.getVirtualEnergyOrFuelClass(TimingFields.getVirtualEnergy(i)),
 			align: 'end',
 			colType: 'char5-col'
 		},
@@ -427,22 +409,8 @@ class TimingFields {
 			id: 20,
 			name: 'Fuel',
 			desc: 'Current fuel',
-			value: i => {
-				let value;
-				if (i.standing?.player)
-					value = !i.lastLap || i.lastLap.fuel <= 0 ? -1 : i.lastLap.fuel;
-				else
-					value = typeof i.standing === 'undefined' ? -1 : i.standing.fuelFraction;
-				return value < 0 ? '-' : Format.percent(value);
-			},
-			classes: i => {
-				let value;
-				if (i.standing?.player)
-					value = !i.lastLap || i.lastLap.fuel <= 0 ? -1 : i.lastLap.fuel;
-				else
-					value = typeof i.standing === 'undefined' ? -1 : i.standing.fuelFraction;
-				return value < 0 || value > .1 ? '' : value > .05 ? 'text-warning' : 'text-danger';
-			},
+			value: i => TimingFields.getVirtualEnergyOrFuelFormatted(TimingFields.getFuel(i)),
+			classes: i => TimingFields.getVirtualEnergyOrFuelClass(TimingFields.getFuel(i)),
 			align: 'end',
 			colType: 'char5-col'
 		},
@@ -761,6 +729,35 @@ class TimingFields {
 	byName(name: string) {
 		return this.nameMap.get(name);
 	}
+
+	static getVirtualEnergy(i: TimingCarInfo) {
+		if (i.wsStanding)
+			return i.wsStanding.virtualEnergy / 100;
+		else
+			return !i.lastLap || i.lastLap.virtualEnergy <= 0 ? -1 : i.lastLap.virtualEnergy;
+	}
+
+	static getFuel(i: TimingCarInfo) {
+		if (i.standing?.player)
+			return !i.lastLap || i.lastLap.fuel <= 0 ? -1 : i.lastLap.fuel;
+		else
+			return typeof i.standing === 'undefined' ? -1 : i.standing.fuelFraction
+	}
+
+	static getVirtualEnergyOrFuel(i: TimingCarInfo) {
+		if (i.carClass == 'Hyper' || i.carClass == 'GT3')
+			return this.getVirtualEnergy(i);
+		else
+			return this.getFuel(i);
+	}
+
+	static getVirtualEnergyOrFuelFormatted(value: number) {
+		return value < 0 ? '-' : Format.percent(value)
+	}
+
+	static getVirtualEnergyOrFuelClass(value: number) {
+		return value < 0 || value > .1 ? '' : value > .05 ? 'text-warning' : 'text-danger';
+	}
 }
 
 export class TimingCarInfo {
@@ -769,6 +766,7 @@ export class TimingCarInfo {
 	car?: Car;
 	state?: CarState;
 	standing?: Standing;
+	wsStanding?: WSStandingSubset;
 	carClass: string = '';
 	lastClasses: BestClasses = this.defaultBestClasses();
 	bestClasses: BestClasses = this.defaultBestClasses();
@@ -797,6 +795,7 @@ export class TimingCarInfo {
 			this.state = timingService.carState.get(this.id);
 			if (this.car) {
 				this.standing = this.session?.standings?.find(x => CarKey.fromStanding(x).id == this.id);
+				this.wsStanding = this.session?.wsStandings?.find(x => CarKey.fromWSStanding(x).id == this.id);
 				this.carClass = (this.car && this.car.class ? this.car.class : this.standing?.carClass) ?? '';
 				if (this.standing) {
 					this.lastClasses = timingService.getLastClasses(this.standing, this.carClass);
@@ -804,6 +803,7 @@ export class TimingCarInfo {
 					this.positionInClass = timingService.positionInClass.get(this.id) ?? 0;
 				} else {
 					this.standing = undefined;
+					this.wsStanding = undefined;
 					this.lastClasses = this.defaultBestClasses();
 					this.bestClasses = this.defaultBestClasses();
 				}
@@ -826,6 +826,7 @@ export class TimingCarInfo {
 				this.car = undefined;
 				this.state = undefined;
 				this.standing = undefined;
+				this.wsStanding = undefined;
 				this.carClass = '';
 				this.lastClasses = this.defaultBestClasses();
 				this.bestClasses = this.defaultBestClasses();
@@ -834,6 +835,7 @@ export class TimingCarInfo {
 			this.car = undefined;
 			this.state = undefined;
 			this.standing = undefined;
+			this.wsStanding = undefined;
 			this.carClass = '';
 			this.lastClasses = this.defaultBestClasses();
 			this.bestClasses = this.defaultBestClasses();

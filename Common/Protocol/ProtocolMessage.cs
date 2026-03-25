@@ -20,5 +20,6 @@ namespace LMUSessionTracker.Common.Protocol {
 		public List<TeamStrategy> TeamStrategy { get; set; }
 		public StrategyUsage StrategyUsage { get; set; }
 		public List<Chat> Chat { get; set; }
+		public List<WSStandingSubset> WSStandings { get; set; }
 	}
 }

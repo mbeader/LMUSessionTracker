@@ -48,7 +48,7 @@ namespace LMUSessionTracker.Common.Http {
 					client.ReconnectTimeout = TimeSpan.FromSeconds(30);
 					client.ReconnectionHappened.Subscribe(info => {
 						logger.LogDebug($"Reconnection happened, type: {info.Type}");
-						if(info.Type == ReconnectionType.NoMessageReceived) {
+						if(info.Type != ReconnectionType.Initial) {
 							client.Send("{\"messageType\": \"SUB\", \"topic\": \"LiveStandings\"}");
 							client.Send("{\"messageType\": \"SUB\", \"topic\": \"SessionInfo\"}");
 						}

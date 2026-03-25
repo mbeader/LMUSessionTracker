@@ -37,9 +37,9 @@ describe('Tire', () => {
 			{ compound: 'N/A', changed: false, notUsed: true, ex: 'Unknown' },
 			{ compound: 'N/A', changed: true, notUsed: false, ex: 'Unknown' },
 			{ compound: 'N/A', changed: false, notUsed: false, ex: 'Unknown' },
-			{ compound: 'Soft', changed: undefined, notUsed: true, ex: 'Soft' },
-			{ compound: 'Soft', changed: true, notUsed: undefined, ex: 'Soft' },
-			{ compound: 'Soft', changed: undefined, notUsed: undefined, ex: 'Soft' },
+			{ compound: 'Soft', changed: undefined, notUsed: true, ex: 'Unknown Soft' },
+			{ compound: 'Soft', changed: true, notUsed: undefined, ex: 'Unknown Soft' },
+			{ compound: 'Soft', changed: undefined, notUsed: undefined, ex: 'Unknown Soft' },
 		])('$compound $changed $notUsed', ({ compound, changed, notUsed, ex }) => {
 			expect(new Tire(compound, changed, notUsed).getDescription()).toBe(ex);
 		});

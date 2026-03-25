@@ -10,6 +10,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public List<Chat> Chat { get; set; }
 		public List<TeamStrategy> Strategies { get; set; }
 		public StrategyUsage Usage { get; set; }
+		public List<WSStandingSubset> WSStandings { get; set; }
 
 		public SessionUpdate(ProtocolMessage data = null) {
 			if(data != null) {
@@ -19,6 +20,7 @@ namespace LMUSessionTracker.Core.Tracking {
 				Chat = data.Chat;
 				Strategies = data.TeamStrategy;
 				Usage = data.StrategyUsage;
+				WSStandings = data.WSStandings;
 			}
 		}
 	}

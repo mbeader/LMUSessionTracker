@@ -7,6 +7,7 @@ namespace LMUSessionTracker.Server.ViewModels {
 	public class SessionViewModel {
 		public SessionInfo Info { get; set; }
 		public List<Standing> Standings { get; set; }
+		public List<WSStandingSubset> WSStandings { get; set; }
 		public List<CarHistory> History { get; set; }
 		public List<CarState> CarState { get; set; }
 		public Dictionary<CarKey, int> PositionInClass { get; } = new Dictionary<CarKey, int>();
@@ -21,6 +22,7 @@ namespace LMUSessionTracker.Server.ViewModels {
 		public void SetSession(Session session, bool includeBests = true) {
 			if(session != null) {
 				Standings = session.LastStandings;
+				WSStandings = session.LastWSStandings;
 				History = session.History.GetAllHistory();
 				CarState = session.CarState.GetAllStates();
 				if(Standings != null)

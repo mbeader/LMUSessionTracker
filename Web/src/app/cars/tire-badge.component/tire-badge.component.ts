@@ -12,6 +12,7 @@ import { Format } from '../../format';
 export class TireBadgeComponent {
 	@Input() pit?: Pit;
 	@Input() lap?: Lap;
+	@Input() compounds?: string[];
 	@Input() align?: string;
 	protected tires: Tires = new Tires();
 	protected Format = Format;
@@ -21,7 +22,7 @@ export class TireBadgeComponent {
 	}
 
 	private getTires() {
-		return new Tires(this.pit);
+		return new Tires(this.pit, this.compounds);
 	}
 
 	getUsage() {
@@ -48,11 +49,11 @@ export class Tires {
 	public readonly rr: Tire;
 	public readonly all?: Tire;
 
-	constructor(pit?: Pit) {
-		this.lf = new Tire(pit?.lfCompound, pit?.lfChanged, pit?.lfNew);
-		this.rf = new Tire(pit?.rfCompound, pit?.rfChanged, pit?.rfNew);
-		this.lr = new Tire(pit?.lrCompound, pit?.lrChanged, pit?.lrNew);
-		this.rr = new Tire(pit?.rrCompound, pit?.rrChanged, pit?.rrNew);
+	constructor(pit?: Pit, compounds?: string[]) {
+		this.lf = new Tire(pit?.lfCompound, pit?.lfChanged, pit?.lfNew, compounds?.at(0));
+		this.rf = new Tire(pit?.rfCompound, pit?.rfChanged, pit?.rfNew, compounds?.at(1));
+		this.lr = new Tire(pit?.lrCompound, pit?.lrChanged, pit?.lrNew, compounds?.at(2));
+		this.rr = new Tire(pit?.rrCompound, pit?.rrChanged, pit?.rrNew, compounds?.at(3));
 		if (this.lf.same(this.rf) && this.lf.same(this.lr) && this.lf.same(this.rr))
 			this.all = this.lf;
 	}
@@ -101,22 +102,23 @@ export class Tire {
 	public readonly compound: string;
 	public readonly type: string;
 
-	constructor(compound?: string | null, changed?: boolean, notUsed?: boolean) {
-		switch (compound) {
+	constructor(compound?: string | null, changed?: boolean, notUsed?: boolean, compoundFallback?: string) {
+		let resolvedCompound = compound ? compound : compoundFallback;
+		switch (resolvedCompound) {
 			case 'Soft':
 			case 'Medium':
 			case 'Hard':
 			case 'Wet':
-				this.compound = compound;
+				this.compound = resolvedCompound;
 				break;
 			default:
 				this.compound = '';
 				break;
 		}
-		if (typeof changed === 'boolean' && typeof notUsed === 'boolean')
+		if (this.compound && compound && typeof changed === 'boolean' && typeof notUsed === 'boolean')
 			this.type = notUsed ? 'New' : !changed ? 'Unchanged' : 'Used';
 		else
-			this.type = '';
+			this.type = 'Unknown';
 	}
 
 	same(other: Tire) {
@@ -124,6 +126,6 @@ export class Tire {
 	}
 
 	getDescription() {
-		return this.compound ? `${this.type}${this.type ? ' ' : ''}${this.compound}` : 'Unknown';
+		return this.compound ? `${this.type}${this.type ? ' ' : ''}${this.compound}` : this.type;
 	}
 }

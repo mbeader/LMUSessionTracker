@@ -18,6 +18,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public Dictionary<string, bool> RoleChanges { get; private set; }
 		public SessionInfo LastInfo { get; private set; }
 		public List<Standing> LastStandings { get; private set; }
+		public List<WSStandingSubset> LastWSStandings { get; private set; }
 		public EntryList Entries { get; private set; }
 		public History History { get; private set; }
 		public Bests Bests { get; private set; }
@@ -138,6 +139,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public SessionUpdateResult Update(UpdateContext<Session> context, SessionUpdate data) {
 			LastInfo = data.Info ?? LastInfo;
 			LastStandings = data.Standings ?? LastStandings;
+			LastWSStandings = data.WSStandings ?? LastWSStandings;
 			bool bestsChanged = false;
 			List<string> carStateChanges = null;
 			if(data.Standings != null) {
@@ -269,7 +271,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public Session Clone() {
 			Session session = Create(SessionId, LastInfo, Timestamp, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()), CarState.GetAllStates().ConvertAll(x => x.Clone()));
-			session.Update(UpdateContext<Session>.Create(LastUpdate, LastInfo.currentEventTime), new SessionUpdate() { Info = LastInfo, Standings = LastStandings });
+			session.Update(UpdateContext<Session>.Create(LastUpdate, LastInfo.currentEventTime), new SessionUpdate() { Info = LastInfo, Standings = LastStandings, WSStandings = LastWSStandings });
 			return session;
 		}
 
