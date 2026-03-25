@@ -5,7 +5,7 @@ import { Vehicle } from '../../tracking';
 import { Format } from '../../format';
 import { ClassBadgeComponent } from '../../cars/class-badge/class-badge.component';
 import { BrandBadgeComponent } from '../../cars/brand-badge/brand-badge.component';
-import { TireBadgeComponent } from '../../cars/tire-badge.component/tire-badge.component';
+import { TireBadgeComponent } from '../../cars/tire-badge/tire-badge.component';
 
 @Component({
 	selector: 'app-best-laps-lap',
