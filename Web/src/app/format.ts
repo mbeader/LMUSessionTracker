@@ -158,10 +158,10 @@ export class Format {
 	static lapProgress(progress: number | null, total: number | null) {
 		if (progress != null && total != null) {
 			let value = (progress / total * 10);
-			if (value > 10)
-				value = 10;
-			else if (value < -10)
-				value = -10
+			if (value > 9)
+				value = 9;
+			else if (value < -9)
+				value = -9;
 			return value.toString().split('.')[0];
 		}
 		return '0';
