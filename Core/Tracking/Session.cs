@@ -155,7 +155,7 @@ namespace LMUSessionTracker.Core.Tracking {
 						standing.slotID += minSlot;
 				}
 				carStateChanges = CarState.Update(context.Create<CarStateMonitor>(), data.Standings);
-				List<CarLap> laps = History.Update(context.Create<History>(), CarState, data.Standings, data.Strategies, data.Usage);
+				List<CarLap> laps = History.Update(context.Create<History>(), CarState, data.Standings, data.WSStandings, data.Strategies, data.Usage);
 				foreach(CarLap lap in laps) {
 					if(Bests.Update(lap))
 						bestsChanged = true;

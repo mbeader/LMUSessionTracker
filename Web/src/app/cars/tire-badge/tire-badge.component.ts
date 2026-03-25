@@ -22,7 +22,7 @@ export class TireBadgeComponent {
 	}
 
 	private getTires() {
-		return new Tires(this.pit, this.compounds);
+		return new Tires(this.pit, this.lap, this.compounds);
 	}
 
 	getUsage() {
@@ -49,7 +49,22 @@ export class Tires {
 	public readonly rr: Tire;
 	public readonly all?: Tire;
 
-	constructor(pit?: Pit, compounds?: string[]) {
+	constructor(pit?: Pit, lap?: Lap, compounds?: (string | undefined)[]) {
+		if (pit && lap) {
+			if (lap.lfCompound || lap.rfCompound || lap.lrCompound || lap.rrCompound) {
+				let same = true;
+				same = same && pit.lfCompound == lap.lfCompound;
+				same = same && pit.rfCompound == lap.rfCompound;
+				same = same && pit.lrCompound == lap.lrCompound;
+				same = same && pit.rrCompound == lap.rrCompound;
+				if (!same) {
+					pit = undefined;
+				}
+			}
+		}
+		if (!pit && lap && !compounds) {
+			compounds = [lap.lfCompound, lap.rfCompound, lap.lrCompound, lap.rrCompound];
+		}
 		this.lf = new Tire(pit?.lfCompound, pit?.lfChanged, pit?.lfNew, compounds?.at(0));
 		this.rf = new Tire(pit?.rfCompound, pit?.rfChanged, pit?.rfNew, compounds?.at(1));
 		this.lr = new Tire(pit?.lrCompound, pit?.lrChanged, pit?.lrNew, compounds?.at(2));

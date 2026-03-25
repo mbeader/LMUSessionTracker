@@ -44,10 +44,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			return Laps[lapNumber - 1] ?? Lap.Default(lapNumber);
 		}
 
-		public Lap Update(UpdateContext<CarHistory> context, CarStateChange state, Standing standing, List<Strategy> strategy, List<StrategyDriverUsage> usage) {
+		public Lap Update(UpdateContext<CarHistory> context, CarStateChange state, Standing standing, WSStandingSubset wsStanding, List<Strategy> strategy, List<StrategyDriverUsage> usage) {
 			Lap newLap = null;
 			if(standing.lapsCompleted > 0)
-				newLap = AddLap(new Lap(standing, state.Previous), context.Timestamp);
+				newLap = AddLap(new Lap(standing, wsStanding, state.Previous), context.Timestamp);
 			AddPit(state, newLap);
 			AddStrategy(context, strategy);
 			AddUsage(context, usage);

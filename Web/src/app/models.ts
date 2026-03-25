@@ -115,6 +115,10 @@ export interface Lap {
 	rfUsage: number;
 	lrUsage: number;
 	rrUsage: number;
+	lfCompound?: string;
+	rfCompound?: string;
+	lrCompound?: string;
+	rrCompound?: string;
 	resolved: boolean;
 
 	timestamp: Date | null;

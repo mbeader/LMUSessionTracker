@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Tire, TireBadgeComponent, Tires } from './tire-badge.component';
-import { Pit } from '../../tracking';
+import { Lap, Pit } from '../../tracking';
 
 describe('TireBadgeComponent', () => {
 	let component: TireBadgeComponent;
@@ -70,7 +70,26 @@ describe('Tires', () => {
 			p.rrNew = pit.rr.notUsed;
 		}
 		return p;
-	}
+	};
+	let pit2 = (pit2?: { lf: string, rf: string, lr: string, rr: string }) => {
+		return pit({
+			lf: { compound: pit2?.lf ?? null, changed: true, notUsed: true },
+			rf: { compound: pit2?.rf ?? null, changed: true, notUsed: true },
+			lr: { compound: pit2?.lr ?? null, changed: true, notUsed: true },
+			rr: { compound: pit2?.rr ?? null, changed: true, notUsed: true },
+		});
+	};
+	let lap = (lap?: { lf?: string, rf?: string, lr?: string, rr?: string }) => {
+		let l = {} as Lap;
+		if (lap) {
+			l.lfCompound = lap.lf;
+			l.rfCompound = lap.rf;
+			l.lrCompound = lap.lr;
+			l.rrCompound = lap.rr;
+		}
+		return l;
+	};
+
 	describe('getDescription', () => {
 		test.each([
 			{
@@ -107,6 +126,47 @@ describe('Tires', () => {
 			},
 		])('$ex', ({ tires, ex }) => {
 			expect(new Tires(pit(tires)).getDescription()).toBe(ex);
+		});
+
+		test.each([
+			{
+				name: 'undefined lap tires',
+				pitTires: { lf: 'Soft', rf: 'Soft', lr: 'Soft', rr: 'Soft' },
+				lapTires: { lf: undefined, rf: undefined, lr: undefined, rr: undefined },
+				ex: 'New Soft'
+			},
+			{
+				name: 'matching lap tires',
+				pitTires: { lf: 'Soft', rf: 'Soft', lr: 'Soft', rr: 'Soft' },
+				lapTires: { lf: 'Soft', rf: 'Soft', lr: 'Soft', rr: 'Soft' },
+				ex: 'New Soft'
+			},
+			{
+				name: 'unmatching lap lf',
+				pitTires: { lf: 'Soft', rf: 'Soft', lr: 'Soft', rr: 'Soft' },
+				lapTires: { lf: 'Medium', rf: 'Soft', lr: 'Soft', rr: 'Soft' },
+				ex: 'Rears: Unknown Soft, LF: Unknown Medium, RF: Unknown Soft'
+			},
+			{
+				name: 'unmatching lap rf',
+				pitTires: { lf: 'Soft', rf: 'Soft', lr: 'Soft', rr: 'Soft' },
+				lapTires: { lf: 'Soft', rf: 'Medium', lr: 'Soft', rr: 'Soft' },
+				ex: 'Rears: Unknown Soft, LF: Unknown Soft, RF: Unknown Medium'
+			},
+			{
+				name: 'unmatching lap lr',
+				pitTires: { lf: 'Soft', rf: 'Soft', lr: 'Soft', rr: 'Soft' },
+				lapTires: { lf: 'Soft', rf: 'Soft', lr: 'Medium', rr: 'Soft' },
+				ex: 'Fronts: Unknown Soft, LR: Unknown Medium, RR: Unknown Soft'
+			},
+			{
+				name: 'unmatching lap rr',
+				pitTires: { lf: 'Soft', rf: 'Soft', lr: 'Soft', rr: 'Soft' },
+				lapTires: { lf: 'Soft', rf: 'Soft', lr: 'Soft', rr: 'Medium' },
+				ex: 'Fronts: Unknown Soft, LR: Unknown Soft, RR: Unknown Medium'
+			},
+		])('$name', ({ name, pitTires, lapTires, ex }) => {
+			expect(new Tires(pit2(pitTires), lap(lapTires)).getDescription()).toBe(ex);
 		});
 	});
 });

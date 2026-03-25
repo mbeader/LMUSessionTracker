@@ -31,6 +31,10 @@ namespace LMUSessionTracker.Server.Models {
 		public double RFUsage { get; set; }
 		public double LRUsage { get; set; }
 		public double RRUsage { get; set; }
+		public string LFCompound { get; set; }
+		public string RFCompound { get; set; }
+		public string LRCompound { get; set; }
+		public string RRCompound { get; set; }
 		public bool Resolved { get; set; }
 
 		public DateTime? Timestamp { get; set; }
@@ -63,6 +67,10 @@ namespace LMUSessionTracker.Server.Models {
 			RFUsage = lap.RFUsage;
 			LRUsage = lap.LRUsage;
 			RRUsage = lap.RRUsage;
+			LFCompound = lap.LFCompound;
+			RFCompound = lap.RFCompound;
+			LRCompound = lap.LRCompound;
+			RRCompound = lap.RRCompound;
 			Resolved = lap.Resolved;
 			Timestamp = lap.Timestamp;
 		}
@@ -85,6 +93,10 @@ namespace LMUSessionTracker.Server.Models {
 				RFUsage = RFUsage,
 				LRUsage = LRUsage,
 				RRUsage = RRUsage,
+				LFCompound = LFCompound,
+				RFCompound = RFCompound,
+				LRCompound = LRCompound,
+				RRCompound = RRCompound,
 				FinishStatus = FinishStatus,
 				StartTime = StartTime,
 				Resolved = Resolved,

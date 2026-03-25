@@ -20,6 +20,10 @@ namespace LMUSessionTracker.Core.Tracking {
 		public double RFUsage { get; set; } = -1;
 		public double LRUsage { get; set; } = -1;
 		public double RRUsage { get; set; } = -1;
+		public string LFCompound { get; set; }
+		public string RFCompound { get; set; }
+		public string LRCompound { get; set; }
+		public string RRCompound { get; set; }
 		public string FinishStatus { get; set; }
 		public double StartTime { get; set; }
 		public bool Resolved { get; set; }
@@ -27,7 +31,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public Lap() { }
 
-		public Lap(Standing standing, CarState state = null) {
+		public Lap(Standing standing, WSStandingSubset wsStanding = null, CarState state = null) {
 			LapNumber = standing.lapsCompleted;
 			TotalTime = standing.lastLapTime;
 			Sector1 = standing.lastSectorTime1;
@@ -42,6 +46,12 @@ namespace LMUSessionTracker.Core.Tracking {
 			Penalty = state?.PenaltyThisLap ?? false;
 			Garage = state?.GarageThisLap ?? false;
 			Pit = state?.PitThisLap ?? false;
+			if(wsStanding?.compoundNames != null && wsStanding.compoundNames.Count == 4) {
+				LFCompound = wsStanding.compoundNames[0];
+				RFCompound = wsStanding.compoundNames[1];
+				LRCompound = wsStanding.compoundNames[2];
+				RRCompound = wsStanding.compoundNames[3];
+			}
 		}
 
 		public void Resolve(StrategyDriverUsage lapUsage) {
@@ -80,6 +90,10 @@ namespace LMUSessionTracker.Core.Tracking {
 				RFUsage = RFUsage,
 				LRUsage = LRUsage,
 				RRUsage = RRUsage,
+				LFCompound = LFCompound,
+				RFCompound = RFCompound,
+				LRCompound = LRCompound,
+				RRCompound = RRCompound,
 				FinishStatus = FinishStatus,
 				StartTime = StartTime,
 				Resolved = Resolved,

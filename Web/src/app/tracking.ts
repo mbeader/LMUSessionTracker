@@ -140,6 +140,10 @@ export interface Lap {
 	rfUsage: number;
 	lrUsage: number;
 	rrUsage: number;
+	lfCompound?: string;
+	rfCompound?: string;
+	lrCompound?: string;
+	rrCompound?: string;
 	finishStatus: string;
 	startTime: number;
 	resolved: boolean;
