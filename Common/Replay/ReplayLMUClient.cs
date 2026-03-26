@@ -13,12 +13,14 @@ using System.Threading.Tasks;
 namespace LMUSessionTracker.Common.Replay {
 	public class ReplayLMUClient : LMUClient {
 		private static readonly Regex filenamePattern = new Regex(@"\d{17}-raw.json", RegexOptions.Compiled);
+		private static readonly bool preload = false;
 		private readonly ILogger<ReplayLMUClient> logger;
 		private readonly DateTimeProvider dateTime;
 		private readonly ReplayOptions options;
 		private readonly SchemaValidator schemaValidator;
 		private readonly ContinueProviderSource continueProviderSource;
 		private readonly JsonSerializerOptions serializerOptions;
+		private readonly ReplayLoader loader;
 		private readonly string path;
 		private readonly Queue<string> runQueue;
 		private Dictionary<string, string> context;
@@ -45,6 +47,10 @@ namespace LMUSessionTracker.Common.Replay {
 			};
 			serializerOptions.Converters.Add(new TeamStrategyConverter());
 			logger.LogInformation($"Found {runQueue.Count} runs to replay");
+			if(preload) {
+				loader = new ReplayLoader(serializerOptions);
+				loader.Load(runQueue).Wait();
+			}
 			nextContext = Task.Run(ReadNextContext);
 		}
 
@@ -85,6 +91,8 @@ namespace LMUSessionTracker.Common.Replay {
 
 		private async Task<Dictionary<string, string>> ReadNextContext() {
 			if(runQueue.TryPeek(out string nextFilename)) {
+				if(preload)
+					return await loader.Read(nextFilename);
 				using(FileStream stream = File.OpenRead(nextFilename)) {
 					return (Dictionary<string, string>)await JsonSerializer.DeserializeAsync(stream, serializerOptions.GetTypeInfo(typeof(Dictionary<string, string>)));
 				}

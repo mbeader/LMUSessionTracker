@@ -153,7 +153,8 @@ namespace LMUSessionTracker.Core.Tracking {
 			if(options.TraceLogging && updateResult.CarStateChanges != null)
 				foreach(string carStateChange in updateResult.CarStateChanges)
 					logger.LogTrace(carStateChange);
-			return Accept(data.SessionId, true, PrepareState(session));
+			ProtocolState resultState = PrepareState(session);
+			return Accept(data.SessionId, true, resultState);
 		}
 
 		private ProtocolStatus HandleInvalid(Client client, ProtocolMessage data, DateTime now) {
