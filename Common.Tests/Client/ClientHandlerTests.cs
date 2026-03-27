@@ -19,12 +19,16 @@ namespace LMUSessionTracker.Common.Tests.Client {
 
 		public ClientHandlerTests(LoggingFixture loggingFixture) {
 			this.loggingFixture = loggingFixture;
-			ClientInfo clientInfo = new ClientInfo() { ClientId = clientId };
+			ClientInfo clientInfo = new ClientInfo() { ClientId = clientId, OverrideInterval = true };
 			lmuClient = new Mock<LMUClient>();
 			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_IDLE");
 			lmuClient.Setup(x => x.GetStandings()).ReturnsAsync(new List<Standing>() { new() { } });
 			protocolClient = new Mock<ProtocolClient>();
-			handler = new DefaultClientHandler(loggingFixture.LoggerFactory.CreateLogger<DefaultClientHandler>(), lmuClient.Object, protocolClient.Object, clientInfo,
+			handler = CreateHandler(clientInfo);
+		}
+
+		private DefaultClientHandler CreateHandler(ClientInfo clientInfo) {
+			return new DefaultClientHandler(loggingFixture.LoggerFactory.CreateLogger<DefaultClientHandler>(), lmuClient.Object, protocolClient.Object, clientInfo,
 				Mock.Of<ClientIntervalProvider>(), Mock.Of<ClientSessionState>());
 		}
 
@@ -41,12 +45,16 @@ namespace LMUSessionTracker.Common.Tests.Client {
 			public static TestState Disconnected(string sessionId = null, ProtocolRole role = ProtocolRole.None) => new TestState() { State = ClientState.Disconnected, Role = role, SessionId = sessionId };
 		}
 
-		private void AssertState(TestState ex, ProtocolState remoteState = null) {
+		private void AssertState(DefaultClientHandler handler, TestState ex, ProtocolState remoteState = null) {
 			Assert.Equal(ex.State, handler.State);
 			Assert.Equal(ex.Role, handler.Role);
 			Assert.Equal(ex.SessionId, handler.SessionId);
 			Assert.Equal(clientId.Hash, handler.ClientId);
 			Assert.Equivalent(remoteState, handler.RemoteState);
+		}
+
+		private void AssertState(TestState ex, ProtocolState remoteState = null) {
+			AssertState(handler, ex, remoteState);
 		}
 
 		[Fact]
@@ -510,6 +518,68 @@ namespace LMUSessionTracker.Common.Tests.Client {
 			AssertState(TestState.OnlineWorking("s1"));
 			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Promoted, Role = ProtocolRole.Primary, SessionId = "s1" });
 			await Assert.ThrowsAsync<Exception>(() => handler.Handle(baseTimestamp));
+		}
+
+		private async Task<DefaultClientHandler> Setup_Handle_OnlineSessionSkipped() {
+			DefaultClientHandler handler = CreateHandler(new ClientInfo() { ClientId = clientId });
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo() { currentEventTime = 10 });
+			lmuClient.Setup(x => x.GetMultiplayerJoinState()).ReturnsAsync("JOIN_JOINED_SERVER");
+			lmuClient.Setup(x => x.GetGameState()).ReturnsAsync(new GameState() { MultiStintState = "MONITOR_MENU" });
+			lmuClient.Setup(x => x.GetMultiplayerTeams()).ReturnsAsync(new MultiplayerTeams());
+			protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Changed, Role = ProtocolRole.Primary, SessionId = "s1" });
+			AssertState(handler, TestState.Idle());
+			await handler.Handle(baseTimestamp);
+			AssertState(handler, TestState.Idle());
+			return handler;
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionSkipped_IsIdle() {
+			DefaultClientHandler handler = await Setup_Handle_OnlineSessionSkipped();
+			//protocolClient.Setup(x => x.Send(It.IsAny<ProtocolMessage>())).ReturnsAsync(new ProtocolStatus() { Result = ProtocolResult.Accepted, Role = ProtocolRole.Primary, SessionId = "s1" });
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionSkippedRepeat_IsIdle() {
+			DefaultClientHandler handler = await Setup_Handle_OnlineSessionSkipped();
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo() { currentEventTime = 10 });
+			await handler.Handle(baseTimestamp.AddSeconds(1));
+			AssertState(handler, TestState.Idle());
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionSkippedTimeDecreased_IsIdle() {
+			DefaultClientHandler handler = await Setup_Handle_OnlineSessionSkipped();
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo() { currentEventTime = 0 });
+			await handler.Handle(baseTimestamp.AddSeconds(1));
+			AssertState(handler, TestState.Idle());
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionSkippedTimeIncreasedOverLimit_IsIdle() {
+			DefaultClientHandler handler = await Setup_Handle_OnlineSessionSkipped();
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo() { currentEventTime = 20 });
+			await handler.Handle(baseTimestamp.AddSeconds(1));
+			AssertState(handler, TestState.Idle());
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionSkippedMissingSessionInfo_IsIdle() {
+			DefaultClientHandler handler = await Setup_Handle_OnlineSessionSkipped();
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync((SessionInfo)null);
+			await handler.Handle(baseTimestamp.AddSeconds(1));
+			AssertState(handler, TestState.Idle());
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo() { currentEventTime = 12 });
+			await handler.Handle(baseTimestamp.AddSeconds(2));
+			AssertState(handler, TestState.Idle());
+		}
+
+		[Fact]
+		public async Task Handle_OnlineSessionSkippedTimeIncreasedWithinLimit_IsWorking() {
+			DefaultClientHandler handler = await Setup_Handle_OnlineSessionSkipped();
+			lmuClient.Setup(x => x.GetSessionInfo()).ReturnsAsync(new SessionInfo() { currentEventTime = 11 });
+			await handler.Handle(baseTimestamp.AddSeconds(1));
+			AssertState(handler, TestState.OnlineWorking("s1"));
 		}
 	}
 }

@@ -37,6 +37,9 @@ namespace LMUSessionTracker.Common.Client {
 		private int lastPhaseCount;
 		private long lastUnixSeconds;
 		private int countSinceMajorInterval;
+		private DateTime lastTimestamp = DateTime.MinValue;
+		private double lastCurrentEventTime = -1;
+		private bool lastHadCurrentEventTime = false;
 
 		public ClientState State => state;
 		public ProtocolRole Role => role;
@@ -88,13 +91,38 @@ namespace LMUSessionTracker.Common.Client {
 					lastPhaseCount++;
 			}
 
+			bool skip = false;
+			if(!client.OverrideInterval && message.SessionInfo != null) {
+				// attempt to prevent sending data while still loading by detecting unusual time changes
+				if(lastHadCurrentEventTime && lastCurrentEventTime >= 0) {
+					double diffClock = (timestamp - lastTimestamp).TotalSeconds;
+					skip = message.SessionInfo.currentEventTime <= lastCurrentEventTime || message.SessionInfo.currentEventTime < 0;
+					if(!skip) {
+						double diffGame = message.SessionInfo.currentEventTime - lastCurrentEventTime;
+						if(Math.Abs(diffGame - diffClock) > 1)
+							skip = true;
+					}
+					if(client.TraceLogging && skip)
+						logger.LogTrace($"Skip {diffClock:N3} [{lastCurrentEventTime} to {message.SessionInfo.currentEventTime}]");
+				} else if(!lastHadCurrentEventTime) {
+					skip = true;
+					if(client.TraceLogging)
+						logger.LogTrace($"Skip -.- [{lastCurrentEventTime} to {message.SessionInfo.currentEventTime}]");
+				}
+			}
+			lastHadCurrentEventTime = message.SessionInfo != null;
+			if(lastHadCurrentEventTime) {
+				lastCurrentEventTime = message.SessionInfo.currentEventTime;
+				lastTimestamp = timestamp;
+			}
+
 			if(message.GameState == null || (
 				message.SessionInfo == null && (
 					state == ClientState.Idle ||
 					(message.MultiplayerJoinState == "JOIN_IDLE" && message.GameState.MultiStintState != "DISABLED") ||
 					(message.MultiplayerJoinState == "JOIN_JOINED_SERVER" && message.GameState.MultiStintState != "DISABLED")
 				)
-			)) {
+			) || skip) {
 				if(client.DebugMode)
 					await GetAllData(message);
 				return;
