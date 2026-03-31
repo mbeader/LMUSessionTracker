@@ -30,6 +30,7 @@
 		public bool inGarageStall { get; set; }
 		public double lapDistance { get; set; }
 		public double lapStartET { get; set; }
+		public int lapsBehindClassLeader { get; set; }
 		public int lapsBehindLeader { get; set; }
 		public int lapsBehindNext { get; set; }
 		public int lapsCompleted { get; set; }
@@ -50,12 +51,14 @@
 		public bool serverScored { get; set; }
 		public int slotID { get; set; }
 		public long steamID { get; set; }
+		public double timeBehindClassLeader { get; set; }
 		public double timeBehindLeader { get; set; }
 		public double timeBehindNext { get; set; }
 		public double timeIntoLap { get; set; }
 		public double trackEdge { get; set; }
 		public bool underYellow { get; set; }
 		public string upgradePack { get; set; }
+		public double veFraction { get; set; }
 		public string vehicleFilename { get; set; }
 		public string vehicleName { get; set; }
 	}

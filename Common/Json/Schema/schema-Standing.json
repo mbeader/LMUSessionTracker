@@ -105,6 +105,10 @@
 		"lapStartET": {
 			"type": "number"
 		},
+		"lapsBehindClassLeader": {
+			"type": "integer",
+			"minimum": 0
+		},
 		"lapsBehindLeader": {
 			"type": "integer",
 			"minimum": 0
@@ -174,6 +178,9 @@
 			"type": "integer",
 			"minimum": 0
 		},
+		"timeBehindClassLeader": {
+			"type": "number"
+		},
 		"timeBehindLeader": {
 			"type": "number"
 		},
@@ -194,6 +201,9 @@
 			"minLength": 32,
 			"maxLength": 32,
 			"pattern": "^[0-9a-fA-F]+$"
+		},
+		"veFraction": {
+			"type": "number"
 		},
 		"vehicleFilename": {
 			"type": "string"
@@ -234,6 +244,7 @@
 		"inGarageStall",
 		"lapDistance",
 		"lapStartET",
+		"lapsBehindClassLeader",
 		"lapsBehindLeader",
 		"lapsBehindNext",
 		"lapsCompleted",
@@ -254,12 +265,14 @@
 		"serverScored",
 		"slotID",
 		"steamID",
+		"timeBehindClassLeader",
 		"timeBehindLeader",
 		"timeBehindNext",
 		"timeIntoLap",
 		"trackEdge",
 		"underYellow",
 		"upgradePack",
+		"veFraction",
 		"vehicleFilename",
 		"vehicleName"
 	]

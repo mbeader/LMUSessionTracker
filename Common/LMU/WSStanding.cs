@@ -53,7 +53,7 @@ namespace LMUSessionTracker.Common.LMU {
 		public string vehicleClass { get; set; }
 		public string vehicleName { get; set; }
 		public string vehicleNumber { get; set; }
-		public double virtualEnergy { get; set; }
+		public double? virtualEnergy { get; set; }
 	}
 
 	/// <summary>

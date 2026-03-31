@@ -229,7 +229,7 @@ namespace LMUSessionTracker.Common.Client {
 					penalties = x.penalties,
 					slotID = x.slotID,
 					vehFilename = x.vehFilename,
-					virtualEnergy = x.virtualEnergy
+					virtualEnergy = x.virtualEnergy ?? -1
 				});
 			}
 			return null;

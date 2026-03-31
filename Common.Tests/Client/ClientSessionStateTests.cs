@@ -320,7 +320,7 @@ namespace LMUSessionTracker.Common.Tests.Client {
 
 		[Fact]
 		public void Filter_WSStandings_ReturnsAll() {
-			AssertHelpers.Equivalent(new() { new() { slotID = 0 } }, state.Filter(new WSMessageLiveStandings() { body = new() { new() { slotID = 0 } } }));
+			AssertHelpers.Equivalent(new() { new() { slotID = 0, virtualEnergy = -1 } }, state.Filter(new WSMessageLiveStandings() { body = new() { new() { slotID = 0 } } }));
 		}
 	}
 }

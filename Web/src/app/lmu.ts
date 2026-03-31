@@ -165,6 +165,7 @@ export interface Standing {
 	inGarageStall: boolean;
 	lapDistance: number;
 	lapStartET: number;
+	lapsBehindClassLeader: number;
 	lapsBehindLeader: number;
 	lapsBehindNext: number;
 	lapsCompleted: number;
@@ -185,12 +186,14 @@ export interface Standing {
 	serverScored: boolean;
 	slotID: number;
 	steamID: BigInt;
+	timeBehindClassLeader: number;
 	timeBehindLeader: number;
 	timeBehindNext: number;
 	timeIntoLap: number;
 	trackEdge: number;
 	underYellow: boolean;
 	upgradePack: string;
+	veFraction: number;
 	vehicleFilename: string;
 	vehicleName: string;
 }
