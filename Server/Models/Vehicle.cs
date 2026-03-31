@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LMUSessionTracker.Server.Models {
 	public class Vehicle {
-		private static readonly List<string> seriesNames = new List<string>() { "WEC2023", "WEC2024", "WEC2025", "ELMS2025" };
+		private static readonly List<string> seriesNames = new List<string>() { "WEC2023", "WEC2024", "WEC2025", "WEC2026", "ELMS2025" };
 		private static readonly List<string> classNames = new List<string>() { "Hypercar", "LMP2_ELMS", "LMP2", "LMP3", "GTE", "GT3" };
 
 		[Key, Required]

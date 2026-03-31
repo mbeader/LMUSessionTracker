@@ -35,12 +35,20 @@
 	background-image: url("../../../../public/brands/Brand=Corvette.svg");
 }
 
+.brand.brand-duqueine {
+	background-image: url("../../../../public/brands/Brand=Duqueine.svg");
+}
+
 .brand.brand-ferrari {
 	background-image: url("../../../../public/brands/Brand=Ferrari.svg");
 }
 
 .brand.brand-ford {
 	background-image: url("../../../../public/brands/Brand=Ford.svg");
+}
+
+.brand.brand-genesis {
+	background-image: url("../../../../public/brands/Brand=Genesis.svg");
 }
 
 .brand.brand-ginetta {

@@ -23,6 +23,7 @@ namespace LMUSessionTracker.Server.Services {
 			{ "Bahrain Outer Circuit", new(17, 357, 492) },
 			{ "Bahrain Paddock Circuit", new(9, 256, 490) },
 			{ "COTA National Circuit", new(16, 277, 428) },
+			{ "Circuit de Barcelona", new(8, 335, 678) },
 			{ "Circuit de Spa-Francorchamps Endurance", new(170, 603, 1156) },
 			{ "Circuit de Spa-Francorchamps", new(170, 603, 1157) },
 			{ "Circuit de la Sarthe Mulsanne", new(207, 586, 1751) },
@@ -33,10 +34,17 @@ namespace LMUSessionTracker.Server.Services {
 			{ "Lusail International Circuit", new(1029, 252, 659) },
 			{ "Lusail Short Circuit", new(1, 274, 551) },
 			{ "Monza Curva Grande Circuit", new(296, 695, 1056) },
+			{ "Paul Ricard - 1A", new(1113, 284, 657) },
+			{ "Paul Ricard - 1A-V2", new(1127, 285, 668) },
+			{ "Paul Ricard - 1A-V2-Short", new(997, 282, 654) },
+			{ "Paul Ricard - 3A", new(725, 130, 486) },
 			{ "Paul Ricard - ELMS", new(1127, 285, 666) },
 			{ "Sebring International Raceway", new(2, 431, 728) },
 			{ "Sebring School Circuit", new(269, 476, 584) },
 			{ "Silverstone Grand Prix Circuit - ELMS", new(1149, 290, 632) },
+			{ "Silverstone Grand Prix Circuit - WEC", new(633, 977, 289) },
+			{ "Silverstone International Circuit", new(1, 174, 462) },
+			{ "Silverstone National Circuit", new(2, 149, 357) },
 		};
 		private readonly ILogger<TrackMapService> logger;
 
@@ -113,13 +121,8 @@ namespace LMUSessionTracker.Server.Services {
 			track.S1 = new List<Point2D>();
 			track.S2 = new List<Point2D>();
 			track.S3 = new List<Point2D>();
-			int min = Math.Min(s1Index, Math.Min(s2Index, s3Index));
-			int sector = s1Index == min ? 1 : s2Index == min ? 2 : 3;
-			if(min != 0)
-				sector--;
-			if(sector == 0)
-				sector = 3;
-			int nextSector = sector == 3 ? s1Index : sector == 1 ? s2Index : s3Index;
+			int sector = 1;
+			int nextSector = s2Index;
 			for(int i = 0; i < track.Points.Count; i++) {
 				int curr = (s1Index + i) % track.Points.Count;
 				if(curr == nextSector) {

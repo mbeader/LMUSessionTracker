@@ -31,11 +31,17 @@ namespace LMUSessionTracker.Server.Tests.Tracking {
 			return map;
 		}
 
-		private string Sector(Point2D point) {
-			return point.X > 0 && point.Y >= 0 ? "SECTOR1" :  (point.X == 0 && point.Y > 0) || point.X < 0 ? "SECTOR2" : "SECTOR3";
+		private string Sector(Point2D point, int sectorOffset) {
+			int sector = ((point.X > 0 && point.Y >= 0 ? 1 : (point.X == 0 && point.Y > 0) || point.X < 0 ? 2 : 3) + sectorOffset) % 3;
+			if(sector == 1)
+				return "SECTOR1";
+			else if(sector == 2)
+				return "SECTOR2";
+			else
+				return "SECTOR3";
 		}
 
-		private List<List<Standing>> UnitCirclePath(int laps, bool skipEveryOther = false) {
+		private List<List<Standing>> UnitCirclePath(int laps, bool skipEveryOther = false, int sectorOffset = 0) {
 			List<List<Standing>> path = new List<List<Standing>>();
 			TrackMap map = UnitCircle();
 			for(int i = 0; i < laps; i++) {
@@ -48,7 +54,7 @@ namespace LMUSessionTracker.Server.Tests.Tracking {
 							vehicleFilename = "veh",
 							lapsCompleted = i,
 							lastLapTime = 60,
-							sector = Sector(map.Points[j]),
+							sector = Sector(map.Points[j], sectorOffset),
 							carPosition = new Position() { x = map.Points[j].X, z = map.Points[j].Y }
 						}
 					});
@@ -62,6 +68,20 @@ namespace LMUSessionTracker.Server.Tests.Tracking {
 			foreach(List<Standing> standings in UnitCirclePath(12))
 				builder.Update("s1", "track", standings);
 			trackMapService.Verify(x => x.SetMetadata("track", 0, 8, 24), Times.Once);
+		}
+
+		[Fact]
+		public void Update_UnitCircleIdenticalUnitCirclePathsStartInS2_DeterminesSectorMarkers() {
+			foreach(List<Standing> standings in UnitCirclePath(12, sectorOffset: 1))
+				builder.Update("s1", "track", standings);
+			trackMapService.Verify(x => x.SetMetadata("track", 24, 0, 8), Times.Once);
+		}
+
+		[Fact]
+		public void Update_UnitCircleIdenticalUnitCirclePathsStartInS3_DeterminesSectorMarkers() {
+			foreach(List<Standing> standings in UnitCirclePath(12, sectorOffset: 2))
+				builder.Update("s1", "track", standings);
+			trackMapService.Verify(x => x.SetMetadata("track", 8, 24, 0), Times.Once);
 		}
 
 		[Fact]
