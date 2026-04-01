@@ -7,6 +7,7 @@ namespace LMUSessionTracker.Core.Tracking {
 	public interface ManagementRespository {
 		public Task CreateSession(string sessionId, SessionInfo info, DateTime timestamp, bool online);
 		public Task UpdateSession(string sessionId, SessionInfo info, DateTime timestamp);
+		public Task LockSession(string sessionId, string clientId);
 		public Task CloseSession(string sessionId);
 		public Task UpdateCarStates(string sessionId, List<CarState> cars);
 		public Task UpdateChat(string sessionId, List<Chat> chat);

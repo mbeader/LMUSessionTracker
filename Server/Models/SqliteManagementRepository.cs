@@ -45,6 +45,17 @@ namespace LMUSessionTracker.Server.Models {
 			}
 		}
 
+		public async Task LockSession(string sessionId, string clientId) {
+			using SqliteContext context = await contextFactory.CreateDbContextAsync();
+			using(var transaction = await context.Database.BeginTransactionAsync()) {
+				Session session = await context.Sessions.SingleAsync(x => x.SessionId == sessionId);
+				session.IsLocked = true;
+				session.OwnerClientId = clientId;
+				await context.SaveChangesAsync();
+				await transaction.CommitAsync();
+			}
+		}
+
 		public async Task CloseSession(string sessionId) {
 			using SqliteContext context = await contextFactory.CreateDbContextAsync();
 			using(var transaction = await context.Database.BeginTransactionAsync()) {

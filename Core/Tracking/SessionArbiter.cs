@@ -139,8 +139,14 @@ namespace LMUSessionTracker.Core.Tracking {
 			await managementRepo.UpdateSession(session.SessionId, data.SessionInfo, now);
 			SessionUpdateResult updateResult = session.Update(updateContextFactory.Create<Session>(now, data.SessionInfo.currentEventTime), new SessionUpdate(data));
 			session.ResolveVehicles(vehService);
-			if(updateResult.EntrySlotsChanged)
+			if(updateResult.EntrySlotsChanged) {
+				if(!session.SingleClient) {
+					session.Lock();
+					await managementRepo.LockSession(session.SessionId, data.ClientId);
+					logger.LogInformation($"Client {client.ClientId} locked session {session.SessionId}");
+				}
 				await managementRepo.UpdateEntries(session.SessionId, session.Entries);
+			}
 			await managementRepo.UpdateLaps(session.SessionId, session.History.GetAllHistory());
 			await managementRepo.UpdateCarStates(session.SessionId, session.CarState.GetAllStates());
 			await managementRepo.UpdateChat(session.SessionId, session.Chat.NewMessages);
@@ -223,6 +229,10 @@ namespace LMUSessionTracker.Core.Tracking {
 			activeSessions.Add(session.SessionId, session);
 			bool isPrimary = session.RegisterClient(client.ClientId);
 			client.JoinSession(session, isPrimary);
+			if(!session.Online) {
+				session.Lock();
+				await managementRepo.LockSession(session.SessionId, data.ClientId);
+			}
 			logger.LogInformation($"New session created: {session.SessionId}");
 			if(data.SessionId == null)
 				logger.LogInformation($"Client {client.ClientId} joined session {session.SessionId} as {(isPrimary ? "primary" : "secondary")}");

@@ -6,6 +6,7 @@
 		Completion,
 		PhaseTransition,
 		Network,
-		EntryList
+		EntryList,
+		Locked
 	}
 }

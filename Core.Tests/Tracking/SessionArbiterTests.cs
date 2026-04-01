@@ -310,6 +310,24 @@ namespace LMUSessionTracker.Core.Tests.Tracking {
 		}
 
 		[Fact]
+		public async Task Receive_MultiClientSameSessionOnlineDataChangedEntryList_Accepts() {
+			AssertStatus(Status.ChangedPrimary(1), await Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			MultiplayerTeams teams2 = MultiplayerTeams();
+			teams2.teams.Add("utid1", new() { vehicle = "someotherveh" });
+			AssertStatus(Status.AcceptedPrimary(1), await Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = teams2 }));
+		}
+
+		[Fact]
+		public async Task Receive_MultiClientSameSessionOnlineDataChangedEntryListWithSecondary_CreatesOne() {
+			AssertStatus(Status.ChangedPrimary(1), await Receive(new() { ClientId = clientId, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			AssertStatus(Status.ChangedSecondary(1), await Receive(new() { ClientId = clientI2, SessionInfo = new(), MultiplayerTeams = MultiplayerTeams() }));
+			MultiplayerTeams teams2 = MultiplayerTeams();
+			teams2.teams.Add("utid1", new() { vehicle = "someotherveh" });
+			AssertStatus(Status.AcceptedPrimary(1), await Receive(new() { ClientId = clientId, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = teams2 }));
+			AssertStatus(Status.ChangedPrimary(2), await Receive(new() { ClientId = clientI2, SessionId = SessionId(1), SessionInfo = new(), MultiplayerTeams = teams2 }));
+		}
+
+		[Fact]
 		public async Task Receive_MultiClientSameSessionOnlineWithinFuzziness_CreatesOne() {
 			AssertStatus(Status.ChangedPrimary(1), await Receive(new() { ClientId = clientId, SessionInfo = new() { timeRemainingInGamePhase = 55, raceCompletion = new() { timeCompletion = 0.45 } }, MultiplayerTeams = MultiplayerTeams() }));
 			AssertStatus(Status.ChangedSecondary(1), await Receive(new() { ClientId = clientI2, SessionInfo = new() { timeRemainingInGamePhase = 60, raceCompletion = new() { timeCompletion = 0.40 } }, MultiplayerTeams = MultiplayerTeams() }));

@@ -12,6 +12,8 @@ namespace LMUSessionTracker.Server.Models {
 		public DateTime Timestamp { get; set; }
 		public bool IsOnline { get; set; }
 		public bool IsClosed { get; set; }
+		public bool IsLocked { get; set; }
+		public string OwnerClientId { get; set; }
 
 		public double EndEventTime { get; set; }
 		public string GameMode { get; set; }
@@ -97,6 +99,8 @@ namespace LMUSessionTracker.Server.Models {
 					chats.Add(chat.To());
 			}
 			Core.Tracking.Session session = Core.Tracking.Session.Create(SessionId, info, Timestamp, entries, carHistories, carStates, chats);
+			if(IsLocked)
+				session.Lock(OwnerClientId);
 			if(IsClosed)
 				session.Close();
 			return session;

@@ -29,6 +29,8 @@ namespace LMUSessionTracker.Core.Tracking {
 		public bool FirstUpdate { get; private set; } = true;
 		public bool Finished { get; private set; }
 		public bool Closed { get; private set; }
+		public string OwnerClientId { get; private set; }
+		public bool SingleClient { get; private set; }
 
 		private Session(string sessionId, SessionInfo info, DateTime timestamp, EntryList entries, List<CarHistory> history, List<CarState> carState, List<Chat> chat) {
 			SessionId = sessionId;
@@ -170,6 +172,9 @@ namespace LMUSessionTracker.Core.Tracking {
 				EntryList entries = new EntryList(data.Teams);
 				History.UpdateCars(entries);
 				entrySlotsChanged = Entries.Merge(entries);
+				if(entrySlotsChanged) {
+					Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(context.Logger, $"Slots changed");
+				}
 			}
 			return new SessionUpdateResult() { BestsChanged = bestsChanged, EntrySlotsChanged = entrySlotsChanged, CarStateChanges = carStateChanges };
 		}
@@ -182,6 +187,21 @@ namespace LMUSessionTracker.Core.Tracking {
 				clients.Add(PrimaryClientId);
 			clients.AddRange(SecondaryClientIds);
 			return clients;
+		}
+
+		public void Lock() {
+			//if(!SingleClient && PrimaryClientId != null) {
+			//	OwnerClientId = PrimaryClientId;
+			//	SingleClient = true;
+			//}
+			Lock(PrimaryClientId);
+		}
+
+		public void Lock(string clientId) {
+			if(!SingleClient && clientId != null && (!HasClient() || IsPrimary(clientId))) {
+				OwnerClientId = clientId;
+				SingleClient = true;
+			}
 		}
 
 		public void ResolveVehicles(VehicleService vehService) {
@@ -200,6 +220,8 @@ namespace LMUSessionTracker.Core.Tracking {
 				diff.Set(SessionDifference.Type, Type, info.session);
 			} else if(Online != (teams != null)) {
 				diff.Set(SessionDifference.Network, Online ? "online" : "offline", teams != null ? "online" : "offline");
+			} else if(SingleClient && OwnerClientId != clientId) {
+				diff.Set(SessionDifference.Locked, OwnerClientId, clientId);
 			} else {
 				bool isPrimary = IsPrimary(clientId);
 				bool completionOk = CompletionNotDecreased(info);
@@ -260,6 +282,7 @@ namespace LMUSessionTracker.Core.Tracking {
 		public Session Clone() {
 			Session session = Create(SessionId, LastInfo, Timestamp, Entries?.Reconstruct(), History.GetAllHistory().ConvertAll(x => x.Clone()), CarState.GetAllStates().ConvertAll(x => x.Clone()));
 			session.Update(UpdateContext<Session>.Create(LastUpdate, LastInfo.currentEventTime), new SessionUpdate() { Info = LastInfo, Standings = LastStandings, WSStandings = LastWSStandings });
+			session.Lock(OwnerClientId);
 			return session;
 		}
 
