@@ -13,6 +13,7 @@ namespace LMUSessionTracker.Core.Tracking {
 	public class SessionArbiter : ProtocolServer {
 		private static readonly TimeSpan pruneLimit = new TimeSpan(0, 20, 0);
 		private static readonly TimeSpan activeLimit = new TimeSpan(0, 10, 0);
+		private static readonly double clientTimestampLimit = 2;
 		private readonly ILogger<SessionArbiter> logger;
 		private readonly ManagementRespository managementRepo;
 		private readonly DateTimeProvider dateTimeProvider;
@@ -45,7 +46,7 @@ namespace LMUSessionTracker.Core.Tracking {
 
 		public async Task<ProtocolStatus> Receive(ProtocolMessage data) {
 			DateTime now = dateTimeProvider.UtcNow;
-			if(data?.ClientId == null)
+			if(data?.ClientId == null || Math.Abs((now - data.Timestamp).TotalSeconds) > clientTimestampLimit)
 				return Reject();
 			try {
 				await semaphore.WaitAsync();
