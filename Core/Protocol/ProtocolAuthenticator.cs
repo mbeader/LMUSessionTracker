@@ -16,7 +16,7 @@ namespace LMUSessionTracker.Core.Protocol {
 
 	public class DefaultProtocolAuthenticator : ProtocolAuthenticator {
 		private static readonly string ed25519prefix = "MCowBQYDK2VwAyEA";
-		private static readonly Version minVersion = new Version(0, 12, 0);
+		private static readonly Version minVersion = new Version(0, 13, 0);
 		private static readonly Version maxVersion = new Version(1, 0, 0);
 		private static readonly SignatureAlgorithm algorithm = SignatureAlgorithm.Ed25519;
 		private readonly ConcurrentDictionary<string, PublicKey> clientKeys = new ConcurrentDictionary<string, PublicKey>();

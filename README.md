@@ -65,8 +65,11 @@ as long as one exists, data will continue to be collected uninterrupted.
 
 ![Best laps](bestlaps.png)
 
-### Planned features
+### Possible future features
 
+* Session tracking
+	* Data
+		* Tire wear from connected secondaries
 * Accept data from rF2 plugin
 
 ## Client
@@ -129,10 +132,10 @@ Contains assets created by Studio 397.
 
 * Online
 	* Daily/Weekly/Special Events: supported
-	* Practice sessions: supported
+	* Practice sessions: supported (single-client only)
 	* Hosted: supported
 	* Championships: untested
-* Offline
+* Offline (single-client only)
 	* Race Weekend: supported
 	* Coop: untested
 
