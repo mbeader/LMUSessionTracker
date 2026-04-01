@@ -80,6 +80,11 @@
 									"glob": "sample.db",
 									"input": ".",
 									"output": "."
+								},
+								{
+									"glob": "tracks/*.json",
+									"input": ".",
+									"output": "."
 								}
 							],
 							"outputHashing": "all",

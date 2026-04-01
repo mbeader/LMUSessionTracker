@@ -331,7 +331,16 @@ export class StaticServerApiService implements ServerApiService {
 	}
 
 	getTrackMap(sessionId: string): Promise<TrackMap> {
-		return new Promise(resolve => resolve(new TrackMap()));
+		let session = this.repo.getSession(sessionId);
+		return new Promise(resolve => {
+			if (session)
+				fetch(`tracks/${session.trackName}.json`)
+					.then(res => res.json())
+					.then(res => resolve(new TrackMap(res)))
+					.catch(() => resolve(new TrackMap()));
+			else
+				resolve(new TrackMap())
+		});
 	}
 
 	getChat(sessionId: string): Promise<ChatViewModel> {
