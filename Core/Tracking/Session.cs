@@ -192,43 +192,31 @@ namespace LMUSessionTracker.Core.Tracking {
 			return Finished || (info != null && info.gamePhase == (int)GamePhase.Checkered);
 		}
 
-		public SessionDiff IsSameSession(SessionInfo info, MultiplayerTeams teams = null) {
-			SessionDiff diff = new SessionDiff() { SessionId = SessionId, Difference = SessionDifference.None, MessageFormat = "Expected: {0}. Actual {1}.", MessageParams = new object[2] };
+		public SessionDiff IsSameSession(string clientId, SessionInfo info, MultiplayerTeams teams = null) {
+			SessionDiff diff = new SessionDiff() { SessionId = SessionId };
 			if(Track != info.trackName) {
 				diff.Set(SessionDifference.Track, Track, info.trackName);
 			} else if(Type != info.session) {
 				diff.Set(SessionDifference.Type, Type, info.session);
+			} else if(Online != (teams != null)) {
+				diff.Set(SessionDifference.Network, Online ? "online" : "offline", teams != null ? "online" : "offline");
 			} else {
+				bool isPrimary = IsPrimary(clientId);
 				bool completionOk = CompletionNotDecreased(info);
-				bool currentTimeOk = IsWithinFuzziness(LastInfo.currentEventTime, info.currentEventTime);
-				bool remainingTimeOk = IsWithinFuzziness(LastInfo.timeRemainingInGamePhase, info.timeRemainingInGamePhase);
-				if(!completionOk && (!currentTimeOk || !remainingTimeOk))
+				bool currentTimeOk = IsWithinFuzziness(LastInfo.currentEventTime, info.currentEventTime, isPrimary);
+				bool remainingTimeOk = IsWithinFuzziness(LastInfo.timeRemainingInGamePhase, info.timeRemainingInGamePhase, isPrimary);
+				if(!completionOk && (!currentTimeOk || !remainingTimeOk)) {
 					diff.Set(SessionDifference.Completion,
 						(LastInfo.raceCompletion?.timeCompletion, LastInfo.currentEventTime, LastInfo.timeRemainingInGamePhase),
 						(info.raceCompletion?.timeCompletion, info.currentEventTime, info.timeRemainingInGamePhase));
-				else if(!IsValidPhaseTransition(info)) {
-					diff.Difference = SessionDifference.PhaseTransition;
-					diff.MessageFormat = "{0} to {1}{2}";
-					diff.MessageParams = new object[] { LastInfo.gamePhase, info.gamePhase, Finished ? "while finished" : "" };
+				}
+				if(!IsValidPhaseTransition(info)) {
+					diff.Set(SessionDifference.PhaseTransition, "{0} to {1}{2}", new object[] { LastInfo.gamePhase, info.gamePhase, Finished ? "while finished" : "" });
+				}
+				if(Entries == null || !Entries.HasAnyMatch(new EntryList(teams))) {
+					diff.Set(SessionDifference.EntryList, "Entrylist has no match");
 				}
 			}
-			if(diff.Difference == SessionDifference.None) {
-				if(Online != (teams != null)) {
-					diff.Set(SessionDifference.Network, Online ? "online" : "offline", teams != null ? "online" : "offline");
-				} else if(Entries == null || !Entries.HasAnyMatch(new EntryList(teams))) {
-					diff.Difference = SessionDifference.EntryList;
-					diff.MessageFormat = "Entrylist has no match";
-				}
-			}
-			//bool same = Track == info.trackName &&
-			//	Type == info.session && (
-			//		CompletionNotDecreased(info) || (
-			//			IsWithinFuzziness(LastInfo.currentEventTime, info.currentEventTime) &&
-			//			IsWithinFuzziness(LastInfo.timeRemainingInGamePhase, info.timeRemainingInGamePhase))) &&
-			//	IsValidPhaseTransition(info);
-			//if(!same || Online != (teams != null))
-			//	return false;
-			//return Entries.HasAnyMatch(new EntryList(teams));
 			return diff;
 		}
 
@@ -240,8 +228,8 @@ namespace LMUSessionTracker.Core.Tracking {
 			return last == -1 || curr == -1 || last <= curr;
 		}
 
-		private bool IsWithinFuzziness(double last, double curr) {
-			return Math.Abs(curr - last) <= fuzziness;
+		private bool IsWithinFuzziness(double last, double curr, bool isPrimary) {
+			return Math.Abs(curr - last) <= (isPrimary ? 1 : 2) * fuzziness;
 		}
 
 		/// <summary>
