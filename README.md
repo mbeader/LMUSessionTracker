@@ -1,10 +1,10 @@
 # LMUSessionTracker
 
 LMUSessionTracker is a distributed system that tracks live sessions in Le Mans Ultimate (LMU).
+
 Without a dedicated server and with the growing significance of official endurance events,
-there is a need for a system that uses game clients to provide data for something
-that was once ubiquitous to self-hosted game servers.
-LMUSessionTracker is more than just live timing, it is a collaborative means for the aggregation and display of session data.
+there is a need for a system that uses game clients to provide data for what
+was once ubiquitous to self-hosted game servers.
 
 This repo contains a [client](#client) and a [server](#server).
 
@@ -22,7 +22,8 @@ While LMUSessionTracker itself does not require WebAssembly, the demo instance d
 ### Goal
 
 The objective of this project is to achieve a unified and consistent view of live team endurance races.
-To achieve this, each member of a team can run the client which will send session data to the server.
+To achieve this, each member of a team should run the client,
+which will send session data to the server while the member is in-game.
 Regardless of any members role or whether they are currently connected to the server,
 as long as one exists, data will continue to be collected uninterrupted.
 
