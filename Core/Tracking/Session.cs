@@ -172,9 +172,6 @@ namespace LMUSessionTracker.Core.Tracking {
 				EntryList entries = new EntryList(data.Teams);
 				History.UpdateCars(entries);
 				entrySlotsChanged = Entries.Merge(entries);
-				if(entrySlotsChanged) {
-					Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(context.Logger, $"Slots changed");
-				}
 			}
 			return new SessionUpdateResult() { BestsChanged = bestsChanged, EntrySlotsChanged = entrySlotsChanged, CarStateChanges = carStateChanges };
 		}
