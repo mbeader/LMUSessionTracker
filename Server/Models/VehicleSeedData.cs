@@ -56,6 +56,7 @@ namespace LMUSessionTracker.Server.Models {
 			new Vehicle("193_25_ZIGF7CD1F92", "Ziggo Sport Tempesta 2025 #193:LM", "193", "Ziggo Sport Tempesta", "Le Mans", "Ferrari_296_LMGT3", "GT3", "WEC2025"),
 			new Vehicle("199_25_AO_2FC07322", "AO by TF 2025 #199:LM", "199", "AO by TF", "Le Mans", "LMP2", "Oreca_07", "WEC2025"),
 			new Vehicle("19_24_IRONF799DF42", "Lamborghini Iron Lynx 2024 #19:LM", "19", "Lamborghini Iron Lynx", "Le Mans", "Hypercar", "Lamborghini_SC63", "WEC2024"),
+			new Vehicle("19_26_GENE467AE018", "Genesis Magma Racing 2026 #19:WEC", "19", "Genesis Magma Racing", "WEC", "Genesis_GMR001", "Hypercar", "WEC2025"),
 			new Vehicle("20_24_WRT_211F986E", "BMW M Team WRT 2024 #20:LM", "20", "BMW M Team WRT", "LM Art Car", "BMW_M_Hybrid", "Hypercar", "WEC2024"),
 			new Vehicle("20_24_WRT_2E6B4FF3", "BMW M Team WRT 2024 #20:PL", "20", "BMW M Team WRT", "WEC 2", "BMW_M_Hybrid", "Hypercar", "WEC2024"),
 			new Vehicle("20_24_WRT_7492C369", "BMW M Team WRT 2024 #20:EC", "20", "BMW M Team WRT", "WEC", "BMW_M_Hybrid", "Hypercar", "WEC2024"),
@@ -544,6 +545,7 @@ namespace LMUSessionTracker.Server.Models {
 					AddDrivers(drivers, "193_25_ZIGF7CD1F92", "Eddie Cheever", "", "", "Chris Froggatt", "GB", "Silver", "Jonathan Hui", "", "Bronze");
 					AddDrivers(drivers, "199_25_AO_2FC07322", "PJ Hyett", "US", "Bronze", "Louis Deletraz", "CH", "Gold", "Dane Cameron", "US", "Platinum");
 					AddDrivers(drivers, "19_24_IRONF799DF42", "Matteo Cairoli", "IT", "Platinum", "Andrea Caldarelli", "IT", "Platinum", "Romain Grosjean", "FR", "Platinum");
+					AddDrivers(drivers, "19_26_GENE467AE018", "Paul-Loup Chatin", "FR", "Gold", "Mathieu Jaminet", "FR", "Platinum", "Daniel Juncadella", "ES", "Platinum");
 					AddDrivers(drivers, "20_24_WRT_211F986E", "Sheldon van der Linde", "ZA", "Platinum", "Robin Frijns", "NL", "Platinum", "Rene Rast", "DE", "Platinum");
 					AddDrivers(drivers, "20_24_WRT_2E6B4FF3", "Sheldon van der Linde", "ZA", "Platinum", "Robin Frijns", "NL", "Platinum", "Rene Rast", "DE", "Platinum");
 					AddDrivers(drivers, "20_24_WRT_7492C369", "Sheldon van der Linde", "ZA", "Platinum", "Robin Frijns", "NL", "Platinum", "Rene Rast", "DE", "Platinum");
