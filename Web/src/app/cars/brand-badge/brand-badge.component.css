@@ -15,6 +15,10 @@
 	content: " ";
 }
 
+.brand.brand-adess {
+	background-image: url("../../../../public/brands/Brand=ADESS.svg");
+}
+
 .brand.brand-alpine {
 	background-image: url("../../../../public/brands/Brand=Alpine.svg");
 }
