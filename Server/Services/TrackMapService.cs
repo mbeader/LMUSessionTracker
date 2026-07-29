@@ -29,6 +29,7 @@ namespace LMUSessionTracker.Server.Services {
 			{ "Circuit de la Sarthe Mulsanne", new(207, 586, 1751) },
 			{ "Circuit de la Sarthe", new(206, 586, 1751) },
 			{ "Circuit of the Americas", new(5, 337, 774) },
+			{ "Daytona International Speedway Road Course", new(913, 9, 504) },
 			{ "Fuji Speedway Classic", new(122, 495, 712) },
 			{ "Fuji Speedway", new(123, 496, 721) },
 			{ "Lusail International Circuit", new(1029, 252, 659) },
@@ -45,6 +46,7 @@ namespace LMUSessionTracker.Server.Services {
 			{ "Silverstone Grand Prix Circuit - WEC", new(633, 977, 289) },
 			{ "Silverstone International Circuit", new(1, 174, 462) },
 			{ "Silverstone National Circuit", new(2, 149, 357) },
+			{ "WeatherTech Raceway Laguna Seca", new(45, 327, 615) },
 		};
 		private readonly ILogger<TrackMapService> logger;
 

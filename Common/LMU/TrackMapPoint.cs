@@ -5,9 +5,9 @@
 		public double Z { get; set; }
 		/// <summary>
 		/// 0 - track
-		/// 1 - pit/paddock (including entry+exit)
-		/// >=3 - grid (pair of points)
-		/// >=107 - pit (pair of points)
+		/// 1 - pit road/paddock (including entry+exit)
+		/// >=2 - grid (pair of points)
+		/// >=106 - pit box (pair of points)
 		/// </summary>
 		public int Type { get; set; }
 	}
