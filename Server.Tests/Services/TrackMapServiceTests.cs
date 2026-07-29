@@ -25,6 +25,9 @@ namespace LMUSessionTracker.Server.Tests.Services {
 			Assert.Equal(297, ac.S2.Count);
 			Assert.Equal(450, ac.S3.Count);
 			Assert.Equal(1176, ac.S1.Count + ac.S2.Count + ac.S3.Count);
+			Assert.Equal(2, ac.Pits.Count);
+			Assert.Equal(273, ac.Pits[0].Count);
+			Assert.Equal(73, ac.Pits[1].Count);
 		}
 
 		[Fact]
@@ -37,6 +40,8 @@ namespace LMUSessionTracker.Server.Tests.Services {
 			Assert.Equal(342, ac.S2.Count);
 			Assert.Equal(517, ac.S3.Count);
 			Assert.Equal(1174, ac.S1.Count + ac.S2.Count + ac.S3.Count);
+			Assert.Single(ac.Pits);
+			Assert.Equal(248, ac.Pits[0].Count);
 		}
 
 		[Fact]
@@ -49,6 +54,8 @@ namespace LMUSessionTracker.Server.Tests.Services {
 			Assert.Equal(486, ac.S2.Count);
 			Assert.Equal(344, ac.S3.Count);
 			Assert.Equal(1174, ac.S1.Count + ac.S2.Count + ac.S3.Count);
+			Assert.Single(ac.Pits);
+			Assert.Equal(275, ac.Pits[0].Count);
 		}
 	}
 }

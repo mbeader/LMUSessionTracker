@@ -139,7 +139,7 @@ namespace LMUSessionTracker.Server.Tracking {
 			int minIndex = -1;
 			for(int i = 0; i < points.Count; i++) {
 				Point2D point = points[i];
-				double dist = Math.Sqrt(Math.Pow(marker.X - point.X, 2) + Math.Pow(marker.Y - point.Y, 2));
+				double dist = Point2D.Distance(point, marker);
 				if(dist < min) {
 					min = dist;
 					minIndex = i;

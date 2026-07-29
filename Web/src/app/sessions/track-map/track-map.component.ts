@@ -244,7 +244,9 @@ class TrackMapService {
 		if (this.track.length > 0)
 			this.processTrack(this.track);
 		if (this.track.pits.length > 0)
-			this.processPoints(this.track.pits);
+			for (let i = 0; i < this.track.pits.length; i++)
+				if (this.track.pits[i].length > 0)
+					this.processPoints(this.track.pits[i]);
 		this.calcScaleFactor(this.dx, this.dy);
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.drawTrack();
@@ -329,7 +331,9 @@ class TrackMapService {
 		if (this.track && (this.track.length ?? 0) > 0) {
 			this.staticcanvas.context.lineWidth = 15;
 			if (this.track.pits.length > 0)
-				this.drawSector(this.track.pits, this.track.pits[this.track.pits.length - 1], '#343a40');
+				for (let i = 0; i < this.track.pits.length; i++)
+					if (this.track.pits[i].length > 0)
+						this.drawSector(this.track.pits[i], this.track.pits[i][this.track.pits[i].length - 1], '#343a40');
 			if (this.track.hasSectors()) {
 				this.drawSector(this.track.s1, this.track.s2[0], '#084298');
 				this.drawSector(this.track.s2, this.track.s3[0], '#0f5132');

@@ -11,6 +11,10 @@ using System.Text.Json;
 
 namespace LMUSessionTracker.Server.Services {
 	public class TrackMapService {
+		/// <summary>
+		/// Max distance between successive points of pit path to detect non-contiguous layouts: Daytona, Laguna Seca, Sebring 
+		/// </summary>
+		private static readonly double maxPitPathSegment = 10.0;
 		private static readonly string baseresname = "LMUSessionTracker.Server.Tracks.";
 		private static readonly ConcurrentDictionary<string, TrackMap> tracks = new ConcurrentDictionary<string, TrackMap>();
 		private static readonly Dictionary<string, TrackMapMetadata> trackMetadata = new Dictionary<string, TrackMapMetadata>() {
@@ -79,7 +83,7 @@ namespace LMUSessionTracker.Server.Services {
 		}
 
 		private static TrackMap ProcessPoints(List<TrackMapPoint> points) {
-			TrackMap track = new TrackMap() { Points = new List<Point2D>(), Pits = new List<Point2D>() };
+			TrackMap track = new TrackMap() { Points = new List<Point2D>(), Pits = new List<List<Point2D>>() { new List<Point2D>() } };
 			if(points.Count > 0) {
 				track.MaxX = points[0].X;
 				track.MaxY = points[0].Y;
@@ -93,7 +97,10 @@ namespace LMUSessionTracker.Server.Services {
 						track.Points.Add(point);
 						break;
 					case 1:
-						track.Pits.Add(point);
+						if(track.Pits[^1].Count > 0)
+							if(Point2D.Distance(track.Pits[^1][^1], point) > maxPitPathSegment)
+								track.Pits.Add(new List<Point2D>());
+						track.Pits[^1].Add(point);
 						break;
 					default:
 						continue;

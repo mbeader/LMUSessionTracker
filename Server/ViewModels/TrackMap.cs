@@ -3,7 +3,7 @@
 namespace LMUSessionTracker.Server.ViewModels {
 	public class TrackMap {
 		public List<Point2D> Points { get; set; }
-		public List<Point2D> Pits { get; set; }
+		public List<List<Point2D>> Pits { get; set; }
 		public List<Point2D> S1 { get; set; }
 		public List<Point2D> S2 { get; set; }
 		public List<Point2D> S3 { get; set; }

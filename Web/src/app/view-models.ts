@@ -180,7 +180,7 @@ export class Point2D {
 
 export class TrackMap {
 	points: Point2D[] = [];
-	pits: Point2D[] = [];
+	pits: Point2D[][] = [[]];
 	s1: Point2D[] = [];
 	s2: Point2D[] = [];
 	s3: Point2D[] = [];
