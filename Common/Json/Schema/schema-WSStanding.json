@@ -23,6 +23,9 @@
 		"bestLapTimeS2": {
 			"type": "number"
 		},
+		"calculatedRaceLaps": {
+			"type": "number"
+		},
 		"compoundNames": {
 			"type": "array",
 			"items": {

@@ -7,6 +7,7 @@ namespace LMUSessionTracker.Common.LMU {
 		public double bestLapTime { get; set; }
 		public double bestLapTimeS1 { get; set; }
 		public double bestLapTimeS2 { get; set; }
+		public double calculatedRaceLaps { get; set; }
 		public List<string> compoundNames { get; set; }
 		public string countLapFlag { get; set; }
 		public double currentLapTimeS1 { get; set; }

@@ -16,6 +16,9 @@
 		"closeestWeatherNode": {
 			"$ref": "/LMUSessionTracker/Schema/WeatherNode"
 		},
+		"exitGarageState": {
+			"enum": [ "None", "PitBoxCountdown" ]
+		},
 		"gamePhase": {
 			"enum": [ "GPHASE_BEFORE", "GPHASE_FORMATION", "GPHASE_GREEN", "GPHASE_CHECKERED" ]
 		},
