@@ -12,7 +12,8 @@ using System.Text.Json;
 namespace LMUSessionTracker.Server.Services {
 	public class TrackMapService {
 		/// <summary>
-		/// Max distance between successive points of pit path to detect non-contiguous layouts: Daytona, Laguna Seca, Sebring 
+		/// Max distance between successive points of pit path to detect non-contiguous layouts:
+		/// Daytona, Laguna Seca, Long Beach, Road Atlanta, Sebring 
 		/// </summary>
 		private static readonly double maxPitPathSegment = 10.0;
 		private static readonly string baseresname = "LMUSessionTracker.Server.Tracks.";
@@ -36,8 +37,10 @@ namespace LMUSessionTracker.Server.Services {
 			{ "Daytona International Speedway Road Course", new(913, 9, 504) },
 			{ "Fuji Speedway Classic", new(122, 495, 712) },
 			{ "Fuji Speedway", new(123, 496, 721) },
+			{ "Grand Prix of Long Beach", new(601, 192, 419) },
 			{ "Lusail International Circuit", new(1029, 252, 659) },
 			{ "Lusail Short Circuit", new(1, 274, 551) },
+			{ "Michelin Raceway Road Atlanta", new(6, 123, 512) },
 			{ "Monza Curva Grande Circuit", new(296, 695, 1056) },
 			{ "Paul Ricard - 1A", new(1113, 284, 657) },
 			{ "Paul Ricard - 1A-V2", new(1127, 285, 668) },

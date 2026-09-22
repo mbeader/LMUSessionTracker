@@ -83,7 +83,7 @@
 			"type": "string"
 		},
 		"gamePhase": {
-			"enum": [ "FORMATION", "GREEN" ]
+			"enum": [ "FORMATION", "GREEN", "INVALID" ]
 		},
 		"hasFocus": {
 			"type": "boolean"
