@@ -96,7 +96,7 @@ namespace LMUSessionTracker.Server.Models {
 			new Vehicle("21_25_AFCO36CA1D94", "Vista AF Corse 2025 #21:WEC", "21", "Vista AF Corse", "WEC", "Ferrari_296_LMGT3", "GT3", "WEC2025"),
 			new Vehicle("21_25_AFCO72EE38BF", "Vista AF Corse 2025 #21:LM", "21", "Vista AF Corse", "Le Mans", "Ferrari_296_LMGT3", "GT3", "WEC2025"),
 			new Vehicle("21_25_UNIT606848DD", "United Autosports #21:ELMS25", "21", "United Autosports", "ELMS", "ELMS2025", "LMP2_ELMS", "Oreca_07"),
-			new Vehicle("21_26_AFCO31910023", "Vista AF Corsa 2026 #21:LM", "21", "Vista AF Corsa", "Le Mans", "Ferrari_296_LMGT3", "GT3", "WEC2026"),
+			new Vehicle("21_26_AFCO31910023", "Vista AF Corse 2026 #21:LM", "21", "Vista AF Corse", "Le Mans", "Ferrari_296_LMGT3", "GT3", "WEC2026"),
 			new Vehicle("21_26_AFCO95641716", "Vista AF Corse 2026 #21:WEC", "21", "Vista AF Corse", "WEC", "Ferrari_296_LMGT3", "GT3", "WEC2026"),
 			new Vehicle("21_26_UNIT55791918", "United Autosports #21:ELMS26", "21", "United Autosports", "ELMS", "ELMS2026", "LMP2_ELMS", "Oreca_07"),
 			new Vehicle("21_AFCORSE19F69870", "AF Corse #21:MZ", "21", "AF Corse", "WEC #3", "Ferrari_488_GTE_EVO", "GTE", "WEC2023"),
@@ -262,6 +262,9 @@ namespace LMUSessionTracker.Server.Models {
 			new Vehicle("46_25_ADES81662442", "ADESS Racing Team 2025 #46:LMU2", "46", "ADESS Racing Team 2025", "LMU2", "ADESS_AD25_LMP3", "ELMS2025", "LMP3"),
 			new Vehicle("46_25_WRT_596F2E7B", "Team WRT 2025 #46:WEC", "46", "Team WRT", "WEC", "BMW_M4_LMGT3", "GT3", "WEC2025"),
 			new Vehicle("46_25_WRT_874F6E78", "Team WRT 2025 #46:LM", "46", "Team WRT", "LM", "BMW_M4_LMGT3", "GT3", "WEC2025"),
+			new Vehicle("46_26_ADES20619231", "ADESS Racing Team 2026 #46:LMU1", "46", "ADESS Racing Team 2026", "LMU1", "ADESS_AD25_LMP3", "ELMS2026", "LMP3"),
+			new Vehicle("46_26_ADES51981969", "ADESS Racing Team 2026 #46:ELMS", "46", "ADESS Racing Team 2026", "ELMS", "ADESS_AD25_LMP3", "ELMS2026", "LMP3"),
+			new Vehicle("46_26_ADES81662442", "ADESS Racing Team 2026 #46:LMU2", "46", "ADESS Racing Team 2026", "LMU2", "ADESS_AD25_LMP3", "ELMS2026", "LMP3"),
 			new Vehicle("47_24_COOL3477D827", "Cool Racing 2024 #47:LM", "47", "Cool Racing", "Le Mans", "LMP2", "Oreca_07", "WEC2024"),
 			new Vehicle("47_25_CLX_44FB70E0", "CLX Motorsport #47:ELMS25", "47", "CLX Motorsport", "ELMS", "ELMS2025", "LMP2_ELMS", "Oreca_07"),
 			new Vehicle("47_26_CLX_33830875", "CLX Motorsport #47:ELMS26", "47", "CLX Motorsport", "ELMS", "ELMS2026", "LMP2_ELMS", "Oreca_07"),
@@ -310,7 +313,7 @@ namespace LMUSessionTracker.Server.Models {
 			new Vehicle("54_24_AFCO6DAA6EF0", "Vista AF Corse 2024 #54:LM", "54", "Vista AF Corse", "Le Mans", "Ferrari_296_LMGT3", "GT3", "WEC2024"),
 			new Vehicle("54_25_AFCO859850D7", "Vista AF Corse 2025 #54:LM", "54", "Vista AF Corse", "Le Mans", "Ferrari_296_LMGT3", "GT3", "WEC2025"),
 			new Vehicle("54_25_AFCOC5FA7500", "Vista AF Corse 2025 #54:WEC", "54", "Vista AF Corse", "WEC", "Ferrari_296_LMGT3", "GT3", "WEC2025"),
-			new Vehicle("54_26_AFCO54087704", "Vista AF Corsa 2026 #54:LM", "54", "Vista AF Corsa", "Le Mans", "Ferrari_296_LMGT3", "GT3", "WEC2026"),
+			new Vehicle("54_26_AFCO54087704", "Vista AF Corse 2026 #54:LM", "54", "Vista AF Corse", "Le Mans", "Ferrari_296_LMGT3", "GT3", "WEC2026"),
 			new Vehicle("54_26_AFCO96652607", "Vista AF Corse 2026 #54:WEC", "54", "Vista AF Corse", "WEC", "Ferrari_296_LMGT3", "GT3", "WEC2026"),
 			new Vehicle("54_26_HIGH62031041", "High Class Racing 2026 #54:ELMS", "54", "High Class Racing", "ELMS", "ELMS2026", "GT3", "Porsche_911_GT3_R_LMGT3"),
 			new Vehicle("54_26_HIGH91914076", "High Class Racing 2026 #54:ELMS2", "54", "High Class Racing", "ELMS 2", "ELMS2026", "GT3", "Porsche_911_GT3_R_LMGT3"),
@@ -596,9 +599,9 @@ namespace LMUSessionTracker.Server.Models {
 			new Vehicle("397_25ELMS_AMV", "AMR GT3 ELMS Custom Team 2025 #397", "397", "Custom Team", "Custom", "AMR_LMGT3", "GT3", "ELMS2025"),
 			new Vehicle("397_25ELMS_Z06GT3R", "Z06GT3R ELMS Custom Team 2025 #397", "397", "Custom Team", "Custom", "Corvette_Z06_LMGT3R", "GT3", "ELMS2025"),
 			new Vehicle("397_25ELMS_296GT3", "296GT3 ELMS Custom Team 2025 #397", "397", "Custom Team", "Custom", "Ferrari_296_LMGT3", "GT3", "ELMS2025"),
-			new Vehicle("397_25ELMS_MCLAREN", "McLaren ELMS Custom Team 2025 #397", "397", "Custom Team", "Custom", "McLaren_720S_LMGT3_Evo", "GT3", "ELMS2025"), // removed v1.4.2 2026-09-22
-			new Vehicle("397_25ELMS_AMG", "Mercedes AMG ELMS Custom Team 2025 #397", "397", "Custom Team", "Custom", "Mercedes_AMG_GT3", "GT3", "ELMS2025"), // removed v1.4.2 2026-09-22
-			new Vehicle("397_25ELMS_911GT3R", "911GT3R ELMS Custom Team 2025 #397", "397", "Custom Team", "Custom", "Porsche_911_GT3_R_LMGT3", "GT3", "ELMS2025"), // removed v1.4.2 2026-09-22
+			new Vehicle("397_25ELMS_MCLAREN", "McLaren ELMS Custom Team 2025 #397", "397", "Custom Team", "Custom", "McLaren_720S_LMGT3_Evo", "GT3", "ELMS2025"),
+			new Vehicle("397_25ELMS_AMG", "Mercedes AMG ELMS Custom Team 2025 #397", "397", "Custom Team", "Custom", "Mercedes_AMG_GT3", "GT3", "ELMS2025"),
+			new Vehicle("397_25ELMS_911GT3R", "911GT3R ELMS Custom Team 2025 #397", "397", "Custom Team", "Custom", "Porsche_911_GT3_R_LMGT3", "GT3", "ELMS2025"),
 			new Vehicle("397_25ELMS_ORECA07", "Oreca 07 ELMS Custom Team 2025 #397", "397", "Custom Team", "Custom", "Oreca_07", "LMP2_ELMS", "ELMS2025"),
 			new Vehicle("397_25_AD25", "ADESS AD25 LMP3 Custom Team 2025 #397", "397", "Custom Team", "Custom", "ADESS_AD25_LMP3", "LMP3", "ELMS2025"),
 			new Vehicle("397_25_D09P3", "Duqueine D09 P3 Custom Team 2025 #397", "397", "Custom Team", "Custom", "Duqueine_D09_P3", "LMP3", "ELMS2025"),
@@ -964,6 +967,9 @@ namespace LMUSessionTracker.Server.Models {
 				AddDrivers(drivers, "46_25_ADES81662442", "Dennis Jordan", "", "", "Michael Borda", "", "", "Marek Lesniak", "", "");
 				AddDrivers(drivers, "46_25_WRT_596F2E7B", "Ahmad Al Harthy", "OM", "Bronze", "Valentino Rossi", "IT", "Silver", "Kelvin van der Linde", "ZA", "Platinum");
 				AddDrivers(drivers, "46_25_WRT_874F6E78", "Ahmad Al Harthy", "OM", "Bronze", "Valentino Rossi", "IT", "Silver", "Kelvin van der Linde", "ZA", "Platinum");
+				AddDrivers(drivers, "46_26_ADES20619231", "Mirza Rustemović", "", "", "Alex Sawczuk", "", "", "Will Bennett", "", "");
+				AddDrivers(drivers, "46_26_ADES51981969", "Alex Coutie", "", "", "Paulo Matias", "", "", "Stephen Haley", "", "");
+				AddDrivers(drivers, "46_26_ADES81662442", "Dennis Jordan", "", "", "Michael Borda", "", "", "Marek Lesniak", "", "");
 				AddDrivers(drivers, "47_24_COOL3477D827", "Naveen Rao", "US", "Bronze", "Matt Bell", "GB", "Gold", "Frederik Vesti", "DK", "Platinum");
 				AddDrivers(drivers, "47_25_CLX_44FB70E0", "Pipo Derani", "BR", "Platinum", "Manuel Espírito Santo", "PT", "Silver", "Enzo Fittipaldi", "BR", "Gold");
 				AddDrivers(drivers, "47_26_CLX_33830875", "Georgios Kolovos", "GR", "Bronze", "Charles Milesi", "FR", "Gold", "Ferdinand Habsburg", "AT", "Gold");
